@@ -244,6 +244,12 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
       </div>
 
       <div id = "entity-ui-customisation-options-container-${entity_id}" class = "entity-ui-container options-container">
+        <div class = "options-tab ${entity_id}">
+          <span id = "${entity_id}-fill" class = "options-tab-header active">Fill</span>
+          <span id = "${entity_id}-stroke" class = "options-tab-header">Stroke</span>
+          <span id = "${entity_id}-other" class = "options-tab-header">Other</span>
+          <hr>
+        </div>
       </div>
     </div>
 
@@ -569,6 +575,34 @@ function populateEntityColourWheel (arg0_entity_id) {
   };
 }
 
+function populateEntityOptions (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var fill_el = document.getElementById(`${entity_id}-fill`);
+  var other_el = document.getElementById(`${entity_id}-other`);
+  var stroke_el = document.getElementById(`${entity_id}-stroke`);
+
+  window[`${entity_id}_page`] = "fill"; //Set default page
+
+  fill_el.onclick = function () {
+    removeActiveFromEntityOptions(entity_id);
+    fill_el.setAttribute("class", fill_el.getAttribute("class") + " active");
+    switchEntityTab(entity_id, "fill");
+  };
+  stroke_el.onclick = function () {
+    removeActiveFromEntityOptions(entity_id);
+    stroke_el.setAttribute("class", stroke_el.getAttribute("class") + " active");
+    switchEntityTab(entity_id, "stroke");
+  };
+  other_el.onclick = function () {
+    removeActiveFromEntityOptions(entity_id);
+    other_el.setAttribute("class", other_el.getAttribute("class") + " active");
+    switchEntityTab(entity_id, "other");
+  };
+}
+
 function populateEntityTooltips (arg0_entity_id) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
@@ -603,6 +637,20 @@ function populateEntityTooltips (arg0_entity_id) {
     content: "Jump to Date",
     arrow: false
   });
+}
+
+function removeActiveFromEntityOptions (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var fill_el = document.getElementById(`${entity_id}-fill`);
+  var other_el = document.getElementById(`${entity_id}-other`);
+  var stroke_el = document.getElementById(`${entity_id}-stroke`);
+
+  fill_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
+  other_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
+  stroke_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
 }
 
 function setEntityColourWheelCursor (arg0_entity_id, arg1_colour) {
@@ -678,6 +726,26 @@ function setEntityColourWheelCursor (arg0_entity_id, arg1_colour) {
 
     colour_cursor_el.style.visibility = "visible";
   });
+}
+
+function switchEntityTab (arg0_entity_id, arg1_tab) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var tab = arg1_tab;
+
+  //Declare local instance variables
+  var left_offset = 0.125; //In vw
+  var tab_width = 3.25; //In vw
+  var underline_el = document.querySelector(`.options-tab[class~='${entity_id}'] > hr`);
+
+  window[`${entity_id}_page`] = tab; //Set new page
+
+  if (tab == "fill")
+    underline_el.style.left = `${left_offset}vw`;
+  if (tab == "stroke")
+    underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
+  if (tab == "other")
+    underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
 }
 
 //Field reaction

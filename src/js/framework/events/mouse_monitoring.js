@@ -8,6 +8,7 @@ map.on("popupopen", function (e) {
 
       populateEntityBio(entity_id);
       populateEntityColourWheel(entity_id);
+      populateEntityOptions(entity_id);
       populateTimelineGraph(entity_id);
 
       //Initialise tooltips

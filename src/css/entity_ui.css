@@ -452,6 +452,37 @@
   margin: 0px;
 }
 
+/* -- Container styling: Customisation Options -- */
+.options-tab-header {
+  display: inline-block;
+  width: 3.25vw;
+
+  color: white;
+  font-family: "Barlow";
+  font-size: 0.75vw;
+  font-weight: 300;
+  text-align: center;
+  text-transform: uppercase;
+
+  padding-bottom: 0.2vw;
+}
+.options-tab > hr {
+  position: relative;
+
+  border: none;
+  border-bottom: 3px solid rgb(140, 200, 240);
+  left: 0.125vw;
+  width: 3vw;
+  margin: 0;
+
+  transition: left 1s ease;
+}
+
+/* -- Container styling: Customisation Options Animations -- */
+.options-tab-header:hover {
+  cursor: pointer;
+}
+
 /* -- Container styling: Actions -- */
 
 #entity-ui-actions-container tr td span {
