@@ -109,6 +109,7 @@
 
 /* -- Container styling: Animations -- */
 .entity-ui-container.hidden {
+  margin: 0px;
   max-height: 0px;
   overflow-y: auto;
   padding-bottom: 0px !important;
@@ -129,7 +130,7 @@
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.7);
   margin-bottom: 4px;
-  max-width: calc(100% - (2.25vw + 6px)*var(--entity-ui-header-buttons));
+  max-width: calc(100% - (2.5vw + 6px)*var(--entity-ui-header-buttons));
 }
 #entity-ui-header-container span, #entity-ui-header input {
   vertical-align: middle;
@@ -229,6 +230,10 @@
 .entity-ui-container.bio {
   max-height: 10vh;
   overflow-y: auto;
+}
+.entity-ui-container.bio.hidden {
+  margin: 0px;
+  max-height: 0px;
 }
 .timeline-bio-table tr:not(.no-select):hover {
   background-color: var(--selection-colour);
@@ -341,7 +346,7 @@
 
 /* -- Container styling: Customisation -- */
 
-#customisation-top-parent {
+.customisation-top-parent {
   display: flex;
 }
 .entity-ui-container.colour-container {
@@ -354,6 +359,11 @@
 
   padding: 12px;
 }
+.entity-ui-container.customisation-top-parent {
+  background: none;
+  padding: 0px;
+  width: calc(20vw + 24px);
+}
 .entity-ui-container.options-container {
   height: 7vw;
   min-width: calc(13vw - 30px - 12px) !important;
@@ -361,6 +371,10 @@
 
   margin-left: 6px;
   padding: 12px;
+}
+.hidden.customisation-top-parent {
+  opacity: 0;
+  margin: 0px;
 }
 
 /* -- Container styling: Customisation Colour Wheel -- */
@@ -379,6 +393,11 @@
   border-radius: 50%;
   height: 3.25vw;
   width: 3.25vw;
+
+  opacity: 1;
+}
+.colour-picker-container img {
+  opacity: 1;
 }
 .colour-picker-hue {
   position: absolute;

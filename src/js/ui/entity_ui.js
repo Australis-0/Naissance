@@ -212,7 +212,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
       </div>
     </div>
 
-    <div id = "customisation-top-parent">
+    <div id = "customisation-top-parent-${entity_id}" class = "entity-ui-container customisation-top-parent">
       <div id = "entity-ui-customisation-colour-ui-container" class = "entity-ui-container colour-container">
         <div id = "entity-ui-customisation-colour-picker-container-${entity_id}" class = "colour-picker-container">
           <img id = "colour-picker-hue-${entity_id}" class = "colour-picker-hue" src = "gfx/interface/colour_wheel.png">
@@ -414,6 +414,8 @@ function minimiseUI (arg0_element, arg1_tab) {
     entity_id = entity_id[entity_id.length - 1];
 
   var actions_container = document.getElementById("entity-ui-actions-container");
+  var customisation_container = document.getElementById(`customisation-top-parent-${entity_id}`);
+  var description_container = document.getElementById(`entity-ui-customisation-description-container-${entity_id}`);
   var timeline_bio_container = document.getElementById(`entity-ui-timeline-bio-container-${entity_id}`);
   var timeline_graph_container = document.getElementById(`entity-ui-timeline-graph-container-${entity_id}`);
 
@@ -424,6 +426,11 @@ function minimiseUI (arg0_element, arg1_tab) {
     //Check tab to collapse
     if (tab == "actions")
       actions_container.setAttribute("class", actions_container.getAttribute("class") + " hidden");
+    if (tab == "customisation") {
+      customisation_container.setAttribute("class", customisation_container.getAttribute("class") + " hidden");
+
+      description_container.setAttribute("class", description_container.getAttribute("class") + " hidden");
+    }
     if (tab == "timeline") {
       timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class") + " hidden");
 
@@ -435,6 +442,11 @@ function minimiseUI (arg0_element, arg1_tab) {
     //Check tab to uncollapse
     if (tab == "actions")
       actions_container.setAttribute("class", actions_container.getAttribute("class").replace(" hidden", ""));
+    if (tab == "customisation") {
+      customisation_container.setAttribute("class", customisation_container.getAttribute("class").replace(" hidden", ""));
+
+      description_container.setAttribute("class", description_container.getAttribute("class").replace(" hidden", ""));
+    }
     if (tab == "timeline") {
       timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class").replace(" hidden", ""));
 
