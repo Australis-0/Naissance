@@ -1,0 +1,66 @@
+html,head,body {
+  margin: 0px;
+  height: 100%;
+}
+input {
+  color: white;
+  font-family: "Barlow";
+  font-weight: 300;
+}
+td {
+  display: flex;
+  align-items: center;
+}
+
+/* -- Global display classes -- */
+.display-none, .instant-display-none {
+  display: none;
+}
+.hidden {
+  visibility: hidden;
+}
+
+/* -- Global styling classes -- */
+.icon.small {
+  height: 1vh;
+  width: 1vh;
+}
+.negative {
+  filter: invert(1);
+}
+.no-select {
+  user-select: none;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* -- Text styling -- */
+.small-header {
+  font-size: 0.5vw;
+  text-transform: uppercase;
+}
+
+/* -- Tooltip styling -- */
+.tippy-box {
+  background-color: rgba(0, 0, 0, 0.85);
+  border-radius: 0px;
+  bottom: 0.25vh;
+  padding: 0.25vh;
+
+  color: white;
+  font-family: "Raleway";
+  font-weight: 300;
+  font-size: 1vh;
+}
+
+/* -- CSS Variables -- */
+:root {
+  /* -- Entity UI: Timeline/Data Graph -- */
+  --canvas-height: 4vw;
+  --canvas-x-axis-margin-right: 12px;
+  --canvas-y-axis-margin-left: calc(0.2vw);
+  --entity-ui-header-buttons: 3;
+  --graph-label-font-size: calc(0.5vw);
+  --selection-colour: rgba(255, 255, 255, 0.3);
+}

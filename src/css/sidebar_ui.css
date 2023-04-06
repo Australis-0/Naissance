@@ -1,0 +1,204 @@
+/* -- Sidebar Styling -- */
+.sidebar-container {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  height: calc(100vh - 10px);
+  width: 25vw;
+
+  z-index: 1;
+}
+
+/* -- Date Styling -- */
+.date-container {
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+
+  height: 20vh;
+  width: 100%;
+
+  background-color: rgba(0, 0, 0, 0.85);
+}
+.date-error-ui {
+  font-family: "Barlow";
+  font-size: 1vh;
+  font-weight: 300;
+
+  color: white;
+  text-align: left;
+  margin-left: 1vw;
+}
+.date-header {
+  padding-top: 10px;
+
+  font-family: "Karla";
+  font-weight: 900;
+  font-size: 2vh;
+
+  color: white;
+  text-transform: uppercase;
+}
+.date-header-line {
+  width: 1.5vw;
+  border: 1px solid white;
+}
+.full-date-container input, .full-date-container select, .full-date-container {
+  background: none;
+  border: none;
+
+  font-size: 3vh;
+  font-family: "Barlow Condensed";
+  font-weight: 700;
+  text-align: center;
+
+  color: white;
+}
+.full-date-container input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+.full-date-container input#year-input {
+  max-width: 6vh;
+}
+.full-date-container input {
+  background: none;
+  border: none;
+
+  font-size: 3vh;
+  font-family: "Barlow Condensed";
+  font-weight: 700;
+  text-align: center;
+
+  max-width: 14vh;
+
+  color: white;
+  -webkit-appearance: none;
+  text-align-last: center;
+}
+.full-date-container input#day-input {
+  max-width: 6vh;
+}
+.full-date-container select {
+  -webkit-appearance: none;
+}
+.full-date-container select > option {
+  background-color: black;
+  font-size: 1.5vh;
+  padding: 0.15vw;
+}
+.full-clock-container {
+  font-family: "Slabo 27px";
+  font-size: 1.25vh;
+  color: white;
+  margin-top: 0.5vh;
+
+  text-align: center;
+}
+.full-clock-container input {
+  background: none;
+  border: none;
+  max-width: 2vh;
+
+  font-family: "Slabo 27px";
+  font-size: 1.5vh;
+  text-align: center;
+  color: white;
+}
+
+/* -- Hierarchy Styling-- */
+.hierarchy-body-container {
+  margin-left: 15px;
+  margin-top: 15px;
+}
+.hierarchy-container {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+
+  height: calc(80vh - 32.5px);
+  width: 100%;
+
+  background-color: rgba(0, 0, 0, 0.85);
+}
+.hierarchy-elements-container {
+  color: white;
+  font-family: "Barlow";
+  font-weight: 300;
+}
+.hierarchy-elements-container div.group:not(:empty), .hierarchy-elements-container div > .entity {
+  padding-inline-start: 1vw;
+  padding-inline-end: 0.12vw;
+}
+.hierarchy-elements-container > div.group {
+  padding-inline-start: 0vw !important;
+}
+.hierarchy-elements-container .group > input {
+  font-weight: 700;
+}
+
+.hierarchy-header {
+  padding-top: 10px;
+
+  font-family: "Karla";
+  font-weight: 900;
+  font-size: 3vh;
+
+  color: white;
+  text-transform: uppercase;
+}
+.hierarchy-header-line {
+  border: 1px solid white;
+  background-color: white;
+
+  margin-left: 2px;
+  margin-right: 90%;
+}
+
+/* -- Hiearchy item styling -- */
+.hierarchy-elements-container div > input {
+  padding-left: 0.2vw;
+  padding-right: 0.2vw;
+
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
+  width: 90%;
+}
+.hierarchy-elements-container div:not(.hover) > img {
+  visibility: hidden;
+}
+.hierarchy-elements-container div > img {
+  float: right;
+  right: 2.25vw;
+  margin-top: 0.125vh;
+  position: absolute;
+
+  height: 16px;
+  width: 16px;
+}
+.hierarchy-elements-container div > img:hover {
+  cursor: pointer;
+}
+
+/* -- Hierarchy layer styling -- */
+.hierarchy-elements-container .layer {
+  padding-left: 0.25vw;
+}
+.hierarchy-elements-container .layer.selected {
+  border-left: 3px solid rgb(60, 170, 240);
+}
+
+/* -- Hierarchy functionality styling -- */
+.hierarchy-elements-container div > input {
+  pointer-events: none;
+}
+
+/* -- Hierarchy animation styling -- */
+.hierarchy-elements-container .group.hover input, .hierarchy-elements-container .layer.hover input {
+  background-color: var(--selection-colour);
+}
+.hierarchy-elements-container .hover:not(.group):not(.layer) > input {
+  background-color: var(--selection-colour);
+}
+.hierarchy-elements-container div:hover {
+  cursor: grab;
+}

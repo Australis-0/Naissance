@@ -1,0 +1,563 @@
+function createEntityElement (arg0_layer, arg1_entity_id) {
+  //Convert from parameters
+  var layer = arg0_layer;
+  var entity_id = arg1_entity_id;
+
+  //Declare local instance variables
+  var entity_obj = getEntity(entity_id, layer);
+
+  if (entity_obj) {
+    var header_el = document.createElement("input");
+    var local_el = document.createElement("div");
+
+    local_el.setAttribute("class", "entity");
+    local_el.setAttribute("id", entity_obj.options.className);
+    local_el.setAttribute("onclick", `editSidebarElement();`);
+
+    header_el.setAttribute("onkeyup", "updateAllGroups(true);");
+    header_el.value = (entity_obj.options.entity_name) ? entity_obj.options.entity_name : `Unnamed Polity`;
+
+    //Append all formatted elements
+    local_el.appendChild(header_el);
+
+    //Return statement
+    return local_el;
+  }
+}
+
+function createGroup (arg0_do_not_display, arg1_parent_group_id) { //[WIP]
+  //Convert from parameters
+  var do_not_display = arg0_do_not_display;
+  var parent_group_id = arg1_parent_group_id;
+
+  //Declare local instance variables
+  var group_id = generateGroupID();
+  var group_obj = {
+    name: "New Group",
+    parent_group: (parent_group_id) ? parent_group_id : undefined
+  };
+  var sidebar_el = document.getElementById("hierarchy");
+
+  var selected_layer_el = sidebar_el.querySelector(`[id='${selected_layer}']`);
+
+  window[`${selected_layer}_groups`][group_id] = group_obj;
+
+  //Create actual UI element
+  var group_el = createGroupElement(selected_layer, group_id);
+
+  //If group_obj.parent_group is not defined, we know we're creating it directly in a layer
+  if (!group_obj.parent_group) {
+    var all_first_layer_entities = selected_layer_el.querySelectorAll(`.layer > .entity`);
+    var all_first_layer_groups = selected_layer_el.querySelectorAll(`.layer > .group`);
+
+    (all_first_layer_groups.length > 0) ?
+      all_first_layer_groups[all_first_layer_groups.length - 1].after(group_el) :
+      (all_first_layer_entities.length > 0) ?
+        all_first_layer_entities[0].before(group_el) :
+        selected_layer_el.append(group_el);
+  } else {
+    //Assign to subgroups element
+    var subgroups_el = sidebar_el.querySelector(`[id='${parent_group_id}-subgroups']`);
+
+    if (subgroups_el)
+      subgroups_el.append(group_el);
+  }
+
+  //Refresh sidebar
+  refreshSidebar();
+
+  //Focus on newly created group
+  var actual_group_el = selected_layer_el.querySelectorAll(`[id='${group_id}'].group > input`);
+
+  if (actual_group_el.length > 0)
+    actual_group_el[0].focus();
+}
+
+function createGroupElement (arg0_layer, arg1_group_id) {
+  //Convert from parameters
+  var layer = arg0_layer;
+  var group_id = arg1_group_id;
+
+  //Declare local instance variables
+  var ctx_menu_el = document.createElement("img");
+  var header_el = document.createElement("input");
+  var local_el = document.createElement("div");
+  var local_entities_el = document.createElement("div");
+  var local_groups = window[`${layer}_groups`];
+  var local_layer = window[`${layer}_layer`];
+  var local_subgroups_el = document.createElement("div");
+
+  var local_group = local_groups[group_id];
+
+  //Set element formatting
+  ctx_menu_el.setAttribute("class", "group-context-menu-icon");
+  ctx_menu_el.setAttribute("draggable", "false");
+  ctx_menu_el.setAttribute("src", "./gfx/interface/context_menu_icon.png");
+
+  local_el.setAttribute("class", "group")
+  local_el.setAttribute("id", group_id);
+  local_el.setAttribute("onmouseout", "updateSidebarHover();");
+  local_el.setAttribute("onmouseover", "updateSidebarHover();");
+  local_el.setAttribute("onclick", `editSidebarElement();`);
+
+  local_entities_el.setAttribute("id", `${group_id}-entities`);
+  local_entities_el.setAttribute("class", `entities`);
+  local_subgroups_el.setAttribute("id", `${group_id}-subgroups`);
+  local_subgroups_el.setAttribute("class", `subgroups`);
+
+  //Make sure local_group exists
+  if (local_group) {
+    //Add header_el to local_el
+    header_el.setAttribute("onkeyup", "updateAllGroups(true);");
+    header_el.value = local_group.name;
+
+    //Append all entities
+    if (local_group.entities)
+      for (var i = 0; i < local_group.entities.length; i++)
+        local_entities_el.appendChild(
+          createEntityElement(layer, local_group.entities[i])
+        );
+
+    //Append local_subgroups_el, local_entities_el to local_el
+    local_el.appendChild(header_el);
+    local_el.appendChild(ctx_menu_el);
+
+    local_el.appendChild(local_subgroups_el);
+    local_el.appendChild(local_entities_el);
+
+    //Return statement
+    return local_el;
+  }
+}
+
+function editSidebarElement () {
+  //Declare local instance variables
+  var name_field_el = document.querySelectorAll(`div:hover > input`);
+
+  if (name_field_el.length > 0)
+    name_field_el[name_field_el.length - 1].focus();
+}
+
+function generateGroupID () {
+  //Declare local instance variables
+  var sidebar_el = document.getElementById("hierarchy");
+
+  //While loop to find ID, just in-case of conflicting random ID's:
+  while (true) {
+    var id_taken = false;
+    var local_id = generateRandomID();
+
+    //Check to see if ID is already taken in sidebar
+    var identical_groups_el = sidebar_el.querySelectorAll(`[id='${local_id}']`);
+
+    if (identical_groups_el.length == 0) {
+      return local_id;
+      break;
+    }
+  }
+}
+
+function getRecursiveGroupElement (arg0_layer, arg1_group_id, arg2_el) {
+  //Convert from parameters
+  var layer = arg0_layer;
+  var group_id = arg1_group_id;
+  var element = (arg2_el) ? arg2_el : createGroupElement(layer, group_id);
+
+  //Declare local instance variables
+  var local_groups = window[`${layer}_groups`];
+
+  var all_local_groups = Object.keys(local_groups);
+  var local_group = local_groups[group_id];
+
+  //Only keep going if group has subgroups
+
+  if (local_group)
+    if (local_group.subgroups)
+      if (local_group.subgroups.length > 0)
+        for (var i = 0; i < local_group.subgroups.length; i++) {
+          var local_subgroup = local_groups[local_group.subgroups[i]];
+          var local_subgroup_el = getRecursiveGroupElement(layer, local_group.subgroups[i]);
+
+          //Append everything else
+          if (local_subgroup_el)
+            element.querySelector(`[id='${group_id}-subgroups']`).appendChild(local_subgroup_el);
+        }
+
+  //Return statement
+  return element;
+}
+
+function getUngroupedEntities (arg0_layer) {
+  //Convert from parameters
+  var layer = arg0_layer;
+
+  //Declare local instance variables
+  var local_groups = window[`${layer}_groups`];
+  var local_layer = window[`${layer}_layer`];
+
+  var all_local_groups = Object.keys(local_groups);
+  var grouped_entities = [];
+  var ungrouped_entities = [];
+
+  //Iterate over all_local_groups to push to grouped_entities
+  for (var i = 0; i < local_groups.length; i++) {
+    var local_group = local_groups[all_local_groups[x]];
+
+    if (local_group.entities)
+      for (var x = 0; x < local_group.entities.length; x++)
+        if (!grouped_entities.includes(local_group.entities[x]))
+          grouped_entities.push(local_group.entities[x]);
+  }
+
+  //Iterate over all local_layer elements, check against grouped_entities
+  for (var i = 0; i < local_layer.length; i++)
+    if (!grouped_entities.includes(local_layer[i].options.className))
+      ungrouped_entities.push(local_layer[i].options.className);
+
+  //Return statement
+  return ungrouped_entities;
+}
+
+function onSidebarDragEnd (arg0_event) {
+  //Convert from parameters
+  var e = arg0_event;
+
+  //Declare local instance variables
+  var element_obj = e.item;
+  var target_obj = e.to;
+
+  //Check for dragged element class type
+  if (target_obj.getAttribute("class")) {
+    var target_id = target_obj.getAttribute("id");
+    var target_parent = target_obj.parentElement;
+
+    //Improper group location handling
+    if (element_obj.getAttribute("class").includes("group"))
+      //Move to subgroups if the element is not already there
+      if (!target_id.includes("-subgroups")) {
+        try {
+          var subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
+
+          //Make sure we're after the layer header field
+          if (element_obj.nextElementSibling.getAttribute("class").includes("layer-input")) {
+            target_obj.querySelector(".layer > input").after(element_obj);
+          } else {
+            var properly_moved = false;
+
+            //Make sure to before/prepend since we're dealing with groups
+            if (target_obj && !target_obj.getAttribute("class").includes("layer")) {
+                target_obj.before(element_obj);
+
+                properly_moved = true;
+              }
+
+            //If a subgroups element was detected, we should be inside a group container - prepend to subcontainer instead
+            if (subgroups_el && !properly_moved)
+              if (subgroups_el.id.includes("-subgroups"))
+                subgroups_el.prepend(element_obj);
+          }
+        } catch {
+          //Now we know we're inside of an entity (improper location)
+          var subgroups_el = target_obj.parentElement;
+          var properly_moved = false;
+          var test_el = target_obj.parentElement;
+
+          //Layer case handling
+          if (target_obj.getAttribute("class").includes("layer")) {
+            var all_ungrouped_entities = target_obj.querySelectorAll(".layer > .entity");
+
+            (all_ungrouped_entities.length > 0) ?
+              all_ungrouped_entities[0].before(element_obj) :
+              target_obj.append(element_obj);
+
+            properly_moved = true;
+          }
+
+          if (!properly_moved) {
+            //First-layer case handling
+            if (subgroups_el.id != "hierarchy") {
+              subgroups_el = subgroups_el.parentElement;
+              test_el = subgroups_el.querySelector(`[id='${subgroups_el.id}-subgroups']`);
+            }
+
+            //Append instead of prepend since entities go last
+            target_obj.append(element_obj);
+          }
+        }
+
+        //Postmortem test
+        {
+          var element_parent = element_obj.parentElement;
+
+          //Entity handling
+          if (element_parent.getAttribute("class").includes("entity")) {
+            //Move it out of the entity div first
+            element_parent.before(element_obj);
+          }
+
+          //Group handling
+          if (
+            !element_parent.getAttribute("class").includes("-subgroups") &&
+            element_parent.getAttribute("class").includes("group")
+          ) {
+            var subgroups_el = element_parent.querySelector(".subgroups");
+
+            if (subgroups_el)
+              try {
+                subgroups_el.append(element_obj);
+              } catch {}
+          }
+
+          //Keep moving it upwards until it's finally above all the entities
+          while (true) {
+            //Recursive immediate sibling entity testing
+            var keep_moving = false;
+            var previous_sibling = element_obj.previousSibling;
+
+            if (previous_sibling)
+              if (previous_sibling.getAttribute("class").includes("entity")) {
+                previous_sibling.before(element_obj);
+
+                keep_moving = true;
+              }
+
+            if (!keep_moving)
+              break;
+          }
+        }
+      }
+
+    //Improper entity location handling
+    if (element_obj.getAttribute("class").includes("entity"))
+      if (!target_id.includes("-entities")) {
+        var entities_el = target_parent.querySelector(`[id='${target_id}-entities']`);
+
+        if (!entities_el)
+          entities_el = target_parent.querySelector(`[id='${target_parent.id}-entities']`);
+
+        (target_id != "hierarchy" && entities_el) ?
+          entities_el.append(element_obj) :
+          target_obj.append(element_obj);
+      }
+  }
+
+  //Update group and entity belonging by checking parent
+  var element_id = element_obj.id;
+  var group_element = element_obj.parentElement.parentElement;
+
+  //Entity handling
+  if (element_obj.getAttribute("class").includes("entity"))
+    moveEntityToGroup(element_id, group_element.id);
+  if (element_obj.getAttribute("class").includes("group"))
+    moveGroupToGroup(element_id, group_element.id);
+}
+
+function refreshSidebar () {
+  //Declare local instance variables
+  var sidebar_el = document.getElementById("hierarchy");
+
+  //Create all layer elements
+  for (var i = 0; i < layers.length; i++) {
+    var layer_el = sidebar_el.querySelectorAll(`[id='${layers[i]}']`);
+
+    //Create a new layer container element if only if it doesn't already exist
+    if (layer_el.length == 0) {
+      var local_header_el = document.createElement("input");
+      var local_layer_el = document.createElement("div");
+
+      local_layer_el.setAttribute("id", layers[i]);
+      local_layer_el.setAttribute("class", "layer");
+      local_layer_el.setAttribute("onclick", `selectLayer('${layers[i]}');`);
+
+      //Append header
+      local_header_el.setAttribute("class", "layer-input");
+
+      local_header_el.value = layers[i];
+      local_layer_el.appendChild(local_header_el);
+
+      //Append to sidebar_el
+      sidebar_el.appendChild(local_layer_el);
+    }
+  }
+
+  //Iterate over all window.layers
+  for (var i = 0; i < layers.length; i++) {
+    var local_groups = window[`${layers[i]}_groups`];
+    var local_layer = window[`${layers[i]}_layer`];
+    var local_layer_el = sidebar_el.querySelector(`[id='${layers[i]}']`);
+
+    var all_local_groups = Object.keys(local_groups);
+    var first_layer_groups = [];
+    var ungrouped_entities = getUngroupedEntities(layers[i]);
+
+    //Check for first layer groups
+    for (var x = 0; x < all_local_groups.length; x++) {
+      var local_group = local_groups[all_local_groups[x]];
+
+      //Check if local_group has parent_group. If not, this is a first layer group
+      if (!local_group.parent_group)
+        first_layer_groups.push(all_local_groups[x]);
+    }
+
+    //Initialise first layer group HTML with entities
+    for (var x = 0; x < first_layer_groups.length; x++) {
+      var local_group_el = getRecursiveGroupElement(layers[i], first_layer_groups[x]);
+
+      if (!local_layer_el.querySelector(`[id='${first_layer_groups[x]}']`))
+        local_layer_el.appendChild(local_group_el);
+    }
+
+    //Append ungrouped entities to end of list
+    for (var x = 0; x < ungrouped_entities.length; x++) {
+      var local_entity_el = createEntityElement(layers[i], ungrouped_entities[x]);
+
+      if (!local_layer_el.querySelector(`[id='${ungrouped_entities[x]}']`))
+        local_layer_el.appendChild(local_entity_el);
+    }
+  }
+
+  //Make sidebar draggable
+  var all_listings = document.querySelectorAll("#hierarchy div");
+
+  for (var i = 0; i < all_listings.length; i++)
+    Sortable.create(all_listings[i], {
+      animation: 350,
+      group: "hierarchy",
+      fallbackOnBody: true,
+      filter: ".layer:not(.layer div)",
+      swapThreshold: 0.65,
+
+      onEnd: function (e) {
+        onSidebarDragEnd(e);
+      }
+    });
+
+  Sortable.create(sidebar_el, {
+    animation: 350,
+    group: "hierarchy",
+    fallbackOnBody: true,
+    swapThreshold: 0.65,
+
+    onEnd: function (e) {
+      onSidebarDragEnd(e);
+    }
+  });
+
+  //Select current selected layer
+  selectLayer(selected_layer);
+}
+
+function selectLayer (arg0_layer) {
+  //Convert from parameters
+  var layer = arg0_layer;
+
+  //Declare local instance variables
+  var sidebar_el = document.getElementById("hierarchy");
+
+  var all_selected_layers = sidebar_el.querySelectorAll(`.layer.selected`);
+  var selected_layer = sidebar_el.querySelectorAll(`[id='${layer}']`);
+
+  //Deselect all currently selected layers
+  for (var i = 0; i < all_selected_layers.length; i++)
+    all_selected_layers[i].setAttribute("class",
+      all_selected_layers[i].getAttribute("class").replace(" selected", "")
+    );
+
+  //Select current layer
+  if (selected_layer.length > 0) {
+    selected_layer[0].setAttribute("class",
+      selected_layer[0].getAttribute("class") + " selected"
+    );
+    selected_layer = layer;
+  }
+}
+
+function updateAllGroups (arg0_do_not_refresh) {
+  //Convert from parameters
+  var do_not_refresh = arg0_do_not_refresh;
+
+  //Iterate over all layers
+  for (var i = 0; i < layers.length; i++)
+    updateGroups(layers[i], do_not_refresh);
+}
+
+function updateGroups (arg0_layer, arg1_do_not_refresh) { //[WIP] - Add layer elements
+  //Convert from parameters
+  var layer = arg0_layer;
+  var do_not_refresh = arg1_do_not_refresh;
+
+  //Declare local instance variables
+  var first_layer_groups = [];
+  var groups_obj = {};
+  var sidebar_el = document.getElementById("hierarchy");
+
+  var all_groups = document.querySelectorAll("div.group");
+
+  //Iterate over all_groups
+  for (var i = 0; i < all_groups.length; i++) {
+    var all_subelements = all_groups[i].children;
+    var group_obj = {};
+    var local_entities = [];
+    var local_id = all_groups[i].getAttribute("id");
+    var local_subgroups = [];
+
+    var local_entities_el = all_groups[i].querySelector(`[id='${local_id}-entities']`);
+    var local_subgroups_el = all_groups[i].querySelector(`[id='${local_id}-subgroups']`);
+
+    //Apply name
+    for (var x = 0; x < all_subelements.length; x++)
+      if (all_subelements[x].tagName == "INPUT")
+        group_obj.name = all_subelements[x].value;
+
+    //Apply parent_group
+    if (all_groups[i].parentElement)
+      if (all_groups[i].parentElement.parentElement) {
+        var parent_group_id = all_groups[i].parentElement.parentElement.getAttribute("id");
+
+        if (parent_group_id != "hierarchy")
+          group_obj.parent_group = parent_group_id;
+      }
+
+    //Format local_entities
+    if (local_entities_el) {
+      var all_local_entities = local_entities_el.children;
+
+      for (var x = 0; x < all_local_entities.length; x++)
+        local_entities.push(all_local_entities[x].getAttribute("id"));
+    }
+
+    //Format local_subgroups
+    if (local_subgroups_el) {
+      var all_local_subgroups = local_subgroups_el.children;
+
+      for (var x = 0; x < all_local_subgroups.length; x++)
+        local_subgroups.push(all_local_subgroups[x].getAttribute("id"));
+    }
+
+    //Add local_entities and local_subgroups if they exist
+    if (local_subgroups.length > 0)
+      group_obj.subgroups = local_subgroups;
+    if (local_entities.length > 0)
+      group_obj.entities = local_entities;
+
+    if (local_subgroups.length == 0)
+      first_layer_groups.push(local_id);
+
+    //Add to groups_obj
+    groups_obj[local_id] = group_obj;
+  }
+
+  //Set window[<layer>_groups] as groups_obj; refreshSidebar();
+  window[`${layer}_groups`] = groups_obj;
+
+  if (!do_not_refresh)
+    refreshSidebar();
+}
+
+//Button handlers
+document.getElementById("hierarchy-create-new-group").onclick = function () {
+  createGroup();
+};
+
+//Initialise sidebar functions
+refreshSidebar();
