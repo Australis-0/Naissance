@@ -237,7 +237,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
             <span class = "opacity-range-container">
               <span class = "small-header">Opacity</span>
-              <input type = "range" min = "0" max = "100" value = "100" id = "colour-picker-opacity-range-${entity_id}" class = "colour-picker-opacity-range">
+              <input type = "range" min = "0" max = "100" value = "50" id = "colour-picker-opacity-range-${entity_id}" class = "colour-picker-opacity-range">
             </span>
           </span>
         </div>
@@ -561,6 +561,8 @@ function populateEntityColourWheel (arg0_entity_id) {
       r_el.value = pixel[0];
       g_el.value = pixel[1];
       b_el.value = pixel[2];
+
+      setEntityColour(entity_id);
     });
   };
 
@@ -571,9 +573,13 @@ function populateEntityColourWheel (arg0_entity_id) {
     //Set brightness opacity
     colour_brightness_el.style.opacity = `${1 - brightness_value*0.01}`;
   });
+  onRangeChange(opacity_el, function (e) {
+    setEntityColour(entity_id);
+  });
 
   //RGB listeners
   r_el.onchange = function () {
+    console.log("changed!");
     this.value = Math.max(Math.min(this.value, 255), 0);
     setEntityColourWheelCursor(entity_id, [r_el.value, g_el.value, b_el.value]);
   };
@@ -665,10 +671,42 @@ function removeActiveFromEntityOptions (arg0_entity_id) {
   stroke_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
 }
 
-function setEntityColourWheelCursor (arg0_entity_id, arg1_colour) {
+function setEntityColour (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var b_el = document.getElementById(`${entity_id}-b`);
+  var g_el = document.getElementById(`${entity_id}-g`);
+  var entity_obj = getEntity(entity_id);
+  var opacity_el = document.querySelector(`#colour-picker-opacity-range-${entity_id}`);
+  var r_el = document.getElementById(`${entity_id}-r`);
+
+  var b = parseInt(b_el.value);
+  var g = parseInt(g_el.value);
+  var r = parseInt(r_el.value);
+
+  var current_colour = RGBToHex(r, g, b);
+  var current_tab = window[`${entity_id}_page`];
+
+  //Set entity fill colour
+  if (current_tab == "fill")
+    entity_obj.setStyle({
+      fillColor: current_colour,
+      fillOpacity: opacity_el.value/100
+    });
+  if (current_tab == "stroke")
+    entity_obj.setStyle({
+      color: current_colour,
+      opacity: opacity_el.value/100
+    });
+}
+
+function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_change) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var colour = arg1_colour;
+  var do_not_change = arg2_do_not_change;
 
   //Declare local instance variables
   var brightness_el = document.querySelector(`#colour-picker-brightness-range-${entity_id}`);
@@ -738,6 +776,9 @@ function setEntityColourWheelCursor (arg0_entity_id, arg1_colour) {
 
     colour_cursor_el.style.visibility = "visible";
   });
+
+  //Set entity colour
+  setEntityColour(entity_id);
 }
 
 function switchEntityTab (arg0_entity_id, arg1_tab) {
@@ -750,14 +791,54 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
   var tab_width = 3.25; //In vw
   var underline_el = document.querySelector(`.options-tab[class~='${entity_id}'] > hr`);
 
+  var entity_obj = getEntity(entity_id);
+
   window[`${entity_id}_page`] = tab; //Set new page
 
-  if (tab == "fill")
+  if (tab == "fill") {
+    var fill_colour = hexToRGB(entity_obj.options.fillColor);
+    updateEntityColour(entity_id, fill_colour, entity_obj.options.fillOpacity);
+
     underline_el.style.left = `${left_offset}vw`;
-  if (tab == "stroke")
+  }
+  if (tab == "stroke") {
+    var stroke_colour = hexToRGB(entity_obj.options.color);
+    updateEntityColour(entity_id, stroke_colour, entity_obj.options.opacity);
+
     underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
+  }
   if (tab == "other")
     underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
+}
+
+function updateEntityColour (arg0_entity_id, arg1_colour, arg2_opacity) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var colour = arg1_colour;
+  var opacity = arg2_opacity;
+
+  //Declare local instance variables
+  var b_el = document.getElementById(`${entity_id}-b`);
+  var opacity_el = document.querySelector(`#colour-picker-opacity-range-${entity_id}`);
+  var g_el = document.getElementById(`${entity_id}-g`);
+  var r_el = document.getElementById(`${entity_id}-r`);
+
+  //Update values
+  if (colour) {
+    if (colour[0]) r_el.value = colour[0];
+    if (colour[1]) g_el.value = colour[1];
+    if (colour[2]) b_el.value = colour[2];
+    if (opacity)
+      opacity_el.value = opacity*100;
+
+    setEntityColourWheelCursor(entity_id, colour, true);
+  } else {
+    r_el.value = 255;
+    g_el.value = 255;
+    b_el.value = 255;
+
+    setEntityColourWheelCursor(entity_id, [255, 255, 255], true);
+  }
 }
 
 //Field reaction
