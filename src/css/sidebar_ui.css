@@ -55,7 +55,7 @@
   color: white;
 }
 .full-date-container input::-webkit-calendar-picker-indicator {
-  display: none;
+  display: none !important;
 }
 .full-date-container input#year-input {
   max-width: 6vh;

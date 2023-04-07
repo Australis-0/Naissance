@@ -25,17 +25,73 @@ function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
       new_history_entry.id = new_timestamp;
 
       if (context_menu_el) {
-        //Move context_menu_date_el back to popup_el; repopulate bio; move it to new history entry
-        popup_el.after(context_menu_el);
+        //Repopulate bio; move it to new history entry
         populateEntityBio(entity_id);
 
         var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
 
         new_history_entry_el.after(context_menu_el);
+        new_history_entry_el.after(context_menu_date_el);
       }
     } else {
       console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);
     }
+}
+
+function createHistoryEntry (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+  var options = arg2_options;
+  var coords = arg3_coords;
+
+  //Declare local instance variables
+  var date_string = getTimestamp(date);
+  var entity_obj = getEntity(entity_id);
+  var old_history_entry = getPolityHistory(entity_id, date);
+
+  if (entity_obj) {
+    //Make sure history object is initailised
+    if (!entity_obj.options.history) entity_obj.options.history = {};
+
+    //Fetch actual coords
+    var actual_coords;
+
+    if (!coords) {
+      actual_coords = (old_history_entry) ?
+        old_history_entry.coords :
+        entity_obj._latlngs;
+    } else {
+      actual_coords = coords;
+    }
+
+    //Create new history object
+    if (!entity_obj.options.history[date_string])
+      entity_obj.options.history[date_string] = {
+        id: date_string,
+
+        coords: actual_coords,
+        options: {}
+      };
+
+    //Manually transcribe options to avoid recursion
+    var all_option_keys = Object.keys(options);
+    var local_history = entity_obj.options.history[date_string];
+
+    local_history.coords = actual_coords;
+
+    for (var i = 0; i < all_option_keys.length; i++)
+      if (!["history", "type"].includes(all_option_keys[i]))
+        local_history.options[all_option_keys[i]] = options[all_option_keys[i]];
+
+    //Delete local_history if it's the same as old_history_entry
+    if (old_history_entry)
+      if (
+        JSON.stringify(old_history_entry.coords) == JSON.stringify(local_history.coords) && JSON.stringify(old_history_entry.options) == JSON.stringify(local_history.options) &&
+        old_history_entry.id != local_history.id
+      )
+        delete entity_obj.options.history[date_string];
+  }
 }
 
 function deletePolityHistory (arg0_entity_id, arg1_date) {

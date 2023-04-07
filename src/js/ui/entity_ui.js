@@ -37,28 +37,30 @@ function adjustTime (arg0_entity_id, arg1_timestamp) { //[WIP] - Finish rest of 
   };
 }
 
-function closeContextDateMenu (arg0_entity_id) {
+function closeContextDateMenu (arg0_entity_id, arg1_instant) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
+  var instant = arg1_instant;
 
   //Declare local instance variables
   var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
 
   //Set to display-none
   if (!context_menu_date_el.getAttribute("class").includes("instant-display-none"))
-    context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + " display-none");
+    context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
 }
 
-function closeContextMenu (arg0_entity_id) {
+function closeContextMenu (arg0_entity_id, arg1_instant) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
+  var instant = arg1_instant;
 
   //Declare local instance variables
   var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
 
   //Set to display-none
   if (!context_menu_el.getAttribute("class").includes("instant-display-none"))
-    context_menu_el.setAttribute("class", context_menu_el.getAttribute("class") + " display-none");
+    context_menu_el.setAttribute("class", context_menu_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
 
   //Close attached menus
   closeContextDateMenu(entity_id);
@@ -349,14 +351,15 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
     //Onclick events - Context menu interactions
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
+    //if (popup_el)
     popup_el.onclick = function (e) {
       var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
 
       //Check if target is context menu
       try {
-        if (e.path[0].getAttribute("class").includes("bio-context-menu-icon")) {
+        if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon")) {
           //Set context menu to be visible and teleport to selected element; close previously attached menus
-          e.path[1].after(context_menu_el);
+          e.composedPath()[1].after(context_menu_el);
           closeContextDateMenu(entity_id);
 
           context_menu_el.setAttribute("class",
@@ -367,7 +370,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
           //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
           var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
-          var local_timestamp = e.path[0].getAttribute("timestamp");
+          var local_timestamp = e.composedPath()[0].getAttribute("timestamp");
 
           //Populate context menu buttons
           for (var i = 0; i < all_context_menu_buttons.length; i++) {
@@ -383,14 +386,16 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
               all_context_menu_buttons[i].setAttribute("onclick", `editKeyframe('${entity_id}', '${local_timestamp}');`);
           }
         }
-      } catch {}
+      } catch (e) {
+        console.log(e);
+      }
 
       //Context menu should be closed if the context menu itself or the button isn't a parent in the path
       try {
         if (
-          !arrayHasElementAttribute(e.path, "id", `entity-ui-context-menu-${entity_id}`) &&
-          !arrayHasElementAttribute(e.path, "id", `context-date-menu-${entity_id}`) &&
-          !arrayHasElementAttribute(e.path, "class", `bio-context-menu-icon`)
+          !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
+          !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
+          !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
         )
           closeContextMenu(entity_id);
       } catch (e) {
@@ -463,10 +468,24 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
   var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
   var bio_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id}`);
   var bio_string = [];
+  var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
+  var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
   var entity_obj = getEntity(entity_id);
+  var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
   if (entity_obj) {
+    var actual_timestamp;
     var all_histories = Object.keys(entity_obj.options.history);
+
+    //Set actual_timestamp
+    if (context_menu_el)
+      if (context_menu_el.parentElement.getAttribute("timestamp"))
+        actual_timestamp = parseInt(context_menu_el.parentElement.getAttribute("timestamp"));
+
+    //Move context_menu_el back to popup_el; then repopulate bio
+    popup_el.after(context_menu_el);
+    popup_el.after(context_menu_date_el);
+    closeContextMenu(entity_id, true); //Close context menu
 
     //Format bio_string; populate header
     bio_string.push(`<tr class = "no-select">
@@ -482,6 +501,7 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
       var last_history_entry = entity_obj.options.history[all_histories[i - 1]];
       var local_date = parseTimestamp(all_histories[i]);
       var local_history = entity_obj.options.history[all_histories[i]];
+      var local_options = local_history.options;
       var timestamp = ` timestamp = ${all_histories[i]}`;
 
       if (!last_history_entry) {
@@ -497,14 +517,35 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
         var land_percentage_change = (Math.round((1 - (old_land_area/current_land_area))*100*100)/100/100); //Round to hundreths place
         var land_percentage_change_string = "";
 
-        //Land area handler
-        if (land_percentage_change < 0)
-          land_percentage_change_string = `lost ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} of her land.`;
-        if (land_percentage_change > 0)
-          land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
+        //Colour/customisation handler
+        {
+          var customisation_changed = false;
+          var fill_colour_string = ``;
+          var stroke_colour_string = ``;
 
-        if (land_percentage_change != 0)
-          bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${entity_obj.options.entity_name} ${land_percentage_change_string}</td></tr>`);
+          if (local_options.fillColor)
+            fill_colour_string = `Fill colour changed to ${local_options.fillColor}.`;
+          if (local_options.color)
+            stroke_colour_string = ` Stroke colour changed to ${local_options.color}.`;
+
+          if ((fill_colour_string + stroke_colour_string).length > 0)
+            customisation_changed = true;
+
+          //Check if customisation_changed
+          if (customisation_changed)
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${fill_colour_string}${stroke_colour_string}</td></tr>`); //[WIP] - Actually style
+        }
+
+        //Land area handler
+        {
+          if (land_percentage_change < 0)
+            land_percentage_change_string = `lost ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} of her land.`;
+          if (land_percentage_change > 0)
+            land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
+
+          if (land_percentage_change != 0)
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${entity_obj.options.entity_name} ${land_percentage_change_string}</td></tr>`);
+        }
       }
     }
 
@@ -519,6 +560,14 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
         <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${all_histories[i]}" src = "./gfx/interface/context_menu_icon.png">
         <img class = "bio-jump-to-icon" draggable = "false" timestamp = "${all_histories[i]}" src = "./gfx/interface/jump_to_icon.png">
       `;
+
+    //Move context_menu_el back to relevant element if available
+    var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${actual_timestamp}"]`);
+
+    if (new_history_entry_el) {
+      new_history_entry_el.after(context_menu_el);
+      new_history_entry_el.after(context_menu_date_el);
+    }
   } else {
     //Hide the Bio UI if entity_obj is not defined yet
     bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
@@ -687,19 +736,34 @@ function setEntityColour (arg0_entity_id) {
   var r = parseInt(r_el.value);
 
   var current_colour = RGBToHex(r, g, b);
+  var current_history_entry = getPolityHistory(entity_id, date);
   var current_tab = window[`${entity_id}_page`];
 
   //Set entity fill colour
-  if (current_tab == "fill")
+  if (current_tab == "fill") {
+    createHistoryEntry(entity_id, date, {
+      fillColor: current_colour,
+      fillOpacity: opacity_el.value/100
+    });
     entity_obj.setStyle({
       fillColor: current_colour,
       fillOpacity: opacity_el.value/100
     });
-  if (current_tab == "stroke")
+  }
+
+  if (current_tab == "stroke") {
+    createHistoryEntry(entity_id, date, {
+      color: current_colour,
+      opacity: opacity_el.value/100
+    });
     entity_obj.setStyle({
       color: current_colour,
       opacity: opacity_el.value/100
     });
+  }
+
+  //Repopulate entity bio
+  populateEntityBio(entity_id);
 }
 
 function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_change) {

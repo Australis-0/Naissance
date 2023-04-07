@@ -105,24 +105,13 @@ function finishEntity () {
     options: current_union.options
   };
 
-  //Add coords to current history date
-  var is_duplicate_history = false;
-  var old_history_entry = {};
+  var coords = current_union._layers[local_layers[0]]._latlngs;
 
-  if (new_entity.options.history)
-    old_history_entry = getPolityHistory(new_entity.options.className, date);
-
+  //Set type to polity
   if (!new_entity.options.type) new_entity.options.type = "polity";
-  if (!new_entity.options.history) new_entity.options.history = {};
 
-  new_entity.options.history[date_string] = {
-    id: date_string,
-
-    coords: current_union._layers[local_layers[0]]._latlngs,
-    options: {}
-  };
-
-  var current_history_entry = new_entity.options.history[date_string];
+  //Create history entry
+  createHistoryEntry(new_entity, date, {}, coords);
 
   //Edit options; append ID and HTML
   if (!new_entity.options.has_id) {
@@ -136,22 +125,7 @@ function finishEntity () {
     new_entity.options.has_id = true;
   }
 
-  //Manually transcribe options to avoid recursion
-  var all_option_keys = Object.keys(current_union.options);
-  var local_history = new_entity.options.history[date_string];
-
-  for (var i = 0; i < all_option_keys.length; i++)
-    if (!["history", "type"].includes(all_option_keys[i]))
-      local_history.options[all_option_keys[i]] = current_union.options[all_option_keys[i]];
-
-    //Delete current_history_entry if it's the same as old_history_entry
-    if (
-      JSON.stringify(old_history_entry.coords) == JSON.stringify(current_history_entry.coords) &&
-      JSON.stringify(old_history_entry.options) == JSON.stringify(current_history_entry.options)
-    )
-      delete new_entity.options.history[date_string];
-
-  var new_union = L.polygon(current_history_entry.coords, new_entity.options);
+  var new_union = L.polygon(coords, new_entity.options);
 
   clearBrush();
   if (window.polity_index != -1) {
@@ -312,6 +286,9 @@ function getEntity (arg0_entity_id, arg1_layer) {
 
   //Declare local isntance variables
   var local_entity;
+
+  //Guard clause
+  if (typeof entity_id == "object") return entity_id;
 
   if (!layer) {
     //Iterate over all layers for .options.className

@@ -130,7 +130,7 @@ function loadDate (arg0_old_date) {
 
             for (var y = 0; y < all_local_history_options.length; y++)
               local_options[all_local_history_options[y]] = local_history.options[all_local_history_options[y]];
-
+            
             local_layer[x] = L.polygon(local_history.coords, local_options).addTo(map);
             local_layer[x].on("click", function (e) {
               entityUI(e, false, true);
