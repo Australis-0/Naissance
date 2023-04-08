@@ -349,34 +349,36 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
     opened_popups[entity_id] = e;
 
     //Onclick events - Context menu interactions
-    var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
+    setTimeout(function(){
+      var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
-    //if (popup_el)
-    popup_el.onclick = function (e) {
-      var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
+      if (popup_el)
+        popup_el.onclick = function (e) {
+          var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
 
-      //Check if target is context menu
-      try {
-        if (e.composedPath()[0].getAttribute("class"))
-          if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
-            //Set context menu to be visible and teleport to selected element; close previously attached menus
-            openContextMenu(entity_id, e.composedPath()[1]);
-      } catch (e) {
-        console.log(e);
-      }
+          //Check if target is context menu
+          try {
+            if (e.composedPath()[0].getAttribute("class"))
+              if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
+                //Set context menu to be visible and teleport to selected element; close previously attached menus
+                openContextMenu(entity_id, e.composedPath()[1]);
+          } catch (e) {
+            console.log(e);
+          }
 
-      //Context menu should be closed if the context menu itself or the button isn't a parent in the path
-      try {
-        if (
-          !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
-          !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
-          !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
-        )
-          closeContextMenu(entity_id);
-      } catch (e) {
-        console.log(e);
-      }
-    };
+          //Context menu should be closed if the context menu itself or the button isn't a parent in the path
+          try {
+            if (
+              !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
+              !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
+              !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
+            )
+              closeContextMenu(entity_id);
+          } catch (e) {
+            console.log(e);
+          }
+        };
+    }, 250);
   }
 
   //Return statement
@@ -531,8 +533,11 @@ function populateEntityBio (arg0_entity_id) {
       var timestamp = ` timestamp = ${all_histories[i]}`;
 
       if (!last_history_entry) {
+        var actual_entity_name = (entity_obj.options.entity_name) ?
+          entity_obj.options.entity_name : `Unnamed Polity`;
+
         //This is the first history entry. Mark it as such
-        bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${entity_obj.options.entity_name} is founded.</td></tr>`);
+        bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${actual_entity_name} is founded.</td></tr>`);
       } else {
         var last_history_date = parseTimestamp(all_histories[i - 1]);
 
@@ -775,7 +780,8 @@ function populateEntityUI (arg0_entity_id) {
   }, 100);
 
   //Initialise page and colour
-  switchEntityTab(entity_id, (page) ? page : "fill");
+  if (entity_id)
+    switchEntityTab(entity_id, (page) ? page : "fill");
 
   //Keep collapsed tabs
   for (var i = 0; i < tabs.length; i++)
@@ -937,20 +943,22 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
 
   window[`${entity_id}_page`] = tab; //Set new page
 
-  if (tab == "fill") {
-    var fill_colour = hexToRGB(entity_obj.options.fillColor);
-    updateEntityColour(entity_id, fill_colour, entity_obj.options.fillOpacity);
+  if (tab) {
+    if (tab == "fill") {
+      var fill_colour = hexToRGB(entity_obj.options.fillColor);
+      updateEntityColour(entity_id, fill_colour, entity_obj.options.fillOpacity);
 
-    underline_el.style.left = `${left_offset}vw`;
-  }
-  if (tab == "stroke") {
-    var stroke_colour = hexToRGB(entity_obj.options.color);
-    updateEntityColour(entity_id, stroke_colour, entity_obj.options.opacity);
+      underline_el.style.left = `${left_offset}vw`;
+    }
+    if (tab == "stroke") {
+      var stroke_colour = hexToRGB(entity_obj.options.color);
+      updateEntityColour(entity_id, stroke_colour, entity_obj.options.opacity);
 
-    underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
+      underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
+    }
+    if (tab == "other")
+      underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
   }
-  if (tab == "other")
-    underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
 }
 
 function updateEntityColour (arg0_entity_id, arg1_colour, arg2_opacity) {

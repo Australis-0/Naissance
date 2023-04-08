@@ -122,31 +122,33 @@ function loadDate (arg0_old_date) {
         local_layer[x].remove();
 
         if (local_history)
-          if (local_layer[x].options.type == "polity") {
-            var local_options = JSON.parse(JSON.stringify(local_layer[x].options));
+          if (local_layer[x].options.type == "polity")
+            //Make sure polity is not extinct
+            if (!local_history.options.extinct) {
+              var local_options = JSON.parse(JSON.stringify(local_layer[x].options));
 
-            //Overwrite local_options with local_history_options
-            var all_local_history_options = Object.keys(local_history.options);
+              //Overwrite local_options with local_history_options
+              var all_local_history_options = Object.keys(local_history.options);
 
-            for (var y = 0; y < all_local_history_options.length; y++)
-              local_options[all_local_history_options[y]] = local_history.options[all_local_history_options[y]];
+              for (var y = 0; y < all_local_history_options.length; y++)
+                local_options[all_local_history_options[y]] = local_history.options[all_local_history_options[y]];
 
-            local_layer[x] = L.polygon(local_history.coords, local_options).addTo(map);
-            local_layer[x].on("click", function (e) {
-              entityUI(e, false, true);
-            });
+              local_layer[x] = L.polygon(local_history.coords, local_options).addTo(map);
+              local_layer[x].on("click", function (e) {
+                entityUI(e, false, true);
+              });
 
-            //Check for current_union
-            if (window.polity_options)
-              if (polity_options.className == local_layer[x].options.className) {
-                current_entity._layers = {};
-                local_layer[x].addTo(current_entity);
-                current_union.addTo(current_entity);
+              //Check for current_union
+              if (window.polity_options)
+                if (polity_options.className == local_layer[x].options.className) {
+                  current_entity._layers = {};
+                  local_layer[x].addTo(current_entity);
+                  current_union.addTo(current_entity);
 
-                entity_cache = [local_layer[x]];
-                current_union = unify(current_entity.getLayers());
-              }
-          }
+                  entity_cache = [local_layer[x]];
+                  current_union = unify(current_entity.getLayers());
+                }
+            }
       }
     }
   }

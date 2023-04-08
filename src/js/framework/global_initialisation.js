@@ -85,5 +85,5 @@ window.right_mouse = false;
 
 //Test scripts
 setTimeout(function(){
-  loadSave("switzerland");
+  loadSave("england");
 }, 100);
