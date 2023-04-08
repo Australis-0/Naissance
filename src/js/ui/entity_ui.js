@@ -233,12 +233,12 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
           <span class = "no-select">
             <span class = "brightness-range-container">
-              <span class = "small-header">Brightness</span>
+              <span id = "${entity_id}-brightness-header" class = "small-header">Brightness</span>
               <input type = "range" min = "0" max = "100" value = "100" id = "colour-picker-brightness-range-${entity_id}" class = "colour-picker-brightness-range">
             </span>
 
             <span class = "opacity-range-container">
-              <span class = "small-header">Opacity</span>
+              <span id = "${entity_id}-opacity-header" class = "small-header">Opacity</span>
               <input type = "range" min = "0" max = "100" value = "50" id = "colour-picker-opacity-range-${entity_id}" class = "colour-picker-opacity-range">
             </span>
           </span>
@@ -479,7 +479,7 @@ function openContextMenu (arg0_entity_id, arg1_parent_el) {
   }
 }
 
-function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functionality
+function populateEntityBio (arg0_entity_id) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
 
@@ -540,19 +540,25 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
         {
           var customisation_changed = false;
           var fill_colour_string = ``;
+          var fill_opacity_string = ``;
           var stroke_colour_string = ``;
+          var stroke_opacity_string = ``;
 
           if (local_options.fillColor)
-            fill_colour_string = `Fill colour changed to ${local_options.fillColor}.`;
+            fill_colour_string = `Fill colour changed to <span class = "bio-box" style = "color: ${local_options.fillColor};">&#8718;</span>. `;
+          if (local_options.fillOpacity)
+            fill_opacity_string = `Fill opacity changed to ${printPercentage(local_options.fillOpacity)}. `;
           if (local_options.color)
-            stroke_colour_string = ` Stroke colour changed to ${local_options.color}.`;
+            stroke_colour_string = `Stroke colour changed to <span class = "bio-box" style = "color: ${local_options.color};">&#8718;</span>. `;
+          if (local_options.opacity)
+            stroke_opacity_string = `Stroke opacity changed to ${printPercentage(local_options.opacity)}. `;
 
-          if ((fill_colour_string + stroke_colour_string).length > 0)
+          if ((fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string).length > 0)
             customisation_changed = true;
 
           //Check if customisation_changed
           if (customisation_changed)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${fill_colour_string}${stroke_colour_string}</td></tr>`); //[WIP] - Actually style
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}</span></td></tr>`); //[WIP] - Actually style
         }
 
         //Land area handler
@@ -563,7 +569,7 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
             land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
 
           if (land_percentage_change != 0)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${entity_obj.options.entity_name} ${land_percentage_change_string}</td></tr>`);
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_obj.options.entity_name} ${land_percentage_change_string}</span></td></tr>`);
         }
       }
     }
@@ -654,9 +660,11 @@ function populateEntityColourWheel (arg0_entity_id) {
 
     //Set brightness opacity
     colour_brightness_el.style.opacity = `${1 - brightness_value*0.01}`;
+    updateBrightnessOpacityHeaders(entity_id);
   });
   onRangeChange(opacity_el, function (e) {
     setEntityColour(entity_id);
+    updateBrightnessOpacityHeaders(entity_id);
   });
 
   //RGB listeners
@@ -898,6 +906,7 @@ function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_ch
   });
 
   //Set entity colour
+  updateBrightnessOpacityHeaders(entity_id);
   setEntityColour(entity_id);
 }
 
@@ -959,6 +968,26 @@ function updateEntityColour (arg0_entity_id, arg1_colour, arg2_opacity) {
 
     setEntityColourWheelCursor(entity_id, [255, 255, 255], true);
   }
+}
+
+function updateBrightnessOpacityHeaders (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var brightness_el = document.getElementById(`colour-picker-brightness-range-${entity_id}`);
+  var brightness_header_el = document.getElementById(`${entity_id}-brightness-header`);
+  var opacity_el = document.getElementById(`colour-picker-opacity-range-${entity_id}`);
+  var opacity_header_el = document.getElementById(`${entity_id}-opacity-header`);
+
+  var brightness_value = parseInt(brightness_el.value);
+  var opacity_value = parseInt(opacity_el.value);
+
+  //Update values
+  if (brightness_header_el)
+    brightness_header_el.innerHTML = `Brightness | ${brightness_value/100}`;
+  if (opacity_header_el)
+    opacity_header_el.innerHTML = `Opacity | ${opacity_value/100}`;
 }
 
 //Field reaction

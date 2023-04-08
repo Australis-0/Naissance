@@ -37,6 +37,7 @@ td {
 
 /* -- Text styling -- */
 .small-header {
+  display: inline-block;
   font-size: 0.5vw;
   text-transform: uppercase;
 }

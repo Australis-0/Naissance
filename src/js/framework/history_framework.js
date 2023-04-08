@@ -125,7 +125,6 @@ function editPolityHistory (arg0_entity_id, arg1_date) {
   var entry_date = arg1_date;
 
   //Change date to entry_date
-  console.log(entry_date);
   date = entry_date;
 
   //Edit entity
