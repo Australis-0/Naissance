@@ -242,8 +242,8 @@
 /* -- Container styling: Bio Context Menu -- */
 .bio-context-menu-container {
   position: fixed;
-  left: 21vw;
-  width: 8vw;
+  left: calc(var(--entity-ui-width) + 12px);
+  width: var(--context-menu-width);
 
   background-color: rgb(255, 255, 255);
   border-radius: 5px;
@@ -268,7 +268,7 @@
 
 .bio-context-menu-date-container {
   position: fixed;
-  left: calc(29vw + 4px);
+  left: calc(var(--entity-ui-width) + var(--context-menu-width) + 16px);
 
   background-color: rgb(255, 255, 255);
   border-radius: 5px;
@@ -362,7 +362,7 @@
 .entity-ui-container.customisation-top-parent {
   background: none;
   padding: 0px;
-  width: calc(20vw + 24px);
+  width: var(--entity-ui-width);
 }
 .entity-ui-container.options-container {
   height: 7vw;

@@ -6,13 +6,7 @@ map.on("popupopen", function (e) {
     setTimeout(function(){
       var entity_id = local_popup.options.class;
 
-      populateEntityBio(entity_id);
-      populateEntityColourWheel(entity_id);
-      populateEntityOptions(entity_id);
-      populateTimelineGraph(entity_id);
-
-      //Initialise tooltips
-      populateEntityTooltips(entity_id);
+      populateEntityUI(entity_id);
     }, 200);
 });
 

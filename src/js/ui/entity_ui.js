@@ -357,35 +357,9 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
       //Check if target is context menu
       try {
-        if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon")) {
+        if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
           //Set context menu to be visible and teleport to selected element; close previously attached menus
-          e.composedPath()[1].after(context_menu_el);
-          closeContextDateMenu(entity_id);
-
-          context_menu_el.setAttribute("class",
-            context_menu_el.getAttribute("class")
-              .replace(" instant-display-none", "")
-              .replace(" display-none", "")
-          );
-
-          //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
-          var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
-          var local_timestamp = e.composedPath()[0].getAttribute("timestamp");
-
-          //Populate context menu buttons
-          for (var i = 0; i < all_context_menu_buttons.length; i++) {
-            var local_id = all_context_menu_buttons[i].id;
-
-            all_context_menu_buttons[i].setAttribute("timestamp", local_timestamp);
-
-            if (local_id == "context-menu-adjust-time-button")
-              all_context_menu_buttons[i].setAttribute("onclick", `adjustTime('${entity_id}', '${local_timestamp}');`);
-            if (local_id == "context-menu-delete-keyframe-button")
-              all_context_menu_buttons[i].setAttribute("onclick", `deleteKeyframe('${entity_id}', '${local_timestamp}');`);
-            if (local_id == "context-menu-edit-keyframe-button")
-              all_context_menu_buttons[i].setAttribute("onclick", `editKeyframe('${entity_id}', '${local_timestamp}');`);
-          }
-        }
+          openContextMenu(entity_id, e.composedPath()[1]);
       } catch (e) {
         console.log(e);
       }
@@ -460,6 +434,50 @@ function minimiseUI (arg0_element, arg1_tab) {
   }
 }
 
+function openContextMenu (arg0_entity_id, arg1_parent_el) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var parent_el = arg1_parent_el;
+
+  //Declare local instance variables
+  var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
+  var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
+  var header_el = document.getElementById(`entity-ui-header`);
+  var offset_top = parent_el.offsetTop - bio_container_el.scrollTop;
+  var timeline_graph_el = document.getElementById(`entity-ui-timeline-graph-container-${entity_id}`);
+  var timeline_header_el = document.getElementById(`entity-ui-timeline-data-header`);
+  var top_bio_header_el = document.querySelector(`.top-bio-header`);
+
+  //Move context_menu_el to parent_el; close previously attached menus
+  parent_el.after(context_menu_el);
+  closeContextDateMenu(entity_id);
+
+  context_menu_el.setAttribute("class",
+    context_menu_el.getAttribute("class")
+      .replace(" instant-display-none", "")
+      .replace(" display-none", "")
+  );
+  context_menu_el.style.top = `calc(${header_el.offsetHeight}px + ${timeline_graph_el.offsetHeight}px + ${timeline_header_el.offsetHeight}px + ${top_bio_header_el.offsetHeight}px + ${offset_top}px + 8px)`;
+
+  //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
+  var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
+  var local_timestamp = parent_el.getAttribute("timestamp");
+
+  //Populate context menu buttons
+  for (var i = 0; i < all_context_menu_buttons.length; i++) {
+    var local_id = all_context_menu_buttons[i].id;
+
+    all_context_menu_buttons[i].setAttribute("timestamp", local_timestamp);
+
+    if (local_id == "context-menu-adjust-time-button")
+      all_context_menu_buttons[i].setAttribute("onclick", `adjustTime('${entity_id}', '${local_timestamp}');`);
+    if (local_id == "context-menu-delete-keyframe-button")
+      all_context_menu_buttons[i].setAttribute("onclick", `deleteKeyframe('${entity_id}', '${local_timestamp}');`);
+    if (local_id == "context-menu-edit-keyframe-button")
+      all_context_menu_buttons[i].setAttribute("onclick", `editKeyframe('${entity_id}', '${local_timestamp}');`);
+  }
+}
+
 function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functionality
   //Convert from parameters
   var entity_id = arg0_entity_id;
@@ -488,7 +506,7 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
     closeContextMenu(entity_id, true); //Close context menu
 
     //Format bio_string; populate header
-    bio_string.push(`<tr class = "no-select">
+    bio_string.push(`<tr class = "no-select top-bio-header">
       <th class = "uppercase">Date</th>
       <th>
         <img class = "bio-add-keyframe-icon plus-icon" draggable = "false" src = "./gfx/interface/plus_icon.png">
@@ -704,6 +722,28 @@ function populateEntityTooltips (arg0_entity_id) {
     content: "Jump to Date",
     arrow: false
   });
+}
+
+//Kept for initialising entity UIs
+function populateEntityUI (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variable
+  var page = window[`${entity_id}_page`];
+
+  //Begin populating entity UI
+  populateEntityBio(entity_id);
+  populateEntityColourWheel(entity_id);
+  populateEntityOptions(entity_id);
+  populateTimelineGraph(entity_id);
+
+  //Initialise tooltips
+  populateEntityTooltips(entity_id);
+
+  //Initialise page and colour
+  if (page)
+    switchEntityTab(entity_id, page);
 }
 
 function removeActiveFromEntityOptions (arg0_entity_id) {
