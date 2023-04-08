@@ -30,14 +30,19 @@ function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_elem
   new_date.month = parseInt(month_el.value);
   new_date.day = parseInt(day_el.value);
 
-  var hour_value = returnSafeNumber(hour_el.value);
-  var minute_value = returnSafeNumber(minute_el.value);
+  var hour_value = returnSafeNumber(parseInt(hour_el.value));
+  var minute_value = returnSafeNumber(parseInt(minute_el.value));
 
   //Set min, max bounds
   if (hour_value < 0) hour_value = 0;
   if (hour_value > 23) hour_value = 23;
   if (minute_value < 0) minute_value = 0;
   if (minute_value > 59) minute_value = 59;
+
+  //New Year's exception (change to 00:01 if date is January 1)
+  if (new_date.month == 1 && new_date.day == 1)
+    if (hour_value == 0 && minute_value == 0)
+      minute_value = 1;
 
   new_date.hour = hour_value;
   new_date.minute = minute_value;
@@ -46,6 +51,8 @@ function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_elem
   day_el.value = new_date.day;
   hour_el.value = `${(new_date.hour < 10) ? "0" : ""}${new_date.hour}`;
   minute_el.value = `${(new_date.minute < 10) ? "0" : ""}${new_date.minute}`;
+
+  console.log(new_date);
 
   return new_date;
 }

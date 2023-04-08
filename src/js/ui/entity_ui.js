@@ -26,7 +26,8 @@ function adjustTime (arg0_entity_id, arg1_timestamp) { //[WIP] - Finish rest of 
         .replace(" instant-display-none", "")
         .replace(" display-none", "")
     ) :
-    context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + " display-none");
+    context_menu_date_el.setAttribute("class",
+    context_menu_date_el.getAttribute("class") + " display-none");
 
   //Button listeners
   change_date_btn_el.onclick = function () {
@@ -59,7 +60,7 @@ function closeContextMenu (arg0_entity_id, arg1_instant) {
   var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
 
   //Set to display-none
-  if (!context_menu_el.getAttribute("class").includes("instant-display-none"))
+  if (!context_menu_el.getAttribute("class").includes("display-none"))
     context_menu_el.setAttribute("class", context_menu_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
 
   //Close attached menus
@@ -621,7 +622,8 @@ function populateEntityBio (arg0_entity_id) {
       };
   } else {
     //Hide the Bio UI if entity_obj is not defined yet
-    bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
+    if (!bio_container_el.getAttribute("class").includes("display-none"))
+      bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
   }
 }
 
@@ -926,7 +928,9 @@ function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_ch
 
   //Set entity colour
   updateBrightnessOpacityHeaders(entity_id);
-  setEntityColour(entity_id);
+
+  if (!do_not_change)
+    setEntityColour(entity_id);
 }
 
 function switchEntityTab (arg0_entity_id, arg1_tab) {

@@ -16,22 +16,25 @@ function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
   //Move history_entry to new timestamp
   if (entity_obj)
     if (history_entry) {
-      //Move to new_timestamp
-      entity_obj.options.history[new_timestamp] = history_entry;
-      var new_history_entry = entity_obj.options.history[new_timestamp];
+      //Only change date of keyframe if it does not conflict with the same keyframe
+      if (history_entry.id != new_timestamp) {
+        //Move to new_timestamp
+        entity_obj.options.history[new_timestamp] = history_entry;
+        var new_history_entry = entity_obj.options.history[new_timestamp];
 
-      //Delete old timestamp; change ID
-      delete entity_obj.options.history[history_entry.id];
-      new_history_entry.id = new_timestamp;
+        //Delete old timestamp; change ID
+        delete entity_obj.options.history[history_entry.id];
+        new_history_entry.id = new_timestamp;
 
-      if (context_menu_el) {
-        //Repopulate bio; move it to new history entry
-        populateEntityBio(entity_id);
+        if (context_menu_el) {
+          //Repopulate bio; move it to new history entry
+          populateEntityBio(entity_id);
 
-        var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
+          var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
 
-        new_history_entry_el.after(context_menu_el);
-        new_history_entry_el.after(context_menu_date_el);
+          new_history_entry_el.after(context_menu_el);
+          new_history_entry_el.after(context_menu_date_el);
+        }
       }
     } else {
       console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);

@@ -218,7 +218,7 @@ function randomNumber (min, max) {
 
 function returnSafeNumber (arg0_operation, arg1_default) {
   //Convert from parameters
-  var operation = parseInt(arg0_operation);
+  var operation = arg0_operation;
   var default_number = (arg1_default) ? arg1_default : 0;
 
   //Return statement

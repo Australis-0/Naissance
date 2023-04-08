@@ -59,7 +59,7 @@ function createTimelineGraph (arg0_element, arg1_start_date, arg2_end_date, arg3
   canvas.onmouseup = function () {
     dragging = false;
   };
-  
+
   canvas.onwheel = function (e) {
     begin_date = JSON.parse(JSON.stringify(start_date));
     finish_date = JSON.parse(JSON.stringify(end_date));
@@ -140,7 +140,7 @@ function drawTimelineGraph (arg0_element, arg1_start_date, arg2_end_date, arg3_d
 
       var local_maximum_value = Math.max(returnSafeNumber(local_rear_value), returnSafeNumber(local_forwards_value));
       var local_minimum_value = Math.min(returnSafeNumber(local_rear_value), returnSafeNumber(local_forwards_value));
-
+      
       if (local_maximum_value > maximum_visible_value || !maximum_visible_value)
         maximum_visible_value = local_maximum_value;
       if (local_minimum_value < minimum_visible_value || !minimum_visible_value)
