@@ -357,9 +357,10 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
       //Check if target is context menu
       try {
-        if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
-          //Set context menu to be visible and teleport to selected element; close previously attached menus
-          openContextMenu(entity_id, e.composedPath()[1]);
+        if (e.composedPath()[0].getAttribute("class"))
+          if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
+            //Set context menu to be visible and teleport to selected element; close previously attached menus
+            openContextMenu(entity_id, e.composedPath()[1]);
       } catch (e) {
         console.log(e);
       }
@@ -461,7 +462,7 @@ function openContextMenu (arg0_entity_id, arg1_parent_el) {
 
   //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
   var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
-  var local_timestamp = parent_el.getAttribute("timestamp");
+  var local_timestamp = parent_el.parentElement.getAttribute("timestamp");
 
   //Populate context menu buttons
   for (var i = 0; i < all_context_menu_buttons.length; i++) {
@@ -573,11 +574,14 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
     //Append context menu button
     var all_table_entries = document.querySelectorAll(`#entity-ui-timeline-bio-table-${entity_id}.timeline-bio-table tr:not(.no-select) > td:last-child`);
 
-    for (var i = 0; i < all_table_entries.length; i++)
+    for (var i = 0; i < all_table_entries.length; i++) {
+      var local_timestamp = all_table_entries[i].parentElement.getAttribute("timestamp");
+
       all_table_entries[i].innerHTML += `
-        <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${all_histories[i]}" src = "./gfx/interface/context_menu_icon.png">
-        <img class = "bio-jump-to-icon" draggable = "false" timestamp = "${all_histories[i]}" src = "./gfx/interface/jump_to_icon.png">
+        <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/context_menu_icon.png">
+        <img class = "bio-jump-to-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/jump_to_icon.png">
       `;
+    }
 
     //Move context_menu_el back to relevant element if available
     var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${actual_timestamp}"]`);
@@ -586,6 +590,17 @@ function populateEntityBio (arg0_entity_id) { //[WIP] - Add jump to icon functio
       new_history_entry_el.after(context_menu_el);
       new_history_entry_el.after(context_menu_date_el);
     }
+
+    //Add jump to functionality
+    var all_jump_to_btns = document.querySelectorAll(`img.bio-jump-to-icon`);
+
+    for (var i = 0; i < all_jump_to_btns.length; i++)
+      all_jump_to_btns[i].onclick = function (e) {
+        var local_timestamp = parseInt(this.getAttribute("timestamp"));
+
+        date = parseTimestamp(local_timestamp);
+        loadDate();
+      };
   } else {
     //Hide the Bio UI if entity_obj is not defined yet
     bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
@@ -739,11 +754,12 @@ function populateEntityUI (arg0_entity_id) {
   populateTimelineGraph(entity_id);
 
   //Initialise tooltips
-  populateEntityTooltips(entity_id);
+  setTimeout(function(){
+    populateEntityTooltips(entity_id);
+  }, 100);
 
   //Initialise page and colour
-  if (page)
-    switchEntityTab(entity_id, page);
+  switchEntityTab(entity_id, (page) ? page : "fill");
 }
 
 function removeActiveFromEntityOptions (arg0_entity_id) {
