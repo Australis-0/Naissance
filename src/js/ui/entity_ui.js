@@ -394,6 +394,7 @@ function minimiseUI (arg0_element, arg1_tab) {
     entity_id = entity_id[entity_id.length - 1];
 
   var actions_container = document.getElementById("entity-ui-actions-container");
+  var collapsed_flag =`${entity_id}_${tab}_collapsed`;
   var customisation_container = document.getElementById(`customisation-top-parent-${entity_id}`);
   var description_container = document.getElementById(`entity-ui-customisation-description-container-${entity_id}`);
   var timeline_bio_container = document.getElementById(`entity-ui-timeline-bio-container-${entity_id}`);
@@ -416,22 +417,28 @@ function minimiseUI (arg0_element, arg1_tab) {
 
       timeline_bio_container.setAttribute("class", timeline_bio_container.getAttribute("class") + " hidden");
     }
+
+    //Set flag as tab collapsed
+    window[collapsed_flag] = true;
   } else {
     element.setAttribute("class", element.getAttribute("class").replace("reverse-minimise-icon", "minimise-icon"));
 
     //Check tab to uncollapse
     if (tab == "actions")
-      actions_container.setAttribute("class", actions_container.getAttribute("class").replace(" hidden", ""));
+      actions_container.setAttribute("class", actions_container.getAttribute("class").replace(/ hidden/g, ""));
     if (tab == "customisation") {
-      customisation_container.setAttribute("class", customisation_container.getAttribute("class").replace(" hidden", ""));
+      customisation_container.setAttribute("class", customisation_container.getAttribute("class").replace(/ hidden/g, ""));
 
-      description_container.setAttribute("class", description_container.getAttribute("class").replace(" hidden", ""));
+      description_container.setAttribute("class", description_container.getAttribute("class").replace(/ hidden/g, ""));
     }
     if (tab == "timeline") {
-      timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class").replace(" hidden", ""));
+      timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class").replace(/ hidden/g, ""));
 
-      timeline_bio_container.setAttribute("class", timeline_bio_container.getAttribute("class").replace(" hidden", ""));
+      timeline_bio_container.setAttribute("class", timeline_bio_container.getAttribute("class").replace(/ hidden/g, ""));
     }
+
+    //Remove tab collapsed flag
+    delete window[collapsed_flag];
   }
 }
 
@@ -754,6 +761,7 @@ function populateEntityUI (arg0_entity_id) {
 
   //Declare local instance variable
   var page = window[`${entity_id}_page`];
+  var tabs = ["actions", "customisation", "timeline"];
 
   //Begin populating entity UI
   populateEntityBio(entity_id);
@@ -768,6 +776,11 @@ function populateEntityUI (arg0_entity_id) {
 
   //Initialise page and colour
   switchEntityTab(entity_id, (page) ? page : "fill");
+
+  //Keep collapsed tabs
+  for (var i = 0; i < tabs.length; i++)
+    if (window[`${entity_id}_${tabs[i]}_collapsed`])
+      minimiseUI(`${tabs[i]}-minimise-btn-${entity_id}`, tabs[i]);
 }
 
 function removeActiveFromEntityOptions (arg0_entity_id) {

@@ -127,7 +127,7 @@
 }
 .hierarchy-elements-container div.group:not(:empty), .hierarchy-elements-container div > .entity {
   padding-inline-start: 1vw;
-  padding-inline-end: 0.12vw;
+  padding-inline-end: 0.115vw;
 }
 .hierarchy-elements-container > div.group {
   padding-inline-start: 0vw !important;
