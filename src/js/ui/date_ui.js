@@ -52,8 +52,6 @@ function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_elem
   hour_el.value = `${(new_date.hour < 10) ? "0" : ""}${new_date.hour}`;
   minute_el.value = `${(new_date.minute < 10) ? "0" : ""}${new_date.minute}`;
 
-  console.log(new_date);
-
   return new_date;
 }
 
