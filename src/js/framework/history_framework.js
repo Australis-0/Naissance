@@ -121,6 +121,10 @@ function deletePolityHistory (arg0_entity_id, arg1_date) {
 
         populateEntityBio(entity_id);
       }
+
+      //Delete entity if no history entries are left
+      if (Object.keys(entity_obj.options.history).length == 0)
+        deleteEntity(entity_id);
     }
 }
 

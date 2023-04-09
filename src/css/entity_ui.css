@@ -519,8 +519,16 @@
 
 /* -- Container styling: Actions -- */
 
-#entity-ui-actions-container tr td span {
-  position: relative;
+#entity-ui-actions-container table {
+}
+#entity-ui-actions-container tr td {
+  border: 0px;
+  display: table-cell;
+}
+#entity-ui-actions-container tr td:not(:first-child) {
+  padding-left: 1vw;
+}
+#entity-ui-actions-container tr td span, #entity-ui-actions-container tr td img {
   margin-left: 10px;
 
   font-size: 22px;

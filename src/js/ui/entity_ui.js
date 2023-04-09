@@ -142,6 +142,9 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
           <td>
             <img src = "gfx/interface/empty_icon.png" class = "medium button pencil-icon" id = "edit-entity" onclick = "editEntity('${entity_id}');" draggable = "false"><span>Edit Polity</span>
           </td>
+          <td>
+            <img src = "gfx/interface/simplify_icon.png" id = "simplify-entity" class = "medium button" id = "simplify-entity" draggable = "false"><span>Simplify Path</span>
+          </td>
         </tr>
       </table>
     </div>` :
