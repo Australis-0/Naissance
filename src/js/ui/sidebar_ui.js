@@ -512,6 +512,9 @@ function toggleSidebarContextMenu (arg0_group_id) {
   var group_el = document.querySelector(`div.group[id="${group_id}"]`);
   var offset_top = group_el.offsetTop - hierarchy_container_el.scrollTop;
 
+  var delete_all_btn = context_menu_el.querySelector(`#context-menu-delete-all-button`);
+  var delete_group_btn = context_menu_el.querySelector("#context-menu-delete-group-button");
+
   //Toggleable open
   if (context_menu_el.getAttribute("class").includes("display-none")) {
     context_menu_el.setAttribute("class",
@@ -524,6 +527,10 @@ function toggleSidebarContextMenu (arg0_group_id) {
   //Set group attribute for context menu for obvious reasons
   context_menu_el.setAttribute("group", group_id);
   context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
+
+  //Set button functionality
+  delete_group_btn.setAttribute("onclick", `deleteGroup('${group_id}');`);
+  delete_all_btn.setAttribute("onclick", `deleteGroupRecursively('${group_id}');`);
 }
 
 function updateAllGroups (arg0_do_not_refresh) {
