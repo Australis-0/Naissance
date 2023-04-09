@@ -124,6 +124,9 @@
   color: white;
   font-family: "Barlow";
   font-weight: 300;
+
+  max-height: calc(70vh - 2.5vh);
+  overflow-y: auto;
 }
 .hierarchy-elements-container div.group:not(:empty), .hierarchy-elements-container div > .entity {
   padding-inline-start: 1vw;
@@ -170,7 +173,7 @@
   float: right;
   right: 2.25vw;
   margin-top: 0.125vh;
-  position: absolute;
+  position: relative;
 
   height: 16px;
   width: 16px;

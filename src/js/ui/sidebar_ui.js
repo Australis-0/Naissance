@@ -1,3 +1,15 @@
+function closeSidebarContextMenu () {
+  //Declare local instance variables
+  var context_menu_el = document.querySelector(`#hierarchy-context-menu`);
+
+  //Close context menu
+  if (!context_menu_el.getAttribute("class").includes("display-none"))
+    context_menu_el.setAttribute("class",
+      context_menu_el.getAttribute("class") + " display-none"
+    );
+  context_menu_el.removeAttribute("group");
+}
+
 function createEntityElement (arg0_layer, arg1_entity_id) {
   //Convert from parameters
   var layer = arg0_layer;
@@ -12,13 +24,15 @@ function createEntityElement (arg0_layer, arg1_entity_id) {
 
     local_el.setAttribute("class", "entity");
     local_el.setAttribute("id", entity_obj.options.className);
-    local_el.setAttribute("onclick", `editSidebarElement();`);
 
     header_el.setAttribute("onkeyup", "updateAllGroups(true);");
     header_el.value = (entity_obj.options.entity_name) ? entity_obj.options.entity_name : `Unnamed Polity`;
 
     //Append all formatted elements
     local_el.appendChild(header_el);
+    local_el.onclick = function (e) {
+      editSidebarElement(e);
+    };
 
     //Return statement
     return local_el;
@@ -93,12 +107,12 @@ function createGroupElement (arg0_layer, arg1_group_id) {
   ctx_menu_el.setAttribute("class", "group-context-menu-icon");
   ctx_menu_el.setAttribute("draggable", "false");
   ctx_menu_el.setAttribute("src", "./gfx/interface/context_menu_icon.png");
+  ctx_menu_el.setAttribute("onclick", `toggleSidebarContextMenu('${group_id}');`);
 
   local_el.setAttribute("class", "group")
   local_el.setAttribute("id", group_id);
   local_el.setAttribute("onmouseout", "updateSidebarHover();");
   local_el.setAttribute("onmouseover", "updateSidebarHover();");
-  local_el.setAttribute("onclick", `editSidebarElement();`);
 
   local_entities_el.setAttribute("id", `${group_id}-entities`);
   local_entities_el.setAttribute("class", `entities`);
@@ -125,16 +139,26 @@ function createGroupElement (arg0_layer, arg1_group_id) {
     local_el.appendChild(local_subgroups_el);
     local_el.appendChild(local_entities_el);
 
+    local_el.onclick = function (e) {
+      editSidebarElement(e);
+    };
+
     //Return statement
     return local_el;
   }
 }
 
-function editSidebarElement () {
+function editSidebarElement (e) {
   //Declare local instance variables
+  var context_menu_clicked = false;
   var name_field_el = document.querySelectorAll(`div:hover > input`);
 
-  if (name_field_el.length > 0)
+  if (e.composedPath())
+    if (e.composedPath()[0].getAttribute("class"))
+      if (e.composedPath()[0].getAttribute("class").includes("context-menu-icon"))
+        context_menu_clicked = true;
+
+  if (name_field_el.length > 0 && !context_menu_clicked)
     name_field_el[name_field_el.length - 1].focus();
 }
 
@@ -471,6 +495,30 @@ function selectLayer (arg0_layer) {
   }
 }
 
+function toggleSidebarContextMenu (arg0_group_id) {
+  //Convert from parameters
+  var group_id = arg0_group_id;
+
+  //Declare local instance variables
+  var context_menu_el = document.querySelector(`#hierarchy-context-menu`);
+  var hierarchy_container_el = document.querySelector(`#hierarchy`);
+  var group_el = document.querySelector(`div.group[id="${group_id}"]`);
+  var offset_top = group_el.offsetTop - hierarchy_container_el.scrollTop;
+
+  //Toggleable open
+  if (context_menu_el.getAttribute("class").includes("display-none")) {
+    context_menu_el.setAttribute("class",
+      context_menu_el.getAttribute("class")
+        .replace(" instant-display-none", "")
+        .replace(" display-none", "")
+    );
+  }
+
+  //Set group attribute for context menu for obvious reasons
+  context_menu_el.setAttribute("group", group_id);
+  context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
+}
+
 function updateAllGroups (arg0_do_not_refresh) {
   //Convert from parameters
   var do_not_refresh = arg0_do_not_refresh;
@@ -556,6 +604,18 @@ function updateGroups (arg0_layer, arg1_do_not_refresh) { //[WIP] - Add layer el
 //Button handlers
 document.getElementById("hierarchy-create-new-group").onclick = function () {
   createGroup();
+};
+
+//Sidebar click handler
+var sidebar_container_el = document.getElementById("hierarchy-ui-container");
+
+sidebar_container_el.onclick = function (e) {
+  //Context menu should be closed if the context menu itself or the button isn't a parent in the path
+  if (
+    !arrayHasElementAttribute(e.composedPath(), "id", "hierarchy-context-menu") &&
+    !arrayHasElementAttribute(e.composedPath(), "class", "group-context-menu-icon")
+  )
+    closeSidebarContextMenu();
 };
 
 //Initialise sidebar functions
