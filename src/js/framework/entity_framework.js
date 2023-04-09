@@ -166,10 +166,11 @@ function generateEntityID () {
   }
 }
 
-function getArea (arg0_entity_id, arg1_date) {
+function getArea (arg0_entity_id, arg1_date, arg2_test) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var date = arg1_date;
+  var test = arg2_test;
 
   //Declare local instance variables
   var entity_area = 0;
@@ -179,10 +180,13 @@ function getArea (arg0_entity_id, arg1_date) {
   if (entity_obj) {
     var local_history = getPolityHistory(entity_id, date);
 
-    if (local_history)
+    if (local_history) {
+      var local_coordinates = getTurfCoordinates(entity_id, date, test);
+
       entity_area = turf.area(
-        turf.polygon(getTurfCoordinates(entity_id, date))
+        turf[local_coordinates[1]](local_coordinates[0])
       );
+    }
   }
 
   //Return statement
@@ -209,10 +213,22 @@ function getEntityGroup (arg0_entity_id) {
   }
 }
 
-function getTurfCoordinates (arg0_entity_id, arg1_date) {
+function getPoly (arg0_geoJSON) {
+  //Convert from parameters
+  var geoJSON = arg0_geoJSON;
+
+  //Return statement
+  return (geoJSON.type == "Polygon") ?
+    turf.polygon(geoJSON.coordinates) :
+    turf.multiPolygon(geoJSON.coordinates);
+}
+
+//Returns [coordinates, type];
+function getTurfCoordinates (arg0_entity_id, arg1_date, arg2_test) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var date = arg1_date;
+  var test = arg2_test;
 
   //Declare local instance variables
   var local_entity = getEntity(entity_id);
@@ -222,61 +238,12 @@ function getTurfCoordinates (arg0_entity_id, arg1_date) {
   if (local_entity) {
     var local_history = getPolityHistory(entity_id, date);
 
-    if (local_history) {
-      var coords_type = 0; //1. Simple polygon, no holes; 2. Simple polygon, holes; 3. Multiple polygons, no holes; 4. Multiple polygons, holes
-
-      if (local_history.coords.length == 1 && typeof local_history.coords[0][0] == "object")
-        coords_type = 1;
-      if (local_history.coords.length > 1)
-        coords_type = (local_history.coords[0][0].lat) ? 2 : 3;
-      if (coords_type == 3)
-        for (var i = 0; i < local_history.coords.length; i++)
-          if (local_history.coords[i].length > 1)
-            coords_type = 4;
-
-      //Special case handling
-      if (coords_type == 1 || coords_type == 2) { //Simple polygon
-        //No holes handler
-        for (var i = 0; i < local_history.coords.length; i++) {
-          var local_poly = [];
-
-          for (var x = 0; x < local_history.coords[i].length; x++)
-            local_poly.push([
-              local_history.coords[i][x].lat, local_history.coords[i][x].lng
-            ]);
-
-          //Make sure last point is equivalent to first
-          local_poly.push([
-            local_history.coords[i][0].lat, local_history.coords[i][0].lng
-          ]);
-
-          turf_coords.push(local_poly);
-        }
-      }
-
-      if (coords_type == 3 || coords_type == 4) { //Multiple polygons
-        for (var i = 0; i < local_history.coords.length; i++)
-          for (var x = 0; x < local_history.coords[i].length; x++) {
-            var local_enclave = [];
-
-            for (var y = 0; y < local_history.coords[i][x].length; y++)
-              local_enclave.push([
-                local_history.coords[i][x][y].lat, local_history.coords[i][x][y].lng
-              ]);
-
-            //Make sure last point is equivalent to first
-            local_enclave.push([
-              local_history.coords[i][x][0].lat, local_history.coords[i][x][0].lng
-            ]);
-
-            turf_coords.push(local_enclave);
-          }
-      }
-    }
-
-    //Return statement
-    return turf_coords;
+    var temp_polygon = L.polygon(local_history.coords).toGeoJSON();
+    turf_coords = temp_polygon.geometry.coordinates;
   }
+
+  //Return statement
+  return [turf_coords, (temp_polygon.geometry.type == "Polygon") ? "polygon" : "multiPolygon"];
 }
 
 function getEntity (arg0_entity_id, arg1_layer) {

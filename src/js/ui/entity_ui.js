@@ -561,7 +561,8 @@ function populateEntityBio (arg0_entity_id) {
             var previous_entity_name = getPreviousEntityName(entity_id, all_histories[i]);
 
             if (previous_entity_name)
-              entity_name_string = `Name changed from ${previous_entity_name} to ${local_options.entity_name}. `;
+              if (previous_entity_name != local_options.entity_name)
+                entity_name_string = `Name changed from ${previous_entity_name} to ${local_options.entity_name}. `;
           }
           if (local_options.fillColor)
             fill_colour_string = `Fill colour changed to <span class = "bio-box" style = "color: ${local_options.fillColor};">&#8718;</span>. `;
@@ -627,6 +628,8 @@ function populateEntityBio (arg0_entity_id) {
 
         date = parseTimestamp(local_timestamp);
         loadDate();
+
+        console.log(getArea("15301473073", date, true));
       };
   } else {
     //Hide the Bio UI if entity_obj is not defined yet
@@ -1033,7 +1036,14 @@ document.body.addEventListener("keyup", (e) => {
   if (local_id == "polity-name") {
     try {
       local_polity.options.entity_name = input;
-      createHistoryEntry(local_class, date, { entity_name: input });
+
+      if (getPreviousEntityName(entity_id, date) != local_polity.options.entity_name) {
+        createHistoryEntry(local_class, date, { entity_name: input });
+      } else {
+        var local_history = getPolityHistory(local_class, date);
+
+        delete local_history.class_name;
+      }
 
       //Repopulate bio
       populateEntityBio(local_class);
