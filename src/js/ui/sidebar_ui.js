@@ -376,9 +376,16 @@ function onSidebarDragEnd (arg0_event) {
     moveGroupToGroup(element_id, group_element.id);
 }
 
-function refreshSidebar () {
+function refreshSidebar (arg0_do_not_refresh) {
+  //Convert from parameters
+  var do_not_refresh = arg0_do_not_refresh;
+
   //Declare local instance variables
   var sidebar_el = document.getElementById("hierarchy");
+
+  //Reset HTML
+  if (!do_not_refresh)
+    sidebar_el.innerHTML = "";
 
   //Create all layer elements
   for (var i = 0; i < layers.length; i++) {

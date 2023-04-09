@@ -1,13 +1,77 @@
-function getGroup (arg0_group_id) {
+function deleteGroup (arg0_group_id) {
   //Convert from parameters
   var group_id = arg0_group_id;
+
+  //Declare local instance variables
+  var context_menu_el = document.getElementById("hierarchy-context-menu");
+  var group_layer = getGroup(group_id, { return_layer: true });
+  var group_obj = getGroup(group_id);
+  var parent_group = getGroupGroup(group_id);
+
+  if (group_obj) {
+    //Make sure to move all subgroups and entities out into group's parent element if it exists (change parent_group)
+    if (parent_group)
+      if (group_obj.subgroups) {
+        if (!parent_group.subgroups) parent_group.subgroups = [];
+
+        //Add all current subgroups to parent_group.subgroups if not already there
+        for (var i = 0; i < group_obj.subgroups.length; i++)
+          if (!parent_group.subgroups.includes(group_obj.subgroups[i]))
+            parent_group.subgroups.push(group_obj.subgroups[i]);
+      }
+
+    //Delete group
+    delete window[`${group_layer}_groups`][group_id];
+
+    //Close context menu if attached to current group
+    var context_menu_group = context_menu_el.getAttribute("group");
+
+    if (context_menu_group == group_id)
+      closeSidebarContextMenu();
+
+    //Refresh sidebar
+    refreshSidebar();
+  }
+}
+
+function deleteGroupRecursively (arg0_group_id) { //[WIP] - Finish rest of function
+  //Convert from parameters
+  var group_id = arg0_group_id;
+
+  //Declare local instance variables
+  var context_menu_el = document.getElementById("hierarchy-context-menu");
+  var group_layer = getGroup(group_id, { return_layer: true });
+  var group_obj = getGroup(group_id);
+  var parent_group = getGroupGroup(group_id);
+  var still_has_subgroups = true;
+
+  //Delete all subgroups first to move everything to the base group until group_obj has no subgroups
+
+  //Delete all entities remaining in base group
+}
+
+/*
+  getGroup() - Returns a group object or key.
+  {
+    return_layer: true/false - Whether to return the layer key instead of object
+    return_key: true/false - Whether to return the key instead of object
+  }
+*/
+function getGroup (arg0_group_id, arg1_options) {
+  //Convert from parameters
+  var group_id = arg0_group_id;
+  var options = (arg1_options) ? arg1_options : {};
 
   //Iterate over all layers for group ID
   for (var i = 0; i < layers.length; i++) {
     var local_layer = window[`${layers[i]}_groups`];
 
     if (local_layer[group_id])
-      return local_layer[group_id];
+      if (options.return_layer) {
+        return layers[i];
+      } else {
+        return (!options.return_key) ? local_layer[group_id] : group_id;
+      }
   }
 }
 
