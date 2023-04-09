@@ -166,11 +166,10 @@ function generateEntityID () {
   }
 }
 
-function getArea (arg0_entity_id, arg1_date, arg2_test) {
+function getArea (arg0_entity_id, arg1_date) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var date = arg1_date;
-  var test = arg2_test;
 
   //Declare local instance variables
   var entity_area = 0;
@@ -181,7 +180,7 @@ function getArea (arg0_entity_id, arg1_date, arg2_test) {
     var local_history = getPolityHistory(entity_id, date);
 
     if (local_history) {
-      var local_coordinates = getTurfCoordinates(entity_id, date, test);
+      var local_coordinates = getTurfCoordinates(entity_id, date);
 
       entity_area = turf.area(
         turf[local_coordinates[1]](local_coordinates[0])
@@ -224,11 +223,10 @@ function getPoly (arg0_geoJSON) {
 }
 
 //Returns [coordinates, type];
-function getTurfCoordinates (arg0_entity_id, arg1_date, arg2_test) {
+function getTurfCoordinates (arg0_entity_id, arg1_date) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var date = arg1_date;
-  var test = arg2_test;
 
   //Declare local instance variables
   var local_entity = getEntity(entity_id);
