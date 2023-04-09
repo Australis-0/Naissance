@@ -1,3 +1,67 @@
+function createGroup (arg0_parent_group_id, arg1_do_not_refresh) {
+  //Convert from parameters
+  var parent_group_id = arg0_parent_group_id;
+  var do_not_refresh = arg1_do_not_refresh;
+
+  //Declare local instance variables
+  var group_id = generateGroupID();
+  var group_obj = {
+    name: "New Group",
+    parent_group: (parent_group_id) ? parent_group_id : undefined
+  };
+  var sidebar_el = document.getElementById("hierarchy");
+
+  var selected_layer_el = sidebar_el.querySelector(`[id='${selected_layer}']`);
+
+  window[`${selected_layer}_groups`][group_id] = group_obj;
+
+  //Create actual UI element
+  var group_el = createGroupElement(selected_layer, group_id);
+
+  //If group_obj.parent_group is not defined, we know we're creating it directly in a layer
+  if (!group_obj.parent_group) {
+    var all_first_layer_entities = selected_layer_el.querySelectorAll(`.layer > .entity`);
+    var all_first_layer_groups = selected_layer_el.querySelectorAll(`.layer > .group`);
+
+    (all_first_layer_groups.length > 0) ?
+      all_first_layer_groups[all_first_layer_groups.length - 1].after(group_el) :
+      (all_first_layer_entities.length > 0) ?
+        all_first_layer_entities[0].before(group_el) :
+        selected_layer_el.append(group_el);
+  } else {
+    //Assign to subgroups element
+    var subgroups_el = sidebar_el.querySelector(`[id='${parent_group_id}-subgroups']`);
+
+    //Make sure it exists in new parent .subgroups
+    if (parent_group_id) {
+      var parent_group = getGroup(parent_group_id);
+
+      if (parent_group) {
+        if (!parent_group.subgroups) parent_group.subgroups = [];
+        parent_group.subgroups.push(group_id);
+      }
+    }
+
+    //Append to sidebar HTML regardless
+    if (subgroups_el)
+      subgroups_el.append(group_el);
+  }
+
+  //Refresh sidebar
+  if (!do_not_refresh) {
+    refreshSidebar();
+
+    //Focus on newly created group
+    var actual_group_el = selected_layer_el.querySelectorAll(`[id='${group_id}'].group > input`);
+
+    if (actual_group_el.length > 0)
+      actual_group_el[0].focus();
+  }
+
+  //Return statement
+  return group_obj;
+}
+
 function deleteGroup (arg0_group_id, arg1_do_not_refresh) {
   //Convert from parameters
   var group_id = arg0_group_id;
