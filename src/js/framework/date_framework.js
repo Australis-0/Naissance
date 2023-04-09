@@ -55,6 +55,7 @@ function getTimestamp (arg0_date) {
   var date = arg0_date;
 
   //Guard clause
+  if (typeof date == "string") date = parseInt(date);
   if (!isNaN(parseInt(date))) return date;
 
   //Declare local instance variables
@@ -105,11 +106,12 @@ function loadDate (arg0_old_date) {
 
     for (var x = 0; x < local_layer.length; x++) {
       var do_not_reload = false;
-      var local_history = getPolityHistory(local_layer[x].options.className, date, { layer: layers[i] });
+      var local_entity_id = local_layer[x].options.className;
+      var local_history = getPolityHistory(local_entity_id, date, { layer: layers[i] });
 
       //Check against old date
       if (old_date) {
-        var local_old_history = getPolityHistory(local_layer[x].options.className, old_date, { layer: layers[i] });
+        var local_old_history = getPolityHistory(local_entity_id, old_date, { layer: layers[i] });
 
         if (local_old_history && local_history)
           if (local_old_history.id == local_history.id)
@@ -121,7 +123,17 @@ function loadDate (arg0_old_date) {
         //Reload object; add to map
         local_layer[x].remove();
 
-        if (local_history)
+        if (local_history) {
+          //Update UIs for each open popup
+          var local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
+
+          if (local_popup) {
+            var name_field = local_popup.querySelector(`input#polity-name`);
+
+            name_field.value = getEntityName(local_entity_id);
+          }
+
+          //Run through each options type
           if (local_layer[x].options.type == "polity")
             //Make sure polity is not extinct
             if (!local_history.options.extinct) {
@@ -149,6 +161,7 @@ function loadDate (arg0_old_date) {
                   current_union = unify(current_entity.getLayers());
                 }
             }
+        }
       }
     }
   }

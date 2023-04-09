@@ -173,10 +173,10 @@ function getArea (arg0_entity_id, arg1_date) {
 
   //Declare local instance variables
   var entity_area = 0;
-  var local_entity = getEntity(entity_id);
+  var entity_obj = getEntity(entity_id);
 
-  //Check to make sure local_entity exists
-  if (local_entity) {
+  //Check to make sure entity_obj exists
+  if (entity_obj) {
     var local_history = getPolityHistory(entity_id, date);
 
     if (local_history)
@@ -313,16 +313,29 @@ function getEntity (arg0_entity_id, arg1_layer) {
   return local_entity;
 }
 
-function getEntityName (arg0_entity_id) {
+function getEntityName (arg0_entity_id, arg1_date) {
   //Convert from parmateers
   var entity_id = arg0_entity_id;
+  var date = arg1_date;
 
   //Declare local instance variables
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
   var entity_name;
-  var local_entity = getEntity(entity_id);
+  var entity_obj = getEntity(entity_id);
 
-  if (local_entity)
-    entity_name = (local_entity.options.entity_name) ? local_entity.options.entity_name : undefined;
+  if (entity_obj)
+    if (entity_obj.options)
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++) {
+          var local_history = entity_obj.options.history[all_history_entries[i]];
+
+          if (parseInt(local_history.id) <= ending_timestamp)
+            if (local_history.options.entity_name)
+              entity_name = local_history.options.entity_name;
+        }
+      }
 
   if (!entity_name)
     if (window.current_union)
@@ -331,6 +344,34 @@ function getEntityName (arg0_entity_id) {
 
   //Return statement
   return (entity_name) ? entity_name : "Unnamed Polity";
+}
+
+function getPreviousEntityName (arg0_entity_id, arg1_date) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+
+  //Declare local instance variables
+  var ending_timestamp = getTimestamp(date);
+  var entity_obj = getEntity(entity_id);
+  var last_history_name = (entity_obj.entity_name) ? entity_obj.entity_name : undefined;
+
+  //Iterate over all history entries if they exist
+  if (entity_obj.options)
+    if (entity_obj.options.history) {
+      var all_history_entries = Object.keys(entity_obj.options.history);
+
+      for (var i = 0; i < all_history_entries.length; i++) {
+        var local_history = entity_obj.options.history[all_history_entries[i]];
+
+        if (parseInt(local_history.id) < ending_timestamp)
+          if (local_history.options.entity_name)
+            last_history_name = local_history.options.entity_name;
+      }
+    }
+
+  //Return statement
+  return last_history_name;
 }
 
 function moveEntityToGroup (arg0_entity_id, arg1_group_id) {

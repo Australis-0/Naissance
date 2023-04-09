@@ -534,8 +534,7 @@ function populateEntityBio (arg0_entity_id) {
       var timestamp = ` timestamp = ${all_histories[i]}`;
 
       if (!last_history_entry) {
-        var actual_entity_name = (entity_obj.options.entity_name) ?
-          entity_obj.options.entity_name : `Unnamed Polity`;
+        var actual_entity_name = getEntityName(entity_id, all_histories[i]);
 
         //This is the first history entry. Mark it as such
         bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${actual_entity_name} is founded.</td></tr>`);
@@ -552,11 +551,18 @@ function populateEntityBio (arg0_entity_id) {
         //Colour/customisation handler
         {
           var customisation_changed = false;
+          var entity_name_string = ``;
           var fill_colour_string = ``;
           var fill_opacity_string = ``;
           var stroke_colour_string = ``;
           var stroke_opacity_string = ``;
 
+          if (local_options.entity_name) {
+            var previous_entity_name = getPreviousEntityName(entity_id, all_histories[i]);
+
+            if (previous_entity_name)
+              entity_name_string = `Name changed from ${previous_entity_name} to ${local_options.entity_name}. `;
+          }
           if (local_options.fillColor)
             fill_colour_string = `Fill colour changed to <span class = "bio-box" style = "color: ${local_options.fillColor};">&#8718;</span>. `;
           if (local_options.fillOpacity)
@@ -566,12 +572,14 @@ function populateEntityBio (arg0_entity_id) {
           if (local_options.opacity)
             stroke_opacity_string = `Stroke opacity changed to ${printPercentage(local_options.opacity)}. `;
 
-          if ((fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string).length > 0)
+          if ((
+            entity_name_string + fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string
+          ).length > 0)
             customisation_changed = true;
 
           //Check if customisation_changed
           if (customisation_changed)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}</span></td></tr>`); //[WIP] - Actually style
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_name_string}${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}</span></td></tr>`); //[WIP] - Actually style
         }
 
         //Land area handler
@@ -582,7 +590,7 @@ function populateEntityBio (arg0_entity_id) {
             land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
 
           if (land_percentage_change != 0)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_obj.options.entity_name} ${land_percentage_change_string}</span></td></tr>`);
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${getEntityName(entity_id, local_date)} ${land_percentage_change_string}</span></td></tr>`);
         }
       }
     }
@@ -1025,6 +1033,10 @@ document.body.addEventListener("keyup", (e) => {
   if (local_id == "polity-name") {
     try {
       local_polity.options.entity_name = input;
+      createHistoryEntry(local_class, date, { entity_name: input });
+
+      //Repopulate bio
+      populateEntityBio(local_class);
     } catch {}
 
     //current_union handler
