@@ -44,8 +44,9 @@ function deleteEntity (arg0_entity_id) {
       var local_group = local_layer_groups[all_layer_groups[x]];
 
       //Splice from entities
-      for (var y = 0; y < local_group.entities.length; y++)
-        local_group.entities.splice(y, 1);
+      if (local_group.entities)
+        for (var y = 0; y < local_group.entities.length; y++)
+          local_group.entities.splice(y, 1);
     }
   }
 

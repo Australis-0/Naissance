@@ -1,6 +1,7 @@
-function deleteGroup (arg0_group_id) {
+function deleteGroup (arg0_group_id, arg1_do_not_refresh) {
   //Convert from parameters
   var group_id = arg0_group_id;
+  var do_not_refresh = arg1_do_not_refresh;
 
   //Declare local instance variables
   var context_menu_el = document.getElementById("hierarchy-context-menu");
@@ -23,6 +24,25 @@ function deleteGroup (arg0_group_id) {
     //Delete group
     delete window[`${group_layer}_groups`][group_id];
 
+    //Remove all mentions of group_id from subgroups in layer
+    var layer_groups = window[`${group_layer}_groups`];
+
+    var all_layer_groups = Object.keys(layer_groups);
+
+    for (var i = 0; i < all_layer_groups.length; i++) {
+      var local_group = layer_groups[all_layer_groups[i]];
+
+      if (local_group.subgroups)
+        for (var x = 0; x < local_group.subgroups.length; x++)
+          if (local_group.subgroups[x] == group_id)
+            local_group.subgroups.splice(x, 1);
+
+      //Delete local_group.subgroups key if nothing is left
+      if (local_group.subgroups)
+        if (local_group.subgroups.length == 0)
+          delete local_group.subgroups;
+    }
+
     //Close context menu if attached to current group
     var context_menu_group = context_menu_el.getAttribute("group");
 
@@ -30,11 +50,12 @@ function deleteGroup (arg0_group_id) {
       closeSidebarContextMenu();
 
     //Refresh sidebar
-    refreshSidebar();
+    if (!do_not_refresh)
+      refreshSidebar();
   }
 }
 
-function deleteGroupRecursively (arg0_group_id) { //[WIP] - Finish rest of function
+function deleteGroupRecursively (arg0_group_id) {
   //Convert from parameters
   var group_id = arg0_group_id;
 
@@ -46,8 +67,33 @@ function deleteGroupRecursively (arg0_group_id) { //[WIP] - Finish rest of funct
   var still_has_subgroups = true;
 
   //Delete all subgroups first to move everything to the base group until group_obj has no subgroups
+  var clear_subgroups_loop = setInterval(function(){
+    if (!group_obj.subgroups) {
+      still_has_subgroups = false;
+    } else
+      try {
+        if (group_obj.subgroups)
+          for (var i = 0; i < group_obj.subgroups.length; i++)
+            deleteGroup(group_obj.subgroups[i], true);
+      } catch {}
 
-  //Delete all entities remaining in base group
+    if (!still_has_subgroups) {
+      //Delete all entities remaining in base group
+      if (group_obj.entities)
+        for (var i = 0; i < group_obj.entities.length; i++)
+          deleteEntity(group_obj.entities[i]);
+
+      //Delete group proper
+      deleteGroup(group_id, true);
+
+      //Refresh sidebar; reload map
+      refreshSidebar();
+      loadDate();
+
+      //Clear interval
+      clearInterval(clear_subgroups_loop);
+    }
+  }, 0);
 }
 
 /*
