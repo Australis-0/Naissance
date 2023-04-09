@@ -519,8 +519,6 @@
 
 /* -- Container styling: Actions -- */
 
-#entity-ui-actions-container table {
-}
 #entity-ui-actions-container tr td {
   border: 0px;
   display: table-cell;

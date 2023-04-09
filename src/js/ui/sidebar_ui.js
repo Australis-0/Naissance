@@ -424,7 +424,6 @@ function refreshSidebar () {
       animation: 350,
       group: "hierarchy",
       fallbackOnBody: true,
-      filter: ".layer:not(.layer div)",
       swapThreshold: 0.65,
 
       onEnd: function (e) {

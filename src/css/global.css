@@ -66,4 +66,5 @@ td {
   --entity-ui-width: calc(20vw + 24px);
   --graph-label-font-size: calc(0.5vw);
   --selection-colour: rgba(255, 255, 255, 0.3);
+  --sidebar-width: calc(25vw);
 }
