@@ -456,6 +456,7 @@ function openContextMenu (arg0_entity_id, arg1_parent_el) {
   //Declare local instance variables
   var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
   var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
+  var context_menu_date_el = document.querySelector(`#context-date-menu-${entity_id}`);
   var header_el = document.getElementById(`entity-ui-header`);
   var offset_top = parent_el.offsetTop - bio_container_el.scrollTop;
   var timeline_graph_el = document.getElementById(`entity-ui-timeline-graph-container-${entity_id}`);
@@ -471,7 +472,11 @@ function openContextMenu (arg0_entity_id, arg1_parent_el) {
       .replace(" instant-display-none", "")
       .replace(" display-none", "")
   );
-  context_menu_el.style.top = `calc(${header_el.offsetHeight}px + ${timeline_graph_el.offsetHeight}px + ${timeline_header_el.offsetHeight}px + ${top_bio_header_el.offsetHeight}px + ${offset_top}px + 8px)`;
+
+  var top_string = `calc(${header_el.offsetHeight}px + ${timeline_graph_el.offsetHeight}px + ${timeline_header_el.offsetHeight}px + ${top_bio_header_el.offsetHeight}px + ${offset_top}px + 8px)`;
+
+  context_menu_el.style.top = top_string;
+  context_menu_date_el.style.top = top_string;
 
   //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
   var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
