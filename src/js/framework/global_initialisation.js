@@ -55,29 +55,7 @@ window.right_mouse = false;
 //UI
 {
   //Entity UI
-  window.current_entity_ui = {
-    className: "entity-ui-container",
-    content: `
-      <div id = "entity-ui-header">
-        <div id = "entity-ui-header-container">
-          <input id = "polity-name" class = "{ENTITY_CLASS}" value = "{ENTITY_NAME}"></input>
-
-          <img class = "button cross-icon" id = "close-popup" onclick = "closePopup();" draggable = "false">
-        </div>
-      </div>
-
-      <div id = "entity-ui-container">
-        <table id = "entity-ui-button-container" class = "entity-button-container">
-          <tr>
-            <td>
-              <img id = "confirm-entity" class = "medium button checkmark-icon" onclick = "finishEntity(); closePopup();"><span>Finish Polity</span>
-            </td>
-          </tr>
-        </table>
-      </div>
-    `,
-    interactive: true
-  };
+  window.actions_with_context_menu = ["apply-path", "hide-polity", "simplify-entity"];
   window.entity_options = {
     className: "current-union"
   };

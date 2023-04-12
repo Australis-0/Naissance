@@ -51,6 +51,20 @@ function closeContextDateMenu (arg0_entity_id, arg1_instant) {
     context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
 }
 
+function closeActionContextMenu (arg0_entity_id) { //[WIP] - Update when new menus are attached
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
+
+  //Set to display-none
+  if (!actions_context_menu_el.getAttribute("class").includes("display-none"))
+    actions_context_menu_el.setAttribute("class", actions_context_menu_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
+
+  //Close attached menus
+}
+
 function closeContextMenu (arg0_entity_id, arg1_instant) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
@@ -464,6 +478,26 @@ function minimiseUI (arg0_element, arg1_tab) {
     //Remove tab collapsed flag
     delete window[collapsed_flag];
   }
+}
+
+function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish rest of function
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var mode = arg1_mode;
+
+  //Declare local instance variables
+  var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
+
+  //Close previously attached menus
+
+  //Set actions_context_menu_el to be visible
+  actions_context_menu_el.setAttribute("class",
+    actions_context_menu_el.getAttribute("class")
+      .replace(" instant-display-none", "")
+      .replace(" display-none", "")
+  );
+
+  //Set actions_context_menu_el content according to mode
 }
 
 function openContextMenu (arg0_entity_id, arg1_parent_el) {
