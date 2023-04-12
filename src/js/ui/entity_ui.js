@@ -286,6 +286,10 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
       </div>
     </div>
 
+    <!-- Actions Context Menu -->
+    <div id = "entity-ui-actions-menu-${entity_id}" class = "actions-context-menu-container instant-display-none">
+    </div>
+
     ${local_actions_ui}
 
     <!--  Bio Entry Context Menu -->

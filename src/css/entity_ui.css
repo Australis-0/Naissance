@@ -250,6 +250,18 @@
   background-color: var(--selection-colour);
 }
 
+/* -- Container styling: Actions Context Menu -- */
+.actions-context-menu-container {
+  position: fixed;
+  left: calc(var(--entity-ui-width) + 20px);
+  width: var(--context-menu-width);
+
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  color: black;
+  font-size: 1vh;
+}
+
 /* -- Container styling: Bio Context Menu -- */
 .bio-context-menu-container {
   position: fixed;
