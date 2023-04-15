@@ -391,10 +391,11 @@ function renderEntities (arg0_ignore_date) {
   }
 }
 
-function simplify (arg0_entity_id, arg1_tolerance) {
+function simplify (arg0_entity_id, arg1_tolerance, arg2_date) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var tolerance = (arg1_tolerance) ? arg1_tolerance : 0.01;
+  var date = arg2_date;
 
   //Declare local instance variables
   var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
@@ -414,6 +415,28 @@ function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var tolerance = arg1_tolerance;
+
+  //Declare local instance variables
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+  if (entity_obj) {
+    if (entity_obj.history) {
+      var all_history_entries = Object.keys(entity_obj.history);
+
+      for (var i = 0; i < all_history_entries.length; i++) {
+        var local_date = parseTimestamp(all_history_entries[i]);
+        var local_entry = entity_obj.history[all_history_entries[i]];
+        var local_simplified_coords = simplify(entity_id, tolerance, local_date);
+
+        //Extract coords from local_simplified_coords
+        var local_layers = Object.keys(local_simplified_coords._layers);
+        local_entry.coords = local_simplified_coords._layers[local_layers[0]]._latlngs;
+      }
+    }
+
+    //Simplify current entity to update coords on map
+    simplifyEntity(entity_id, tolerance);
+  }
 }
 
 function simplifyEntity (arg0_entity_id, arg1_tolerance) {

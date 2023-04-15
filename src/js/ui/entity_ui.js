@@ -522,7 +522,6 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
         <input type = "checkbox" id = "simplify-auto-simplify-when-editing-${entity_id}" checked> <span>Auto-Simplify When Editing</span>
       </div>
       <div class = "context-menu-subcontainer">
-        <!-- 1 represents 0.001, 100 represents 0.1 -->
         <span>Strength: </span> <input type = "range" id = "simplify-tolerance-${entity_id}" min = "0" max = "100">
       </div>
       <div class = "context-menu-button confirm" id = "simplify-${entity_id}">
@@ -531,7 +530,18 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     `;
 
     //Set listener events
+    document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
+      //Declare local instance variables
+      var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
+      var auto_simplify_when_editing = document.getElementById(`simplify-auto-simplify-when-editing-${entity_id}`);
+      var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
 
+      var simplify_value = parseInt(simplify_tolerance_el.value);
+
+      //1 represents 0.001, 100 represents 0.1
+      var simplify_tolerance = simplify_value/Math.pow(10, 3);
+      
+    };
   }
 }
 
