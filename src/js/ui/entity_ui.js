@@ -522,7 +522,7 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
         <input type = "checkbox" id = "simplify-auto-simplify-when-editing-${entity_id}" checked> <span>Auto-Simplify When Editing</span>
       </div>
       <div class = "context-menu-subcontainer">
-        <span>Strength: </span> <input type = "range" id = "simplify-tolerance-${entity_id}" min = "0" max = "100">
+        <span>Strength: </span> <input type = "range" id = "simplify-tolerance-${entity_id}" min = "0" max = "100" value = "10">
       </div>
       <div class = "context-menu-button confirm" id = "simplify-${entity_id}">
         <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Confirm</span>
