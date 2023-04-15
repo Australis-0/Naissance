@@ -171,7 +171,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
         <tr>
           <td></td>
           <td>
-            <img src = "gfx/interface/clean_keyframes_icon.png" id = "hide-polity" class = "medium button" draggable = "false"><span>Clean Keyframes</span>
+            <img src = "gfx/interface/clean_keyframes_icon.png" id = "clean-keyframes" class = "medium button" draggable = "false"><span>Clean Keyframes</span>
           </td>
         </tr>
       </table>
@@ -394,10 +394,16 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
           //Check if target is context menu
           try {
+            //Bio context menu
             if (e.composedPath()[0].getAttribute("class"))
               if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
                 //Set context menu to be visible and teleport to selected element; close previously attached menus
                 openContextMenu(entity_id, e.composedPath()[1]);
+
+            //Actions
+            if (e.composedPath()[0].getAttribute("id"))
+              if (e.composedPath()[0].id == "simplify-entity")
+                openActionContextMenu(entity_id, "simplify");
           } catch (e) {
             console.log(e);
           }
@@ -498,6 +504,15 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
   );
 
   //Set actions_context_menu_el content according to mode
+  if (mode == "simplify") {
+    actions_context_menu_el.innerHTML = `
+      <div class = "context-menu-subcontainer">
+        <input type = "checkbox" id = "simplify-apply-to-all-keyframes-${entity_id}"> <span>Apply to All Keyframes</span>
+        <br>
+        <input type = "checkbox" id = "simplify-auto-simplify-when-editing-${entity_id}" checked> <span>Auto-Simplify When Editing</span>
+      </div>
+    `;
+  }
 }
 
 function openContextMenu (arg0_entity_id, arg1_parent_el) {
