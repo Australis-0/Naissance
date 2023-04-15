@@ -227,7 +227,7 @@ function getPoly (arg0_geoJSON) {
 function getTurfCoordinates (arg0_entity_id, arg1_date) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
-  var date = arg1_date;
+  var date = (arg1_date) ? arg1_date : window.date;
 
   //Declare local instance variables
   var local_entity = getEntity(entity_id);
@@ -388,6 +388,47 @@ function renderEntities (arg0_ignore_date) {
       local_layer[x].on("click", function (e) {
         entityUI(e, false, true);
       });
+  }
+}
+
+function simplify (arg0_entity_id, arg1_tolerance) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var tolerance = (arg1_tolerance) ? arg1_tolerance : 0.01;
+
+  //Declare local instance variables
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+  if (entity_obj) {
+    var actual_coords = getTurfCoordinates(entity_id);
+    var turf_coords = turf[actual_coords[1]](actual_coords[0]);
+
+    var simplified_coords = turf.simplify(turf_coords, { tolerance: tolerance, highQuality: true });
+
+    //Return statement
+    return L.geoJSON(simplified_coords);
+  }
+}
+
+function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var tolerance = arg1_tolerance;
+}
+
+function simplifyEntity (arg0_entity_id, arg1_tolerance) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var tolerance = arg1_tolerance;
+
+  //Declare local instance variables
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+  if (entity_obj) {
+    var simplified_coords = simplify(entity_obj, tolerance);
+
+    var all_layers = Object.keys(simplified_coords._layers);
+    entity_obj.setLatLngs(simplified_coords._layers[all_layers[0]]._latlngs);
   }
 }
 

@@ -25,6 +25,10 @@ td {
   height: 1vh;
   width: 1vh;
 }
+.icon.medium {
+  height: 1.25vh;
+  width: 1.25vh;
+}
 .negative {
   filter: invert(1);
 }

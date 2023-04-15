@@ -51,9 +51,10 @@ function closeContextDateMenu (arg0_entity_id, arg1_instant) {
     context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
 }
 
-function closeActionContextMenu (arg0_entity_id) { //[WIP] - Update when new menus are attached
+function closeActionContextMenu (arg0_entity_id, arg1_instant) { //[WIP] - Update when new menus are attached
   //Convert from parameters
   var entity_id = arg0_entity_id;
+  var instant = arg1_instant;
 
   //Declare local instance variables
   var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
@@ -157,7 +158,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
             <img src = "gfx/interface/empty_icon.png" class = "medium button pencil-icon" id = "edit-entity" onclick = "editEntity('${entity_id}');" draggable = "false"><span>Edit Polity</span>
           </td>
           <td>
-            <img src = "gfx/interface/simplify_icon.png" id = "simplify-entity" class = "medium button" draggable = "false"><span>Simplify Path</span>
+            <img src = "gfx/interface/simplify_icon.png" id = "simplify-entity" class = "medium button" draggable = "false" context = "true"><span>Simplify Path</span>
           </td>
         </tr>
         <tr>
@@ -416,6 +417,12 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
               !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
             )
               closeContextMenu(entity_id);
+
+            if (
+              !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-actions-menu-${entity_id}`) &&
+              !arrayHasElementAttribute(e.composedPath(), "context", "true")
+            )
+              closeActionContextMenu(entity_id);
           } catch (e) {
             console.log(e);
           }
@@ -507,11 +514,24 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
   if (mode == "simplify") {
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
+        <b>Simplify Path:</b>
+      </div>
+      <div class = "context-menu-subcontainer">
         <input type = "checkbox" id = "simplify-apply-to-all-keyframes-${entity_id}"> <span>Apply to All Keyframes</span>
         <br>
         <input type = "checkbox" id = "simplify-auto-simplify-when-editing-${entity_id}" checked> <span>Auto-Simplify When Editing</span>
       </div>
+      <div class = "context-menu-subcontainer">
+        <!-- 1 represents 0.001, 100 represents 0.1 -->
+        <span>Strength: </span> <input type = "range" id = "simplify-tolerance-${entity_id}" min = "0" max = "100">
+      </div>
+      <div class = "context-menu-button confirm" id = "simplify-${entity_id}">
+        <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Confirm</span>
+      </div>
     `;
+
+    //Set listener events
+
   }
 }
 
