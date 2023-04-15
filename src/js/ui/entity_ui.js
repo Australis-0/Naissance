@@ -532,15 +532,18 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     //Set listener events
     document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
       //Declare local instance variables
-      var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
       var auto_simplify_when_editing = document.getElementById(`simplify-auto-simplify-when-editing-${entity_id}`);
+      var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
       var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
 
       var simplify_value = parseInt(simplify_tolerance_el.value);
 
       //1 represents 0.001, 100 represents 0.1
       var simplify_tolerance = simplify_value/Math.pow(10, 3);
-      
+
+      (simplify_all_keyframes_el.checked) ?
+        simplifyAllEntityKeyframes(entity_id, simplify_tolerance) :
+        simplifyEntity(entity_id, simplify_tolerance);
     };
   }
 }
@@ -733,8 +736,6 @@ function populateEntityBio (arg0_entity_id) {
 
         date = parseTimestamp(local_timestamp);
         loadDate();
-
-        console.log(getArea("15301473073", date, true));
       };
   } else {
     //Hide the Bio UI if entity_obj is not defined yet

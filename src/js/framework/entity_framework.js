@@ -401,7 +401,7 @@ function simplify (arg0_entity_id, arg1_tolerance, arg2_date) {
   var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
   if (entity_obj) {
-    var actual_coords = getTurfCoordinates(entity_id);
+    var actual_coords = getTurfCoordinates(entity_id, date);
     var turf_coords = turf[actual_coords[1]](actual_coords[0]);
 
     var simplified_coords = turf.simplify(turf_coords, { tolerance: tolerance, highQuality: true });
@@ -420,12 +420,12 @@ function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
   var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
   if (entity_obj) {
-    if (entity_obj.history) {
-      var all_history_entries = Object.keys(entity_obj.history);
+    if (entity_obj.options.history) {
+      var all_history_entries = Object.keys(entity_obj.options.history);
 
       for (var i = 0; i < all_history_entries.length; i++) {
         var local_date = parseTimestamp(all_history_entries[i]);
-        var local_entry = entity_obj.history[all_history_entries[i]];
+        var local_entry = entity_obj.options.history[all_history_entries[i]];
         var local_simplified_coords = simplify(entity_id, tolerance, local_date);
 
         //Extract coords from local_simplified_coords
@@ -445,13 +445,22 @@ function simplifyEntity (arg0_entity_id, arg1_tolerance) {
   var tolerance = arg1_tolerance;
 
   //Declare local instance variables
-  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id
 
   if (entity_obj) {
     var simplified_coords = simplify(entity_obj, tolerance);
 
     var all_layers = Object.keys(simplified_coords._layers);
-    entity_obj.setLatLngs(simplified_coords._layers[all_layers[0]]._latlngs);
+    var actual_coords = simplified_coords._layers[all_layers[0]]._latlngs;
+
+    entity_obj.setLatLngs(actual_coords);
+
+    //Set history entry to reflect actual_coords
+    if (entity_obj.options.history) {
+      var current_history_entry = getPolityHistory(entity_obj, window.date);
+
+      current_history_entry.coords = actual_coords;
+    }
   }
 }
 

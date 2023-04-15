@@ -154,7 +154,7 @@ function getPolityHistory (arg0_entity_id, arg1_date, arg2_options) {
   var options = (arg2_options) ? arg2_options : {};
 
   //Declare local instance variables
-  var entity_obj = getEntity(entity_id, options.layer);
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id, options.layer) : entity_id;
   var entry_timestamp = getTimestamp(arg1_date);
 
   //Check that entity_obj actually exists
