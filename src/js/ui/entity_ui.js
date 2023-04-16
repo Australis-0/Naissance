@@ -570,8 +570,10 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     onRangeChange(simplify_tolerance_el, function (e) {
       var simplify_value = parseInt(e.target.value);
 
+      var simplify_tolerance = simplify_value/Math.pow(10, 3);
+
       //Set global flag
-      window.simplify_tolerance = simplify_value;
+      window.simplify_tolerance = simplify_tolerance;
     });
   }
 }

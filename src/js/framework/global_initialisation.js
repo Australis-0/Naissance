@@ -40,6 +40,9 @@ window.date = {
   }
 */
 
+//Default brush options
+window.auto_simplify_when_editing = true;
+
 //Entity renderer
 window.layers = ["polities"];
 window.polities_groups = {};

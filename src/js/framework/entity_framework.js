@@ -126,6 +126,7 @@ function finishEntity () {
     new_entity.options.has_id = true;
   }
 
+  var entity_id = new_entity.options.className;
   var new_union = L.polygon(coords, new_entity.options);
 
   clearBrush();
@@ -144,8 +145,15 @@ function finishEntity () {
   if (window.current_union)
     current_union.options = {};
 
+  //Global brush options processing
+  {
+    //Auto-simplify when editing
+    if (window.auto_simplify_when_editing)
+      simplifyEntity(entity_id, window.simplify_tolerance);
+  }
+
   //Return statement
-  return new_entity.options.className;
+  return entity_id;
 }
 
 function generateEntityID () {
