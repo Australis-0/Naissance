@@ -529,13 +529,34 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
       </div>
     `;
 
-    //Set listener events
-    document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
-      //Declare local instance variables
-      var auto_simplify_when_editing = document.getElementById(`simplify-auto-simplify-when-editing-${entity_id}`);
-      var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
-      var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
+    //Declare local instance variables
+    var auto_simplify_when_editing_el = document.getElementById(`simplify-auto-simplify-when-editing-${entity_id}`);
+    var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
+    var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
 
+    //Set default if not already defined
+    if (!window.auto_simplify_when_editing) window.auto_simplify_when_editing = true;
+    if (!window.simplify_all_keyframes_el) window.simplify_all_keyframes_el = false;
+    if (!window.simplify_tolerance) window.simplify_tolerance = 10;
+
+    //Auto-populate based on global settings
+    if (window.auto_simplify_when_editing)
+      auto_simplify_when_editing_el.checked = true;
+    if (window.simplify_all_keyframes_el)
+      simplify_all_keyframes_el.checked = true;
+    if (window.simplify_tolerance)
+      simplify_tolerance_el.value = window.simplify_tolerance;
+
+    //Set listener events
+    auto_simplify_when_editing_el.onclick = function (e) {
+      //Set global flag
+      window.auto_simplify_when_editing = e.target.checked;
+    };
+    simplify_all_keyframes_el.onclick = function (e) {
+      //Set global flag
+      window.simplify_all_keyframes_el = e.target.checked;
+    };
+    document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
       var simplify_value = parseInt(simplify_tolerance_el.value);
 
       //1 represents 0.001, 100 represents 0.1
@@ -545,6 +566,13 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
         simplifyAllEntityKeyframes(entity_id, simplify_tolerance) :
         simplifyEntity(entity_id, simplify_tolerance);
     };
+
+    onRangeChange(simplify_tolerance_el, function (e) {
+      var simplify_value = parseInt(e.target.value);
+
+      //Set global flag
+      window.simplify_tolerance = simplify_value;
+    });
   }
 }
 
