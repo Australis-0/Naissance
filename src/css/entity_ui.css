@@ -571,6 +571,35 @@
   bottom: 0.1vh;
 }
 
+/* -- Container styling: Actions Context Menu: Date styling -- */
+.actions-context-menu-container .day-input {
+  width: 4vh;
+}
+.actions-context-menu-container .hour-input, .actions-context-menu-container .minute-input {
+  width: 2vh;
+}
+.actions-context-menu-container input, .actions-context-menu-container select {
+  border-radius: 0px;
+  color: black;
+  font-family: "Barlow";
+  font-size: 1vh;
+
+  text-align: center;
+  text-align-last: center;
+}
+.actions-context-menu-container input[type="number"]::-webkit-outer-spin-button, .actions-context-menu-container input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.actions-context-menu-container select {
+  -webkit-appearance: none;
+
+  padding: 0.125vh; /* 1/8ths of font size */
+}
+.actions-context-menu-container .year-input {
+  width: 4vh;
+}
+
 /* -- Container styling: Actions Context Menu Animations -- */
 .actions-context-menu-container .context-menu-button:hover {
   background-color: rgba(0, 0, 0, 0.1);

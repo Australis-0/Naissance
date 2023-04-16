@@ -193,12 +193,17 @@ function monthsFromDays (arg0_date) {
 
 function parseTimestamp (arg0_timestamp) {
   //Convert from parameters
-  var timestamp = parseInt(arg0_timestamp);
+  var timestamp = (typeof arg0_timestamp != "object") ? parseInt(arg0_timestamp) : arg0_timestamp;
 
   //Declare local instance variables
   var local_date = {};
 
+  //Guard clause
+  if (typeof timestamp == "object")
+    return timestamp;
+
   //Calculate years
+
   var leap_years = leapYearsBefore(local_date.year);
 
   local_date.year = Math.floor(timestamp/(365.2425*24*60));

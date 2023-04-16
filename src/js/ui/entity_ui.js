@@ -163,7 +163,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
         </tr>
         <tr>
           <td>
-            <img src = "gfx/interface/hide_polity_icon.png" id = "hide-polity" class = "medium button" draggable = "false"><span>Hide Polity</span>
+            <img src = "gfx/interface/hide_polity_icon.png" id = "hide-polity" class = "medium button" draggable = "false" context = "true"><span>Hide Polity</span>
           </td>
           <td>
             <img src = "gfx/interface/apply_path_icon.png" id = "apply-path" class = "medium button" draggable = "false"><span>Apply Path</span>
@@ -402,9 +402,12 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
                 openContextMenu(entity_id, e.composedPath()[1]);
 
             //Actions
-            if (e.composedPath()[0].getAttribute("id"))
+            if (e.composedPath()[0].getAttribute("id")) {
+              if (e.composedPath()[0].id == "hide-polity")
+                openActionContextMenu(entity_id, "hide");
               if (e.composedPath()[0].id == "simplify-entity")
                 openActionContextMenu(entity_id, "simplify");
+            }
           } catch (e) {
             console.log(e);
           }
@@ -511,7 +514,36 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
   );
 
   //Set actions_context_menu_el content according to mode
-  if (mode == "simplify") {
+  if (mode == "hide") {
+    actions_context_menu_el.innerHTML = `
+      <div class = "context-menu-subcontainer">
+        <b>Hide/Unhide Polity:</b>
+      </div>
+      <div class = "context-menu-subcontainer">
+        <center>
+          <select id = "hidden-date-menu-${entity_id}-day" class = "day-input"></select>
+          <select id = "hidden-date-menu-${entity_id}-month" class = "month-input"></select>
+          <input id = "hidden-date-menu-${entity_id}-year" class = "year-input" type = "number">
+        </center>
+        <center>
+          <input id = "hidden-date-menu-${entity_id}-hour" class = "hour-input" type = "number" min = "0" max = "23"> :
+          <input id = "hidden-date-menu-${entity_id}-minute" class = "minute-input" type = "number" min = "0" max = "59">
+
+          <select id = "hidden-date-menu-${entity_id}-year-type"></select>
+        </center>
+      </div>
+
+      <div id = "hidden-mark-polity-as-hidden" class = "context-menu-button">
+        Mark Polity As Hidden
+      </div>
+      <div id = "hidden-mark-polity-as-visible" class = "context-menu-button">
+        Mark Polity As Visible
+      </div>
+    `;
+
+    var prefix = `hidden-date-menu-${entity_id}`;
+    populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date);
+  } else if (mode == "simplify") {
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
         <b>Simplify Path:</b>
