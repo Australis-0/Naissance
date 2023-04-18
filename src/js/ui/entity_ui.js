@@ -542,7 +542,11 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     `;
 
     var prefix = `hidden-date-menu-${entity_id}`;
+
+    //Populate only if not already defined in entity_obj.options
     populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date);
+
+    //Set listener events
   } else if (mode == "simplify") {
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
