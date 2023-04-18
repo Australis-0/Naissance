@@ -452,6 +452,7 @@ function hidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     });
 
     populateEntityBio(entity_id);
+    populateTimelineGraph(entity_id);
 
     if (!do_not_reload)
       loadDate();
@@ -1208,6 +1209,7 @@ function unhidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     });
 
     populateEntityBio(entity_id);
+    populateTimelineGraph(entity_id);
 
     if (!do_not_reload)
       loadDate();

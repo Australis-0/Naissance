@@ -186,14 +186,15 @@ function getArea (arg0_entity_id, arg1_date) {
 
   //Check to make sure entity_obj exists
   if (entity_obj) {
+    var is_extinct = isPolityHidden(entity_id, date);
     var local_history = getPolityHistory(entity_id, date);
 
     if (local_history) {
       var local_coordinates = getTurfCoordinates(entity_id, date);
 
-      entity_area = turf.area(
+      entity_area = (!is_extinct) ? turf.area(
         turf[local_coordinates[1]](local_coordinates[0])
-      );
+      ) : 0;
     }
   }
 
@@ -367,8 +368,11 @@ function isPolityHidden (arg0_entity_id, arg1_date) {
           var local_history = entity_obj.options.history[all_history_entries[i]];
 
           if (parseInt(local_history.id) <= ending_timestamp)
-            if (local_history.options.extinct)
+            if (local_history.options.extinct) {
               is_extinct = local_history.options.extinct;
+            } else if (local_history.options.extinct == false) {
+              is_extinct = false;
+            }
         }
       }
 

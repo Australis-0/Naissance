@@ -94,6 +94,8 @@ function createHistoryEntry (arg0_entity_id, arg1_date, arg2_options, arg3_coord
         old_history_entry.id != local_history.id
       )
         delete entity_obj.options.history[date_string];
+
+    console.log(entity_obj.options.history[date_string])
   }
 }
 
