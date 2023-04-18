@@ -437,6 +437,27 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
   return popup;
 }
 
+function hidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+  var do_not_reload = arg2_do_not_reload;
+
+  //Declare local instance variables
+  var entity_obj = getEntity(entity_id);
+
+  if (entity_obj) {
+    createHistoryEntry(entity_id, date, {
+      extinct: true
+    });
+
+    populateEntityBio(entity_id);
+
+    if (!do_not_reload)
+      loadDate();
+  }
+}
+
 function minimiseUI (arg0_element, arg1_tab) {
   //Convert from parameters
   var raw_element = arg0_element;
@@ -533,10 +554,10 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
         </center>
       </div>
 
-      <div id = "hidden-mark-polity-as-hidden" class = "context-menu-button">
+      <div id = "hidden-mark-polity-as-hidden-${entity_id}" class = "context-menu-button">
         Mark Polity As Hidden
       </div>
-      <div id = "hidden-mark-polity-as-visible" class = "context-menu-button">
+      <div id = "hidden-mark-polity-as-visible-${entity_id}" class = "context-menu-button">
         Mark Polity As Visible
       </div>
     `;
@@ -546,7 +567,22 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     //Populate only if not already defined in entity_obj.options
     populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date);
 
+    //Declare local instance variables
+    var mark_polity_as_hidden_el = document.getElementById(`hidden-mark-polity-as-hidden-${entity_id}`);
+    var mark_polity_as_visible_el = document.getElementById(`hidden-mark-polity-as-visible-${entity_id}`);
+
     //Set listener events
+    mark_polity_as_hidden_el.onclick = function (e) {
+      console.log(prefix);
+      var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
+
+      hidePolity(entity_id, entered_date);
+    };
+    mark_polity_as_visible_el.onclick = function (e) {
+      var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
+
+      unhidePolity(entity_id, entered_date);
+    };
   } else if (mode == "simplify") {
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
@@ -703,6 +739,7 @@ function populateEntityBio (arg0_entity_id) {
     for (var i = 0; i < all_histories.length; i++) {
       var last_history_entry = entity_obj.options.history[all_histories[i - 1]];
       var local_date = parseTimestamp(all_histories[i]);
+      var local_entity_name = getEntityName(entity_id, local_date);
       var local_history = entity_obj.options.history[all_histories[i]];
       var local_options = local_history.options;
       var timestamp = ` timestamp = ${all_histories[i]}`;
@@ -757,6 +794,14 @@ function populateEntityBio (arg0_entity_id) {
             bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_name_string}${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}</span></td></tr>`); //[WIP] - Actually style
         }
 
+        //Extinct/Hide polity handler
+        {
+          if (local_history.options.extinct)
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is abolished.</td></tr>`);
+          if (local_history.options.extinct == false)
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is re-established.</td></tr>`);
+        }
+
         //Land area handler
         {
           if (land_percentage_change < 0)
@@ -765,7 +810,7 @@ function populateEntityBio (arg0_entity_id) {
             land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
 
           if (land_percentage_change != 0)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${getEntityName(entity_id, local_date)} ${land_percentage_change_string}</span></td></tr>`);
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${local_entity_name} ${land_percentage_change_string}</span></td></tr>`);
         }
       }
     }
@@ -1145,6 +1190,27 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
     }
     if (tab == "other")
       underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
+  }
+}
+
+function unhidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+  var do_not_reload = arg2_do_not_reload;
+
+  //Declare local instance variables
+  var entity_obj = getEntity(entity_id);
+
+  if (entity_obj) {
+    createHistoryEntry(entity_id, date, {
+      extinct: false
+    });
+
+    populateEntityBio(entity_id);
+
+    if (!do_not_reload)
+      loadDate();
   }
 }
 

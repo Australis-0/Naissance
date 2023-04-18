@@ -348,6 +348,34 @@ function getPreviousEntityName (arg0_entity_id, arg1_date) {
   return last_history_name;
 }
 
+function isPolityHidden (arg0_entity_id, arg1_date) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+
+  //Declare local instance variables
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+  var entity_obj = getEntity(entity_id);
+  var is_extinct;
+
+  if (entity_obj)
+    if (entity_obj.options)
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++) {
+          var local_history = entity_obj.options.history[all_history_entries[i]];
+
+          if (parseInt(local_history.id) <= ending_timestamp)
+            if (local_history.options.extinct)
+              is_extinct = local_history.options.extinct;
+        }
+      }
+
+  //Return statement
+  return is_extinct;
+}
+
 function moveEntityToGroup (arg0_entity_id, arg1_group_id) {
   //Convert from parameters
   var entity_id = arg0_entity_id;

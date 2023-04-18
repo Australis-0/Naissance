@@ -87,8 +87,6 @@ function createHistoryEntry (arg0_entity_id, arg1_date, arg2_options, arg3_coord
       if (!["history", "type"].includes(all_option_keys[i]))
         local_history.options[all_option_keys[i]] = options[all_option_keys[i]];
 
-    console.log(local_history);
-
     //Delete local_history if it's the same as old_history_entry
     if (old_history_entry)
       if (

@@ -136,7 +136,7 @@ function loadDate (arg0_old_date) {
           //Run through each options type
           if (local_layer[x].options.type == "polity")
             //Make sure polity is not extinct
-            if (!local_history.options.extinct) {
+            if (!isPolityHidden(local_entity_id, window.date)) {
               var local_options = JSON.parse(JSON.stringify(local_layer[x].options));
 
               //Overwrite local_options with local_history_options
@@ -160,6 +160,8 @@ function loadDate (arg0_old_date) {
                   entity_cache = [local_layer[x]];
                   current_union = unify(current_entity.getLayers());
                 }
+            } else {
+              console.log(true);
             }
         }
       }
