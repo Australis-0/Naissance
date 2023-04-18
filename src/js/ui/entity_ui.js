@@ -525,6 +525,7 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
 
   //Declare local instance variables
   var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
+  var entity_obj = getEntity(entity_id);
 
   //Close previously attached menus
 
@@ -566,15 +567,17 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     var prefix = `hidden-date-menu-${entity_id}`;
 
     //Populate only if not already defined in entity_obj.options
-    populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date);
+    (!entity_obj.options.ui_hide_polity_date) ?
+      populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date) :
+      populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, parseTimestamp(entity_obj.options.ui_hide_polity_date));
 
     //Declare local instance variables
+    var hide_polity_date_fields = [`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`];
     var mark_polity_as_hidden_el = document.getElementById(`hidden-mark-polity-as-hidden-${entity_id}`);
     var mark_polity_as_visible_el = document.getElementById(`hidden-mark-polity-as-visible-${entity_id}`);
 
     //Set listener events
     mark_polity_as_hidden_el.onclick = function (e) {
-      console.log(prefix);
       var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
 
       hidePolity(entity_id, entered_date);
@@ -584,6 +587,18 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
 
       unhidePolity(entity_id, entered_date);
     };
+
+    //Update entity_obj.options.ui_hide_polity_date
+    for (var i = 0; i < hide_polity_date_fields.length; i++) {
+      var local_el = document.getElementById(hide_polity_date_fields[i]);
+
+      local_el.onchange = function (e) {
+        var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
+
+        entity_obj.options.ui_hide_polity_date = getTimestamp(entered_date);
+        console.log(e);
+      };
+    }
   } else if (mode == "simplify") {
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
