@@ -472,7 +472,8 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
     };
 
     //Create entity options to serve as flags
-    if (!entity_obj.options.selected_keyframes) entity_obj.options.selected_keyframes = [];
+    if (entity_obj)
+      if (!entity_obj.options.selected_keyframes) entity_obj.options.selected_keyframes = [];
 
     if (!is_pinned) popup_options.is_pinned = pin;
 
@@ -522,6 +523,8 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
                     e.target.setAttribute("toggle", "true");
                   }, 1, e);
                 }
+                if (e.composedPath()[0].id == "clean-keyframes")
+                  cleanKeyframes(entity_id);
                 if (e.composedPath()[0].id == "hide-polity")
                   openActionContextMenu(entity_id, "hide");
                 if (e.composedPath()[0].id == "simplify-entity")

@@ -41,6 +41,38 @@ function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
     }
 }
 
+//Removes duplicate keyframes
+function cleanKeyframes (arg0_entity_id) { //[WIP] - Allow user to specify tolerance time range in which to clean up keyframes later on
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var entity_obj = getEntity(entity_id);
+
+  if (entity_obj)
+    if (entity_obj.options.history) {
+      var all_history_entries = Object.keys(entity_obj.options.history);
+
+      for (var i = all_history_entries.length - 1; i >= 0; i--) {
+        var local_history_entry = entity_obj.options.history[all_history_entries[i]];
+
+        for (var x = all_history_entries.length - 1; x >= 0; x--) {
+          var local_comparison_entry = entity_obj.options.history[all_history_entries[x]];
+
+          if (
+            JSON.stringify(local_history_entry.coords) == JSON.stringify(local_comparison_entry.coords) &&
+            JSON.stringify(local_history_entry.options) == JSON.stringify(local_comparison_entry.options) &&
+            local_history_entry.id != local_comparison_entry.id
+          )
+            all_history_entries.splice(x, 1);
+        }
+      }
+
+      //Repopulate entity bio; refresh UI
+      populateEntityBio(entity_id);
+    }
+}
+
 function createHistoryEntry (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
