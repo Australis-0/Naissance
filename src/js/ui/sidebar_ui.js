@@ -51,6 +51,9 @@ function createEntityElement (arg0_layer, arg1_entity_id) {
       } else {
         local_el.setAttribute("class", local_el.getAttribute("class").replace(" selected", ""));
       }
+
+      //Update sidebar selection information last
+      updateSidebarSelectionInformation();
     };
 
     //Return statement
@@ -586,6 +589,15 @@ function updateGroups (arg0_layer, arg1_do_not_refresh) { //[WIP] - Add layer el
 
   if (!do_not_refresh)
     refreshSidebar();
+}
+
+function updateSidebarSelectionInformation () {
+  //Declare local instance variables
+  var selection_info_el = document.getElementById(`hierarchy-selection-info`);
+
+  selection_info_el.innerHTML = (window.sidebar_selected_entities.length > 0) ?
+    `${parseNumber(window.sidebar_selected_entities.length)} entities selected.` :
+    "";
 }
 
 //Button handlers

@@ -112,21 +112,21 @@
 }
 .hierarchy-container {
   position: absolute;
-  top: 5px;
+  top: calc(5vh + 5px);
   left: 5px;
 
-  height: calc(80vh - 32.5px);
+  height: calc(75vh - 32.5px);
   width: 100%;
 
   background-color: rgba(0, 0, 0, 0.85);
 }
 .hierarchy-elements-container {
+  height: calc(65vh - 2.5vh - 2.5vh);
+  overflow-y: auto;
+
   color: white;
   font-family: "Barlow";
   font-weight: 300;
-
-  max-height: calc(70vh - 2.5vh);
-  overflow-y: auto;
 }
 .hierarchy-elements-container div.group:not(:empty), .hierarchy-elements-container div > .entity {
   padding-inline-start: 1vw;
@@ -137,6 +137,14 @@
 }
 .hierarchy-elements-container .group > input {
   font-weight: 700;
+}
+.hierarchy-selection-info-container {
+  max-height: 2.5vh;
+
+  color: white;
+  font-family: "Barlow";
+  font-size: 1vh;
+  font-weight: 300;
 }
 
 .hierarchy-header {
