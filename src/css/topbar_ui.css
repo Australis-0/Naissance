@@ -9,6 +9,8 @@
 
   font-family: "Raleway";
   font-weight: 700;
+
+  pointer-events: none;
 }
 
 .topbar-container ul {
@@ -34,6 +36,8 @@
   border-bottom: 0.25vh solid black;
   border-top: 0.25vh solid rgba(0, 0, 0, 0);
   transition: .3s ease-in-out;
+
+  pointer-events: all;
 }
 .topbar-container ul li a {
   position: relative;

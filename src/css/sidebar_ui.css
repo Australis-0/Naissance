@@ -6,7 +6,11 @@
   height: calc(100vh - 10px);
   width: var(--sidebar-width);
 
+  pointer-events: none;
   z-index: 1;
+}
+.sidebar-container * {
+  pointer-events: all;
 }
 
 /* -- Date Styling -- */
