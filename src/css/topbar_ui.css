@@ -1,0 +1,71 @@
+/* -- Topbar Styling -- */
+.topbar-container {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 5vh;
+  z-index: 2;
+
+  font-family: "Raleway";
+  font-weight: 700;
+}
+
+.topbar-container ul {
+  height: 100%;
+  padding-inline-start: 12px;
+
+  margin-block-start: 0.5vh;
+  margin-block-end: 0px;
+}
+.topbar-container ul li {
+  height: 2vh;
+  display: inline-block;
+  margin-top: 0.5vh;
+  text-decoration: none;
+
+  background-color: rgba(0, 0, 0, 0.8);
+
+  padding-bottom: 0.5vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  padding-top: 0.5vh;
+
+  border-bottom: 0.25vh solid black;
+  border-top: 0.25vh solid rgba(0, 0, 0, 0);
+  transition: .3s ease-in-out;
+}
+.topbar-container ul li a {
+  position: relative;
+
+  color: white;
+  font-size: 1.5vh;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  top: 0.125vh;
+}
+.topbar-container ul li:not(:first-child) {
+  margin-left: 8px;
+}
+.topbar-container ul hr {
+  height: .25rem;
+  width: 10%;
+  margin: 0;
+  background: rgb(240, 60, 60);
+  border: none;
+  transition: .3s ease-in-out;
+}
+
+.topbar-container ul li.active {
+  background-color: rgba(240, 60, 60, 0.65);
+  border-bottom: 0.25vh solid rgb(240, 60, 60);
+}
+
+/* -- Topbar Animations -- */
+.topbar-container ul li:hover {
+  cursor: pointer;
+}
+.topbar-container ul li:not(.active):hover {
+  border-bottom: 0.25vh solid white;
+}
