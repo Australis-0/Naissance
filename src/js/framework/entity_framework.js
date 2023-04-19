@@ -1,4 +1,28 @@
 //Declare functions
+function applyPathToKeyframes (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var entity_obj = getEntity(entity_id);
+
+  if (entity_obj)
+    if (entity_obj.options.selected_keyframes) {
+      var current_history_entry = getPolityHistory(entity_id, window.date);
+
+      for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++) {
+        var local_history_entry = entity_obj.options.history[entity_obj.options.selected_keyframes[i]];
+
+        local_history_entry.coords = current_history_entry.coords;
+      }
+
+      //Repopulate entity bio; refresh UI
+      populateEntityBio(entity_id);
+      if (window[`${entity_id}_apply_path`])
+        applyPath(entity_id);
+    }
+}
+
 function difference (arg0_polylist, arg1_mask) {
   //Convert from parameters
   var polylist = arg0_polylist;

@@ -191,8 +191,21 @@
   display: inline-block;
   width: calc(100% - (0.85vh + 0.25vh*2)*2 - 12px);
 }
+.timeline-bio-table .top-bio-header th:nth-child(2) {
+  font-weight: 300;
+  font-size: 0.9vh;
+}
+.timeline-bio-table .top-bio-header th:nth-child(2) input[type="checkbox"] {
+  position: relative;
+  top: 0.1vh;
+}
 .timeline-bio-table tr td, .timeline-bio-table tr th {
   padding-left: 5px;
+}
+.timeline-bio-table tr td input[type="checkbox"] {
+  position: relative;
+  top: 0.1vh;
+  margin-right: 0.3vh;
 }
 
 .bio-add-keyframe-icon {

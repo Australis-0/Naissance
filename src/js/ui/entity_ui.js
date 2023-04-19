@@ -38,6 +38,107 @@ function adjustTime (arg0_entity_id, arg1_timestamp) { //[WIP] - Finish rest of 
   };
 }
 
+function applyPath (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
+  var entity_obj = getEntity(entity_id);
+
+  //Make sure bio_container_el exists in the first place
+  if (bio_container_el) {
+    var bio_entries = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span`);
+    var bio_top_header_el = bio_container_el.querySelector(`.top-bio-header th:nth-child(2)`);
+
+    //Set select all field at top header
+    var select_all_el = document.createElement("span");
+
+    select_all_el.innerHTML = `Select All: <input type = "checkbox" id = "select-all-${entity_id}">`;
+    bio_top_header_el.prepend(select_all_el);
+
+    //Add select_all_el event listener
+    select_all_el.onclick = function (e) {
+      var all_checkboxes = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span input[type="checkbox"]`);
+
+      //Check all if select_all_el.checked is true, uncheck all if not
+      entity_obj.options.selected_keyframes = [];
+
+      for (var i = 0; i < all_checkboxes.length; i++)
+        all_checkboxes[i].checked = e.target.checked;
+
+      if (e.target.checked)
+        for (var i = 0; i < all_checkboxes.length; i++)
+          entity_obj.options.selected_keyframes.push(all_checkboxes[i].getAttribute("timestamp"));
+    };
+
+    //Iterate over each one and assign each a checkbox
+    for (var i = 0; i < bio_entries.length; i++) {
+      var local_checkbox_el = document.createElement("input");
+      var local_parent_el = bio_entries[i].parentElement.parentElement;
+      var local_timestamp = local_parent_el.getAttribute("timestamp");
+
+      local_checkbox_el.setAttribute("type", "checkbox");
+      local_checkbox_el.setAttribute("timestamp", local_timestamp);
+
+      if (entity_obj.options.selected_keyframes.includes(local_timestamp))
+        local_checkbox_el.checked = true;
+
+      bio_entries[i].prepend(local_checkbox_el);
+
+      //Add event listener
+      local_checkbox_el.onclick = function (e) {
+        var actual_timestamp = e.target.getAttribute("timestamp");
+
+        if (e.target.checked) {
+          if (!entity_obj.options.selected_keyframes.includes(actual_timestamp))
+            entity_obj.options.selected_keyframes.push(actual_timestamp);
+        } else {
+          for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++)
+            if (entity_obj.options.selected_keyframes[i] == actual_timestamp)
+              entity_obj.options.selected_keyframes.splice(i, 1);
+        }
+      };
+    }
+
+    //Set global flag
+    window[`${entity_id}_apply_path`] = true;
+    window[`${entity_id}_keyframes_open`] = true;
+  }
+}
+
+function closeApplyPath (arg0_entity_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+
+  //Declare local instance variables
+  var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
+  var entity_obj = getEntity(entity_id);
+
+  //Make sure bio_container_el exists in the first place
+  if (bio_container_el) {
+    var bio_entries = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span`);
+    var bio_top_header_el = bio_container_el.querySelector(`.top-bio-header th:nth-child(2)`);
+
+    //Remove select all field at top header
+    try {
+      bio_top_header_el.querySelector(`span:first-child`).remove();
+    } catch {}
+
+    //Iterate over each one and remove the checkbox
+    for (var i = 0; i < bio_entries.length; i++) {
+      var local_checkbox_el = bio_entries[i].querySelector(`input[type="checkbox"]`);
+
+      if (local_checkbox_el)
+        local_checkbox_el.remove();
+    }
+
+    //Clear global flag
+    delete window[`${entity_id}_apply_path`];
+    delete window[`${entity_id}_keyframes_open`];
+  }
+}
+
 function closeContextDateMenu (arg0_entity_id, arg1_instant) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
@@ -137,6 +238,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
   var data_graph_types = [{ id: "land_area", name: "Land Area" }];
   var data_select_ui = [];
   var entity_id = e.target.options.className;
+  var entity_obj = getEntity(entity_id);
   var is_pinned = pin;
   var local_popup = opened_interfaces[entity_id];
   var to_pin = !pin;
@@ -170,7 +272,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
             <img src = "gfx/interface/hide_polity_icon.png" id = "hide-polity" class = "medium button" draggable = "false" context = "true"><span>Hide Polity</span>
           </td>
           <td>
-            <img src = "gfx/interface/apply_path_icon.png" id = "apply-path" class = "medium button" draggable = "false"><span>Apply Path</span>
+            <img src = "gfx/interface/apply_path_icon.png" id = "apply-path" class = "medium button" draggable = "false" context = "true"><span>Apply Path</span>
           </td>
         </tr>
         <tr>
@@ -369,6 +471,9 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
       className: entity_id
     };
 
+    //Create entity options to serve as flags
+    if (!entity_obj.options.selected_keyframes) entity_obj.options.selected_keyframes = [];
+
     if (!is_pinned) popup_options.is_pinned = pin;
 
     if (pin) {
@@ -391,6 +496,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
 
     //Onclick events - Context menu interactions
     setTimeout(function(){
+      var just_opened_apply_path = false;
       var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
       if (popup_el)
@@ -398,40 +504,72 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
           var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
 
           //Check if target is context menu
-          try {
-            //Bio context menu
-            if (e.composedPath()[0].getAttribute("class"))
-              if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
-                //Set context menu to be visible and teleport to selected element; close previously attached menus
-                openContextMenu(entity_id, e.composedPath()[1]);
+          {
+            //Case 1 - Opening Action Context Menu Logic
+            try {
+              //Bio context menu
+              if (e.composedPath()[0].getAttribute("class"))
+                if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
+                  //Set context menu to be visible and teleport to selected element; close previously attached menus
+                  openContextMenu(entity_id, e.composedPath()[1]);
 
-            //Actions
-            if (e.composedPath()[0].getAttribute("id")) {
-              if (e.composedPath()[0].id == "hide-polity")
-                openActionContextMenu(entity_id, "hide");
-              if (e.composedPath()[0].id == "simplify-entity")
-                openActionContextMenu(entity_id, "simplify");
+              //Actions
+              if (e.composedPath()[0].getAttribute("id")) {
+                if (e.composedPath()[0].id == "apply-path") {
+                  openActionContextMenu(entity_id, "apply_path");
+
+                  setTimeout(function(e){
+                    e.target.setAttribute("toggle", "true");
+                  }, 1, e);
+                }
+                if (e.composedPath()[0].id == "hide-polity")
+                  openActionContextMenu(entity_id, "hide");
+                if (e.composedPath()[0].id == "simplify-entity")
+                  openActionContextMenu(entity_id, "simplify");
+              }
+            } catch (e) {
+              console.log(e);
             }
-          } catch (e) {
-            console.log(e);
-          }
 
-          //Context menu should be closed if the context menu itself or the button isn't a parent in the path
-          try {
-            if (
-              !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
-              !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
-              !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
-            )
-              closeContextMenu(entity_id);
+            //Case 2 - Context menu should be closed if the context menu itself or the button isn't a parent in the path
+            try {
+              if (
+                !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
+                !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
+                !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
+              )
+                closeContextMenu(entity_id);
 
-            if (
-              !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-actions-menu-${entity_id}`) &&
-              !arrayHasElementAttribute(e.composedPath(), "context", "true")
-            )
-              closeActionContextMenu(entity_id);
-          } catch (e) {
-            console.log(e);
+              //Logic handling for closing action context menu assuming keyframes aren't open
+              if (
+                !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-actions-menu-${entity_id}`) &&
+                !arrayHasElementAttribute(e.composedPath(), "context", "true") &&
+                !window[`${entity_id}_keyframes_open`]
+              )
+                closeActionContextMenu(entity_id);
+            } catch (e) {
+              console.log(e);
+            }
+
+            //Case 3 - Logic handling for action button toggleables
+            try {
+              if (window[`${entity_id}_keyframes_open`])
+                if (window[`${entity_id}_apply_path`])
+                  if (
+                    arrayHasElementAttribute(e.composedPath(), "id", "apply-path") &&
+                    arrayHasElementAttribute(e.composedPath(), "toggle", "true")
+                  ) {
+                    closeActionContextMenu(entity_id);
+                    closeApplyPath(entity_id);
+                    closeApplyPath(entity_id);
+
+                    setTimeout(function(e) {
+                      e.target.setAttribute("toggle", "false");
+                    }, 2, e);
+                  }
+            } catch (e) {
+              console.log(e);
+            }
           }
         };
     }, 250);
@@ -541,7 +679,29 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
   );
 
   //Set actions_context_menu_el content according to mode
-  if (mode == "hide") {
+  if (mode == "apply_path") {
+    actions_context_menu_el.innerHTML = `
+      <div class = "context-menu-subcontainer">
+        <b>Apply Path:</b>
+      </div>
+      <div id = "apply-path-${entity_id}" class = "context-menu-button confirm">
+        <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Apply Path to Selected Keyframes</span>
+      </div>
+    `;
+
+    //Declare local instance variables
+    var apply_path_el = document.getElementById(`apply-path-${entity_id}`);
+
+    //Set listener events
+    apply_path_el.onclick = function (e) {
+      applyPathToKeyframes(entity_id);
+    };
+
+    applyPath(entity_id);
+  } else if (mode == "hide") {
+    //Close other menus first
+    closeApplyPath(entity_id);
+
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
         <b>Hide/Unhide Polity:</b>
@@ -604,6 +764,9 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
       };
     }
   } else if (mode == "simplify") {
+    //Close other menus first
+    closeApplyPath(entity_id);
+
     actions_context_menu_el.innerHTML = `
       <div class = "context-menu-subcontainer">
         <b>Simplify Path:</b>
@@ -768,7 +931,7 @@ function populateEntityBio (arg0_entity_id) {
         var actual_entity_name = getEntityName(entity_id, all_histories[i]);
 
         //This is the first history entry. Mark it as such
-        bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${actual_entity_name} is founded.</td></tr>`);
+        bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${actual_entity_name} is founded.</span></td></tr>`);
       } else {
         var last_history_date = parseTimestamp(all_histories[i - 1]);
 
