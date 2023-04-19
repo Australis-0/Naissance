@@ -27,7 +27,7 @@ function createEntityElement (arg0_layer, arg1_entity_id) {
     local_el.setAttribute("id", entity_id);
 
     header_el.setAttribute("onkeyup", "updateAllGroups(true);");
-    header_el.value = (entity_obj.options.entity_name) ? entity_obj.options.entity_name : `Unnamed Polity`;
+    header_el.value = getEntityName(entity_id, window.date);
 
     //Append all formatted elements
     local_el.appendChild(header_el);

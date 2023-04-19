@@ -330,7 +330,7 @@ function getEntityName (arg0_entity_id, arg1_date) {
   var entity_name;
   var entity_obj = getEntity(entity_id);
 
-  if (entity_obj)
+  if (entity_obj) {
     if (entity_obj.options)
       if (entity_obj.options.history) {
         var all_history_entries = Object.keys(entity_obj.options.history);
@@ -343,6 +343,10 @@ function getEntityName (arg0_entity_id, arg1_date) {
               entity_name = local_history.options.entity_name;
         }
       }
+
+    if (!entity_name)
+      entity_name = entity_obj.options.entity_name;
+  }
 
   if (!entity_name)
     if (window.current_union)

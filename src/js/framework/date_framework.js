@@ -169,6 +169,7 @@ function loadDate (arg0_old_date) {
   }
 
   autoFillDate();
+  refreshSidebar();
 }
 
 function monthsFromDays (arg0_date) {
