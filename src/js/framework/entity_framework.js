@@ -46,7 +46,8 @@ function deleteEntity (arg0_entity_id) {
       //Splice from entities
       if (local_group.entities)
         for (var y = 0; y < local_group.entities.length; y++)
-          local_group.entities.splice(y, 1);
+          if (local_group.entities[y] == entity_id)
+            local_group.entities.splice(y, 1);
     }
   }
 
@@ -81,6 +82,7 @@ function editEntity (arg0_entity_id) {
   //Iterate over all polities
   for (var i = 0; i < polities_layer.length; i++)
     if (polities_layer[i].options.className == entity_id) {
+      window.editing_entity = entity_id;
       window.polity_index = i;
       window.polity_options = polities_layer[i].options;
 
@@ -161,8 +163,9 @@ function finishEntity () {
   clearBrush();
   if (window.polity_index != -1) {
     //Splice to correct index
-    polities_layer.splice(polity_index, 1, new_union);
+    //polities_layer.splice(polity_index, 1, new_union); Deprecated
     window.polity_index = -1;
+    delete window.editing_entity;
     delete window.polity_options;
   } else {
     polities_layer.push(new_union);

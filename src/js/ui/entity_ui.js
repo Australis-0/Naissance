@@ -141,6 +141,10 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
   var local_popup = opened_interfaces[entity_id];
   var to_pin = !pin;
 
+  //Fetch is_being_edited
+  if (window.editing_entity == entity_id)
+    is_being_edited = true;
+
   //Fetch is_pinned
   if (local_popup)
     is_pinned = !local_popup.options.is_pinned;
