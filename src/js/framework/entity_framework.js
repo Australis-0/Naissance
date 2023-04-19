@@ -98,6 +98,35 @@ function editEntity (arg0_entity_id) {
     }
 }
 
+//[WIP] - Make function more general-purpose
+function entityHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var date = arg1_date;
+  var conditional_function = arg2_conditional_function;
+
+  //Declare local instance variables
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+  var entity_obj = getEntity(entity_id);
+  var has_property;
+
+  if (entity_obj)
+    if (entity_obj.options)
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++) {
+          var local_history = entity_obj.options.history[all_history_entries[i]];
+
+          if (parseInt(local_history.id) <= ending_timestamp)
+            has_property = conditional_function(local_history);
+        }
+      }
+
+  //Return statement
+  return has_property;
+}
+
 function finishEntity () {
   //Declare local instance variables
   var date_string = getTimestamp(date);
@@ -354,30 +383,18 @@ function isPolityHidden (arg0_entity_id, arg1_date) {
   var entity_id = arg0_entity_id;
   var date = arg1_date;
 
-  //Declare local instance variables
-  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
-  var entity_obj = getEntity(entity_id);
-  var is_extinct;
-
-  if (entity_obj)
-    if (entity_obj.options)
-      if (entity_obj.options.history) {
-        var all_history_entries = Object.keys(entity_obj.options.history);
-
-        for (var i = 0; i < all_history_entries.length; i++) {
-          var local_history = entity_obj.options.history[all_history_entries[i]];
-
-          if (parseInt(local_history.id) <= ending_timestamp)
-            if (local_history.options.extinct) {
-              is_extinct = local_history.options.extinct;
-            } else if (local_history.options.extinct == false) {
-              is_extinct = false;
-            }
-        }
-      }
-
   //Return statement
-  return is_extinct;
+  return entityHasProperty(entity_id, date, function (local_history) {
+    var is_extinct;
+
+    if (local_history.options.extinct) {
+      is_extinct = local_history.options.extinct;
+    } else if (local_history.options.extinct == false) {
+      is_extinct = false;
+    }
+
+    return is_extinct;
+  });
 }
 
 function moveEntityToGroup (arg0_entity_id, arg1_group_id) {

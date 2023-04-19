@@ -374,12 +374,13 @@
 .entity-ui-container.customisation-top-parent {
   background: none;
   padding: 0px;
-  width: var(--entity-ui-width);
+
+  overflow: visible;
 }
 .entity-ui-container.options-container {
+  flex: 1;
   height: 7vw;
   min-width: calc(13vw - 30px - 12px) !important;
-  max-width: calc(13vw - 30px - 12px);
 
   margin-left: 6px;
   padding: 12px;
