@@ -19,11 +19,12 @@ function createEntityElement (arg0_layer, arg1_entity_id) {
   var entity_obj = getEntity(entity_id, layer);
 
   if (entity_obj) {
+    var entity_id = entity_obj.options.className;
     var header_el = document.createElement("input");
     var local_el = document.createElement("div");
 
-    local_el.setAttribute("class", "entity");
-    local_el.setAttribute("id", entity_obj.options.className);
+    local_el.setAttribute("class", `entity${(window.sidebar_selected_entities.includes(entity_id)) ? " selected" : ""}`);
+    local_el.setAttribute("id", entity_id);
 
     header_el.setAttribute("onkeyup", "updateAllGroups(true);");
     header_el.value = (entity_obj.options.entity_name) ? entity_obj.options.entity_name : `Unnamed Polity`;
@@ -32,6 +33,24 @@ function createEntityElement (arg0_layer, arg1_entity_id) {
     local_el.appendChild(header_el);
     local_el.onclick = function (e) {
       editSidebarElement(e);
+
+      if (window.ctrl_pressed)
+        if (!window.sidebar_selected_entities.includes(entity_id)) {
+          window.sidebar_selected_entities.push(entity_id);
+        } else {
+          //Remove from selection
+          for (var i = 0; i < window.sidebar_selected_entities.length; i++)
+            if (window.sidebar_selected_entities[i] == entity_id)
+              window.sidebar_selected_entities.splice(i, 1);
+        }
+
+      //Append class if selected, remove selected class if not
+      if (window.sidebar_selected_entities.includes(entity_id)) {
+        if (!local_el.getAttribute("class").includes("selected"))
+          local_el.setAttribute("class", `${local_el.getAttribute("class")} selected`);
+      } else {
+        local_el.setAttribute("class", local_el.getAttribute("class").replace(" selected", ""));
+      }
     };
 
     //Return statement

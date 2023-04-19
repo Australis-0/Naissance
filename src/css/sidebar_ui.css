@@ -236,6 +236,11 @@
   color: white;
 }
 
+/* -- Hierarchy selection styling -- */
+.hierarchy-elements-container .entity.selected input {
+  background-color: var(--selection-colour);
+}
+
 /* -- Hierarchy animation styling -- */
 .hierarchy-elements-container .group.hover input, .hierarchy-elements-container .layer.hover input {
   background-color: var(--selection-colour);

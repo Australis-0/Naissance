@@ -62,6 +62,9 @@ window.right_mouse = false;
   window.entity_options = {
     className: "current-union"
   };
+
+  //Sidebar UI
+  window.sidebar_selected_entities = [];
 }
 
 //Test scripts
