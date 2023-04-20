@@ -201,3 +201,37 @@ function getPolityHistory (arg0_entity_id, arg1_date, arg2_options) {
   //Return statement
   return current_entry;
 }
+
+function getEntityProperty (arg0_entity_id, arg1_property, arg2_date, arg3_previous_property) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var property = arg1_property;
+  var date = arg2_date;
+  var previous_property = arg3_previous_property;
+
+  //Declare local instance variables
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+  var entity_value;
+  var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+  if (entity_obj) {
+    if (entity_obj.options)
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++) {
+          var local_history = entity_obj.options.history[all_history_entries[i]];
+
+          if (parseInt(local_history.id) <= ending_timestamp)
+            if (local_history.options[property])
+              entity_value = local_history.options[property];
+        }
+
+        if (!entity_value)
+          entity_value = entity_obj.options[property];
+      }
+
+    //Return statement
+    return entity_value;
+  }
+}

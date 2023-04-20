@@ -391,6 +391,12 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
           <span id = "${entity_id}-other" class = "options-tab-header">Other</span>
           <hr>
         </div>
+
+        <div id = "${entity_id}-other-container" class = "options-body">
+          <b>Visibility Settings:</b><br><br>
+          Minimum Zoom: <input id = "minimum-zoom-level-${entity_id}" class = "short-number-input" type = "number"><br>
+          Maximum Zoom: <input id = "maximum-zoom-level-${entity_id}" class = "short-number-input" type = "number"><br>
+        </div>
       </div>
     </div>
 
@@ -954,6 +960,10 @@ function populateEntityBio (arg0_entity_id) {
           var stroke_colour_string = ``;
           var stroke_opacity_string = ``;
 
+          //Interactivity strings
+          var maximum_zoom_level_string = ``;
+          var minimum_zoom_level_string = ``;
+
           if (local_options.entity_name) {
             var previous_entity_name = getPreviousEntityName(entity_id, all_histories[i]);
 
@@ -970,14 +980,19 @@ function populateEntityBio (arg0_entity_id) {
           if (local_options.opacity)
             stroke_opacity_string = `Stroke opacity changed to ${printPercentage(local_options.opacity)}. `;
 
+          if (local_options.maximum_zoom_level)
+            maximum_zoom_level_string = `Maximum zoom set to ${local_options.maximum_zoom_level}. `;
+          if (local_options.minimum_zoom_level)
+            minimum_zoom_level_string = `Minimum zoom set to ${local_options.minimum_zoom_level}. `;
+
           if ((
-            entity_name_string + fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string
+            entity_name_string + fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string + minimum_zoom_level_string + maximum_zoom_level_string
           ).length > 0)
             customisation_changed = true;
 
           //Check if customisation_changed
           if (customisation_changed)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_name_string}${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}</span></td></tr>`); //[WIP] - Actually style
+            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_name_string}${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}${minimum_zoom_level_string}${maximum_zoom_level_string}</span></td></tr>`);
         }
 
         //Extinct/Hide polity handler
@@ -1353,6 +1368,7 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
   var tab = arg1_tab;
 
   //Declare local instance variables
+  var options_el = document.getElementById(`${entity_id}-other-container`);
   var left_offset = 0.125; //In vw
   var tab_width = 3.25; //In vw
   var underline_el = document.querySelector(`.options-tab[class~='${entity_id}'] > hr`);
@@ -1363,19 +1379,63 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
 
   if (tab) {
     if (tab == "fill") {
+      //Switch tabs first
+      options_el.setAttribute("class", "options-body hidden");
+      underline_el.style.left = `${left_offset}vw`;
+
       var fill_colour = hexToRGB(entity_obj.options.fillColor);
       updateEntityColour(entity_id, fill_colour, entity_obj.options.fillOpacity);
-
-      underline_el.style.left = `${left_offset}vw`;
     }
     if (tab == "stroke") {
+      //Switch tabs first
+      options_el.setAttribute("class", "options-body hidden");
+      underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
+
       var stroke_colour = hexToRGB(entity_obj.options.color);
       updateEntityColour(entity_id, stroke_colour, entity_obj.options.opacity);
-
-      underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
     }
-    if (tab == "other")
+    if (tab == "other") {
+      //Declare local instance variables
+      var maximum_zoom_level_el = document.getElementById(`maximum-zoom-level-${entity_id}`);
+      var minimum_zoom_level_el = document.getElementById(`minimum-zoom-level-${entity_id}`);
+
+      //Switch tabs first
+      options_el.setAttribute("class", "options-body");
       underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
+
+      //Populate default values
+      var current_maximum_zoom_value = getEntityProperty(entity_obj, "maximum_zoom_level", window.date);
+      var current_minimum_zoom_value = getEntityProperty(entity_obj, "minimum_zoom_level", window.date);
+
+      if (current_maximum_zoom_value)
+        maximum_zoom_level_el.value = current_maximum_zoom_value;
+      if (current_minimum_zoom_value)
+        minimum_zoom_level_el.value = current_minimum_zoom_value;
+
+      //Add event listeners
+      maximum_zoom_level_el.onchange = function (e) {
+        var local_value = parseInt(e.target.value);
+
+        createHistoryEntry(entity_id, window.date, {
+          maximum_zoom_level: local_value
+        });
+        populateEntityBio(entity_id);
+
+        //Fix value
+        maximum_zoom_level_el.value = local_value;
+      };
+      minimum_zoom_level_el.onchange = function (e) {
+        var local_value = parseInt(e.target.value);
+
+        createHistoryEntry(entity_id, window.date, {
+          minimum_zoom_level: local_value
+        });
+        populateEntityBio(entity_id);
+
+        //Fix value
+        minimum_zoom_level_el.value = local_value;
+      };
+    }
   }
 }
 

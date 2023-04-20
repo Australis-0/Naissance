@@ -402,6 +402,16 @@
   opacity: 0;
   margin: 0px;
 }
+.options-body {
+  margin-top: 0.5vw;
+
+  font-size: 0.9vh;
+}
+.options-body .short-number-input {
+  width: 2.5vh;
+
+  color: black;
+}
 
 /* -- Container styling: Customisation Colour Wheel -- */
 .colour-picker-brightness {

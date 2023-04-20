@@ -350,27 +350,8 @@ function getEntityName (arg0_entity_id, arg1_date) {
   var date = arg1_date;
 
   //Declare local instance variables
-  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
-  var entity_name;
+  var entity_name = getEntityProperty(entity_id, "entity_name", date);
   var entity_obj = getEntity(entity_id);
-
-  if (entity_obj) {
-    if (entity_obj.options)
-      if (entity_obj.options.history) {
-        var all_history_entries = Object.keys(entity_obj.options.history);
-
-        for (var i = 0; i < all_history_entries.length; i++) {
-          var local_history = entity_obj.options.history[all_history_entries[i]];
-
-          if (parseInt(local_history.id) <= ending_timestamp)
-            if (local_history.options.entity_name)
-              entity_name = local_history.options.entity_name;
-        }
-      }
-
-    if (!entity_name)
-      entity_name = entity_obj.options.entity_name;
-  }
 
   if (!entity_name)
     if (window.current_union)
@@ -387,26 +368,11 @@ function getPreviousEntityName (arg0_entity_id, arg1_date) {
   var date = arg1_date;
 
   //Declare local instance variables
-  var ending_timestamp = getTimestamp(date);
   var entity_obj = getEntity(entity_id);
-  var last_history_name = (entity_obj.entity_name) ? entity_obj.entity_name : undefined;
-
-  //Iterate over all history entries if they exist
-  if (entity_obj.options)
-    if (entity_obj.options.history) {
-      var all_history_entries = Object.keys(entity_obj.options.history);
-
-      for (var i = 0; i < all_history_entries.length; i++) {
-        var local_history = entity_obj.options.history[all_history_entries[i]];
-
-        if (parseInt(local_history.id) < ending_timestamp)
-          if (local_history.options.entity_name)
-            last_history_name = local_history.options.entity_name;
-      }
-    }
+  var last_history_name = getEntityProperty(entity_id, "entity_name", date, true);
 
   //Return statement
-  return last_history_name;
+  return (last_history_name) ? last_history_name : entity_obj.options.entity_name;
 }
 
 function isPolityHidden (arg0_entity_id, arg1_date) {
