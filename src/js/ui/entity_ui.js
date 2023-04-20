@@ -1414,7 +1414,7 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
 
       //Add event listeners
       maximum_zoom_level_el.onchange = function (e) {
-        var local_value = parseInt(e.target.value);
+        var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
         createHistoryEntry(entity_id, window.date, {
           maximum_zoom_level: local_value
@@ -1422,10 +1422,11 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
         populateEntityBio(entity_id);
 
         //Fix value
-        maximum_zoom_level_el.value = local_value;
+        if (local_value)
+          maximum_zoom_level_el.value = local_value;
       };
       minimum_zoom_level_el.onchange = function (e) {
-        var local_value = parseInt(e.target.value);
+        var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
         createHistoryEntry(entity_id, window.date, {
           minimum_zoom_level: local_value
@@ -1433,7 +1434,8 @@ function switchEntityTab (arg0_entity_id, arg1_tab) {
         populateEntityBio(entity_id);
 
         //Fix value
-        minimum_zoom_level_el.value = local_value;
+        if (local_value)
+          minimum_zoom_level_el.value = local_value;
       };
     }
   }
