@@ -55,6 +55,99 @@ function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_elem
   return new_date;
 }
 
+function getDateRangeFromFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element) {
+  //Convert from parameters
+  var year_el = document.getElementById(arg0_year_element);
+  var month_el = document.getElementById(arg1_month_element);
+  var day_el = document.getElementById(arg2_day_element);
+  var hour_el = document.getElementById(arg3_hour_element);
+  var minute_el = document.getElementById(arg4_minute_element);
+
+  //Declare local instance variables
+  var local_date = {
+    year: parseInt(year_el.value),
+    month: parseInt(month_el.value),
+    day: parseInt(month_el.value),
+
+    hour: parseInt(month_el.value),
+    minute: parseInt(month_el.value)
+  };
+
+  //Return statement
+  return parseTimestamp(getTimestamp(local_date)); //Flatten date
+}
+
+function generateDateFields (arg0_element, arg1_prefix, arg2_date) {
+  //Convert from parameters
+  var container_el = document.getElementById(arg0_element);
+  var prefix = arg1_prefix;
+  var date = arg2_date;
+
+  //Declare local instance variables
+  var local_html = `
+    <center>
+      <select id = "${prefix}-day" class = "day-input"></select>
+      <select id = "${prefix}-month" class = "month-input"></select>
+      <input id = "${prefix}-year" class = "year-input" type = "number">
+    </center>
+    <center>
+      <input id = "${prefix}-hour" class = "hour-input" type = "number" min = "0" max = "23"> :
+      <input id = "${prefix}-minute" class = "minute-input" type = "number" min = "0" max = "59">
+
+      <select id = "${prefix}-year-type"></select>
+    </center>
+  `;
+
+  //Set innerHTML and call populateDateFields()
+  try {
+    container_el.innerHTML = local_html;
+
+    populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, date);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function generateDateRangeFields (arg0_element, arg1_prefix, arg2_date) {
+  //Convert from parameters
+  var container_el = document.getElementById(arg0_element);
+  var prefix = arg1_prefix;
+  var date = arg2_date;
+
+  //Declare local instance variables
+  var local_html = `
+    <table class = "date-range-fields">
+      <tr>
+        <td>Years</td>
+        <td>|&nbsp;&nbsp;<input id = "${prefix}-years" class = "date-range-input" type = "number" placeholder = "0"></td>
+      </tr>
+      <tr>
+        <td>Months</td>
+        <td>|&nbsp;&nbsp;<input id = "${prefix}-months" class = "date-range-input" type = "number" placeholder = "0"></td>
+      </tr>
+      <tr>
+        <td>Days</td>
+        <td>|&nbsp;&nbsp;<input id = "${prefix}-days" class = "date-range-input" type = "number" placeholder = "0"></td>
+      </tr>
+      <tr>
+        <td>Hours</td>
+        <td>|&nbsp;&nbsp;<input id = "${prefix}-hours" class = "date-range-input" type = "number" placeholder = "0"></td>
+      </tr>
+      <tr>
+        <td>Minutes</td>
+        <td>|&nbsp;&nbsp;<input = "${prefix}-hours" class = "date-range-input" type = "number" placeholder = "0"></td>
+      </tr>
+    </table>
+  `;
+
+  //Set innerHTML and call populateDateRangeFields()
+  try {
+    container_el.innerHTML = local_html;
+
+    populateDateRangeFields(`${prefix}-years`, `${prefix}-months`, `${prefix}-days`, `${prefix}-months`, `${prefix}-minute`, date);
+  } catch {}
+}
+
 function populateDateFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element, arg6_date) {
   //Convert from parameters
   var year_el = document.getElementById(arg0_year_element);
@@ -142,6 +235,39 @@ function populateDateFields (arg0_year_element, arg1_month_element, arg2_day_ele
   month_el.value = date.month;
   year_el.value = date.year; //[WIP] - BC handling
   year_type_el.value = (date.year >= 0) ? "AD" : "BC";
+}
+
+function populateDateRangeFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_date) {
+  //Convert from parameters
+  var year_el = document.getElementById(arg0_year_element);
+  var month_el = document.getElementById(arg1_month_element);
+  var day_el = document.getElementById(arg2_day_element);
+  var hour_el = document.getElementById(arg3_hour_element);
+  var minute_el = document.getElementById(arg4_minute_element);
+  var date = (arg5_date) ? arg5_date : window.date; //Feed in a custom date to populate with
+
+  //Set all the innerHTMLs for year_el, month_el, day_el, minute_el, based on date
+  year_el.value = (date.year) ? date.year : 0;
+  month_el.value = (date.month) ? date.month : 0;
+  day_el.value = (date.day) ? date.day : 0;
+  minute_el.value = (date.minute) ? date.minute : 0;
+
+  //Add event listeners
+  year_el.onchange = function () {
+    this.value = Math.abs(year_el);
+  };
+  month_el.onchange = function () {
+    this.value = Math.abs(month_el);
+  };
+  day_el.onchange = function () {
+    this.value = Math.abs(day_el);
+  };
+  hour_el.onchange = function () {
+    this.value = Math.abs(hour_el);
+  };
+  minute_el.onchange = function () {
+    this.value = Math.abs(minute_el);
+  };
 }
 
 function printDate (arg0_date) {
@@ -245,6 +371,22 @@ function readDate () {
 
   autoFillDate();
   loadDate(old_date);
+}
+
+function returnDateFromFields (arg0_prefix) {
+  //Convert from parameters
+  var prefix = arg0_prefix;
+
+  //Return statement
+  return getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
+}
+
+function returnDateRangeFromFields (arg0_prefix) {
+  //Convert from parameters
+  var prefix = arg0_prefix;
+
+  //Return statement
+  return getDateRangeFromFields(`${prefix}-years`, `${prefix}-months`, `${prefix}-days`, `${prefix}-months`, `${prefix}-days`);
 }
 
 //Populate UI

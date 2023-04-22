@@ -42,9 +42,10 @@ function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
 }
 
 //Removes duplicate keyframes
-function cleanKeyframes (arg0_entity_id) { //[WIP] - Allow user to specify tolerance time range in which to clean up keyframes later on
+function cleanKeyframes (arg0_entity_id, arg1_tolerance) { //[WIP] - Allow user to specify tolerance time range in which to clean up keyframes later on
   //Convert from parameters
   var entity_id = arg0_entity_id;
+  var tolerance = getTimestamp(arg1_tolerance);
 
   //Declare local instance variables
   var entity_obj = getEntity(entity_id);
@@ -60,11 +61,14 @@ function cleanKeyframes (arg0_entity_id) { //[WIP] - Allow user to specify toler
           var local_comparison_entry = entity_obj.options.history[all_history_entries[x]];
 
           if (
-            JSON.stringify(local_history_entry.coords) == JSON.stringify(local_comparison_entry.coords) &&
-            JSON.stringify(local_history_entry.options) == JSON.stringify(local_comparison_entry.options) &&
-            local_history_entry.id != local_comparison_entry.id
+            Math.abs(parseInt(local_comparison_entry.id) - parseInt(local_history_entry.id))
           )
-            all_history_entries.splice(x, 1);
+            if (
+              JSON.stringify(local_history_entry.coords) == JSON.stringify(local_comparison_entry.coords) &&
+              JSON.stringify(local_history_entry.options) == JSON.stringify(local_comparison_entry.options) &&
+              local_history_entry.id != local_comparison_entry.id
+            )
+              all_history_entries.splice(x, 1);
         }
       }
 

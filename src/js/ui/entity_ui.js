@@ -278,7 +278,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
         <tr>
           <td></td>
           <td>
-            <img src = "gfx/interface/clean_keyframes_icon.png" id = "clean-keyframes" class = "medium button" draggable = "false"><span>Clean Keyframes</span>
+            <img src = "gfx/interface/clean_keyframes_icon.png" id = "clean-keyframes" class = "medium button" draggable = "false" context = "true"><span>Clean Keyframes</span>
           </td>
         </tr>
       </table>
@@ -530,7 +530,7 @@ function entityUI (e, arg0_is_being_edited, arg1_pin) {
                   }, 1, e);
                 }
                 if (e.composedPath()[0].id == "clean-keyframes")
-                  cleanKeyframes(entity_id);
+                  openActionContextMenu(entity_id, "clean_keyframes");
                 if (e.composedPath()[0].id == "hide-polity")
                   openActionContextMenu(entity_id, "hide");
                 if (e.composedPath()[0].id == "simplify-entity")
@@ -707,6 +707,43 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     };
 
     applyPath(entity_id);
+  } else if (mode == "clean_keyframes") {
+    actions_context_menu_el.innerHTML = `
+      <div class = "context-menu-subcontainer">
+        <b>Clean Keyframes:</b>
+      </div>
+      <div class = "context-menu-subcontainer">
+        Delete duplicate keyframes within following threshold range.<br>
+        <br>
+        <span id = "clean-keyframes-date-threshold-container-${entity_id}"></span>
+      </div>
+
+      <div id = "clean-keyframes-${entity_id}" class = "context-menu-button confirm">
+        <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Confirm</span>
+      </div>
+    `;
+
+    //Declare local instance variables
+    var clean_keyframes_el = document.getElementById(`clean-keyframes-${entity_id}`);
+    var prefix = `clean-keyframes-date-menu-${entity_id}`;
+    var years_input = document.getElementById(`clean-keyframes-date-menu-${entity_id}-years`);
+
+    //Populate only if not already defined in entity_obj.options
+    if (entity_obj.options.history) {
+      var all_history_entries = Object.keys(entity_obj.options.history);
+      var first_history_entry = entity_obj.options.history[all_history_entries[0]];
+
+      var time_difference = parseTimestamp(getTimestamp(window.date) - getTimestamp(first_history_entry.id));
+
+      generateDateRangeFields(`clean-keyframes-date-threshold-container-${entity_id}`, prefix, time_difference);
+    }
+
+    //Add event listeners
+    clean_keyframes_el.onclick = function (e) {
+      var date_range = returnDateRangeFromFields(prefix);
+
+      cleanKeyframes(entity_id, date_range);
+    };
   } else if (mode == "hide") {
     //Close other menus first
     closeApplyPath(entity_id);
@@ -715,19 +752,7 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
       <div class = "context-menu-subcontainer">
         <b>Hide/Unhide Polity:</b>
       </div>
-      <div class = "context-menu-subcontainer">
-        <center>
-          <select id = "hidden-date-menu-${entity_id}-day" class = "day-input"></select>
-          <select id = "hidden-date-menu-${entity_id}-month" class = "month-input"></select>
-          <input id = "hidden-date-menu-${entity_id}-year" class = "year-input" type = "number">
-        </center>
-        <center>
-          <input id = "hidden-date-menu-${entity_id}-hour" class = "hour-input" type = "number" min = "0" max = "23"> :
-          <input id = "hidden-date-menu-${entity_id}-minute" class = "minute-input" type = "number" min = "0" max = "59">
-
-          <select id = "hidden-date-menu-${entity_id}-year-type"></select>
-        </center>
-      </div>
+      <div id = "hidden-date-menu-container-${entity_id}" class = "context-menu-subcontainer"></div>
 
       <div id = "hidden-mark-polity-as-hidden-${entity_id}" class = "context-menu-button">
         Mark Polity As Hidden
@@ -741,8 +766,8 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
 
     //Populate only if not already defined in entity_obj.options
     (!entity_obj.options.ui_hide_polity_date) ?
-      populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, window.date) :
-      populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, parseTimestamp(entity_obj.options.ui_hide_polity_date));
+      generateDateFields(`hidden-date-menu-container-${entity_id}`, prefix) :
+      generateDateFields(`hidden-date-menu-container-${entity_id}`, prefix, parseTimestamp(entity_obj.options.ui_hide_polity_date));
 
     //Declare local instance variables
     var hide_polity_date_fields = [`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`];

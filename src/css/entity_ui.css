@@ -558,6 +558,7 @@
 }
 
 /* -- Container styling: Actions Context Menu -- */
+
 .actions-context-menu-container {
   position: fixed;
   left: calc(var(--entity-ui-width) + 20px);
@@ -593,6 +594,12 @@
   position: relative;
 
   bottom: 0.1vh;
+}
+.date-range-fields tr td {
+  display: table-cell;
+}
+.date-range-input {
+  width: 5vh;
 }
 
 /* -- Container styling: Actions Context Menu: Date styling -- */
