@@ -7,6 +7,8 @@
 <div align = "center">-</div>
 <br>
 
+[![Join our community!](https://img.shields.io/discord/548994743925997570?label=Discord&style=for-the-badge)](https://discord.gg/89kQY2KFQz) ![](https://img.shields.io/github/languages/code-size/Australis-0/Naissance?style=for-the-badge) ![](https://img.shields.io/github/downloads/Australis-0/Naissance/total?style=for-the-badge)
+
 Naissance is a new type of GIS that makes it possible to utilize raster tools on vector maps. The ultimate goal is to create a modernized tool for data visualization and mapmaking where you can create interactive atlases, different mapmodes, and export maps as video/3D- all w/ a UI so simple a toddler could use it.
 
 We're still a long way from that goal, but join us on that journey!
