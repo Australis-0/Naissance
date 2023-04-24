@@ -25,8 +25,8 @@ We're still a long way from that goal, but join us on that journey!
 - Polities can be set to disappear/appear at different zoom levels
 - Polities can be simplified, hidden, and unhidden
 - Polity names, coordinates, and settings change over time
-- Tooling to remove duplicate keyframes and retroactively apply current paths
+- Tooling to remove duplicate keyframes and retroactively apply current paths.
 
 \-
 
-These features are subject to change with additional releases.
+These features are subject to change with additional releases. Take a look at our [wishlist](https://docs.google.com/document/d/19thlJ2VnYoFYODNtoYuwE4L0spx301AVnWkBPG8W3WU/edit?usp=sharing)!
