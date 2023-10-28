@@ -23,7 +23,7 @@ function applyPathToKeyframes (arg0_entity_id) {
     }
 }
 
-function difference (arg0_polylist, arg1_mask) {
+function difference (arg0_polylist, arg1_mask) { //Legacy function, don't know what this really does
   //Convert from parameters
   var polylist = arg0_polylist;
 
@@ -153,6 +153,20 @@ function entityHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function
   return has_property;
 }
 
+function featureToTurfCoordinates (arg0_feature) {
+  //Convert from parameters
+  var feature = arg0_feature;
+
+  //Declare local instance variables
+  var local_geometry = feature.geometry;
+
+  //Return statement
+  return [
+    local_geometry.coordinates,
+    (local_geometry.type == "Polygon") ? "polygon" : "multiPolygon"
+  ];
+}
+
 function finishEntity () {
   //Declare local instance variables
   var date_string = getTimestamp(date);
@@ -278,6 +292,53 @@ function getEntityGroup (arg0_entity_id) {
   }
 }
 
+function getGeoJSONCoords (arg0_geoJSON) {
+  //Convert from parameters
+  var geojson = arg0_geoJSON;
+
+  //Declare local instance variables
+  var coords = [];
+
+  //Standardise to regular coords if TURF coordinates type
+  if (!isTurfCoordinates(geojson)) {
+    //Check if layers exists
+    if (geojson._layers) {
+      var all_layers = Object.keys(geojson._layers);
+
+      if (all_layers.length > 0)
+        coords = geojson._layers[all_layers[0]]._latlngs;
+    }
+  } else {
+    //TURF coordinates type, convert to L.geoJSON
+    var turf_obj = getTurfObject(geojson);
+
+    var local_geojson = L.geoJSON(turf_obj);
+
+    //Return statement
+    return getGeoJSONCoords(local_geojson);
+  }
+
+  //Return statement
+  return coords;
+}
+
+function getGeoJSONTurfCoordinates (arg0_geoJSON) {
+  //Convert from parameters
+  var geojson = arg0_geoJSON;
+
+  //Declare local instance variables
+  var turf_coords = [];
+
+  //Parse turf_coords
+  var geojson_coords = getGeoJSONCoords(geojson);
+  var temp_polygon = L.polygon(geojson_coords).toGeoJSON();
+
+  turf_coords = temp_polygon.geometry.coordinates;
+
+  //Return statement
+  return [turf_coords, (temp_polygon.geometry.type == "Polygon") ? "polygon" : "multiPolygon"];
+}
+
 function getPoly (arg0_geoJSON) {
   //Convert from parameters
   var geoJSON = arg0_geoJSON;
@@ -295,15 +356,36 @@ function getTurfCoordinates (arg0_entity_id, arg1_date) {
   var date = (arg1_date) ? arg1_date : window.date;
 
   //Declare local instance variables
-  var local_entity = getEntity(entity_id);
+  var local_entity = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
   var turf_coords = [];
+
+  //Guard clause if already TURF coordinates
+  if (isTurfCoordinates(date))
+    return date;
 
   //Check to make sure local_entity exists
   if (local_entity) {
-    var local_history = getPolityHistory(entity_id, date);
+    if (date._initHooksCalled) { //Actual GeoJSON
+      return getGeoJSONTurfCoordinates(date);
+    } else { //Other type
+      if (Array.isArray(date)) { //Raw coordinates provided
+        //console.log(`Is turf coordinates:`, isTurfCoordinates(date));
+        //console.log(`Date:`, date);
+        var temp_polygon = L.polygon(date).toGeoJSON();
+        turf_coords = temp_polygon.geometry.coordinates;
+      } else {
+        var local_history = (date.id) ? date : getPolityHistory(entity_id, date);
 
-    var temp_polygon = L.polygon(local_history.coords).toGeoJSON();
-    turf_coords = temp_polygon.geometry.coordinates;
+        //Guard clause if no coords
+        if (local_history.coords)
+          if (local_history.coords.length == 0)
+            return [local_history.coords, "polygon"];
+
+        //console.log(local_history);
+        var temp_polygon = L.polygon(local_history.coords).toGeoJSON();
+        turf_coords = temp_polygon.geometry.coordinates;
+      }
+    }
   }
 
   //Return statement
@@ -375,6 +457,69 @@ function getPreviousEntityName (arg0_entity_id, arg1_date) {
   return (last_history_name) ? last_history_name : entity_obj.options.entity_name;
 }
 
+function getTurfDifference (arg0_turf_coords, arg1_turf_coords, arg2_options) {
+  //Convert from parameters
+  var old_turf_coords = arg0_turf_coords;
+  var new_turf_coords = arg1_turf_coords;
+  var options = (arg2_options) ? arg2_options : undefined;
+
+  //Declare local instance variables
+  var old_turf_obj = getTurfObject(old_turf_coords);
+  var new_turf_obj = getTurfObject(new_turf_coords);
+
+  //Get turf difference
+  var turf_difference = turf.difference(old_turf_obj, new_turf_obj);
+  var local_geojson = L.geoJSON(turf_difference, options);
+
+  //Return statement
+  return local_geojson;
+}
+
+function getTurfIntersection (arg0_turf_coords, arg1_turf_coords, arg2_options) {
+  //Convert from parameters
+  var old_turf_coords = arg0_turf_coords;
+  var new_turf_coords = arg1_turf_coords;
+  var options = (arg2_options) ? arg2_options : undefined;
+
+  //Declare local instance variables
+  var old_turf_obj = getTurfObject(old_turf_coords);
+  var new_turf_obj = getTurfObject(new_turf_coords);
+
+  //Get turf intersection
+  var turf_intersection = turf.intersect(old_turf_obj, new_turf_obj);
+  var local_geojson = L.geoJSON(turf_intersection, options);
+
+  //Return statement
+  return local_geojson;
+}
+
+function getTurfObject (arg0_turf_coords) {
+  //Convert from parameters
+  var turf_coords = arg0_turf_coords;
+
+  //Return statement
+  return turf[turf_coords[1]](turf_coords[0]);
+}
+
+function getTurfUnion (arg0_turf_coords, arg1_turf_coords, arg2_options) {
+  //Convert from parameters
+  var old_turf_coords = arg0_turf_coords;
+  var new_turf_coords = arg1_turf_coords;
+  var options = (arg2_options) ? arg2_options : undefined;
+
+  //Declare local instance variables
+  var old_turf_obj = getTurfObject(old_turf_coords);
+
+  var new_turf_obj = getTurfObject(new_turf_coords);
+
+  //Get turf intersection
+  var turf_union = turf.union(old_turf_obj, new_turf_obj);
+  var local_geojson = L.geoJSON(turf_union, options);
+
+  //Return statement
+  return local_geojson;
+}
+
 function isPolityHidden (arg0_entity_id, arg1_date) {
   //Convert from parameters
   var entity_id = arg0_entity_id;
@@ -392,6 +537,18 @@ function isPolityHidden (arg0_entity_id, arg1_date) {
 
     return is_extinct;
   });
+}
+
+function isTurfCoordinates (arg0_turf_coords) {
+  //Convert from parameters
+  var turf_coords = arg0_turf_coords;
+
+  //Return statement
+  if (Array.isArray(turf_coords))
+    if (turf_coords.length == 2)
+      if (Array.isArray(turf_coords[0]) && typeof turf_coords[1] == "string")
+        if (["polygon", "multiPolygon"].includes(turf_coords[1]))
+          return true;
 }
 
 function moveEntityToGroup (arg0_entity_id, arg1_group_id) {

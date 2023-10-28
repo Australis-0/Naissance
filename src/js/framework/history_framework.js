@@ -42,7 +42,7 @@ function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
 }
 
 //Removes duplicate keyframes
-function cleanKeyframes (arg0_entity_id, arg1_tolerance) { //[WIP] - Allow user to specify tolerance time range in which to clean up keyframes later on
+function cleanKeyframes (arg0_entity_id, arg1_tolerance) { //[WIP] - Allow user to specify tolerance time range in which to clean up keyframes later on; remove redundant coordinates
   //Convert from parameters
   var entity_id = arg0_entity_id;
   var tolerance = getTimestamp(arg1_tolerance);
