@@ -9,8 +9,10 @@
     var leaflet_coords;
 
     //Guard clauses if already of Leaflet type
-    if (format_type == "leaflet" || format_type == "leaflet_non_poly")
-      return format;
+    if (format_type == "leaflet")
+      return JSON.parse(JSON.stringify(format));
+    if (format_type == "leaflet_non_poly")
+      return JSON.parse(JSON.stringify(format._latlngs));
 
     //If a valid format type, convert it to Leaflet somehow
     if (format_type)
@@ -52,10 +54,18 @@
 
     //Declare local instance variables
     var leaflet_coords = convertToLeaflet(format);
-    var naissance_coords = convertLeafletToNaissance(leaflet_coords);
+
+    //Iterate over leaflet_coords
+    for (var i = 0; i < leaflet_coords.length; i++)
+      if (Array.isArray(leaflet_coords[i])) {
+        console.log(`Calling convertToNaissance()!`);
+        leaflet_coords[i] = convertToNaissance(leaflet_coords[i]);
+      } else {
+        leaflet_coords[i] = [leaflet_coords[i].lat, leaflet_coords[i].lng];
+      }
 
     //Return statement
-    return naissance_coords;
+    return leaflet_coords;
   }
 
   //convertToTurf() - Returns [coordinates, type];

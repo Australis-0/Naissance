@@ -78,30 +78,30 @@
 
         for (var i = 0; i < all_history_entries.length; i++) {
           var local_date = parseTimestamp(all_history_entries[i]);
-          var local_entry = entity_obj.options.history[all_history_entries[i]];
-          var local_simplified_coords = simplify(entity_id, tolerance, local_date);
+          var local_history_frame = entity_obj.options.history[all_history_entries[i]];
+          var local_simplified_coords = convertToNaissance(simplify(local_history_frame, tolerance));
 
           //Extract coords from local_simplified_coords
-          var local_layers = Object.keys(local_simplified_coords._layers);
-          local_entry.coords = local_simplified_coords._layers[local_layers[0]]._latlngs;
+          local_history_frame.coords = local_simplified_coords;
         }
       }
 
       //Simplify current entity to update coords on map
-      simplifyEntity(entity_id, { tolerance: tolerance });
+      simplifyEntity(entity_id, tolerance);
     }
   }
 
   function simplifyEntity (arg0_entity_id, arg1_tolerance) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var tolerance = (arg1_tolerance) ? arg1_tolerance : { tolerance: 0 };
+    var tolerance = arg1_tolerance;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id
 
     if (entity_obj) {
       var simplified_coords = simplify(entity_obj._latlngs, tolerance);
+      entity_obj._latlngs = simplified_coords;
 
       //Set history entry to reflect actual_coords
       if (entity_obj.options.history) {
@@ -109,6 +109,10 @@
 
         current_history_entry.coords = convertToNaissance(simplified_coords);
       }
+
+      //Refresh entity_obj
+      entity_obj.remove();
+      entity_obj.addTo(map);
     }
   }
 }

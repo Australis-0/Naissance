@@ -852,8 +852,8 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
       var simplify_tolerance = simplify_value/Math.pow(10, 3);
 
       (simplify_all_keyframes_el.checked) ?
-        simplifyAllEntityKeyframes(entity_id, { tolerance: simplify_tolerance }) :
-        simplifyEntity(entity_id, { tolerance: simplify_tolerance });
+        simplifyAllEntityKeyframes(entity_id, simplify_tolerance) :
+        simplifyEntity(entity_id, simplify_tolerance);
     };
 
     onRangeChange(simplify_tolerance_el, function (e) {

@@ -288,21 +288,27 @@
       return_leaflet: false/true - Optional. Whether to return a Leaflet object. True by default
     }
   */
-  function simplify (arg0_format, arg1_options) {
+  function simplify (arg0_format, arg1_tolerance, arg2_options) {
     //Convert from parameters
     var format = arg0_format;
-    var options = (arg1_options) ? arg1_options : {};
+    var tolerance = arg1_tolerance;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Initialise options
     if (options.return_leaflet != false) options.return_leaflet = true;
 
-    if (options.tolerance) {
-      //Declare local instance variables
-      var turf_obj = getTurfObject(format);
-      var turf_simplified = turf.simplify(turf_obj, options);
+    if (tolerance) {
+      var new_options = mergeObjects({ tolerance: tolerance }, options);
 
-      //Return statement
-      return (options.return_leaflet) ? convertToLeaflet(turf_simplified) : turf_simplified;
+      if (typeof new_options.tolerance == "number") {
+        var turf_obj = getTurfObject(format);
+        var turf_simplified = turf.simplify(turf_obj, new_options);
+
+        //Return statement
+        return (options.return_leaflet) ? convertToLeaflet(turf_simplified) : turf_simplified;
+      } else {
+        console.error(`Invalid tolerance option!`, new_options);
+      }
     } else {
       console.error(`No options.tolerance specified.`);
     }
