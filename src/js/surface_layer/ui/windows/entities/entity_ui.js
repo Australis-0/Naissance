@@ -852,8 +852,8 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
       var simplify_tolerance = simplify_value/Math.pow(10, 3);
 
       (simplify_all_keyframes_el.checked) ?
-        simplifyAllEntityKeyframes(entity_id, simplify_tolerance) :
-        simplifyEntity(entity_id, simplify_tolerance);
+        simplifyAllEntityKeyframes(entity_id, { tolerance: simplify_tolerance }) :
+        simplifyEntity(entity_id, { tolerance: simplify_tolerance });
     };
 
     onRangeChange(simplify_tolerance_el, function (e) {
@@ -1562,7 +1562,7 @@ document.body.addEventListener("keyup", (e) => {
     } catch {}
 
     //current_union handler
-    if (window.current_union)
-      current_union.options.entity_name = input;
+    if (window.selection)
+      selection.options.entity_name = input;
   }
 });

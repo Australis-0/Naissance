@@ -24,8 +24,6 @@ var minute_field = document.getElementById("minute-input");
 window.date_fields = [day_field, month_field, year_field, hour_field, minute_field];
 
 function autoFillDate () {
-  console.log(date);
-
   year_field.value = Math.abs(date.year);
   month_field.value = months[date.month - 1];
   day_field.value = ordinalise(date.day);
@@ -150,18 +148,9 @@ function loadDate (arg0_old_date) {
                 entityUI(e, false, true);
               });
 
-              //Check for current_union
-              if (window.polity_options)
-                if (polity_options.className == local_layer[x].options.className) {
-                  current_entity._layers = {};
-                  local_layer[x].addTo(current_entity);
-                  current_union.addTo(current_entity);
-
-                  entity_cache = [local_layer[x]];
-                  current_union = unify(current_entity.getLayers());
-                }
-            } else {
-              console.log(true);
+              //This is the current selected polity, re-add cursor
+              if (window.editing_entity == local_layer[x].options.className)
+                clearBrush();
             }
         }
       }

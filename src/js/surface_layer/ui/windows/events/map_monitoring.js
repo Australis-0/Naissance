@@ -17,7 +17,8 @@ map.on("zoom", function (e) {
       //Add/remove to/from map based on whether entity meets curent zoom requirements
       if (zoom_level >= local_entity_minimum_zoom && zoom_level <= local_entity_maximum_zoom) {
         if (!map.hasLayer(local_layer[x]))
-          local_layer[x].addTo(map);
+          if (local_layer[x].options.className != window.editing_entity)
+            local_layer[x].addTo(map);
       } else {
         local_layer[x].removeFrom(map);
       }

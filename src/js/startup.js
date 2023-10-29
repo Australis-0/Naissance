@@ -2,16 +2,20 @@
 window.fs = require("fs");
 
 //Brush variables
-window.brush = {
-  radius: 10000
-};
-window.current_entity = new L.LayerGroup();
 window.current_union;
 window.cursor;
 window.entity_cache = [];
-window.polity_options;
 window.polity_index = -1;
 window.selected_layer = "polities";
+
+//Brush settings
+{
+  window.brush = {
+    radius: 50000
+  };
+  window.polity_options;
+  window.simplify_tolerance = 0.025; //To be folded in later
+}
 
 //Date variables
 var current_date = new Date();
@@ -65,6 +69,29 @@ window.right_mouse = false;
 
   //Sidebar UI
   window.sidebar_selected_entities = [];
+}
+
+//Initialise map, other UI elements after everything else
+{
+  var map = L.map("map").setView({
+    inertia: true,
+    lon: 0,
+    lat: 0,
+    minZoom: 3,
+    maxZoom: 10,
+    worldCopyJump: true //Makes sure the world map wraps around
+  }).setView([51.505, -0.09], 5);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+  //Initialise Brush UI
+  initBrush();
+
+  //Initialise Date handling
+  initDate();
+
+  //Initialise Sidebar handling
+  initSidebar();
 }
 
 //Test scripts

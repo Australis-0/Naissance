@@ -31,6 +31,7 @@ document.getElementById("map").onmousedown = function (e) {
 
   if (e.button == 2)
     window.right_mouse = true;
+  window.left_mouse = (!window.right_mouse);
 };
 
 document.body.onmouseup = function (e) {
