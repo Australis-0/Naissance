@@ -83,6 +83,7 @@
       var local_history = entity_obj.options.history[date_string];
 
       local_history.coords = actual_coords;
+      if (!local_history.options) local_history.options;
 
       for (var i = 0; i < all_option_keys.length; i++)
         if (!["history", "type"].includes(all_option_keys[i]))
@@ -95,6 +96,10 @@
           old_history_entry.id != local_history.id
         )
           delete entity_obj.options.history[date_string];
+
+      //Delete local_history.options if not needed
+      if (!local_history.options)
+        delete local_history.options;
     }
   }
 
@@ -160,8 +165,9 @@
             var local_history = entity_obj.options.history[all_history_entries[i]];
 
             if (parseInt(local_history.id) <= ending_timestamp)
-              if (local_history.options[property])
-                entity_value = local_history.options[property];
+              if (local_history.options)
+                if (local_history.options[property])
+                  entity_value = local_history.options[property];
           }
 
           if (!entity_value)
@@ -208,6 +214,21 @@
 
 //Entity keyframe handling
 {
+  function getEntityCoords (arg0_entity_id, arg1_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : window.date;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    //Return statement
+    return entityHasProperty(entity_obj, date, function (local_history) {
+      if (local_history.coords)
+        return local_history.coords;
+    })
+  }
+
   /*
     getLastCoords() - Fetches the last valid .coords field from a Naissance entity.
     options: {
@@ -221,21 +242,22 @@
     var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : history_frame;
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var last_history_coords = [];
 
     if (entity_obj)
       if (entity_obj.options.history) {
         var all_history_frames = Object.keys(entity_obj.options.history);
-        var current_index = all_history_frames.indexOf(history_frame.id);
+        var current_index = all_history_frames.indexOf(history_frame.id.toString());
 
         //Iterate backwards from current_index
         for (var i = current_index; i >= 0; i--) {
-          var local_history_entry = entity_obj.options.history[current_index[i]];
+          var local_history_entry = entity_obj.options.history[all_history_frames[i]];
 
+          //Return statement
           if (local_history_entry.coords)
             if (options.different_coords) {
-              if (JSON.stringify(local_history_entry.coords) != history_frame.coords)
+              if (JSON.stringify(local_history_entry.coords) != JSON.stringify(history_frame.coords))
                 return local_history_entry.coords;
             } else {
               if (local_history_entry.coords.length > 0)
@@ -243,8 +265,30 @@
             }
         }
       }
+  }
 
-    //Return statement
-    return last_history_coords;
+  function getLastIdenticalCoords (arg0_entity_id, arg1_history_frame) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var history_frame = arg1_history_frame;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj)
+      if (entity_obj.options.history) {
+        var all_history_frames = Object.keys(entity_obj.options.history);
+        var current_index = all_history_frames.indexOf(history_frame.id.toString());
+
+        //Iterate backwards from current_index
+        for (var i = current_index; i >= 0; i--)
+          if (i != current_index) {
+            var local_history_entry = entity_obj.options.history[all_history_frames[i]];
+
+            if (JSON.stringify(local_history_entry.coords) == JSON.stringify(history_frame.coords))
+              //Return statement
+              return local_history_entry.coords;
+          }
+      }
   }
 }

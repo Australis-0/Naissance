@@ -958,7 +958,7 @@ function populateEntityBio (arg0_entity_id) {
       var local_date = parseTimestamp(all_histories[i]);
       var local_entity_name = getEntityName(entity_id, local_date);
       var local_history = entity_obj.options.history[all_histories[i]];
-      var local_options = local_history.options;
+      var local_options = (local_history.options) ? local_history.options : {};
       var timestamp = ` timestamp = ${all_histories[i]}`;
 
       if (!last_history_entry) {
@@ -1022,9 +1022,9 @@ function populateEntityBio (arg0_entity_id) {
 
         //Extinct/Hide polity handler
         {
-          if (local_history.options.extinct)
+          if (local_options.extinct)
             bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is abolished.</td></tr>`);
-          if (local_history.options.extinct == false)
+          if (local_options.extinct == false)
             bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is re-established.</td></tr>`);
         }
 
@@ -1137,7 +1137,6 @@ function populateEntityColourWheel (arg0_entity_id) {
 
   //RGB listeners
   r_el.onchange = function () {
-    console.log("changed!");
     this.value = Math.max(Math.min(this.value, 255), 0);
     setEntityColourWheelCursor(entity_id, [r_el.value, g_el.value, b_el.value]);
   };

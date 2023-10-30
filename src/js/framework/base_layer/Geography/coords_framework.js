@@ -58,7 +58,6 @@
     //Iterate over leaflet_coords
     for (var i = 0; i < leaflet_coords.length; i++)
       if (Array.isArray(leaflet_coords[i])) {
-        console.log(`Calling convertToNaissance()!`);
         leaflet_coords[i] = convertToNaissance(leaflet_coords[i]);
       } else {
         leaflet_coords[i] = [leaflet_coords[i].lat, leaflet_coords[i].lng];

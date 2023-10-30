@@ -266,10 +266,12 @@
     return all_keys;
   }
 
-  function mergeObjects (arg0_scope, arg1_scope) {
+  //mergeObjects() - Merges two objects together. mode: "normal"/"override". normal by default
+  function mergeObjects (arg0_scope, arg1_scope, arg2_mode) {
     //Convert from parameters
     var merged_obj = JSON.parse(JSON.stringify(arg0_scope));
     var merge_obj = JSON.parse(JSON.stringify(arg1_scope));
+    var mode = arg2_mode;
 
     //Declare local instance variables
     var all_merge_keys = Object.keys(merge_obj);

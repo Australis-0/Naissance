@@ -118,7 +118,7 @@
 
     //Declare local instance variables
     var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
-    var entity_obj = getEntity(entity_id);
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var has_property;
 
     if (entity_obj)
@@ -235,10 +235,10 @@
     //Check to make sure entity_obj exists
     if (entity_obj) {
       var is_extinct = isPolityHidden(entity_id, date);
-      var local_history = getPolityHistory(entity_id, date);
+      var last_coords = getEntityCoords(entity_id, date);
 
-      if (local_history) {
-        var local_coordinates = getTurfObject(local_history);
+      if (last_coords) {
+        var local_coordinates = getTurfObject(last_coords);
 
         entity_area = (!is_extinct) ? turf.area(local_coordinates) : 0;
       }
@@ -246,26 +246,6 @@
 
     //Return statement
     return entity_area;
-  }
-
-  function getEntityGroup (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Iterate over all layers and subgroups
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_groups`];
-
-      var all_local_groups = Object.keys(local_layer);
-
-      for (var x = 0; x < all_local_groups.length; x++) {
-        var local_group = local_layer[all_local_groups[x]];
-
-        if (local_group.entities)
-          if (local_group.entities.includes(entity_id))
-            return local_group;
-      }
-    }
   }
 
   /*
@@ -312,6 +292,26 @@
     return local_entity;
   }
 
+  function getEntityGroup (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Iterate over all layers and subgroups
+    for (var i = 0; i < layers.length; i++) {
+      var local_layer = window[`${layers[i]}_groups`];
+
+      var all_local_groups = Object.keys(local_layer);
+
+      for (var x = 0; x < all_local_groups.length; x++) {
+        var local_group = local_layer[all_local_groups[x]];
+
+        if (local_group.entities)
+          if (local_group.entities.includes(entity_id))
+            return local_group;
+      }
+    }
+  }
+
   function getEntityName (arg0_entity_id, arg1_date) {
     //Convert from parmateers
     var entity_id = arg0_entity_id;
@@ -352,11 +352,12 @@
     return entityHasProperty(entity_id, date, function (local_history) {
       var is_extinct;
 
-      if (local_history.options.extinct) {
-        is_extinct = local_history.options.extinct;
-      } else if (local_history.options.extinct == false) {
-        is_extinct = false;
-      }
+      if (local_history.options)
+        if (local_history.options.extinct) {
+          is_extinct = local_history.options.extinct;
+        } else if (local_history.options.extinct == false) {
+          is_extinct = false;
+        }
 
       return is_extinct;
     });

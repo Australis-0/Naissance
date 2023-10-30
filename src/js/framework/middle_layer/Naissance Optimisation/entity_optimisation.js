@@ -27,36 +27,31 @@
       if (entity_obj.options.history) {
         var all_history_entries = Object.keys(entity_obj.options.history);
 
-        for (var i = all_history_entries.length - 1; i >= 0; i--)
+        for (var i = 0; i < all_history_entries.length; i++)
           if (parseInt(all_history_entries[i]) >= (getTimestamp(window.date) - tolerance)) {
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
-            var local_last_coords = getLastCoords(entity_obj, local_history_entry, {
-              different_coords: true
-            });
-            var remove_frame = false;
 
             //Remove .coords if last coords are the same
-            if (JSON.stringify(local_last_coords.coords) == JSON.stringify(local_history_entry.coords))
+            console.log(`Frame ${all_history_entries[i]}:`, getLastIdenticalCoords(entity_obj, local_history_entry));
+            if (getLastIdenticalCoords(entity_obj, local_history_entry))
               delete local_history_entry.coords;
 
             //Remove frame if same .coords and options is empty
-            if (local_history_entry.options)
+            if (local_history_entry.options) {
               if (Object.keys(local_history_entry.options).length == 0) {
                 empty_options = true;
                 delete local_history_entry.options;
               }
-
-            if (!local_history_entry.coords) {
-              remove_frame = empty_options;
             } else {
-              if (!local_history_entry.options)
-                remove_frame = true;
+              empty_options = true;
             }
 
             //Remove frame if needed
-            if (remove_frame)
+            if (!local_history_entry.coords && empty_options) {
+              console.log(`Removing frame ${all_history_entries[i]}!`);
               delete entity_obj.options.history[all_history_entries[i]];
+            }
           }
 
         //Repopulate entity bio; refresh UI

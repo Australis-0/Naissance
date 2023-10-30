@@ -16,8 +16,6 @@
 
     var turf_coords = convertToTurf(format);
 
-    //console.log(`Converting to TURF ..`, turf_coords)
-
     //Return statement
     return turf[turf_coords[1]](turf_coords[0]);
   }
@@ -91,15 +89,10 @@
     //Declare local instance variables
     var original_poly = getTurfObject(format_list[0]);
 
-    console.log(`Format list:`, format_list)
-
     //Iterate over format_list above i = 1
     if (format_list.length > 1)
       for (var i = 1; i < format_list.length; i++) {
         var local_turf_obj = getTurfObject(format_list[i]);
-
-        console.log(`Difference 1:`, original_poly);
-        console.log(`Difference 2:`, local_turf_obj);
 
         original_poly = difference(original_poly, local_turf_obj, {
           return_leaflet: false
