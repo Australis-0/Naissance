@@ -179,6 +179,36 @@
     }
   }
 
+  function getHistoryFrame (arg0_entity_id, arg1_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : window.date;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+    var history_frame = {
+      coords: [],
+      options: {}
+    };
+    var timestamp = getTimestamp(date);
+
+    var all_history_frames = Object.keys(entity_obj.options.history);
+
+    //Iterate over all_history_frames
+    for (var i = 0; i < all_history_frames.length; i++)
+      if (parseInt(all_history_frames[i]) <= timestamp) {
+        var local_history_frame = entity_obj.options.history[all_history_frames[i]];
+
+        if (local_history_frame.coords)
+          history_frame.coords = local_history_frame.coords;
+        if (local_history_frame.options)
+          history_frame.options = mergeObjects(history_frame.options, local_history_frame.options, "override");
+      }
+
+    //Return statement
+    return history_frame;
+  }
+
   /*
     getPolityHistory() - Returns a polity history entry for the specified date
     options: {

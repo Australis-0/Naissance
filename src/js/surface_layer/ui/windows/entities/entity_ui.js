@@ -834,7 +834,7 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     if (window.simplify_all_keyframes_el)
       simplify_all_keyframes_el.checked = true;
     if (window.simplify_tolerance)
-      simplify_tolerance_el.value = window.simplify_tolerance;
+      simplify_tolerance_el.value = parseInt(window.simplify_tolerance*Math.pow(10, 3));
 
     //Set listener events
     auto_simplify_when_editing_el.onclick = function (e) {
@@ -857,12 +857,8 @@ function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish re
     };
 
     onRangeChange(simplify_tolerance_el, function (e) {
-      var simplify_value = parseInt(e.target.value);
-
-      var simplify_tolerance = simplify_value/Math.pow(10, 3);
-
       //Set global flag
-      window.simplify_tolerance = simplify_tolerance;
+      window.simplify_tolerance = getSimplifyTolerance(e.target.value);
     });
   }
 }
@@ -970,8 +966,8 @@ function populateEntityBio (arg0_entity_id) {
         var last_history_date = parseTimestamp(all_histories[i - 1]);
 
         //Compare land areas
-        var current_land_area = getArea(entity_id, local_date);
-        var old_land_area = getArea(entity_id, last_history_date);
+        var current_land_area = getEntityArea(entity_id, local_date);
+        var old_land_area = getEntityArea(entity_id, last_history_date);
 
         var land_percentage_change = (Math.round((1 - (old_land_area/current_land_area))*100*100)/100/100); //Round to hundreths place
         var land_percentage_change_string = "";
@@ -1030,13 +1026,15 @@ function populateEntityBio (arg0_entity_id) {
 
         //Land area handler
         {
-          if (land_percentage_change < 0)
-            land_percentage_change_string = `lost ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} of her land.`;
-          if (land_percentage_change > 0)
-            land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
+          if (isFinite(land_percentage_change)) {
+            if (land_percentage_change < 0)
+              land_percentage_change_string = `lost ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} of her land.`;
+            if (land_percentage_change > 0)
+              land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
 
-          if (land_percentage_change != 0)
-            bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${local_entity_name} ${land_percentage_change_string}</span></td></tr>`);
+            if (land_percentage_change != 0)
+              bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${local_entity_name} ${land_percentage_change_string}</span></td></tr>`);
+          }
         }
       }
     }

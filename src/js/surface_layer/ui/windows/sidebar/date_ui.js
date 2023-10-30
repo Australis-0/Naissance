@@ -1,5 +1,13 @@
 //Date UI functions
 {
+  function autoFillDate () {
+    year_field.value = Math.abs(date.year);
+    month_field.value = months[date.month - 1];
+    day_field.value = ordinalise(date.day);
+
+    hour_field.value = (date.hour < 10) ? "0" + date.hour : date.hour;
+    minute_field.value = (date.minute < 10) ? "0" + date.minute : date.minute;
+  }
 
   function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element) {
     //Convert from parameters

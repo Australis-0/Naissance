@@ -14,7 +14,7 @@ window.selected_layer = "polities";
     radius: 50000
   };
   window.polity_options;
-  window.simplify_tolerance = 0.025; //To be folded in later
+  window.simplify_tolerance = getSimplifyTolerance(10); //To be folded in later
 }
 
 //Date variables

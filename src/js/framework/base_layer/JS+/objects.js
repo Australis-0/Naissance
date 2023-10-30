@@ -271,26 +271,48 @@
     //Convert from parameters
     var merged_obj = JSON.parse(JSON.stringify(arg0_scope));
     var merge_obj = JSON.parse(JSON.stringify(arg1_scope));
-    var mode = arg2_mode;
+    var mode = (arg2_mode) ? arg2_mode : "normal";
 
     //Declare local instance variables
     var all_merge_keys = Object.keys(merge_obj);
 
     //Iterate over all_merge_keys
-    for (var i = 0; i < all_merge_keys.length; i++) {
-      var current_value = merged_obj[all_merge_keys[i]];
-      var local_value = merge_obj[all_merge_keys[i]];
+    if (mode == "normal") {
+      for (var i = 0; i < all_merge_keys.length; i++) {
+        var current_value = merged_obj[all_merge_keys[i]];
+        var local_value = merge_obj[all_merge_keys[i]];
 
-      if (typeof local_value == "number") {
-        if (merged_obj[all_merge_keys[i]]) {
-          merged_obj[all_merge_keys[i]] = merged_obj[all_merge_keys[i]] + local_value; //Add numbers together
+        if (typeof local_value == "number") {
+          if (merged_obj[all_merge_keys[i]]) {
+            merged_obj[all_merge_keys[i]] = merged_obj[all_merge_keys[i]] + local_value; //Add numbers together
+          } else {
+            merged_obj[all_merge_keys[i]] = local_value;
+          }
+        } else if (typeof local_value == "object" && current_value && local_value) {
+          merged_obj[all_merge_keys[i]] = module.exports.mergeObjects(current_value, local_value, mode); //Recursively merge objects if possible
         } else {
           merged_obj[all_merge_keys[i]] = local_value;
         }
-      } else if (typeof local_value == "object" && current_value && local_value) {
-        merged_obj[all_merge_keys[i]] = module.exports.mergeObjects(current_value, local_value); //Recursively merge objects if possible
-      } else {
-        merged_obj[all_merge_keys[i]] = local_value;
+      }
+    } else if (mode == "override") {
+      for (var i = 0; i < all_merge_keys.length; i++) {
+        var current_value = merged_obj[all_merge_keys[i]];
+        var local_override = false;
+        var local_value = merge_obj[all_merge_keys[i]];
+
+        if (current_value) {
+          if (typeof local_value == "object" && !Array.isArray(local_value)) {
+            //Recursively merge objects
+            merged_obj[all_merge_keys[i]] = module.exports.mergeObjects(current_value, local_value, mode); //Recursively merge objects if possible
+          } else {
+            local_override = true;
+          }
+        } else {
+          local_override = true;
+        }
+
+        if (local_override)
+          merged_obj[all_merge_keys[i]] = local_value;
       }
     }
 
