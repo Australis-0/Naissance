@@ -252,130 +252,135 @@
     var element_obj = e.item;
     var target_obj = e.to;
 
-    //Check for dragged element class type
-    if (target_obj.getAttribute("class")) {
-      var target_id = target_obj.getAttribute("id");
-      var target_parent = target_obj.parentElement;
+    //Make sure element_obj isn't being moved into hierarchy
+    if (target_obj.id != "hierarchy") {
+      //Check for dragged element class type
+      if (target_obj.getAttribute("class")) {
+        var target_id = target_obj.getAttribute("id");
+        var target_parent = target_obj.parentElement;
 
-      //Improper group location handling
-      if (element_obj.getAttribute("class").includes("group"))
-        //Move to subgroups if the element is not already there
-        if (!target_id.includes("-subgroups")) {
-          try {
-            var subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
+        //Improper group location handling
+        if (element_obj.getAttribute("class").includes("group"))
+          //Move to subgroups if the element is not already there
+          if (!target_id.includes("-subgroups")) {
+            try {
+              var subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
 
-            //Make sure we're after the layer header field
-            if (element_obj.nextElementSibling.getAttribute("class").includes("layer-input")) {
-              target_obj.querySelector(".layer > input").after(element_obj);
-            } else {
+              //Make sure we're after the layer header field
+              if (element_obj.nextElementSibling.getAttribute("class").includes("layer-input")) {
+                target_obj.querySelector(".layer > input").after(element_obj);
+              } else {
+                var properly_moved = false;
+
+                //Make sure to before/prepend since we're dealing with groups
+                if (target_obj && !target_obj.getAttribute("class").includes("layer")) {
+                    target_obj.before(element_obj);
+
+                    properly_moved = true;
+                  }
+
+                //If a subgroups element was detected, we should be inside a group container - prepend to subcontainer instead
+                if (subgroups_el && !properly_moved)
+                  if (subgroups_el.id.includes("-subgroups"))
+                    subgroups_el.prepend(element_obj);
+              }
+            } catch {
+              //Now we know we're inside of an entity (improper location)
+              var subgroups_el = target_obj.parentElement;
               var properly_moved = false;
+              var test_el = target_obj.parentElement;
 
-              //Make sure to before/prepend since we're dealing with groups
-              if (target_obj && !target_obj.getAttribute("class").includes("layer")) {
-                  target_obj.before(element_obj);
+              //Layer case handling
+              if (target_obj.getAttribute("class").includes("layer")) {
+                var all_ungrouped_entities = target_obj.querySelectorAll(".layer > .entity");
 
-                  properly_moved = true;
-                }
+                (all_ungrouped_entities.length > 0) ?
+                  all_ungrouped_entities[0].before(element_obj) :
+                  target_obj.append(element_obj);
 
-              //If a subgroups element was detected, we should be inside a group container - prepend to subcontainer instead
-              if (subgroups_el && !properly_moved)
-                if (subgroups_el.id.includes("-subgroups"))
-                  subgroups_el.prepend(element_obj);
-            }
-          } catch {
-            //Now we know we're inside of an entity (improper location)
-            var subgroups_el = target_obj.parentElement;
-            var properly_moved = false;
-            var test_el = target_obj.parentElement;
-
-            //Layer case handling
-            if (target_obj.getAttribute("class").includes("layer")) {
-              var all_ungrouped_entities = target_obj.querySelectorAll(".layer > .entity");
-
-              (all_ungrouped_entities.length > 0) ?
-                all_ungrouped_entities[0].before(element_obj) :
-                target_obj.append(element_obj);
-
-              properly_moved = true;
-            }
-
-            if (!properly_moved) {
-              //First-layer case handling
-              if (subgroups_el.id != "hierarchy") {
-                subgroups_el = subgroups_el.parentElement;
-                test_el = subgroups_el.querySelector(`[id='${subgroups_el.id}-subgroups']`);
+                properly_moved = true;
               }
 
-              //Append instead of prepend since entities go last
-              target_obj.append(element_obj);
-            }
-          }
-
-          //Postmortem test
-          {
-            var element_parent = element_obj.parentElement;
-
-            //Entity handling
-            if (element_parent.getAttribute("class").includes("entity")) {
-              //Move it out of the entity div first
-              element_parent.before(element_obj);
-            }
-
-            //Group handling
-            if (
-              !element_parent.getAttribute("class").includes("-subgroups") &&
-              element_parent.getAttribute("class").includes("group")
-            ) {
-              var subgroups_el = element_parent.querySelector(".subgroups");
-
-              if (subgroups_el)
-                try {
-                  subgroups_el.append(element_obj);
-                } catch {}
-            }
-
-            //Keep moving it upwards until it's finally above all the entities
-            while (true) {
-              //Recursive immediate sibling entity testing
-              var keep_moving = false;
-              var previous_sibling = element_obj.previousSibling;
-
-              if (previous_sibling)
-                if (previous_sibling.getAttribute("class").includes("entity")) {
-                  previous_sibling.before(element_obj);
-
-                  keep_moving = true;
+              if (!properly_moved) {
+                //First-layer case handling
+                if (subgroups_el.id != "hierarchy") {
+                  subgroups_el = subgroups_el.parentElement;
+                  test_el = subgroups_el.querySelector(`[id='${subgroups_el.id}-subgroups']`);
                 }
 
-              if (!keep_moving)
-                break;
+                //Append instead of prepend since entities go last
+                target_obj.append(element_obj);
+              }
+            }
+
+            //Postmortem test
+            {
+              var element_parent = element_obj.parentElement;
+
+              //Entity handling
+              if (element_parent.getAttribute("class").includes("entity")) {
+                //Move it out of the entity div first
+                element_parent.before(element_obj);
+              }
+
+              //Group handling
+              if (
+                !element_parent.getAttribute("class").includes("-subgroups") &&
+                element_parent.getAttribute("class").includes("group")
+              ) {
+                var subgroups_el = element_parent.querySelector(".subgroups");
+
+                if (subgroups_el)
+                  try {
+                    subgroups_el.append(element_obj);
+                  } catch {}
+              }
+
+              //Keep moving it upwards until it's finally above all the entities
+              while (true) {
+                //Recursive immediate sibling entity testing
+                var keep_moving = false;
+                var previous_sibling = element_obj.previousSibling;
+
+                if (previous_sibling)
+                  if (previous_sibling.getAttribute("class").includes("entity")) {
+                    previous_sibling.before(element_obj);
+
+                    keep_moving = true;
+                  }
+
+                if (!keep_moving)
+                  break;
+              }
             }
           }
-        }
 
-      //Improper entity location handling
+        //Improper entity location handling
+        if (element_obj.getAttribute("class").includes("entity"))
+          if (!target_id.includes("-entities")) {
+            var entities_el = target_parent.querySelector(`[id='${target_id}-entities']`);
+
+            if (!entities_el)
+              entities_el = target_parent.querySelector(`[id='${target_parent.id}-entities']`);
+
+            (target_id != "hierarchy" && entities_el) ?
+              entities_el.append(element_obj) :
+              target_obj.append(element_obj);
+          }
+      }
+
+      //Update group and entity belonging by checking parent
+      var element_id = element_obj.id;
+      var group_element = element_obj.parentElement.parentElement;
+
+      //Entity handling
       if (element_obj.getAttribute("class").includes("entity"))
-        if (!target_id.includes("-entities")) {
-          var entities_el = target_parent.querySelector(`[id='${target_id}-entities']`);
-
-          if (!entities_el)
-            entities_el = target_parent.querySelector(`[id='${target_parent.id}-entities']`);
-
-          (target_id != "hierarchy" && entities_el) ?
-            entities_el.append(element_obj) :
-            target_obj.append(element_obj);
-        }
+        moveEntityToGroup(element_id, group_element.id);
+      if (element_obj.getAttribute("class").includes("group"))
+        moveGroupToGroup(element_id, group_element.id);
+    } else {
+      e.from.append(element_obj);
     }
-
-    //Update group and entity belonging by checking parent
-    var element_id = element_obj.id;
-    var group_element = element_obj.parentElement.parentElement;
-
-    //Entity handling
-    if (element_obj.getAttribute("class").includes("entity"))
-      moveEntityToGroup(element_id, group_element.id);
-    if (element_obj.getAttribute("class").includes("group"))
-      moveGroupToGroup(element_id, group_element.id);
   }
 
   function refreshSidebar (arg0_do_not_refresh) {
