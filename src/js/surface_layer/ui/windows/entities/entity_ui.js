@@ -596,7 +596,7 @@ global.opened_popups = {};
     var entity_obj = getEntity(entity_id);
 
     if (entity_obj) {
-      createHistoryEntry(entity_id, date, {
+      createHistoryFrame(entity_id, date, {
         extinct: true
       });
 
@@ -984,11 +984,11 @@ global.opened_popups = {};
             var minimum_zoom_level_string = ``;
 
             if (local_options.entity_name) {
-              var previous_entity_name = getPreviousEntityName(entity_id, all_histories[i]);
+              var local_entity_name = getEntityName(entity_id, all_histories[i]);
 
-              if (previous_entity_name)
-                if (previous_entity_name != local_options.entity_name)
-                  entity_name_string = `Name changed from ${previous_entity_name} to ${local_options.entity_name}. `;
+              if (local_entity_name)
+                if (local_entity_name != local_options.entity_name)
+                  entity_name_string = `Name changed from ${local_entity_name} to ${local_options.entity_name}. `;
             }
             if (local_options.fillColor)
               fill_colour_string = `Fill colour changed to <span class = "bio-box" style = "color: ${local_options.fillColor};">&#8718;</span>. `;
@@ -1275,7 +1275,7 @@ global.opened_popups = {};
 
     //Set entity fill colour
     if (current_tab == "fill") {
-      createHistoryEntry(entity_id, date, {
+      createHistoryFrame(entity_id, date, {
         fillColor: current_colour,
         fillOpacity: opacity_el.value/100
       });
@@ -1286,7 +1286,7 @@ global.opened_popups = {};
     }
 
     if (current_tab == "stroke") {
-      createHistoryEntry(entity_id, date, {
+      createHistoryFrame(entity_id, date, {
         color: current_colour,
         opacity: opacity_el.value/100
       });
@@ -1436,7 +1436,7 @@ global.opened_popups = {};
         maximum_zoom_level_el.onchange = function (e) {
           var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
-          createHistoryEntry(entity_id, window.date, {
+          createHistoryFrame(entity_id, window.date, {
             maximum_zoom_level: local_value
           });
           populateEntityBio(entity_id);
@@ -1448,7 +1448,7 @@ global.opened_popups = {};
         minimum_zoom_level_el.onchange = function (e) {
           var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
-          createHistoryEntry(entity_id, window.date, {
+          createHistoryFrame(entity_id, window.date, {
             minimum_zoom_level: local_value
           });
           populateEntityBio(entity_id);
@@ -1471,7 +1471,7 @@ global.opened_popups = {};
     var entity_obj = getEntity(entity_id);
 
     if (entity_obj) {
-      createHistoryEntry(entity_id, date, {
+      createHistoryFrame(entity_id, date, {
         extinct: false
       });
 
@@ -1536,17 +1536,16 @@ global.opened_popups = {};
 
 //Field reaction
 document.body.addEventListener("keyup", (e) => {
+  var entity_name = e.target.value;
   var local_class = e.target.getAttribute("class");
   var local_id = e.target.id;
-  var local_polity = getEntity(local_class);
-  var input = e.target.value;
+
+  var entity_obj = getEntity(local_class);
 
   if (local_id == "polity-name") {
     try {
-      local_polity.options.entity_name = input;
-
-      if (getPreviousEntityName(entity_id, date) != local_polity.options.entity_name) {
-        createHistoryEntry(local_class, date, { entity_name: input });
+      if (getEntityName(entity_obj, date) != entity_name) {
+        setEntityName(entity_obj, entity_name, window.date);
       } else {
         var local_history = getPolityHistory(local_class, date);
 
@@ -1555,10 +1554,12 @@ document.body.addEventListener("keyup", (e) => {
 
       //Repopulate bio
       populateEntityBio(local_class);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
 
     //current_union handler
     if (window.selection)
-      selection.options.entity_name = input;
+      selection.options.entity_name = entity_name;
   }
 });

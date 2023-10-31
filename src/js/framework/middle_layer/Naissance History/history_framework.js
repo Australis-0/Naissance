@@ -42,7 +42,7 @@
       }
   }
 
-  function createHistoryEntry (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
+  function createHistoryFrame (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var date = arg1_date;
@@ -51,7 +51,7 @@
 
     //Declare local instance variables
     var date_string = getTimestamp(date);
-    var entity_obj = getEntity(entity_id);
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var old_history_entry = getPolityHistory(entity_id, date);
 
     if (entity_obj) {

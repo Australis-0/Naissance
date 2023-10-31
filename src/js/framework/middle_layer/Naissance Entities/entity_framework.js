@@ -142,6 +142,8 @@
     //Declare local instance variables
     var coords = convertToNaissance(current_union);
     var date_string = getTimestamp(date);
+    var entity_id;
+    var entity_name;
     var is_new_entity = false;
     var new_entity = {
       options: selection.options
@@ -151,25 +153,25 @@
     if (!new_entity.options.type) new_entity.options.type = "polity";
 
     //Create history entry
-    createHistoryEntry(new_entity, date, {}, coords);
+    createHistoryFrame(new_entity, date, {}, coords);
 
     //Edit options; append ID and HTML
     {
       if (!new_entity.options.has_id) {
-        var entity_id = generateEntityID();
+        entity_id = generateEntityID();
 
         new_entity.options.className = (new_entity.options.className) ?
           new_entity.options.className + ` ${entity_id}` :
           entity_id.toString();
         if (selection.options.entity_name)
-          new_entity.options.entity_name = selection.options.entity_name;
+          entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
         new_entity.options.has_id = true;
       } else {
         is_new_entity = true;
       }
     }
 
-    //Push to polities_layer if new entity
+    //Add new entity to relevant layer
     if (new_entity.options.className) {
       var entity_exists = getEntity(new_entity.options.className);
 
@@ -177,6 +179,7 @@
         var new_entity_obj = L.polygon(current_union, new_entity.options);
 
         window[`${window.selected_layer}_layer`].push(new_entity_obj);
+        setEntityName(entity_id, entity_name, window.date);
       }
     }
 
@@ -322,7 +325,7 @@
 
     //Declare local instance variables
     var entity_name;
-    var entity_obj = getEntity(entity_id);
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
     //Check if this is an actual entity object or a new selection
     if (entity_obj) {
@@ -340,19 +343,6 @@
 
     //Return statement
     return (entity_name) ? entity_name : "Unnamed Polity";
-  }
-
-  function getPreviousEntityName (arg0_entity_id, arg1_date) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var date = arg1_date;
-
-    //Declare local instance variables
-    var entity_obj = getEntity(entity_id);
-    var last_history_name = getEntityProperty(entity_id, "entity_name", date, true);
-
-    //Return statement
-    return (last_history_name) ? last_history_name : entity_obj.options.entity_name;
   }
 
   function isPolityHidden (arg0_entity_id, arg1_date) {
@@ -393,5 +383,44 @@
           entityUI(e, false, true);
         });
     }
+  }
+
+  function setEntityName (arg0_entity_id, arg1_entity_name, arg2_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
+    var date = (arg2_date) ? getTimestamp(arg2_date) : window.date;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj)
+      createHistoryFrame(entity_obj, date, { entity_name: entity_name });
+
+    //Return statement
+    return entity_name;
+  }
+
+  function setEntityNameFromInput (arg0_entity_id, arg1_element) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var element = arg1_element;
+
+    //Declare local instance variables
+    var entity_name;
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (element && entity_obj) {
+      var is_unnamed_entity = false;
+
+      if (!element.value || element.value == "Unnamed Polity")
+        is_unnamed_entity = true;
+
+      entity_name = (is_unnamed_entity) ? `Unnamed Polity` : element.value;
+      createHistoryFrame(entity_obj, window.date, { entity_name: entity_name });
+    }
+
+    //Return statement
+    return entity_name;
   }
 }
