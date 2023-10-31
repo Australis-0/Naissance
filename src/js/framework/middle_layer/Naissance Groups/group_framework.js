@@ -205,6 +205,37 @@ function getGroupGroup (arg0_group_id) {
   }
 }
 
+function moveEntityToGroup (arg0_entity_id, arg1_group_id) {
+  //Convert from parameters
+  var entity_id = arg0_entity_id;
+  var group_id = arg1_group_id;
+
+  //Declare local instance variables
+  var new_group = getGroup(group_id);
+  var old_group = getEntityGroup(entity_id);
+
+  //Remove from old group if entity has already been assigned a group
+  if (old_group)
+    if (old_group.entities) {
+      for (var i = 0; i < old_group.entities.length; i++)
+        if (old_group.entities[i] == entity_id)
+          old_group.entities.splice(i, 1);
+
+      if (old_group.entities.length == 0)
+        delete old_group.entities;
+    }
+
+  //Add to new group
+  if (new_group) {
+    //Make sure entities array exists if possible
+    if (!new_group.entities)
+      new_group.entities = [];
+
+    //Push to new_group.entities
+    new_group.entities.push(entity_id);
+  }
+}
+
 function moveGroupToGroup (arg0_group_id, arg1_group_id) {
   //Convert from parameters
   var child_group_id = arg0_group_id;
