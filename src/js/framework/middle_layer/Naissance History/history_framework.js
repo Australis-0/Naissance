@@ -179,6 +179,16 @@
     }
   }
 
+  /*
+    getHistoryFrame() - Returns the history frame of an entity.
+    Returns: {
+      is_founding: true/false, - Whether this frame is the founding frame
+
+      id: "1943983189043", - The current history timestamp
+      coords: [], - An array of Naissance coords representing the poly
+      options: {} - A list of customisation options
+    }
+  */
   function getHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -199,10 +209,21 @@
       if (parseInt(all_history_frames[i]) <= timestamp) {
         var local_history_frame = entity_obj.options.history[all_history_frames[i]];
 
+        //is_founding handler
+        if (i == 0) {
+          history_frame.is_founding = true;
+        } else {
+          delete history_frame.is_founding;
+        }
+
+        //Other data structures
+        history_frame.id = local_history_frame.id;
         if (local_history_frame.coords)
           history_frame.coords = local_history_frame.coords;
         if (local_history_frame.options)
           history_frame.options = mergeObjects(history_frame.options, local_history_frame.options, "override");
+      } else {
+        break; //Break once past timestamp, no point in continuing on
       }
 
     //Return statement

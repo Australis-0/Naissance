@@ -948,93 +948,10 @@ global.opened_popups = {};
 
       //Iterate over all_history_entries
       for (var i = 0; i < all_histories.length; i++) {
-        var last_history_entry = entity_obj.options.history[all_histories[i - 1]];
-        var local_date = parseTimestamp(all_histories[i]);
-        var local_entity_name = getEntityName(entity_id, local_date);
-        var local_history = entity_obj.options.history[all_histories[i]];
-        var local_options = (local_history.options) ? local_history.options : {};
-        var timestamp = ` timestamp = ${all_histories[i]}`;
+        var old_history_frame = getHistoryFrame(entity_obj, all_histories[i - 1]);
+        var new_history_frame = getHistoryFrame(entity_obj, all_histories[i]);
 
-        if (!last_history_entry) {
-          var actual_entity_name = getEntityName(entity_id, all_histories[i]);
-
-          //This is the first history entry. Mark it as such
-          bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${actual_entity_name} is founded.</span></td></tr>`);
-        } else {
-          var last_history_date = parseTimestamp(all_histories[i - 1]);
-
-          //Compare land areas
-          var current_land_area = getEntityArea(entity_id, local_date);
-          var old_land_area = getEntityArea(entity_id, last_history_date);
-
-          var land_percentage_change = (Math.round((1 - (old_land_area/current_land_area))*100*100)/100/100); //Round to hundreths place
-          var land_percentage_change_string = "";
-
-          //Colour/customisation handler
-          {
-            var customisation_changed = false;
-            var entity_name_string = ``;
-            var fill_colour_string = ``;
-            var fill_opacity_string = ``;
-            var stroke_colour_string = ``;
-            var stroke_opacity_string = ``;
-
-            //Interactivity strings
-            var maximum_zoom_level_string = ``;
-            var minimum_zoom_level_string = ``;
-
-            if (local_options.entity_name) {
-              var local_entity_name = getEntityName(entity_id, all_histories[i]);
-
-              if (local_entity_name)
-                if (local_entity_name != local_options.entity_name)
-                  entity_name_string = `Name changed from ${local_entity_name} to ${local_options.entity_name}. `;
-            }
-            if (local_options.fillColor)
-              fill_colour_string = `Fill colour changed to <span class = "bio-box" style = "color: ${local_options.fillColor};">&#8718;</span>. `;
-            if (local_options.fillOpacity)
-              fill_opacity_string = `Fill opacity changed to ${printPercentage(local_options.fillOpacity)}. `;
-            if (local_options.color)
-              stroke_colour_string = `Stroke colour changed to <span class = "bio-box" style = "color: ${local_options.color};">&#8718;</span>. `;
-            if (local_options.opacity)
-              stroke_opacity_string = `Stroke opacity changed to ${printPercentage(local_options.opacity)}. `;
-
-            if (local_options.maximum_zoom_level)
-              maximum_zoom_level_string = `Maximum zoom set to ${local_options.maximum_zoom_level}. `;
-            if (local_options.minimum_zoom_level)
-              minimum_zoom_level_string = `Minimum zoom set to ${local_options.minimum_zoom_level}. `;
-
-            if ((
-              entity_name_string + fill_colour_string + fill_opacity_string + stroke_colour_string + stroke_opacity_string + minimum_zoom_level_string + maximum_zoom_level_string
-            ).length > 0)
-              customisation_changed = true;
-
-            //Check if customisation_changed
-            if (customisation_changed)
-              bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${entity_name_string}${fill_colour_string}${fill_opacity_string}${stroke_colour_string}${stroke_opacity_string}${minimum_zoom_level_string}${maximum_zoom_level_string}</span></td></tr>`);
-          }
-
-          //Extinct/Hide polity handler
-          {
-            if (local_options.extinct)
-              bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is abolished.</td></tr>`);
-            if (local_options.extinct == false)
-              bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td>${local_entity_name} is re-established.</td></tr>`);
-          }
-
-          //Land area handler
-          {
-            if (isFinite(land_percentage_change)) {
-              if (land_percentage_change < 0)
-                land_percentage_change_string = `lost ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} of her land.`;
-              if (land_percentage_change > 0)
-                land_percentage_change_string = `gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`;
-
-              if (land_percentage_change != 0)
-                bio_string.push(`<tr${timestamp}><td>${printDate(local_date)}</td><td><span>${local_entity_name} ${land_percentage_change_string}</span></td></tr>`);
-            }
-          }
-        }
+        bio_string.push(getHistoryFrameLocalisation(entity_obj, old_history_frame, new_history_frame));
       }
 
       //Set bio_el to bio_string

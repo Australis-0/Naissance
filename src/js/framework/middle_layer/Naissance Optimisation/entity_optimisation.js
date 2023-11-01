@@ -32,8 +32,7 @@
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
 
-            //Remove .coords if last coords are the same
-            console.log(`Frame ${all_history_entries[i]}:`, getLastIdenticalCoords(entity_obj, local_history_entry));
+            //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
             if (getLastIdenticalCoords(entity_obj, local_history_entry))
               delete local_history_entry.coords;
 
@@ -48,10 +47,8 @@
             }
 
             //Remove frame if needed
-            if (!local_history_entry.coords && empty_options) {
-              console.log(`Removing frame ${all_history_entries[i]}!`);
+            if (!local_history_entry.coords && empty_options)
               delete entity_obj.options.history[all_history_entries[i]];
-            }
           }
 
         //Repopulate entity bio; refresh UI
