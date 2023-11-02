@@ -280,7 +280,7 @@
               var local_history = local_entity.options.history[all_entity_histories[i]];
               var local_history_date = parseTimestamp(local_history.id);
 
-              var local_area = getEntityArea(entity_id, local_history_date);
+              var local_area = getPolityArea(entity_id, local_history_date);
 
               if (local_area > maximum_land_area)
                 maximum_land_area = local_area;
@@ -295,7 +295,7 @@
               var local_history = local_entity.options.history[all_entity_histories[i]];
               var local_history_date = parseTimestamp(local_history.id);
 
-              var local_area = getEntityArea(entity_id, local_history_date);
+              var local_area = getPolityArea(entity_id, local_history_date);
               var local_area_percentage = Math.round((local_area/maximum_land_area)*1000)/1000;
 
               //Push element with value
