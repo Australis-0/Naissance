@@ -19,7 +19,8 @@
           var local_coordinates = getTurfObject(last_coords);
 
           entity_area = (!is_extinct) ? turf.area(local_coordinates) : 0;
-        } catch {
+        } catch (e) {
+          console.log(e);
           entity_area = 0;
         }
     }

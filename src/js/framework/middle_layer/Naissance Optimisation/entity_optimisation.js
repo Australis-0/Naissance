@@ -14,14 +14,20 @@
 
 //Entity keyframe optimisation
 {
-  //Removes duplicate keyframes
-  function cleanKeyframes (arg0_entity_id, arg1_tolerance) {
+  /*
+    cleanKeyframes() - Removes duplicate keyframes.
+    options: {
+      do_not_display: true/false - Whether to display in populateEntityBio() or not. False by default.
+    }
+  */
+  function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var tolerance = getTimestamp(arg1_tolerance);
+    var tolerance = (arg1_tolerance) ? getTimestamp(arg1_tolerance) : Infinity;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
-    var entity_obj = getEntity(entity_id);
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
     if (entity_obj)
       if (entity_obj.options.history) {
@@ -32,9 +38,16 @@
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
 
-            //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
-            if (getLastIdenticalCoords(entity_obj, local_history_entry))
-              delete local_history_entry.coords;
+            //Process .coords
+            {
+              //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
+              if (getLastIdenticalCoords(entity_obj, local_history_entry))
+                delete local_history_entry.coords;
+
+              //Convert to Naissance format if applicable
+              if (local_history_entry.coords)
+                local_history_entry.coords = convertToNaissance(local_history_entry.coords);
+            }
 
             //Remove frame if same .coords and options is empty
             if (local_history_entry.options) {
@@ -52,8 +65,14 @@
           }
 
         //Repopulate entity bio; refresh UI
-        populateEntityBio(entity_id);
+        if (!options.do_not_display)
+          try {
+            populateEntityBio(entity_id);
+          } catch {}
       }
+
+    //Return statement
+    return entity_obj;
   }
 
   function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {

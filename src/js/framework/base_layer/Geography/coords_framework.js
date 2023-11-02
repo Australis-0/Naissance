@@ -138,11 +138,6 @@
           return "leaflet";
     }
 
-    //Check if type is naissance
-    if (Array.isArray(format))
-      if (!format.some(isNaN))
-        return "naissance";
-
     //Check if type is naissance_history
     if (typeof format == "object")
       if (format.id && format.coords)
@@ -151,7 +146,7 @@
     //Check if type is turf
     if (Array.isArray(format))
       if (format.length == 2)
-        if (format.isArray(format[0]) && typeof format[1] == "string")
+        if (Array.isArray(format[0]) && typeof format[1] == "string")
           if (["polygon", "multiPolygon"].includes(format[1]))
             return "turf";
 
@@ -159,6 +154,11 @@
     if (typeof format == "object")
       if (format.type == "Feature" && format.geometry)
         return "turf_object";
+
+    //If none of the above and is array, return Naissance
+    if (format)
+      if (Array.isArray(format))
+        return "naissance";
   }
 }
 

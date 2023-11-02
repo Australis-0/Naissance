@@ -52,11 +52,19 @@ function writeSave (arg0_file_name) {
     //Initialise save_data[${layers[i]}]
     save_data[layers[i]] = [];
 
-    for (var x = 0; x < local_layer.length; x++)
+    for (var x = 0; x < local_layer.length; x++) {
+      var local_entity = local_layer[x];
+
+      //Process .options.history, clean keyframes
+      local_layer[x] = cleanKeyframes(local_layer[x], undefined, {
+        do_not_display: true
+      });
+
       save_data[layers[i]].push({
-        coords: local_layer[x]._latlngs,
+        coords: convertToNaissance(local_layer[x]._latlngs),
         options: local_layer[x].options
       });
+    }
 
     //Save layer groups
     save_data[`${layers[i]}_groups`] = window[`${layers[i]}_groups`];
