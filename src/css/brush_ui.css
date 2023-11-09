@@ -1,0 +1,19 @@
+/* -- Brush context menu styling -- */
+.brush-context-menu-container {
+  position: fixed;
+  bottom: 10px;
+  right: calc(20% + 12px + 10px);
+  width: calc(var(--context-menu-width)*1.5);
+
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  color: black;
+  font-family: "Barlow";
+  font-size: 1vh;
+  font-weight: 300;
+
+  padding-bottom: 0.5vh;
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  padding-top: 0.5vh;
+}

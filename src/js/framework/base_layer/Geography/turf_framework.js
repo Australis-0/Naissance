@@ -290,7 +290,7 @@
     //Initialise options
     if (options.return_leaflet != false) options.return_leaflet = true;
 
-    if (tolerance) {
+    if (tolerance != undefined) {
       var new_options = mergeObjects({ tolerance: tolerance }, options);
 
       if (typeof new_options.tolerance == "number") {

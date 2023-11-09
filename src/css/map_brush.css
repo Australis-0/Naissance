@@ -1,4 +1,16 @@
 /* -- General bottom right container styling -- */
+.brush-map-container {
+  display: flex;
+  flex-direction: column-reverse;
+
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+
+  height: 50%;
+  width: 20%;
+}
+
 .bottom-right {
   display: block;
   margin-top: 0.7vh;
@@ -15,17 +27,6 @@
   position: relative;
   bottom: 0.1vh;
   right: 0.2vh;
-}
-.brush-map-container {
-  display: flex;
-  flex-direction: column-reverse;
-
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-
-  height: 50%;
-  width: 20%;
 }
 
 /* -- Brush Options container -- */
@@ -52,7 +53,7 @@
 .brush-information-container {
   margin-left: 0.1vh;
   margin-top: 1%;
-  
+
   max-height: 4vh;
   min-height: 4vh;
 }
