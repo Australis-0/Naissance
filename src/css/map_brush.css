@@ -34,11 +34,27 @@
 
   background-color: rgba(0, 0, 0, 0.85);
 }
+.brush-buttons-container {
+  margin-bottom: 5px;
+  margin-left: calc(-12px + 5px);
+}
 .brush-options-container {
   margin: 12px;
+
+  color: white;
+  font-family: "Barlow Light";
+  font-size: 1vh;
 }
+
 .brush-options.subheader {
   margin-left: 0px; /* -- Resets the default 5px margin -- */
+}
+.brush-information-container {
+  margin-left: 0.1vh;
+  margin-top: 1%;
+  
+  max-height: 4vh;
+  min-height: 4vh;
 }
 
 /* -- Mapmode container -- */

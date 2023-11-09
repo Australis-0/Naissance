@@ -92,6 +92,12 @@ window.right_mouse = false;
 
   //Initialise Sidebar handling
   initSidebar();
+
+  //UI loop
+  setInterval(function(){
+    //Update bottom-right sidebar UI
+    printBrush();
+  }, 100);
 }
 
 //Test scripts
