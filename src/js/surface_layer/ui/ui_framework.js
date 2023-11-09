@@ -4,6 +4,18 @@
     map.closePopup();
   }
 
+  function hideElement (arg0_element) {
+    //Convert from parameters
+    var element = arg0_element;
+
+    //Declare local instance variables
+    var class_name = element.getAttribute("class");
+
+    (class_name) ?
+      element.setAttribute("class", `${class_name} hidden`) :
+      element.setAttribute("class", " hidden");
+  }
+
   function updateSidebarHover () {
     //Declare local instance variables
     var all_hovers = document.querySelectorAll(`.hierarchy-elements-container div:hover`);
@@ -25,5 +37,40 @@
         ) :
         all_hovers[all_hovers.length - 1].setAttribute("class", " hover");
     }
+  }
+
+  function showElement (arg0_element) {
+    //Convert from parameters
+    var element = arg0_element;
+
+    //Declare local instance variables
+    var class_name = element.getAttribute("class");
+
+    if (class_name)
+      element.setAttribute("class", class_name.replace(/ hidden/gm, ""));
+  }
+
+  function toggleElementVisibility (arg0_element, arg1_button_element) {
+    //Convert from parameters
+    var element = arg0_element;
+    var btn_element = arg1_button_element;
+
+    //Declare local instance variables
+    var class_name = element.getAttribute("class");
+    var is_visible = true;
+
+    if (class_name)
+      if (class_name.includes(" hidden"))
+        is_visible = false;
+
+    (is_visible) ?
+      hideElement(element) :
+      showElement(element);
+
+    //Set button element class if present
+    if (btn_element)
+      (is_visible) ?
+        btn_element.setAttribute("class", btn_element.getAttribute("class").replace(" minimise-icon", " reverse-minimise-icon")) :
+        btn_element.setAttribute("class", btn_element.getAttribute("class").replace(" reverse-minimise-icon", " minimise-icon"));
   }
 }

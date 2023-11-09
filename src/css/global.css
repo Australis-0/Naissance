@@ -45,6 +45,15 @@ td {
   font-size: 0.5vw;
   text-transform: uppercase;
 }
+.subheader {
+  color: white;
+  font-family: "Karla";
+  font-size: 2vh;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  margin-left: 10px;
+}
 
 /* -- Tooltip styling -- */
 .tippy-box {
@@ -67,7 +76,7 @@ td {
   --canvas-y-axis-margin-left: calc(0.2vw);
   --context-menu-width: calc(8vw);
   --entity-ui-header-buttons: 3;
-  --entity-ui-width: calc(20vw + 24px); 
+  --entity-ui-width: calc(20vw + 24px);
   --graph-label-font-size: calc(0.5vw);
   --selection-colour: rgba(255, 255, 255, 0.3);
   --sidebar-width: calc(25vw);
