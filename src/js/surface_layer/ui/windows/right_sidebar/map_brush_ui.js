@@ -1,3 +1,23 @@
+//Button functionality
+{
+  function initBrushUI () {
+    window.brush_container_el = document.getElementById("brush-container");
+    window.brush_context_menu_el = document.getElementById("brush-context-menu-container");
+
+    brush_container_el.onclick = function (e) {
+      //Hide element only e.target is not a button
+      if (!e.target.getAttribute("onclick"))
+        hideElement(brush_context_menu_el);
+    };
+
+    //Intiialise tooltips
+    tippy(`#simplify-brush-btn`, {
+      content: "Simplify",
+      arrow: false
+    });
+  }
+}
+
 //Brush UI functions
 {
   function printBrush () {
@@ -31,6 +51,53 @@
 
     //Return statement
     return brush_string;
+  }
+
+  /*
+    printBrushOptions() - Changes the brush options UI to the selected page
+    mode: "simplify"
+  */
+  function printBrushOptions (arg0_mode) {
+    //Convert from parameters
+    var mode = arg0_mode;
+
+    //Declare local instance variables
+    var brush_ui = document.getElementById("brush-context-menu-container");
+
+    //Show element
+    showElement(brush_context_menu_el);
+
+    //Set brush_ui.innerHTML according to mode
+    if (mode == "simplify") {
+      brush_ui.innerHTML = `
+        <div class = "context-menu-subcontainer">
+          <b>Simplify Path:</b>
+        </div>
+        <div class = "context-menu-subcontainer">
+          <input type = "checkbox" id = "auto-simplify-when-editing" checked> <span>Auto-Simplify When Editing</span>
+        </div>
+        <div class = "context-menu-subcontainer">
+          <span>Strength: </span> <input type = "range" id = "simplify-tolerance" min = "0" max = "100" value = "10">
+        </div>
+      `;
+
+      //Populate UI options
+      var auto_simplify_when_editing_el = document.getElementById("auto-simplify-when-editing");
+      var simplify_tolerance_el = document.getElementById("simplify-tolerance");
+
+      simplify_tolerance_el.value = parseInt(window.simplify_tolerance*Math.pow(10, 3));
+
+      //Set listener events
+      auto_simplify_when_editing_el.onclick = function (e) {
+        //Set global flag
+        window.brush.auto_simplify_when_editing = e.target.checked;
+      };
+
+      onRangeChange(simplify_tolerance_el, function (e) {
+        //Set global flag
+        window.simplify_tolerance = getSimplifyTolerance(e.target.value);
+      });
+    }
   }
 }
 

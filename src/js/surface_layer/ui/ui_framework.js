@@ -11,9 +11,10 @@
     //Declare local instance variables
     var class_name = element.getAttribute("class");
 
-    (class_name) ?
-      element.setAttribute("class", `${class_name} hidden`) :
-      element.setAttribute("class", " hidden");
+    if (!class_name.includes(" hidden"))
+      (class_name) ?
+        element.setAttribute("class", `${class_name} hidden`) :
+        element.setAttribute("class", " hidden");
   }
 
   function updateSidebarHover () {

@@ -822,12 +822,10 @@ global.opened_popups = {};
       var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
 
       //Set default if not already defined
-      if (!window.auto_simplify_when_editing) window.auto_simplify_when_editing = true;
       if (!window.simplify_all_keyframes_el) window.simplify_all_keyframes_el = false;
-      if (!window.simplify_tolerance) window.simplify_tolerance = 10;
 
       //Auto-populate based on global settings
-      if (window.auto_simplify_when_editing)
+      if (window.brush.auto_simplify_when_editing)
         auto_simplify_when_editing_el.checked = true;
       if (window.simplify_all_keyframes_el)
         simplify_all_keyframes_el.checked = true;
@@ -837,11 +835,11 @@ global.opened_popups = {};
       //Set listener events
       auto_simplify_when_editing_el.onclick = function (e) {
         //Set global flag
-        window.auto_simplify_when_editing = e.target.checked;
+        window.brush.auto_simplify_when_editing = e.target.checked;
       };
       simplify_all_keyframes_el.onclick = function (e) {
         //Set global flag
-        window.simplify_all_keyframes_el = e.target.checked;
+        brush.simplify_all_keyframes_el = e.target.checked;
       };
       document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
         var simplify_value = parseInt(simplify_tolerance_el.value);

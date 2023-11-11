@@ -193,13 +193,6 @@
       clearBrush();
     }
 
-    //Global brush options processing
-    {
-      //Auto-simplify when editing
-      if (window.auto_simplify_when_editing)
-        simplifyEntity(entity_id, window.simplify_tolerance);
-    }
-
     //Render entities - KEEP AT BOTTOM!
     renderEntities(true);
 

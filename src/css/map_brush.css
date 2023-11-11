@@ -29,6 +29,12 @@
   right: 0.2vh;
 }
 
+/* -- Brush Context Menu container -- */
+.brush-context-menu-container > .context-menu-subcontainer {
+  padding-bottom: 0.5vh;
+  padding-top: 0.5vh;
+}
+
 /* -- Brush Options container -- */
 .brush-container {
   height: 10vh;

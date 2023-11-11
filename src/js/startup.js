@@ -11,6 +11,7 @@ window.selected_layer = "polities";
 //Brush settings
 {
   window.brush = {
+    auto_simplify_when_editing: true,
     radius: 50000
   };
   window.polity_options;
@@ -43,9 +44,6 @@ window.date = {
     entities: ["38179137582", "38179137583"] //Entity ID's
   }
 */
-
-//Default brush options
-window.auto_simplify_when_editing = true;
 
 //Entity renderer
 window.layers = ["polities"];
@@ -86,6 +84,7 @@ window.right_mouse = false;
 
   //Initialise Brush UI
   initBrush();
+  initBrushUI();
 
   //Initialise Date handling
   initDate();

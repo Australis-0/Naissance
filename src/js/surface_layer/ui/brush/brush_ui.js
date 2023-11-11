@@ -24,16 +24,18 @@
           if (!window.current_union)
             window.current_union = cursor;
 
-          current_union = simplify(
-            union(current_union, cursor),
-            window.simplify_tolerance);
+          current_union = union(current_union, cursor);
+
+          if (window.brush.auto_simplify_when_editing)
+            current_union = simplify(current_union, window.simplify_tolerance);
         } else if (window.right_mouse) {
           //Only delete if current_union exists
           if (window.current_union)
             try {
-              current_union = simplify(
-                difference(current_union, cursor),
-                window.simplify_tolerance);
+              current_union = difference(current_union, cursor);
+
+              if (window.brush.auto_simplify_when_editing)
+                current_union = simplify(current_union, window.simplify_tolerance);
             } catch {
               //The selection has been completely deleted
               delete window.current_union;
