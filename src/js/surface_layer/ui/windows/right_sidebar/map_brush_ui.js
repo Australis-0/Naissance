@@ -41,6 +41,8 @@
       }
 
       //Simplification handler
+      if (brush_obj.auto_simplify_when_editing)
+        brush_string.push(`Auto-Simplify`);
       if (brush_obj.simplify_tolerance)
         brush_string.push(`Simplify Tolerance: ${parseNumber(brush_obj.simplify_tolerance, { display_float: true })}`);
     }
