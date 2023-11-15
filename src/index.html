@@ -8,6 +8,7 @@
 
 		<!-- CSS Stylesheets -->
 		<link rel = "stylesheet" href = "./css/brush_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/context_menu_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/entity_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/file_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/global.css" type = "text/css">
@@ -78,7 +79,7 @@
 					</div>
 
 					<!-- Hierarchy Context Menu -->
-					<div id = "hierarchy-context-menu" class = "hierarchy-context-menu-container instant-display-none">
+					<div id = "hierarchy-context-menu" class = "context-menu-container instant-display-none"> <!-- Add instant-display-none to class later -->
 						<div id = "context-menu-create-subgroup-button" class = "context-menu-button">
 							<img src = "gfx/interface/plus_icon.png" class = "icon small negative" draggable = "false"> Create Subgroup
 						</div>
@@ -96,8 +97,15 @@
 						</div>
 					</div>
 
+					<!-- Hierarchy Second Context menu -->
+					<div id = "hierarchy-context-menu-two" class = "context-menu-container two hidden">
+						<div id = "hierarchy-context-menu-text" class = "context-menu-text">
+							<b>Test</b>
+						</div>
+					</div>
+
 					<div id = "hierarchy-action-context-menu" class = "hierarchy-action-context-menu-container instant-display-none">
-						
+
 					</div>
 				</div>
 			</div>

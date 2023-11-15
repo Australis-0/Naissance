@@ -7,15 +7,17 @@
     };
 
     //Sidebar click handler
-    var sidebar_container_el = document.getElementById("hierarchy-ui-container");
+    var sidebar_container_el = document.getElementById("hierarchy");
 
     sidebar_container_el.onclick = function (e) {
       //Context menu should be closed if the context menu itself or the button isn't a parent in the path
       if (
         !arrayHasElementAttribute(e.composedPath(), "id", "hierarchy-context-menu") &&
         !arrayHasElementAttribute(e.composedPath(), "class", "group-context-menu-icon")
-      )
+      ) {
         closeSidebarContextMenu();
+        closeSidebarSubcontextMenu();
+      }
     };
 
     //Initialise sidebar functions
@@ -23,9 +25,53 @@
   }
 }
 
+//Sidebar Context Menu UI functions
+{
+  function closeSidebarSubcontextMenu () {
+    //Declare local instance variables
+    var hierarchy_subcontext_el = document.getElementById("hierarchy-context-menu-two");
+
+    hideElement(hierarchy_subcontext_el);
+  }
+
+  //printSidebarSubcontextMenu() - Prints the current selected group ID for a variety of different modes: "mask"
+  function printSidebarSubcontextMenu (arg0_element, arg1_group_id, arg2_mode) {
+    //Convert from parameters
+    var btn_el = arg0_element;
+    var group_id = arg1_group_id;
+    var mode = arg2_mode;
+
+    //Declare local instance variables
+    var group_el = document.querySelector(`div.group[id="${group_id}"]`);
+    var hierarchy_container_el = document.querySelector(`#hierarchy`);
+    var hierarchy_subcontext_el = document.getElementById("hierarchy-context-menu-two");
+    var offset_top = group_el.offsetTop - hierarchy_container_el.scrollTop;
+
+    //Check mode
+    if (group_el) {
+      showElement(hierarchy_subcontext_el);
+      hierarchy_subcontext_el.setAttribute("style", `top: calc(${offset_top}px);`);
+
+      if (mode == "mask") {
+        hierarchy_subcontext_el.innerHTML = `
+          <div id = "mask-context-menu-text" class = "context-menu-text">
+            <b>Set Mask:</b><br>
+            <select id = "group-mask-${group_id}">
+              <option value = "mask_override">Mask Override</option>
+              <option value = "override_mask">Override Mask</option>
+            </select>
+          </div>
+          <div id = "mask-context-menu-confirm" class = "context-menu-button confirm">
+            <img src = "gfx/interface/checkmark_icon.png" class = "icon small negative" draggable = "false"> Confirm
+          </div>
+        `;
+      }
+    }
+  }
+}
+
 //Sidebar UI functions
 {
-
   function closeSidebarContextMenu () {
     //Declare local instance variables
     var context_menu_el = document.querySelector(`#hierarchy-context-menu`);
@@ -522,6 +568,7 @@
     var create_subgroup_btn = context_menu_el.querySelector(`#context-menu-create-subgroup-button`);
     var delete_all_btn = context_menu_el.querySelector(`#context-menu-delete-all-button`);
     var delete_group_btn = context_menu_el.querySelector("#context-menu-delete-group-button");
+    var set_mask_btn = context_menu_el.querySelector(`#context-menu-mask-group-button`);
 
     //Toggleable open
     if (context_menu_el.getAttribute("class").includes("display-none")) {
@@ -540,6 +587,10 @@
     create_subgroup_btn.setAttribute("onclick", `createGroup('${group_id}');`);
     delete_group_btn.setAttribute("onclick", `deleteGroup('${group_id}');`);
     delete_all_btn.setAttribute("onclick", `deleteGroupRecursively('${group_id}');`);
+
+    set_mask_btn.onclick = function (e) {
+      printSidebarSubcontextMenu(e, group_id, "mask");
+    };
   }
 
   function updateAllGroups (arg0_do_not_refresh) {

@@ -48,8 +48,11 @@
     }
 
 
-    //Set innerHTML
-    brush_info_el.innerHTML = brush_string.join(` &nbsp;|&nbsp; `);
+    //Set .innerHTML
+    var actual_brush_string = brush_string.join(` &nbsp;|&nbsp; `);
+
+    if (brush_info_el.innerHTML != actual_brush_string)
+      brush_info_el.innerHTML = brush_string.join(` &nbsp;|&nbsp; `);
 
     //Return statement
     return brush_string;
