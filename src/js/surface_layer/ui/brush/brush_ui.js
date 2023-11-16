@@ -26,16 +26,14 @@
 
           current_union = union(current_union, cursor);
 
-          if (window.brush.auto_simplify_when_editing)
-            current_union = simplify(current_union, window.simplify_tolerance);
+          brush.brush_change = true;
         } else if (window.right_mouse) {
           //Only delete if current_union exists
           if (window.current_union)
             try {
               current_union = difference(current_union, cursor);
 
-              if (window.brush.auto_simplify_when_editing)
-                current_union = simplify(current_union, window.simplify_tolerance);
+              brush.brush_change = true;
             } catch {
               //The selection has been completely deleted
               delete window.current_union;
@@ -43,17 +41,7 @@
         }
 
         //Refresh selection display
-        {
-          if (window.selection) window.selection.remove();
-          if (window.current_union)
-            window.selection = L.polygon(current_union, window.polity_options).addTo(map);
-
-          //Bind tooltip to selection
-          L.setOptions(selection, window.polity_options);
-          selection.on("click", function (e) {
-            entityUI(e, true);
-          });
-        }
+        refreshBrush();
       }
     });
 
@@ -64,5 +52,68 @@
       if (e.wheelDeltaY > 0)
         brush.radius = brush.radius*0.9;
     });
+  }
+
+  function processBrush () {
+    //Declare local instance variables
+    var brush_obj = getBrush();
+
+    if (brush_obj.brush_change) {
+      if (window.current_union) {
+        //Mask processing
+        {
+          var all_mask_add_keys = Object.keys(brush_obj.mask_add);
+          var all_mask_subtract_keys = Object.keys(brush_obj.mask_subtract);
+
+          //Iterate over all_mask_add_keys
+          for (var i = 0; i < all_mask_add_keys.length; i++) {
+            var local_value = brush_obj.mask_add[all_mask_add_keys[i]];
+
+            if (local_value._latlngs) {
+              var local_coords = difference(local_value._latlngs, current_union);
+
+              local_value.setLatLngs(local_coords);
+              
+              //Set new ._latlngs to coords of current history frame
+              createHistoryFrame(local_value.options.className, window.date, {}, local_coords);
+            }
+          }
+
+          //Iterate over all_mask_subtract_keys
+          for (var i = 0; i < all_mask_subtract_keys.length; i++) {
+            var local_value = brush_obj.mask_subtract[all_mask_subtract_keys[i]];
+
+            if (local_value._latlngs)
+              current_union = difference(current_union, local_value._latlngs);
+          }
+        }
+
+        //Simplify processing
+        if (brush_obj.auto_simplify_when_editing)
+          current_union = simplify(current_union, window.simplify_tolerance);
+
+        //Set new poly now
+        refreshBrush();
+      }
+
+      //Set brush_obj.brush_change to false to avoid repeat processing
+      brush_obj.brush_change = false;
+    }
+  }
+
+  function refreshBrush () {
+    //Refresh polity
+    {
+      if (window.selection)
+        window.selection.remove();
+      if (window.current_union)
+        window.selection = L.polygon(current_union, window.polity_options).addTo(map);
+
+      //Bind tooltip to selection
+      L.setOptions(selection, window.polity_options);
+      selection.on("click", function (e) {
+        entityUI(e, true);
+      });
+    }
   }
 }

@@ -13,100 +13,12 @@
   pointer-events: all;
 }
 
-/* -- Date Styling -- */
-.date-container {
-  position: absolute;
-  left: 5px;
-  bottom: 5px;
-
-  height: 20vh;
-  width: 100%;
-
-  background-color: rgba(0, 0, 0, 0.85);
+/* -- Group styling -- */
+.group.mask-subtract {
+  background-color: rgba(240, 60, 60, 0.3);
 }
-.date-error-ui {
-  font-family: "Barlow";
-  font-size: 1vh;
-  font-weight: 300;
-
-  color: white;
-  text-align: left;
-  margin-left: 1vw;
-}
-.date-header {
-  padding-top: 10px;
-
-  font-family: "Karla";
-  font-weight: 900;
-  font-size: 2vh;
-
-  color: white;
-  text-transform: uppercase;
-}
-.date-header-line {
-  width: 1.5vw;
-  border: 1px solid white;
-}
-.full-date-container input, .full-date-container select, .full-date-container {
-  background: none;
-  border: none;
-
-  font-size: 3vh;
-  font-family: "Barlow Condensed";
-  font-weight: 700;
-  text-align: center;
-
-  color: white;
-}
-.full-date-container input::-webkit-calendar-picker-indicator {
-  display: none !important;
-}
-.full-date-container input#year-input {
-  max-width: 6vh;
-}
-.full-date-container input {
-  background: none;
-  border: none;
-
-  font-size: 3vh;
-  font-family: "Barlow Condensed";
-  font-weight: 700;
-  text-align: center;
-
-  max-width: 14vh;
-
-  color: white;
-  -webkit-appearance: none;
-  text-align-last: center;
-}
-.full-date-container input#day-input {
-  max-width: 6vh;
-}
-.full-date-container select {
-  -webkit-appearance: none;
-}
-.full-date-container select > option {
-  background-color: black;
-  font-size: 1.5vh;
-  padding: 0.15vw;
-}
-.full-clock-container {
-  font-family: "Slabo 27px";
-  font-size: 1.25vh;
-  color: white;
-  margin-top: 0.5vh;
-
-  text-align: center;
-}
-.full-clock-container input {
-  background: none;
-  border: none;
-  max-width: 2vh;
-
-  font-family: "Slabo 27px";
-  font-size: 1.5vh;
-  text-align: center;
-  color: white;
+.group.mask-add {
+  background-color: rgba(60, 240, 60, 0.3);
 }
 
 /* -- Hierarchy Styling-- */

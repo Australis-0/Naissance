@@ -1,0 +1,94 @@
+//Declare Mask framework functions
+{
+  /*
+    addGroupMask() - Sets an entire group to have a mask according to mode
+
+    mode: "add"/"clear"/"subtract",
+      - "add" allows the group to subtract from current selection,
+      - "clear" removes all group masks from current selection,
+      - "subtract" allows the current selection to subtract from all entities in group
+    options: {
+      do_not_override_entity_masks: true/false - Whether to override entity masks. [REVISIT] - To be implemented in future
+    }
+  */
+  function addGroupMask (arg0_group_id, arg1_mode, arg2_options) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+    var mode = (arg1_mode) ? arg1_mode : "add";
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var group_obj = getGroup(group_id);
+
+    var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
+    var group_el_class;
+
+    if (group_el)
+      group_el_class = group_el.getAttribute("class");
+
+    //Mode handling
+    if (mode == "add") {
+      //Set group_el class
+      if (group_el_class) {
+        //Edit class display
+        var new_class = removeClasses(group_el, reserved.mask_classes);
+        group_el.setAttribute("class", `${new_class} mask-add`);
+
+        //Get all selected entities and add to window.brush.mask_add
+        var all_selected_entities = getGroupEntities(group_obj.id);
+
+        brush.mask_add = appendArrays(brush.mask_add, all_selected_entities);
+      }
+    } else if (mode == "clear") {
+      removeGroupMask(group_obj.id, options);
+    } else if (mode == "subtract") {
+      //Set group_el class
+      if (group_el_class) {
+        var new_class = removeClasses(group_el, reserved.mask_classes);
+        group_el.setAttribute("class", `${new_class} mask-subtract`);
+
+        //Get all selected entities and add to window.brush.mask_subtract
+        var all_selected_entities = getGroupEntities(group_obj.id);
+
+        brush.mask_subtract = appendArrays(brush.mask_subtract, all_selected_entities);
+      }
+    }
+  }
+
+  /*
+    removeGroupMask() - Sets an entire group to no longer have a mask
+
+    options: {
+      do_not_override_entity_masks: true/false - Whether to override entity masks. [REVISIT] - To be implemented in future
+    }
+  */
+  function removeGroupMask (arg0_group_id, arg1_options) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var group_obj = getGroup(group_id);
+
+    var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
+
+    //Edit class display
+    if (group_el) {
+      var all_selected_entity_keys = getGroupEntities(group_obj.id, { return_keys: true });
+      var new_class = removeClasses(group_el, reserved.mask_classes);
+
+      //Get all selected_entities and remove from all masks
+      for (var i = 0; i < reserved.mask_types.length; i++) {
+        var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+
+        //Remove all_selected_entity_keys from mask
+        for (var x = local_mask.length - 1; x >= 0; x--) {
+          var local_entity = local_mask[x];
+
+          if (all_selected_entity_keys.includes(local_entity.className))
+            local_mask.splice(x, 1);
+        }
+      }
+    }
+  }
+}

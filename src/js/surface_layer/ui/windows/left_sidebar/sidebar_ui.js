@@ -57,11 +57,12 @@
           <div id = "mask-context-menu-text" class = "context-menu-text">
             <b>Set Mask:</b><br>
             <select id = "group-mask-${group_id}">
-              <option value = "mask_override">Mask Override</option>
-              <option value = "override_mask">Override Mask</option>
+              <option value = "subtract">Mask Override</option>
+              <option value = "add">Override Mask</option>
+              <option value = "clear">None</option>
             </select>
           </div>
-          <div id = "mask-context-menu-confirm" class = "context-menu-button confirm">
+          <div id = "mask-context-menu-confirm" class = "context-menu-button confirm" onclick = "setGroupMask('${group_id}');">
             <img src = "gfx/interface/checkmark_icon.png" class = "icon small negative" draggable = "false"> Confirm
           </div>
         `;
@@ -617,10 +618,11 @@
     //Iterate over all_groups
     for (var i = 0; i < all_groups.length; i++) {
       var all_subelements = all_groups[i].children;
-      var group_obj = {};
       var local_entities = [];
       var local_id = all_groups[i].getAttribute("id");
       var local_subgroups = [];
+
+      var group_obj = getGroup(local_id);
 
       var local_entities_el = all_groups[i].querySelector(`[id='${local_id}-entities']`);
       var local_subgroups_el = all_groups[i].querySelector(`[id='${local_id}-subgroups']`);

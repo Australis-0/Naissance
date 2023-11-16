@@ -39,4 +39,7 @@ document.body.onmouseup = function (e) {
   window.right_mouse = false;
 
   map.dragging.enable();
+
+  //Process brush
+  processBrush();
 };

@@ -1,5 +1,3 @@
-//Declare functions
-
 //Listener events
 document.getElementById("load-file").onclick = function (e) {
   var load_file_name_el = document.getElementById("load-file-path");

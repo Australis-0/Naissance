@@ -11,8 +11,15 @@ window.selected_layer = "polities";
 //Brush settings
 {
   window.brush = {
+    //Basic options
     auto_simplify_when_editing: true,
-    radius: 50000
+    brush_change: false, //Is updated on brush change
+    radius: 50000,
+
+    //Masks
+    brush_only_mask: false, //Whether the mask only apply to the current brush, and not the entire selection. False by default
+    mask_add: [], //Mask override (Array<Object, Polity>)
+    mask_subtract: [] //Overrides mask (Array<Object, Polity>)
   };
   window.polity_options;
   window.simplify_tolerance = getSimplifyTolerance(10); //To be folded in later
@@ -56,6 +63,19 @@ window.keys = {};
 //Mouse events
 window.mouse_pressed = false;
 window.right_mouse = false;
+
+//Optimisation
+window.reserved = {
+  mask_classes: [],
+  mask_types: ["add", "subtract"]
+};
+
+//Process optimisation
+{
+  //Masks
+  for (var i = 0; i < reserved.mask_types.length; i++)
+    reserved.mask_classes.push(` mask-${reserved.mask_types[i]}`);
+}
 
 //UI
 {

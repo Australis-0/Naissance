@@ -27,10 +27,43 @@
           if (array[i].getAttribute(attribute_type) == attribute_content) return true;
         } catch {}
   }
+
+  function removeClasses (arg0_element, arg1_array) {
+    //Convert from parameters
+    var element = arg0_element;
+    var array = getList(arg1_array);
+
+    //Declare local instance variables
+    var element_class = element.getAttribute("class");
+
+    if (element_class) {
+      for (var i = 0; i < array.length; i++)
+        element_class = element_class.replace(array[i], "");
+      element.setAttribute("class", element_class);
+    }
+
+    //Return statement
+    return element_class;
+  }
 }
 
 //General-purpose array functions
 {
+  function appendArrays (arg0_array, arg1_array) {
+    //Convert from parameters
+    var array = getList(arg0_array);
+    var ot_array = getList(arg1_array);
+
+    //Iterate over ot_array, add to array
+    if (ot_array)
+      if (ot_array.length > 0)
+        for (var i = 0; i < ot_array.length; i++)
+          array.push(ot_array[i]);
+
+    //Return statement
+    return array;
+  }
+
   function findDuplicates (arg0_array) {
     //Convert from parameters
     var array = arg0_array;

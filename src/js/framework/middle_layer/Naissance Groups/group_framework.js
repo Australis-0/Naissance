@@ -9,6 +9,8 @@
     var group_id = generateGroupID();
     var group_obj = {
       name: "New Group",
+      id: group_id,
+
       parent_group: (parent_group_id) ? parent_group_id : undefined
     };
     var sidebar_el = document.getElementById("hierarchy");
@@ -120,6 +122,11 @@
       //Refresh sidebar
       if (!do_not_refresh)
         refreshSidebar();
+
+      //Remove group options
+      {
+        removeGroupMask(group_id, { do_not_override_entity_masks: true });
+      }
     }
   }
 
@@ -176,6 +183,9 @@
     var group_id = arg0_group_id;
     var options = (arg1_options) ? arg1_options : {};
 
+    //Guard clause for object
+    if (typeof group_id == "object") return group_id;
+
     //Iterate over all layers for group ID
     for (var i = 0; i < layers.length; i++) {
       var local_layer = window[`${layers[i]}_groups`];
@@ -187,6 +197,41 @@
           return (!options.return_key) ? local_layer[group_id] : group_id;
         }
     }
+  }
+
+  /*
+    getGroupEntities() - Recursively fetches an array of entity objects from groups and subgroups
+
+    options: {
+      return_keys: truie/false, - Whether to return keys. False by default
+      surface_layer: true/false - Whether to only get surface layer entities. False by default
+    }
+  */
+  function getGroupEntities (arg0_group_id, arg1_options) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var entity_array = [];
+    var group_obj = getGroup(group_id);
+
+    console.log(`Group ID ${group_id}`, group_obj);
+    if (group_obj.entities) {
+      for (var i = 0; i < group_obj.entities.length; i++) {
+        var local_entity = getEntity(group_obj.entities[i]);
+
+        entity_array.push((!options.return_keys) ? local_entity : local_entity.className);
+      }
+    }
+    if (group_obj.subgroups) {
+      for (var i = 0; i < group_obj.subgroups.length; i++)
+        //Call function recursively
+        entity_array = appendArrays(entity_array, getGroupEntities(group_obj.subgroups[i], options));
+    }
+
+    //Return statement
+    return entity_array;
   }
 
   function getGroupGroup (arg0_group_id) {
