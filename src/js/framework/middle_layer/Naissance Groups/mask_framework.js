@@ -26,6 +26,8 @@
     if (group_el)
       group_el_class = group_el.getAttribute("class");
 
+    removeGroupMask(group_obj.id, options);
+
     //Mode handling
     if (mode == "add") {
       //Set group_el class
@@ -39,8 +41,6 @@
 
         brush.mask_add = appendArrays(brush.mask_add, all_selected_entities);
       }
-    } else if (mode == "clear") {
-      removeGroupMask(group_obj.id, options);
     } else if (mode == "subtract") {
       //Set group_el class
       if (group_el_class) {

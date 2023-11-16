@@ -215,8 +215,7 @@
     //Declare local instance variables
     var entity_array = [];
     var group_obj = getGroup(group_id);
-
-    console.log(`Group ID ${group_id}`, group_obj);
+    
     if (group_obj.entities) {
       for (var i = 0; i < group_obj.entities.length; i++) {
         var local_entity = getEntity(group_obj.entities[i]);
