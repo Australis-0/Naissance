@@ -133,6 +133,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     local_date.month = monthsFromDays({ year: local_date.year, day: number_of_days });
     timestamp -= daysInMonths({ year: local_date.year, month: local_date.month })*24*60;
 
+    //Calculate months
+    if (local_date.month > 12) local_date.month = 1;
+
     //Calculate days
     local_date.day = Math.floor(timestamp/(24*60));
     timestamp -= local_date.day*24*60;

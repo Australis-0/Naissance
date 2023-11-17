@@ -243,7 +243,7 @@
     hour_el.value = `${(date.hour < 10) ? "0" : ""}${date.hour}`;
     minute_el.value = `${(date.minute < 10) ? "0" : ""}${date.minute}`;
     month_el.value = date.month;
-    year_el.value = date.year; //[WIP] - BC handling
+    year_el.value = Math.abs(date.year); //[WIP] - BC handling
     year_type_el.value = (date.year >= 0) ? "AD" : "BC";
   }
 
