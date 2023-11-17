@@ -82,6 +82,11 @@
 }
 
 /* -- Hiearchy item styling -- */
+#hierarchy .entity.extinct > input {
+  color: rgb(150, 150, 150);
+  font-style: oblique;
+}
+
 .hierarchy-elements-container div > input {
   padding-left: 0.2vw;
   padding-right: 0.2vw;

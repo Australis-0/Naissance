@@ -96,9 +96,16 @@
     if (entity_obj) {
       var entity_id = entity_obj.options.className;
       var header_el = document.createElement("input");
+      var is_hidden = isPolityHidden(entity_id, window.date);
       var local_el = document.createElement("div");
 
-      local_el.setAttribute("class", `entity${(window.sidebar_selected_entities.includes(entity_id)) ? " selected" : ""}`);
+      var entity_class = `entity${(window.sidebar_selected_entities.includes(entity_id)) ? " selected" : ""}`;
+
+      //Initialise local instance variables
+      if (is_hidden)
+        entity_class += ` extinct`;
+
+      local_el.setAttribute("class", entity_class);
       local_el.setAttribute("id", entity_id);
 
       header_el.setAttribute("onkeyup", "updateAllGroups(true);");
