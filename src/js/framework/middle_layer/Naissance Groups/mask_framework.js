@@ -40,6 +40,7 @@
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_add = appendArrays(brush.mask_add, all_selected_entities);
+        group_obj.mask = "add";
       }
     } else if (mode == "subtract") {
       //Set group_el class
@@ -51,6 +52,7 @@
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_subtract = appendArrays(brush.mask_subtract, all_selected_entities);
+        group_obj.mask = "subtract";
       }
     }
   }
@@ -89,6 +91,8 @@
             local_mask.splice(x, 1);
         }
       }
+
+      delete group_obj.mask;
     }
   }
 }

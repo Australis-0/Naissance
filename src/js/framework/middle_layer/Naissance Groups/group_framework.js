@@ -215,7 +215,7 @@
     //Declare local instance variables
     var entity_array = [];
     var group_obj = getGroup(group_id);
-    
+
     if (group_obj.entities) {
       for (var i = 0; i < group_obj.entities.length; i++) {
         var local_entity = getEntity(group_obj.entities[i]);
@@ -281,6 +281,18 @@
 
       //Push to new_group.entities
       new_group.entities.push(entity_id);
+
+      //Group options handling
+      {
+        var group_el = document.querySelector(`#hierarchy .group[id='${group_id}']`);
+
+        //Mask handling
+        if (group_el) {
+          var group_el_class = group_el.getAttribute("class");
+          var group_mask;
+          
+        }
+      }
     }
   }
 

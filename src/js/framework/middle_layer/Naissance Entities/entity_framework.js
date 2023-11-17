@@ -294,11 +294,17 @@
 
     //Check if this is an actual entity object or a new selection
     if (entity_obj) {
+      var first_history_frame = getFirstHistoryFrame(entity_obj);
       var history_frame = getHistoryFrame(entity_obj, date);
 
       if (history_frame.options)
         if (history_frame.options.entity_name)
           entity_name = history_frame.options.entity_name;
+      if (!entity_name)
+        if (first_history_frame.options)
+          if (first_history_frame.options.entity_name)
+            entity_name = first_history_frame.options.entity_name;
+
 
       if (!entity_name)
         if (window.current_union)
