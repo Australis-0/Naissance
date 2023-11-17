@@ -37,7 +37,7 @@
     //Check if date is before first history frame
     var first_history_frame = getFirstHistoryFrame(entity_id);
 
-    if (first_history_frame.id >= getTimestamp(window.date))
+    if (first_history_frame.id > getTimestamp(window.date))
       return true;
 
     //Return statement

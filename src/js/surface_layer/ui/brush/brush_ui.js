@@ -57,34 +57,45 @@
   function processBrush () {
     //Declare local instance variables
     var brush_obj = getBrush();
+    var selected_id = "";
 
     if (brush_obj.brush_change) {
       if (window.current_union) {
+        if (window.selection)
+          selected_id = window.selection.options.className;
+
         //Mask processing
         {
-          var all_mask_add_keys = Object.keys(brush_obj.mask_add);
-          var all_mask_subtract_keys = Object.keys(brush_obj.mask_subtract);
-
           //Iterate over all_mask_add_keys
-          for (var i = 0; i < all_mask_add_keys.length; i++) {
-            var local_value = brush_obj.mask_add[all_mask_add_keys[i]];
+          for (var i = 0; i < brush_obj.mask_add.length; i++) {
+            var local_value = brush_obj.mask_add[i];
 
-            if (local_value._latlngs) {
-              var local_coords = difference(local_value._latlngs, current_union);
+            var local_id = local_value.options.className;
 
-              local_value.setLatLngs(local_coords);
-              
-              //Set new ._latlngs to coords of current history frame
-              createHistoryFrame(local_value.options.className, window.date, {}, local_coords);
-            }
+            if (local_id != selected_id)
+              if (local_value._latlngs) {
+                var local_coords = difference(local_value._latlngs, current_union);
+
+                local_value.setLatLngs(local_coords);
+
+                //Set new ._latlngs to coords of current history frame
+                createHistoryFrame(local_value.options.className, window.date, {}, local_coords);
+              }
           }
 
-          //Iterate over all_mask_subtract_keys
-          for (var i = 0; i < all_mask_subtract_keys.length; i++) {
-            var local_value = brush_obj.mask_subtract[all_mask_subtract_keys[i]];
 
-            if (local_value._latlngs)
-              current_union = difference(current_union, local_value._latlngs);
+          //Iterate over all_mask_subtract_keys
+          for (var i = 0; i < brush_obj.mask_subtract.length; i++) {
+            var local_value = brush_obj.mask_subtract[i];
+
+            var local_id = local_value.options.className;
+
+            if (local_id != selected_id) {
+              var local_value = brush_obj.mask_subtract[i];
+
+              if (local_value._latlngs)
+                current_union = difference(current_union, local_value._latlngs);
+            }
           }
         }
 

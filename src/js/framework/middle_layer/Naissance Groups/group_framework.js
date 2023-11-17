@@ -78,6 +78,11 @@
     var parent_group = getGroupGroup(group_id);
 
     if (group_obj) {
+      //KEEP AT TOP! - Remove group options first
+      {
+        removeGroupMask(group_id, { do_not_override_entity_masks: true });
+      }
+
       //Make sure to move all subgroups and entities out into group's parent element if it exists (change parent_group)
       if (parent_group)
         if (group_obj.subgroups) {
@@ -122,11 +127,6 @@
       //Refresh sidebar
       if (!do_not_refresh)
         refreshSidebar();
-
-      //Remove group options
-      {
-        removeGroupMask(group_id, { do_not_override_entity_masks: true });
-      }
     }
   }
 

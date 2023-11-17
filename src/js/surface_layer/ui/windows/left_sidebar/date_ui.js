@@ -1,6 +1,7 @@
 //Date UI functions
 {
   function autoFillDate () {
+    year_type_field.value = (date.year >= 0) ? "AD" : "BC";
     year_field.value = Math.abs(date.year);
     month_field.value = months[date.month - 1];
     day_field.value = ordinalise(date.day);
@@ -245,6 +246,8 @@
     month_el.value = date.month;
     year_el.value = Math.abs(date.year); //[WIP] - BC handling
     year_type_el.value = (date.year >= 0) ? "AD" : "BC";
+
+    console.log(`Year`, date.year);
   }
 
   function populateDateRangeFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_date) {

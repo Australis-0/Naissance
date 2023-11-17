@@ -1464,7 +1464,8 @@ document.body.addEventListener("keyup", (e) => {
       } else {
         var local_history = getPolityHistory(local_class, date);
 
-        delete local_history.class_name;
+        if (local_history)
+          delete local_history.class_name;
       }
 
       //Repopulate bio
