@@ -179,6 +179,39 @@
     }
   }
 
+  function getFirstHistoryFrame (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    //If entity_obj exists, check options.history for first date
+    if (entity_obj)
+      if (entity_obj.options)
+        if (entity_obj.options.history) {
+          var all_history_frames = Object.keys(entity_obj.options.history);
+          var history_frame = {
+            coords: [],
+            options: {}
+          };
+
+          if (all_history_frames.length >= 1) {
+            var first_history_frame = entity_obj.options.history[all_history_frames[0]];
+
+            history_frame.id = first_history_frame.id;
+            history_frame.is_founding = true;
+            if (first_history_frame.coords)
+              history_frame.coords = first_history_frame.coords;
+            if (first_history_frame.options)
+              history_frame.options = mergeObjects(history_frame.options, first_history_frame.options, "override");
+
+            //Return statement
+            return history_frame;
+          }
+        }
+  }
+
   /*
     getHistoryFrame() - Returns the history frame of an entity.
     Returns: {

@@ -121,5 +121,5 @@ window.reserved = {
 
 //Test scripts
 setTimeout(function(){
-  loadSave("england");
+  loadSave("atlas");
 }, 100);
