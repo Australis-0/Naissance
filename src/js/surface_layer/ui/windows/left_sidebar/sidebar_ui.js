@@ -417,15 +417,34 @@
       }
 
       //Update group and entity belonging by checking parent
-      var element_id = element_obj.id;
-      var group_element = element_obj.parentElement.parentElement;
+      {
+        var element_id = element_obj.id;
+        var group_element = element_obj.parentElement.parentElement;
+        var group_obj = getGroup(group_element.id);
+        var selector = "";
 
-      //Entity handling
-      if (element_obj.getAttribute("class").includes("entity"))
-        moveEntityToGroup(element_id, group_element.id);
-      if (element_obj.getAttribute("class").includes("group"))
-        moveGroupToGroup(element_id, group_element.id);
+        //Entity handling
+        if (element_obj.getAttribute("class").includes("entity")) {
+          moveEntityToGroup(element_id, group_element.id);
+          selector = "entities";
+        }
+        if (element_obj.getAttribute("class").includes("group")) {
+          moveGroupToGroup(element_id, group_element.id);
+          selector = "subgroups";
+        }
+
+        //Only reorganise elements if this is an actual group
+        if (group_obj) {
+          var group_children = Array.from(element_obj.parentElement.children);
+          var old_index = group_obj[selector].indexOf(element_id);
+          var new_index = group_children.indexOf(element_obj);
+
+          //Move element within selector
+          moveElement(group_obj[selector], old_index, new_index);
+        }
+      }
     } else {
+      console.log(true);
       e.from.append(element_obj);
     }
   }
