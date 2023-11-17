@@ -161,10 +161,13 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     //Iterate over all entities in all layers and update their history
     for (var i = 0; i < layers.length; i++) {
       var local_layer = window[`${layers[i]}_layer`];
+      var local_render_order = getLayerRenderingOrder(layers[i]);
 
-      for (var x = 0; x < local_layer.length; x++) {
+      for (var x = 0; x < local_render_order.length; x++) {
         var do_not_reload = false;
-        var local_entity_id = local_layer[x].options.className;
+        var entity_key = getEntity(local_render_order[x], { return_key: true });
+        var local_entity = window[entity_key[0]][entity_key[1]];
+        var local_entity_id = local_entity.options.className;
         var local_history = getPolityHistory(local_entity_id, date, { layer: layers[i] });
 
         //Check against old date
@@ -179,7 +182,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
         //Check if the object should be reloaded
         if (!do_not_reload) {
           //Reload object; add to map
-          local_layer[x].remove();
+          local_entity.remove();
 
           if (local_history) {
             //Update UIs for each open popup
@@ -192,12 +195,12 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
             }
 
             //Run through each options type
-            if (local_layer[x].options.type == "polity")
+            if (local_entity.options.type == "polity")
               //Make sure polity is not extinct
               if (!isPolityHidden(local_entity_id, window.date)) {
                 //Deprecating this makes Naissance crash for some reason
-                var local_history_frame = getHistoryFrame(local_layer[x], window.date);
-                var local_options = JSON.parse(JSON.stringify(local_layer[x].options));
+                var local_history_frame = getHistoryFrame(local_entity, window.date);
+                var local_options = JSON.parse(JSON.stringify(local_entity.options));
 
                 //Overwrite local_options with local_history_options
                 var all_local_history_options = Object.keys(local_history_frame.options);
@@ -205,13 +208,13 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
                 for (var y = 0; y < all_local_history_options.length; y++)
                   local_options[all_local_history_options[y]] = local_history_frame.options[all_local_history_options[y]];
 
-                local_layer[x] = L.polygon(local_history_frame.coords, local_options).addTo(map);
-                local_layer[x].on("click", function (e) {
+                local_layer[entity_key[1]] = L.polygon(local_history_frame.coords, local_options).addTo(map);
+                local_layer[entity_key[1]].on("click", function (e) {
                   entityUI(e, false, true);
                 });
 
                 //This is the current selected polity, re-add cursor
-                if (window.editing_entity == local_layer[x].options.className)
+                if (window.editing_entity == local_entity.options.className)
                   clearBrush();
               }
           }

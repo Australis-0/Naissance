@@ -280,8 +280,8 @@
     var ungrouped_entities = [];
 
     //Iterate over all_local_groups to push to grouped_entities
-    for (var i = 0; i < local_groups.length; i++) {
-      var local_group = local_groups[all_local_groups[x]];
+    for (var i = 0; i < all_local_groups.length; i++) {
+      var local_group = local_groups[all_local_groups[i]];
 
       if (local_group.entities)
         for (var x = 0; x < local_group.entities.length; x++)
@@ -451,7 +451,6 @@
         }
       }
     } else {
-      console.log(true);
       e.from.append(element_obj);
     }
   }
