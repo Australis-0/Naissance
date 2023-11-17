@@ -259,8 +259,12 @@
     var group_id = arg1_group_id;
 
     //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var new_group = getGroup(group_id);
     var old_group = getEntityGroup(entity_id);
+
+    //Initialise local instance variables
+    entity_id = entity_obj.options.className;
 
     //Remove from old group if entity has already been assigned a group
     if (old_group)
@@ -284,14 +288,11 @@
 
       //Group options handling
       {
-        var group_el = document.querySelector(`#hierarchy .group[id='${group_id}']`);
-
         //Mask handling
-        if (group_el) {
-          var group_el_class = group_el.getAttribute("class");
-          var group_mask;
-          
-        }
+        removeEntityMask(entity_obj);
+
+        if (new_group.mask)
+          window.brush[`mask_${new_group.mask}`].push(entity_obj);
       }
     }
   }

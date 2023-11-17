@@ -143,6 +143,7 @@
 
     //Declare local instance variables
     var ctx_menu_el = document.createElement("img");
+    var group_class = `group`;
     var header_el = document.createElement("input");
     var local_el = document.createElement("div");
     var local_entities_el = document.createElement("div");
@@ -150,7 +151,13 @@
     var local_layer = window[`${layer}_layer`];
     var local_subgroups_el = document.createElement("div");
 
-    var local_group = local_groups[group_id];
+    var group_obj = local_groups[group_id];
+
+    //Initialise local instance variables
+    {
+      if (group_obj.mask)
+        group_class += ` mask-${group_obj.mask}`;
+    }
 
     //Set element formatting
     ctx_menu_el.setAttribute("class", "group-context-menu-icon");
@@ -158,7 +165,7 @@
     ctx_menu_el.setAttribute("src", "./gfx/interface/context_menu_icon.png");
     ctx_menu_el.setAttribute("onclick", `toggleSidebarContextMenu('${group_id}');`);
 
-    local_el.setAttribute("class", "group")
+    local_el.setAttribute("class", group_class);
     local_el.setAttribute("id", group_id);
     local_el.setAttribute("onmouseout", "updateSidebarHover();");
     local_el.setAttribute("onmouseover", "updateSidebarHover();");
@@ -169,16 +176,16 @@
     local_subgroups_el.setAttribute("class", `subgroups`);
 
     //Make sure local_group exists
-    if (local_group) {
+    if (group_obj) {
       //Add header_el to local_el
       header_el.setAttribute("onkeyup", "updateAllGroups(true);");
-      header_el.value = local_group.name;
+      header_el.value = group_obj.name;
 
       //Append all entities
-      if (local_group.entities)
-        for (var i = 0; i < local_group.entities.length; i++)
+      if (group_obj.entities)
+        for (var i = 0; i < group_obj.entities.length; i++)
           local_entities_el.appendChild(
-            createEntityElement(layer, local_group.entities[i])
+            createEntityElement(layer, group_obj.entities[i])
           );
 
       //Append local_subgroups_el, local_entities_el to local_el

@@ -57,6 +57,31 @@
     }
   }
 
+  function removeEntityMask (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    //Initialise local instance variables
+    entity_id = entity_obj.options.className;
+
+    //Iterate over all mask types
+    for (var i = 0; i < reserved.mask_types.length; i++) {
+      var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+
+      //Remove entity_id from mask
+      for (var x = local_mask.length - 1; x >= 0; x--) {
+        var local_entity = local_mask[x];
+
+        if (local_entity.options.className == entity_id)
+          local_mask.splice(x, 1);
+      }
+    }
+
+  }
+
   /*
     removeGroupMask() - Sets an entire group to no longer have a mask
 
