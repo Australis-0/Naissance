@@ -1,3 +1,35 @@
+//Helper functions
+{
+  function removeGroupFromAllSubgroups (arg0_group_id) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+
+    //Declare local instance variables
+    var deleted = false;
+
+    //Iterate over all layers to delete
+    for (var i = 0; i < window.layers.length; i++) {
+      var local_groups = window[`${layers[i]}_groups`];
+
+      var all_local_groups = Object.keys(local_groups);
+
+      for (var x = 0; x < all_local_groups.length; x++) {
+        var local_group = local_groups[all_local_groups[x]];
+
+        if (local_group.subgroups)
+          for (var y = local_group.subgroups.length - 1; y >= 0; y--)
+            if (local_group.subgroups[y] == group_id) {
+              local_group.subgroups.splice(y, 1);
+              deleted = true;
+            }
+      }
+    }
+
+    //Return statement
+    return deleted;
+  }
+}
+
 //Group functions
 {
   function createGroup (arg0_parent_group_id, arg1_do_not_refresh) {
@@ -233,13 +265,22 @@
     return entity_array;
   }
 
-  function getGroupGroup (arg0_group_id) {
+  /*
+    getGroupGroup() - Fetches group group
+    options: {
+      return_key: true/false - Optional. Whether to return the key. False by default, returns [`<layer>_groups`, `key`] if true
+    }
+  */
+  function getGroupGroup (arg0_group_id, arg1_options) {
     //Convert from parameters
     var group_id = arg0_group_id;
+    var options = (arg1_options) ? arg1_options : {};
 
     //Iterate over all layers; groups for subgroups
     for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_groups`];
+      var local_key = `${layers[i]}_groups`;
+
+      var local_layer = window[local_key];
 
       var all_local_groups = Object.keys(local_layer);
 
@@ -248,7 +289,7 @@
 
         if (local_group.subgroups)
           if (local_group.subgroups.includes(group_id));
-            return local_group;
+            return (!options.return_key) ? local_group : [local_key, all_local_groups[x]];
       }
     }
   }
@@ -303,28 +344,26 @@
     var parent_group_id = arg1_group_id;
 
     //Declare local instance variables
-    var new_group = getGroup(parent_group_id);
-    var old_group = getGroupGroup(child_group_id);
+    var new_group = (typeof parent_group_id != "object") ? getGroup(parent_group_id) : parent_group_id;
 
-    //Remove from old_group if group has already been assigned a group
-    if (old_group)
-      if (old_group.subgroups) {
-        for (var i = 0; i < old_group.subgroups.length; i++)
-          if (old_group.subgroups[i] == child_group_id)
-            old_group.subgroups.splice(i, 1);
-
-        if (old_group.subgroups.length == 0)
-          delete old_group.subgroups;
-      }
+    //Remove group from all subgroups in all layers first
+    removeGroupFromAllSubgroups(child_group_id);
 
     //Add to new group
     if (new_group) {
+      var is_in_group = false;
+
       //Make sure subgroups array exists if possible
-      if (!new_group.subgroups)
+      if (!new_group.subgroups) {
         new_group.subgroups = [];
+      } else {
+        if (new_group.subgroups.includes(child_group_id))
+          is_in_group = true;
+      }
 
       //Push to new_group.subgroups
-      new_group.subgroups.push(child_group_id);
+      if (!is_in_group)
+        new_group.subgroups.push(child_group_id);
     }
   }
 }

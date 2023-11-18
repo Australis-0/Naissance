@@ -447,7 +447,7 @@
           selector = "subgroups";
         }
 
-        //Only reorganise elements if this is an actual group
+        //Only reorganise elements if this is being moved within an actual group
         if (group_obj) {
           var group_children = Array.from(element_obj.parentElement.children);
           var old_index = group_obj[selector].indexOf(element_id);
