@@ -191,9 +191,13 @@
       //Append all entities
       if (group_obj.entities)
         for (var i = 0; i < group_obj.entities.length; i++)
-          local_entities_el.appendChild(
-            createEntityElement(layer, group_obj.entities[i])
-          );
+          try {
+            local_entities_el.appendChild(
+              createEntityElement(layer, group_obj.entities[i])
+            );
+          } catch (e) {
+            console.warn(e);
+          }
 
       //Append local_subgroups_el, local_entities_el to local_el
       local_el.appendChild(header_el);
@@ -446,6 +450,8 @@
           moveGroupToGroup(element_id, group_element.id);
           selector = "subgroups";
         }
+
+        console.log(`Moved ${selector}`);
 
         //Only reorganise elements if this is being moved within an actual group
         if (group_obj) {

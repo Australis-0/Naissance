@@ -164,23 +164,13 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
       var local_render_order = getLayerRenderingOrder(layers[i]);
 
       for (var x = 0; x < local_render_order.length; x++) {
-        var do_not_reload = false;
         var entity_key = getEntity(local_render_order[x], { return_key: true });
-        var local_entity = window[entity_key[0]][entity_key[1]];
-        var local_entity_id = local_entity.options.className;
-        var local_history = getPolityHistory(local_entity_id, date, { layer: layers[i] });
 
-        //Check against old date
-        if (old_date) {
-          var local_old_history = getPolityHistory(local_entity_id, old_date, { layer: layers[i] });
+        if (entity_key) {
+          var local_entity = window[entity_key[0]][entity_key[1]];
+          var local_entity_id = local_entity.options.className;
+          var local_history = getPolityHistory(local_entity_id, date, { layer: layers[i] });
 
-          if (local_old_history && local_history)
-            if (local_old_history.id == local_history.id)
-              do_not_reload = true;
-        }
-
-        //Check if the object should be reloaded
-        if (!do_not_reload) {
           //Reload object; add to map
           local_entity.remove();
 

@@ -152,8 +152,9 @@
     //Set new_entity.options
     if (!new_entity.options.type) new_entity.options.type = "polity";
 
-    //Create history entry
+    //Create history entry; sort history object
     createHistoryFrame(new_entity, date, {}, coords);
+    new_entity.options.history = sortObject(new_entity.options.history, "numeric_ascending");
 
     //Edit options; append ID and HTML
     {

@@ -37,6 +37,8 @@
             new_history_entry_el.after(context_menu_date_el);
           }
         }
+
+        entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
       } else {
         console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);
       }

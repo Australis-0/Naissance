@@ -121,10 +121,12 @@
         window.selection = L.polygon(current_union, window.polity_options).addTo(map);
 
       //Bind tooltip to selection
-      L.setOptions(selection, window.polity_options);
-      selection.on("click", function (e) {
-        entityUI(e, true);
-      });
+      if (window.selection) {
+        L.setOptions(selection, window.polity_options);
+        selection.on("click", function (e) {
+          entityUI(e, true);
+        });
+      }
     }
   }
 }

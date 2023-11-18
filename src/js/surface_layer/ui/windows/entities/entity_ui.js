@@ -982,7 +982,7 @@ global.opened_popups = {};
         all_jump_to_btns[i].onclick = function (e) {
           var local_timestamp = parseInt(this.getAttribute("timestamp"));
 
-          date = parseTimestamp(local_timestamp);
+          window.date = parseTimestamp(local_timestamp);
           loadDate();
         };
     } else {

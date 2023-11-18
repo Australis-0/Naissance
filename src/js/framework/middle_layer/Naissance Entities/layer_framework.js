@@ -63,6 +63,26 @@
     if (ungrouped_entities.length > 0)
       rendering_order = appendArrays(rendering_order, ungrouped_entities);
 
+    //Current selection handling - remove from array if extant and push to end
+    {
+      var selected_id = "";
+
+      if (window.selection)
+        if (selection.options)
+          if (selection.options.className)
+            selected_id = selection.options.className;
+
+      //Splice from rendering order
+      if (selected_id != "") {
+        for (var i = 0; i < rendering_order.length; i++)
+          if (rendering_order[i] == selected_id) {
+            rendering_order.splice(i, 1);
+            break;
+          }
+        rendering_order.push(selected_id);
+      }
+    }
+
     //Entity object handling
     if (options.return_objects) {
       var new_rendering_order = [];

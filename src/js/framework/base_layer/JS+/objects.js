@@ -433,9 +433,31 @@
     var object = arg0_object;
     var mode = (arg1_mode) ? arg1_mode : "descending";
 
-    //Return statement
-    return Object.fromEntries(
-      Object.entries(object).sort(([, a], [, b]) => (mode == "descending") ? b - a : a - b)
-    );
+    //Declare local instance variables
+    var all_object_keys = Object.keys(object);
+    var new_object = {};
+
+    if (mode.startsWith("numeric_")) {
+      for (var i = 0; i < all_object_keys.length; i++)
+        all_object_keys[i] = parseInt(all_object_keys[i]);
+
+      //Ascending/descending sort
+      if (mode == "numeric_ascending")
+        all_object_keys.sort((a, b) => a - b);
+      if (mode == "numeric_descending")
+        all_object_keys.sort((a, b) => b - a);
+
+      //Iterate over all_object_keys and append to new_object
+      for (var i = 0; i < all_object_keys.length; i++)
+        new_object[all_object_keys[i]] = object[all_object_keys[i]];
+
+      //Return statement
+      return new_object;
+    } else {
+      //Return statement
+      return Object.fromEntries(
+        Object.entries(object).sort(([, a], [, b]) => (mode == "descending") ? b - a : a - b)
+      );
+    }
   }
 }
