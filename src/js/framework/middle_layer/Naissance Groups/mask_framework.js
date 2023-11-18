@@ -111,8 +111,9 @@
         //Remove all_selected_entity_keys from mask
         for (var x = local_mask.length - 1; x >= 0; x--) {
           var local_entity = local_mask[x];
+          var local_entity_id = local_entity.options.className;
 
-          if (all_selected_entity_keys.includes(local_entity.className))
+          if (all_selected_entity_keys.includes(local_entity_id))
             local_mask.splice(x, 1);
         }
       }

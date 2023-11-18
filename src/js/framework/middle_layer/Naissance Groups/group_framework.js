@@ -252,7 +252,7 @@
       for (var i = 0; i < group_obj.entities.length; i++) {
         var local_entity = getEntity(group_obj.entities[i]);
 
-        entity_array.push((!options.return_keys) ? local_entity : local_entity.className);
+        entity_array.push((!options.return_keys) ? local_entity : local_entity.options.className);
       }
     }
     if (group_obj.subgroups) {

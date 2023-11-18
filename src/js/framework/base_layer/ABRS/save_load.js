@@ -36,6 +36,20 @@ function loadSave (arg0_file_name) {
   renderEntities();
   refreshSidebar();
   loadDate();
+
+  //Load Brush option save
+  for (var i = 0; i < layers.length; i++) {
+    var local_groups = window[`${layers[i]}_groups`];
+
+    var all_local_groups = Object.keys(local_groups);
+
+    for (var x = 0; x < all_local_groups.length; x++) {
+      var local_group = local_groups[all_local_groups[x]];
+
+      if (local_group.mask)
+        addGroupMask(all_local_groups[x], local_group.mask);
+    }
+  }
 }
 
 function writeSave (arg0_file_name) {
