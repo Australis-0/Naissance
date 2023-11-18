@@ -448,8 +448,10 @@
         all_object_keys.sort((a, b) => b - a);
 
       //Iterate over all_object_keys and append to new_object
-      for (var i = 0; i < all_object_keys.length; i++)
-        new_object[all_object_keys[i]] = object[all_object_keys[i]];
+      for (var i = all_object_keys.length - 1; i >= 0; i--)
+        new_object = Object.assign({
+          [all_object_keys[i].toString()]: object[all_object_keys[i].toString()]
+        }, new_object);
 
       //Return statement
       return new_object;

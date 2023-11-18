@@ -36,6 +36,7 @@
   /*
     getLayerRenderingOrder() - Renders polities within a layer.
     options: {
+      exclude_selection: true/false, - Whether to exclude the selected ID. False by default
       return_objects: true/false - Whether to return entity objects instead. False by default
     }
   */
@@ -79,7 +80,9 @@
             rendering_order.splice(i, 1);
             break;
           }
-        rendering_order.push(selected_id);
+
+        if (!options.exclude_selection)
+          rendering_order.push(selected_id);
       }
     }
 

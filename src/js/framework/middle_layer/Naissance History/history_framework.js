@@ -27,6 +27,8 @@
           delete entity_obj.options.history[history_entry.id];
           new_history_entry.id = new_timestamp;
 
+          entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
+
           if (context_menu_el) {
             //Repopulate bio; move it to new history entry
             populateEntityBio(entity_id);
@@ -37,8 +39,6 @@
             new_history_entry_el.after(context_menu_date_el);
           }
         }
-
-        entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
       } else {
         console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);
       }

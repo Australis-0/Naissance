@@ -4,7 +4,7 @@ map.on("zoom", function (e) {
 
   for (var i = 0; i < layers.length; i++) {
     var local_layer = window[`${layers[i]}_layer`];
-    var local_render_order = getLayerRenderingOrder(layers[i]);
+    var local_render_order = getLayerRenderingOrder(layers[i], { exclude_selection: true });
 
     //Remove all local_layer entities from map
     for (var x = 0; x < local_layer.length; x++)
@@ -40,6 +40,12 @@ map.on("zoom", function (e) {
       } else {
         console.warn(`${local_render_order[x]} is bugged out as an entity. Please check the savefile for malformed data structures.`);
       }
+    }
+
+    //Selection refresh
+    if (window.selection) {
+      window.selection.removeFrom(map);
+      window.selection.addTo(map);
     }
   }
 });
