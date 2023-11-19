@@ -42,6 +42,32 @@
         brush.mask_add = appendArrays(brush.mask_add, all_selected_entities);
         group_obj.mask = "add";
       }
+    } else if (mode == "intersect_add") {
+      //Set group_el class
+      if (group_el_class) {
+        //Edit class display
+        var new_class = removeClasses(group_el, reserved.mask_classes);
+        group_el.setAttribute("class", `${new_class} mask-intersect_add`);
+
+        //Get all selected entities and add to window.brush.mask_add
+        var all_selected_entities = getGroupEntities(group_obj.id);
+
+        brush.mask_intersect_add = appendArrays(brush.mask_intersect_add, all_selected_entities);
+        group_obj.mask = "intersect_add";
+      }
+    } else if (mode == "intersect_overlay") {
+      //Set group_el class
+      if (group_el_class) {
+        //Edit class display
+        var new_class = removeClasses(group_el, reserved.mask_classes);
+        group_el.setAttribute("class", `${new_class} mask-intersect_overlay`);
+
+        //Get all selected entities and add to window.brush.mask_add
+        var all_selected_entities = getGroupEntities(group_obj.id);
+
+        brush.mask_intersect_overlay = appendArrays(brush.mask_intersect_overlay, all_selected_entities);
+        group_obj.mask = "intersect_overlay";
+      }
     } else if (mode == "subtract") {
       //Set group_el class
       if (group_el_class) {

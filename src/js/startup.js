@@ -19,6 +19,8 @@ window.selected_layer = "polities";
     //Masks
     brush_only_mask: false, //Whether the mask only apply to the current brush, and not the entire selection. False by default
     mask_add: [], //Mask override (Array<Object, Polity>)
+    mask_intersect_add: [], //Mask intersect override (Array<Object, Polity>)
+    mask_intersect_overlay: [], //Mask intersect overlap (Array<Object, Polity>)
     mask_subtract: [] //Overrides mask (Array<Object, Polity>)
   };
   window.polity_options;
@@ -67,7 +69,7 @@ window.right_mouse = false;
 //Optimisation
 window.reserved = {
   mask_classes: [],
-  mask_types: ["add", "subtract"]
+  mask_types: ["add", "intersect_add", "intersect_overlay", "subtract"]
 };
 
 //Process optimisation

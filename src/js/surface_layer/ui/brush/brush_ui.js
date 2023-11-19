@@ -66,7 +66,7 @@
 
         //Mask processing
         {
-          //Iterate over all_mask_add_keys
+          //Iterate over all mask_add entities
           for (var i = 0; i < brush_obj.mask_add.length; i++) {
             var local_value = brush_obj.mask_add[i];
 
@@ -83,25 +83,85 @@
               }
           }
 
+          //Iterate over all mask_intersect_add entities
+          if (brush_obj.mask_intersect_add.length > 0) {
+            var combined_union = getTurfObject(brush_obj.mask_intersect_add[0]._latlngs);
 
-          //Iterate over all_mask_subtract_keys
+            for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
+              var local_value = brush_obj.mask_intersect_add[i];
+
+              var local_id = local_value.options.className;
+
+              if (local_id != selected_id)
+                if (local_value._latlngs)
+                  combined_union = union(local_value._latlngs, combined_union);
+            }
+
+            //Fetch the area that perfectly overlaps with the intersection
+            current_union = intersection(current_union, combined_union);
+
+            //Overwrite intersection area
+            if (current_union) {
+              //Buffer by 1m on a deep copy to make sure we don't have issues
+              var old_current_union = JSON.parse(JSON.stringify(current_union));
+              current_union = buffer(current_union, {
+                radius: 0.001,
+                units: "kilometers"
+              });
+
+              for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
+                var local_value = brush_obj.mask_intersect_add[i];
+
+                var local_id = local_value.options.className;
+
+                if (local_id != selected_id)
+                  if (local_value._latlngs) {
+                    local_value._latlngs = difference(local_value._latlngs, current_union);
+                    local_value.removeFrom(map);
+                    local_value.addTo(map);
+                  }
+              }
+
+              //Restore old_current_union
+              current_union = old_current_union;
+            }
+          }
+
+
+          //Iterate over all mask_intersect_overlay entities
+          if (brush_obj.mask_intersect_overlay.length > 0) {
+            var combined_union = getTurfObject(brush_obj.mask_intersect_overlay[0]._latlngs);
+
+            for (var i = 0; i < brush_obj.mask_intersect_overlay.length; i++) {
+              var local_value = brush_obj.mask_intersect_overlay[i];
+
+              var local_id = local_value.options.className;
+
+              if (local_id != selected_id)
+                if (local_value._latlngs)
+                  combined_union = union(local_value._latlngs, combined_union);
+            }
+
+            combined_union = union(current_union, combined_union);
+            current_union = intersection(current_union, combined_union);
+          }
+
+          //Iterate over all mask_subtract entities
           for (var i = 0; i < brush_obj.mask_subtract.length; i++) {
             var local_value = brush_obj.mask_subtract[i];
 
             var local_id = local_value.options.className;
 
-            if (local_id != selected_id) {
-              var local_value = brush_obj.mask_subtract[i];
-
+            if (local_id != selected_id)
               if (local_value._latlngs)
                 current_union = difference(current_union, local_value._latlngs);
-            }
           }
         }
 
         //Simplify processing
         if (brush_obj.auto_simplify_when_editing)
-          current_union = simplify(current_union, window.simplify_tolerance);
+          if (current_union)
+            current_union = simplify(current_union, window.simplify_tolerance);
 
         //Set new poly now
         refreshBrush();

@@ -57,7 +57,8 @@
     var turf_operation = turf[options.operation_type](turf_obj, ot_turf_obj);
 
     //Return statement
-    return (options.return_leaflet) ? convertToLeaflet(turf_operation) : turf_operation;
+    if (turf_operation)
+      return (options.return_leaflet) ? convertToLeaflet(turf_operation) : turf_operation;
   }
 }
 

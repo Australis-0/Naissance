@@ -123,6 +123,9 @@
     //Declare local instance variables
     var coord_type;
 
+    if (!format)
+      console.error(`getCoordsType() was fed an undefined format!`, format);
+
     //Check if type is GeoJSON
     if (format._initHooksCalled && !format._latlngs)
       return "geojson";

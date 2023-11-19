@@ -14,11 +14,17 @@
 }
 
 /* -- Group styling -- */
-.group.mask-subtract {
-  background-color: rgba(240, 60, 60, 0.3);
-}
 .group.mask-add {
   background-color: rgba(60, 240, 60, 0.3);
+}
+.group.mask-intersect_add {
+  background-color: rgba(235, 220, 50, 0.3);
+}
+.group.mask-intersect_overlay {
+  background-color: rgba(60, 60, 240, 0.3);
+}
+.group.mask-subtract {
+  background-color: rgba(240, 60, 60, 0.3);
 }
 
 /* -- Hierarchy Styling-- */

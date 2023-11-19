@@ -11,6 +11,9 @@
   font-weight: 300;
   width: var(--context-menu-width);
 }
+.context-menu-container input, .context-menu-container select {
+  max-width: calc(var(--context-menu-width) - 1vw);
+}
 .context-menu-container .context-menu-button {
   padding-bottom: 0.5vh;
   padding-left: 0.5vw;

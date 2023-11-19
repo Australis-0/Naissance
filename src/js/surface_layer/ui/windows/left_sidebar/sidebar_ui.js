@@ -57,8 +57,10 @@
           <div id = "mask-context-menu-text" class = "context-menu-text">
             <b>Set Mask:</b><br>
             <select id = "group-mask-${group_id}">
-              <option value = "subtract">Mask Override</option>
-              <option value = "add">Override Mask</option>
+              <option value = "add">Add (Brush > Mask)</option>
+              <option value = "intersect_add">Intersect Add (Brush > Intersection)</option>
+              <option value = "intersect_overlay">Intersect Overlay (Brush in Intersection)</option>
+              <option value = "subtract">Subtract (Mask > Brush)</option>
               <option value = "clear">None</option>
             </select>
           </div>
