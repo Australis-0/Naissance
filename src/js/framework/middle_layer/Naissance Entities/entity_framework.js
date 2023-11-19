@@ -87,10 +87,12 @@
 
     //finishEntity() if entity_cache has something in it
     try {
-      if (entity_cache.length > 0)
+      if (window.current_union)
         finishEntity();
     } catch {}
 
+    console.log(`Editing ${entity_id}`);
+    console.log(entity_obj.options);
     if (entity_obj) {
       window.editing_entity = entity_id;
       window.polity_options = entity_obj.options;
@@ -100,7 +102,7 @@
 
       //Set brush to this
       window.current_union = entity_obj._latlngs;
-      window.selection = L.polygon(entity_obj._latlngs, window.polity_options).addTo(map);
+      window.selection = L.polygon(window.current_union, window.polity_options).addTo(map);
 
       //Set entityUI for current selected entity
       selection.on("click", function (e) {
@@ -144,9 +146,8 @@
     var date_string = getTimestamp(date);
     var entity_id;
     var entity_name;
-    var is_new_entity = false;
     var new_entity = {
-      options: selection.options
+      options: window.selection.options
     };
 
     //Set new_entity.options
@@ -167,8 +168,6 @@
         if (selection.options.entity_name)
           entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
         new_entity.options.has_id = true;
-      } else {
-        is_new_entity = true;
       }
     }
 
@@ -184,13 +183,11 @@
       }
     }
 
-    //Set selection.options; reset selection
+    //Set selection.options
     {
       delete window.editing_entity;
       delete window.polity_options;
 
-      if (window.selection)
-        selection.options = {};
       clearBrush();
     }
 

@@ -92,7 +92,7 @@
 
               var local_id = local_value.options.className;
 
-              if (local_id != selected_id)
+              if (local_id != selected_id || local_value.selection)
                 if (local_value._latlngs)
                   combined_union = union(local_value._latlngs, combined_union);
             }
@@ -122,8 +122,21 @@
                   }
               }
 
-              //Restore old_current_union
-              current_union = old_current_union;
+              //Push selection to mask now in order to make sure it masks the entire group
+              if (window.selection)
+                brush_obj.mask_intersect_add.push({
+                  selection: true,
+
+                  options: window.selection.options,
+                  _latlngs: old_current_union
+                });
+
+              for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
+                var local_value = brush_obj.mask_intersect_add[i];
+
+                if (local_value.selection)
+                  current_union = union(local_value._latlngs, current_union);
+              }
             }
           }
 
@@ -142,7 +155,6 @@
                   combined_union = union(local_value._latlngs, combined_union);
             }
 
-            combined_union = union(current_union, combined_union);
             current_union = intersection(current_union, combined_union);
           }
 

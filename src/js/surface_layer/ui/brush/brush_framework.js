@@ -1,8 +1,13 @@
 //Declare functions
 {
   function clearBrush () {
-    if (window.selection)
+    //Clear brush in masks
+    clearBrushInMasks();
+
+    if (window.selection) {
       selection.remove();
+      delete window.selection;
+    }
 
     delete window.current_union;
     delete window.editing_entity;

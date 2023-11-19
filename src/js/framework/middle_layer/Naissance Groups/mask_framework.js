@@ -23,19 +23,16 @@
     var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
     var group_el_class;
 
-    if (group_el)
+    if (group_el) {
       group_el_class = group_el.getAttribute("class");
+      window.temp_mask_el = group_el;
+    }
 
     removeGroupMask(group_obj.id, options);
 
     //Mode handling
     if (mode == "add") {
-      //Set group_el class
       if (group_el_class) {
-        //Edit class display
-        var new_class = removeClasses(group_el, reserved.mask_classes);
-        group_el.setAttribute("class", `${new_class} mask-add`);
-
         //Get all selected entities and add to window.brush.mask_add
         var all_selected_entities = getGroupEntities(group_obj.id);
 
@@ -43,12 +40,7 @@
         group_obj.mask = "add";
       }
     } else if (mode == "intersect_add") {
-      //Set group_el class
       if (group_el_class) {
-        //Edit class display
-        var new_class = removeClasses(group_el, reserved.mask_classes);
-        group_el.setAttribute("class", `${new_class} mask-intersect_add`);
-
         //Get all selected entities and add to window.brush.mask_add
         var all_selected_entities = getGroupEntities(group_obj.id);
 
@@ -56,12 +48,7 @@
         group_obj.mask = "intersect_add";
       }
     } else if (mode == "intersect_overlay") {
-      //Set group_el class
       if (group_el_class) {
-        //Edit class display
-        var new_class = removeClasses(group_el, reserved.mask_classes);
-        group_el.setAttribute("class", `${new_class} mask-intersect_overlay`);
-
         //Get all selected entities and add to window.brush.mask_add
         var all_selected_entities = getGroupEntities(group_obj.id);
 
@@ -69,16 +56,34 @@
         group_obj.mask = "intersect_overlay";
       }
     } else if (mode == "subtract") {
-      //Set group_el class
       if (group_el_class) {
-        var new_class = removeClasses(group_el, reserved.mask_classes);
-        group_el.setAttribute("class", `${new_class} mask-subtract`);
-
-        //Get all selected entities and add to window.brush.mask_subtract
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_subtract = appendArrays(brush.mask_subtract, all_selected_entities);
         group_obj.mask = "subtract";
+      }
+    }
+
+    //A delay tick is required to set the DOM class update
+    setTimeout(function(){
+      if (reserved.mask_types.includes(mode)) {
+        var group_el = document.getElementById(window.temp_mask_el.id);
+
+        group_el.setAttribute("class", `group mask-${mode}`);
+      }
+    }, 1);
+  }
+
+  function clearBrushInMasks () {
+    for (var i = 0; i < reserved.mask_types.length; i++) {
+      var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+
+      //Remove all .selection from masks
+      for (var x = local_mask.length - 1; x >= 0; x--) {
+        var local_entity = local_mask[x];
+
+        if (local_entity.selection)
+          local_mask.splice(x, 1);
       }
     }
   }
@@ -130,6 +135,9 @@
       var all_selected_entity_keys = getGroupEntities(group_obj.id, { return_keys: true });
       var new_class = removeClasses(group_el, reserved.mask_classes);
 
+      //Strip classes
+      group_el.setAttribute("class", new_class);
+
       //Get all selected_entities and remove from all masks
       for (var i = 0; i < reserved.mask_types.length; i++) {
         var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
@@ -145,6 +153,23 @@
       }
 
       delete group_obj.mask;
+
+      //Reload entity editing
+      if (window.selection) {
+        var selected_entity_id;
+
+        //Finish entity; initialise selected_entity_id
+        if (window.selection.options)
+          if (window.selection.options.className)
+            selected_entity_id = window.selection.options.className;
+        if (!selected_entity_id) {
+          selected_entity_id = finishEntity();
+        } else {
+          finishEntity();
+        }
+
+        editEntity(selected_entity_id);
+      }
     }
   }
 }
