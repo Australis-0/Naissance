@@ -1,10 +1,20 @@
 //Declare functions
 {
   function clearBrush () {
-    //Clear brush in masks
+    //Declare local instance variables
+    var brush_obj = getBrush();
+
+    //Clear brush; reload brush in masks
     clearBrushInMasks();
 
     if (window.selection) {
+      if (window.selection.options.className)
+        for (var i = 0; i < reserved.mask_types.length; i++) {
+          var local_key = `mask_${reserved.mask_types[i]}`;
+
+          brush_obj[local_key] = reloadEntityInArray(brush_obj[local_key], window.selection.options.className);
+        }
+
       selection.remove();
       delete window.selection;
     }

@@ -131,7 +131,7 @@
           for (var i = 0; i < all_history_entries.length; i++) {
             var local_history = entity_obj.options.history[all_history_entries[i]];
 
-            if (parseInt(local_history.id) <= ending_timestamp)
+            if (parseInt(local_history.id) <= timestampToInt(ending_timestamp))
               has_property = conditional_function(local_history);
           }
         }
@@ -312,6 +312,37 @@
 
     //Return statement
     return (entity_name) ? entity_name : "Unnamed Polity";
+  }
+
+  function reloadEntityInArray (arg0_array, arg1_entity_id) {
+    //Convert from parameters
+    var array = getList(arg0_array);
+    var entity_id = arg1_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ?
+      getEntity(entity_id, { return_key: true }) : entity_id;
+
+    //Initialise local instance variables
+    if (Array.isArray(entity_obj))
+      entity_obj = window[entity_obj[0]][entity_obj[1]];
+
+    if (entity_obj)
+      entity_id = entity_obj.options.class;
+
+    //Iterate over array
+    for (var i = 0; i < array.length; i++)
+      if (array[i].options) {
+        var local_id = array[i].options.className;
+
+        if (local_id == entity_id && !array[i].selection) {
+          array[i].removeFrom(map);
+          array[i] = entity_obj;
+        }
+      }
+
+    //Return statement
+    return array;
   }
 
   function renderEntities (arg0_ignore_date) {

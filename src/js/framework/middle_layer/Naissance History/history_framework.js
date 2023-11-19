@@ -53,8 +53,11 @@
 
     //Declare local instance variables
     var date_string = getTimestamp(date);
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+    var entity_key = getEntity(entity_id, { return_key: true });
     var old_history_entry = getPolityHistory(entity_id, date);
+
+    var entity_obj = (typeof entity_id != "object") ?
+      window[entity_key[0]][entity_key[1]] : entity_id;
 
     if (entity_obj) {
       //Make sure history object is initailised
@@ -102,6 +105,9 @@
       //Delete local_history.options if not needed
       if (!local_history.options)
         delete local_history.options;
+
+      //Fix entity_obj history order
+      entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
     }
   }
 
@@ -235,13 +241,13 @@
       coords: [],
       options: {}
     };
-    var timestamp = getTimestamp(date);
+    var current_timestamp = timestampToInt(getTimestamp(date));
 
     var all_history_frames = Object.keys(entity_obj.options.history);
 
     //Iterate over all_history_frames
     for (var i = 0; i < all_history_frames.length; i++)
-      if (parseInt(all_history_frames[i]) <= timestamp) {
+      if (timestampToInt(all_history_frames[i]) <= current_timestamp) {
         var local_history_frame = entity_obj.options.history[all_history_frames[i]];
 
         //is_founding handler
@@ -289,7 +295,7 @@
         var current_entry = undefined;
 
         for (var i = 0; i < all_entity_histories.length; i++)
-          if (entry_timestamp >= parseInt(all_entity_histories[i]))
+          if (timestampToInt(entry_timestamp) >= timestampToInt(all_entity_histories[i]))
             current_entry = (!options.return_key) ? entity_obj.options.history[all_entity_histories[i]] : all_entity_histories[i];
       }
 

@@ -46,7 +46,10 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var date = arg0_date;
 
     //Guard clause
-    if (typeof date == "string") date = parseInt(date);
+    if (typeof date == "string") {
+      if (date.startsWith("d_")) return date;
+      date = parseInt(date);
+    }
     if (!isNaN(parseInt(date))) return date;
 
     //Declare local instance variables
@@ -55,11 +58,11 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var year_minutes = (leap_years*366 + (date.year - leap_years)*365)*24*60;
 
     //Return statement
-    return Math.floor(returnSafeNumber(year_minutes) +
+    return `d_${Math.floor(returnSafeNumber(year_minutes) +
       returnSafeNumber(daysInMonths(date)*24*60) +
       returnSafeNumber(date.day*24*60) +
       returnSafeNumber(date.hour*60) +
-      returnSafeNumber(date.minute));
+      returnSafeNumber(date.minute))}`;
   }
 
   function isLeapYear (arg0_year) {
@@ -111,7 +114,13 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
   function parseTimestamp (arg0_timestamp) {
     //Convert from parameters
-    var timestamp = (typeof arg0_timestamp != "object") ? parseInt(arg0_timestamp) : arg0_timestamp;
+    var timestamp = arg0_timestamp;
+
+    //Guard clause
+    if (typeof timestamp == "object")
+      return timestamp;
+    if (typeof timestamp == "string")
+      timestamp = parseInt(timestamp.toString().replace("d_", ""));
 
     //Declare local instance variables
     var local_date = {};
@@ -125,7 +134,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var leap_years = leapYearsBefore(local_date.year);
 
     local_date.year = Math.floor(timestamp/(365.2425*24*60));
-    timestamp -= getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 });
+    timestamp -= timestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
 
     //Calculate months
     var number_of_days = timestamp/(24*60);
@@ -149,6 +158,14 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Return statement
     return local_date;
+  }
+
+  function timestampToInt (arg0_timestamp) {
+    //Convert from parameters
+    var timestamp = arg0_timestamp;
+
+    //Return statement
+    return parseInt(timestamp.toString().replace("d_", ""));
   }
 }
 

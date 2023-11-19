@@ -434,24 +434,18 @@
     var mode = (arg1_mode) ? arg1_mode : "descending";
 
     //Declare local instance variables
-    var all_object_keys = Object.keys(object);
     var new_object = {};
 
     if (mode.startsWith("numeric_")) {
-      for (var i = 0; i < all_object_keys.length; i++)
-        all_object_keys[i] = parseInt(all_object_keys[i]);
+      var all_object_keys = Object.entries(object);
 
       //Ascending/descending sort
       if (mode == "numeric_ascending")
-        all_object_keys.sort((a, b) => a - b);
+        all_object_keys.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
       if (mode == "numeric_descending")
-        all_object_keys.sort((a, b) => b - a);
-
-      //Iterate over all_object_keys and append to new_object
-      for (var i = all_object_keys.length - 1; i >= 0; i--)
-        new_object = Object.assign({
-          [all_object_keys[i].toString()]: object[all_object_keys[i].toString()]
-        }, new_object);
+        all_object_keys.sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+      
+      new_object = Object.fromEntries(all_object_keys);
 
       //Return statement
       return new_object;

@@ -925,10 +925,12 @@ global.opened_popups = {};
       var actual_timestamp;
       var all_histories = Object.keys(entity_obj.options.history);
 
+      console.log(`TRUE 1`);
+
       //Set actual_timestamp
       if (context_menu_el)
         if (context_menu_el.parentElement.getAttribute("timestamp"))
-          actual_timestamp = parseInt(context_menu_el.parentElement.getAttribute("timestamp"));
+          actual_timestamp = timestampToInt(context_menu_el.parentElement.getAttribute("timestamp"));
 
       //Move context_menu_el back to popup_el; then repopulate bio
       popup_el.after(context_menu_el);
@@ -942,7 +944,7 @@ global.opened_popups = {};
           <img class = "bio-add-keyframe-icon plus-icon" draggable = "false" src = "./gfx/interface/plus_icon.png">
         </th>
       </tr>`);
-      bio_string.push(`<tr class = "no-select header-padding"><th></th><th></th></tr>`)
+      bio_string.push(`<tr class = "no-select header-padding"><th></th><th></th></tr>`);
 
       //Iterate over all_history_entries
       for (var i = 0; i < all_histories.length; i++) {
@@ -959,7 +961,7 @@ global.opened_popups = {};
       var all_table_entries = document.querySelectorAll(`#entity-ui-timeline-bio-table-${entity_id}.timeline-bio-table tr:not(.no-select) > td:last-child`);
 
       for (var i = 0; i < all_table_entries.length; i++) {
-        var local_timestamp = all_table_entries[i].parentElement.getAttribute("timestamp");
+        var local_timestamp = timestampToInt(all_table_entries[i].parentElement.getAttribute("timestamp"));
 
         all_table_entries[i].innerHTML += `
           <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/context_menu_icon.png">

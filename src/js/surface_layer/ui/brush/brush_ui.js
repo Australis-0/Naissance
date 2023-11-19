@@ -112,11 +112,14 @@
               for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
                 var local_value = brush_obj.mask_intersect_add[i];
 
-                var local_id = local_value.options.className;
+                var local_entity_id = local_value.options.className;
 
-                if (local_id != selected_id)
+                if (local_entity_id != selected_id)
                   if (local_value._latlngs) {
+
                     local_value._latlngs = difference(local_value._latlngs, current_union);
+                    createHistoryFrame(local_entity_id, date, {}, local_value._latlngs);
+
                     local_value.removeFrom(map);
                     local_value.addTo(map);
                   }
