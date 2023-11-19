@@ -444,7 +444,7 @@
         all_object_keys.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
       if (mode == "numeric_descending")
         all_object_keys.sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
-      
+
       new_object = Object.fromEntries(all_object_keys);
 
       //Return statement

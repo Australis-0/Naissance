@@ -12,20 +12,21 @@
     var entity_obj = getEntity(entity_id);
     var history_entry = getPolityHistory(entity_id, entry_date);
     var new_timestamp = getTimestamp(move_to_date);
+    var old_timestamp = getTimestamp(parseTimestamp(entry_date));
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
     //Move history_entry to new timestamp
     if (entity_obj)
       if (history_entry) {
         //Only change date of keyframe if it does not conflict with the same keyframe
-        if (history_entry.id != new_timestamp) {
+        if (history_entry.id != timestampToInt(new_timestamp)) {
           //Move to new_timestamp
           entity_obj.options.history[new_timestamp] = history_entry;
           var new_history_entry = entity_obj.options.history[new_timestamp];
 
           //Delete old timestamp; change ID
-          delete entity_obj.options.history[history_entry.id];
-          new_history_entry.id = new_timestamp;
+          delete entity_obj.options.history[old_timestamp];
+          new_history_entry.id = timestampToInt(new_timestamp);
 
           entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
 
@@ -35,8 +36,10 @@
 
             var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
 
-            new_history_entry_el.after(context_menu_el);
-            new_history_entry_el.after(context_menu_date_el);
+            if (new_history_entry_el) {
+              new_history_entry_el.after(context_menu_el);
+              new_history_entry_el.after(context_menu_date_el);
+            }
           }
         }
       } else {
@@ -77,7 +80,7 @@
       //Create new history object
       if (!entity_obj.options.history[date_string])
         entity_obj.options.history[date_string] = {
-          id: date_string,
+          id: timestampToInt(date_string),
 
           coords: actual_coords,
           options: {}

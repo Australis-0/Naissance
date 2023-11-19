@@ -31,6 +31,25 @@ function arabicise (arg0_number) {
 	return total;
 }
 
+function alphabetiseNumber (arg0_number) {
+	//Convert from parameters
+	var number = arg0_number.toString();
+
+	//Declare local instance variables
+	var alphabet_array = "abcdefghij";
+	var alphabetised_string = "";
+
+	for (var i = 0; i < number.length; i++)
+		if (!isNaN(parseInt(number[i]))) {
+			alphabetised_string += alphabet_array[parseInt(number[i])];
+		} else {
+			alphabetised_string += number[i];
+		}
+
+	//Return statement
+	return alphabetised_string;
+}
+
 function deordinalise (arg0_string) {
 	//Convert from parameters
 	var string = arg0_string;
@@ -118,6 +137,28 @@ function oldDeordinalise (arg0_string) {
 	}
 
 	return deordinalised_string.join(" ").trim();
+}
+
+function numeriseAlphabet (arg0_string) {
+	//Convert from parameters
+	var string = arg0_string.toString();
+
+	//Declare local instance variables
+	var alphabet_array = {
+		a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9
+	}
+	var alphabetised_string = "";
+
+	for (var i = 0; i < string.length; i++) {
+		if (alphabet_array[string[i]] != undefined) {
+			alphabetised_string += alphabet_array[string[i]];
+		} else {
+			alphabetised_string += string[i];
+		}
+	}
+
+	//Return statement
+	return alphabetised_string;
 }
 
 //parseYears() - Returns days/months/years as an object depending on the year amount

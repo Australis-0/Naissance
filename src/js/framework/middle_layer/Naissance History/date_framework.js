@@ -47,7 +47,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Guard clause
     if (typeof date == "string") {
-      if (date.startsWith("d_")) return date;
+      if (date.startsWith("t")) return date;
       date = parseInt(date);
     }
     if (!isNaN(parseInt(date))) return date;
@@ -57,12 +57,15 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var leap_years = leapYearsBefore(date.year);
     var year_minutes = (leap_years*366 + (date.year - leap_years)*365)*24*60;
 
-    //Return statement
-    return `d_${Math.floor(returnSafeNumber(year_minutes) +
+    var timestamp_number = Math.floor(returnSafeNumber(year_minutes) +
       returnSafeNumber(daysInMonths(date)*24*60) +
       returnSafeNumber(date.day*24*60) +
       returnSafeNumber(date.hour*60) +
-      returnSafeNumber(date.minute))}`;
+      returnSafeNumber(date.minute));
+    timestamp_number = alphabetiseNumber(timestamp_number);
+
+    //Return statement
+    return `${(timestamp_number >= 0) ? "tz" : "t"}_${timestamp_number}`;
   }
 
   function isLeapYear (arg0_year) {
@@ -119,8 +122,10 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     //Guard clause
     if (typeof timestamp == "object")
       return timestamp;
-    if (typeof timestamp == "string")
-      timestamp = parseInt(timestamp.toString().replace("d_", ""));
+    if (typeof timestamp == "string") {
+      timestamp = timestamp.toString().replace("t_", "").replace("tz_", "");
+      timestamp = parseInt(numeriseAlphabet(timestamp));
+    }
 
     //Declare local instance variables
     var local_date = {};
@@ -131,10 +136,11 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Calculate years
 
-    var leap_years = leapYearsBefore(local_date.year);
 
-    local_date.year = Math.floor(timestamp/(365.2425*24*60));
+    local_date.year = Math.floor(timestamp/(365.25*24*60));
     timestamp -= timestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
+
+    var leap_years = leapYearsBefore(local_date.year);
 
     //Calculate months
     var number_of_days = timestamp/(24*60);
@@ -143,7 +149,10 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     timestamp -= daysInMonths({ year: local_date.year, month: local_date.month })*24*60;
 
     //Calculate months
-    if (local_date.month > 12) local_date.month = 1;
+    if (local_date.month > 12) {
+      local_date.year++;
+      local_date.month = 1;
+    }
 
     //Calculate days
     local_date.day = Math.floor(timestamp/(24*60));
@@ -165,7 +174,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var timestamp = arg0_timestamp;
 
     //Return statement
-    return parseInt(timestamp.toString().replace("d_", ""));
+    return parseInt(
+      numeriseAlphabet(timestamp.toString().replace("t_", "").replace("tz_", ""))
+    );
   }
 }
 

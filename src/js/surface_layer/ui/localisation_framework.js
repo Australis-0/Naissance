@@ -15,8 +15,6 @@
     var new_land_area = getPolityArea(entity_id, new_history_frame.id);
     var new_options = new_history_frame.options;
 
-    console.log(old_history_frame, new_history_frame);
-
     var entity_name = getEntityName(entity_obj, new_history_frame.id);
     var land_percentage_change = (Math.round((1 - (old_land_area/new_land_area))*100*100)/100/100);
 
@@ -70,8 +68,6 @@
         if (land_percentage_change > 0)
           history_string.push(`${entity_name} gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`);
       }
-
-    console.log(history_string);
 
     //Return statement
     return (history_string.length > 0) ? `<tr timestamp = ${new_history_frame.id}>
