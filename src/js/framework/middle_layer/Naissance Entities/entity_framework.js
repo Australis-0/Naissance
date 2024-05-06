@@ -34,10 +34,6 @@
     //Close popups relating to entity first
     closeEntityUI(entity_id);
 
-    //finishEntity() if entity_cache has something in it first
-    if (entity_cache.length > 0)
-      current_entity_class = finishEntity();
-
     //Delete entity now
     try {
       clearBrush();
@@ -85,14 +81,12 @@
     //Close popups relating to entity first
     closeEntityUI(entity_id);
 
-    //finishEntity() if entity_cache has something in it
+    //finishEntity() if current_union has something in it
     try {
       if (window.current_union)
         finishEntity();
     } catch {}
 
-    console.log(`Editing ${entity_id}`);
-    console.log(entity_obj.options);
     if (entity_obj) {
       window.editing_entity = entity_id;
       window.polity_options = entity_obj.options;

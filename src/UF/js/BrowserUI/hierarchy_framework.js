@@ -1,32 +1,55 @@
+//Hierarchies - Requires Sortable.js to function.
+
 //Initialise Sidebar functions
 {
-  function initSidebar () {
+  /*
+    initHierarchy() - Initialises a hierarchy within a given HTMLElement.
+    arg0_element: (HTMLElement) - The context menu element representing the hierarchy.
+    arg1_context_menu_element: (HTMLElement) - The subcontext menu for the hierarchy to open/close, if it exists
+    arg2_storage_variable: (Object) - The storage object which to reference for storing groups/items.
+  */
+  function initHierarchy (arg0_element, arg1_context_menu_element, arg2_storage_variable) { //[WIP] - Document
+    //Convert from parameters
+    var sidebar_el = arg0_element;
+    var context_menu_el = arg1_context_menu_element;
+    var storage_variable = arg2_storage_variable;
+
+    //Declare local instance variables
+    var add_group_btn_el = sidebar_el.querySelector(`#add-group-button`);
+
+    //Declare globals
+    if (!window.hierarchies)
+      window.hierarchies = [];
+    window[storage_variable] = {};
+    window.hierarchies.push(window[storage_variable]);
+
     //Button handlers
-    document.getElementById("hierarchy-create-new-group").onclick = function () {
-      createGroup();
+    add_group_btn_el.onclick = function () {
+      createGroup(sidebar_el);
     };
 
     //Sidebar click handler
-    var sidebar_container_el = document.getElementById("hierarchy");
-
-    sidebar_container_el.onclick = function (e) {
-      //Context menu should be closed if the context menu itself or the button isn't a parent in the path
-      if (
-        !arrayHasElementAttribute(e.composedPath(), "id", "hierarchy-context-menu") &&
-        !arrayHasElementAttribute(e.composedPath(), "class", "group-context-menu-icon")
-      ) {
-        closeSidebarContextMenu();
-        closeSidebarSubcontextMenu();
-      }
-    };
+    if (context_menu_el)
+      sidebar_el.onclick = function (e) {
+        //Context menu should be closed if the context menu itself or the button isn't a parent in the path
+        if (
+          !arrayHasElementAttribute(e.composedPath(), "id", "hierarchy-context-menu") &&
+          !arrayHasElementAttribute(e.composedPath(), "class", "group-context-menu-icon")
+        )
+          closeHierarchyContextMenu(context_menu_el);
+      };
 
     //Initialise sidebar functions
-    refreshSidebar();
+    initialiseHierarchy(sidebar_el);
   }
 }
 
-//Sidebar Context Menu UI functions
+//Hierarchy Context menu UI functions
 {
+  /*
+    closeHierarchyContextMenu() - Invokes hideElement() on an HTMLElement representing a context menu.
+    arg0_context_menu_element: (HTMLElement) - The element to hide.
+  */
   function closeSidebarSubcontextMenu () {
     //Declare local instance variables
     var hierarchy_subcontext_el = document.getElementById("hierarchy-context-menu-two");
@@ -34,46 +57,36 @@
     hideElement(hierarchy_subcontext_el);
   }
 
-  //printSidebarSubcontextMenu() - Prints the current selected group ID for a variety of different modes: "mask"
-  function printSidebarSubcontextMenu (arg0_element, arg1_group_id, arg2_mode) {
+  /*
+    printHierarchyContextMenu() - Displays a hierarchy context menu.
+    arg0_element: (HTMLElement) - The HTML element representing the hierarchy.
+    arg1_context_menu_element: (HTMLElement) - The div container to set the context menu element in.
+    arg2_group_id: (String) - The ID of the group for which to print the context menu.
+    arg3_html: (String) - The innerHTML to pass to the context menu.
+  */
+  function printSidebarSubcontextMenu (arg0_element, arg1_context_menu_element, arg2_group_id, arg3_html) {
     //Convert from parameters
-    var btn_el = arg0_element;
-    var group_id = arg1_group_id;
-    var mode = arg2_mode;
+    var hierarchy_el = arg0_context_menu_element;
+    var hierarchy_context_el = arg1_context_menu_element;
+    var group_id = arg2_group_id;
+    var html = arg3_html;
 
     //Declare local instance variables
-    var group_el = document.querySelector(`div.group[id="${group_id}"]`);
-    var hierarchy_container_el = document.querySelector(`#hierarchy`);
-    var hierarchy_subcontext_el = document.getElementById("hierarchy-context-menu-two");
-    var offset_top = group_el.offsetTop - hierarchy_container_el.scrollTop;
+    var group_el = hierarchy_el.querySelector(`div.group[id="${group_id}"]`);
+    var offset_top = group_el.offsetTop - hierarchy_context_el.scrollTop;
 
-    //Check mode
+    //Check if group exists
     if (group_el) {
-      showElement(hierarchy_subcontext_el);
-      hierarchy_subcontext_el.setAttribute("style", `top: calc(${offset_top}px);`);
+      showElement(hierarchy_context_el);
+      hierarchy_context_el.setAttribute("style", `top: calc(${offset_top}px);`);
 
-      if (mode == "mask") {
-        hierarchy_subcontext_el.innerHTML = `
-          <div id = "mask-context-menu-text" class = "context-menu-text">
-            <b>Set Mask:</b><br>
-            <select id = "group-mask-${group_id}">
-              <option value = "add">Add (Brush > Mask)</option>
-              <option value = "intersect_add">Intersect Add (Brush > Intersection)</option>
-              <option value = "intersect_overlay">Intersect Overlay (Brush in Intersection)</option>
-              <option value = "subtract">Subtract (Mask > Brush)</option>
-              <option value = "clear">None</option>
-            </select>
-          </div>
-          <div id = "mask-context-menu-confirm" class = "context-menu-button confirm" onclick = "setGroupMask('${group_id}');">
-            <img src = "gfx/interface/checkmark_icon.png" class = "icon small negative" draggable = "false"> Confirm
-          </div>
-        `;
-      }
+      hierarchy_context_el.innerHTML = html;
     }
   }
 }
 
-//Sidebar UI functions
+//[WIP] - Sloppy salvaged code to be brute-force debugged
+//Internal helper functions
 {
   function closeSidebarContextMenu () { //DONE
     //Declare local instance variables

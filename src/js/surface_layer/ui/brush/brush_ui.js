@@ -143,7 +143,6 @@
             }
           }
 
-
           //Iterate over all mask_intersect_overlay entities
           if (brush_obj.mask_intersect_overlay.length > 0) {
             var combined_union = getTurfObject(brush_obj.mask_intersect_overlay[0]._latlngs);

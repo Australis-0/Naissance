@@ -4,8 +4,6 @@ window.fs = require("fs");
 //Brush variables
 window.current_union;
 window.cursor;
-window.entity_cache = [];
-window.polity_index = -1;
 window.selected_layer = "polities";
 
 //Brush settings

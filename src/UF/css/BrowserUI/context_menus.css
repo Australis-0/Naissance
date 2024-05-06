@@ -1,0 +1,378 @@
+/* -- Font imports -- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Jersey+10&family=Karla:ital,wght@0,200..800;1,200..800&display=swap');
+
+/* -- General Context Menu Styling -- */
+.context-menu {
+  border: 1px solid black; /* -- Temp styling -- */
+  border-radius: 0.75rem;
+
+  padding: 0.25rem;
+}
+
+.context-menu td {
+  /*border: 1px solid black;*/
+}
+.context-menu td > div {
+  padding: 0.5rem;
+}
+
+.context-menu-cell {
+  /* -- Default styling -- */
+  font-family: "Karla";
+
+  input {
+    font-family: "Barlow";
+
+    border: 0px solid rgba(0, 0, 0, 0);
+    border-bottom: 1px solid black;
+
+    transition: all 0.5s ease;
+  }
+  input:focus {
+    outline: none;
+    border-bottom: 2px solid rgb(118, 188, 92);
+  }
+
+  /* -- Main element formatting -- */
+  .header {
+    font-family: "Barlow";
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  /* -- BIUF formatting -- */
+  .biuf-input {
+    border: 1px solid black;
+    margin-top: 0.2rem;
+  }
+
+  /* -- Button formatting -- */
+  .button {
+    border: 1px solid black;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    font-weight: 300;
+
+    transition: all 0.5s ease;
+  }
+  .button:hover {
+    background-color: black;
+    color: white;
+
+    cursor: pointer;
+  }
+
+  /* -- Checkbox formatting -- */
+  input[type="checkbox"] {
+    position: relative;
+    top: 0.125rem;
+
+    margin-right: 0.4rem;
+  }
+}
+
+/* -- BIUF Inputs -- */
+.biuf-input {
+  position: relative;
+
+  min-width: 10rem;
+  padding-bottom: 0.1rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  padding-top: 0.1rem;
+}
+.biuf-toolbar {
+  position: absolute;
+
+  top: -30px;
+  left: 0;
+  display: none;
+  background-color: rgb(0, 0, 0, 0.7);
+  padding: 5px;
+}
+
+/* -- WYSIWYG Editor -- */
+.wysiwyg-editor {
+  border: 1px solid black;
+  min-height: 18rem;
+  width: 100%;
+
+  margin: 0.5rem 0;
+
+  .toolbar {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+
+    top: -1.15rem;
+
+    .line {
+      display: flex;
+
+      border-bottom: 1px solid #e2e2e2;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .box {
+      display: flex;
+
+      border-left: 1px solid #e2e2e2;
+
+      .editor-button {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: .2s ease all;
+
+        &:hover, &.active {
+          background-color: #e1e1e1;
+          cursor: pointer;
+        }
+        &.icon img {
+          padding: 9px;
+          width: 15px;
+
+          box-sizing: content-box;
+        }
+        &.icon.smaller img {
+          width: 16px;
+        }
+        &.has-submenu {
+          padding: 0 10px;
+          width: 20px;
+
+          &::after {
+            position: absolute;
+
+            right: 4px;
+
+            content: "";
+            width: 6px;
+            height: 6px;
+
+            background-image: url("https://img.icons8.com/ios-glyphs/30/000000/chevron-down.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+          }
+
+          .submenu {
+            display: none;
+            position: absolute;
+
+            top: 34px;
+            left: -1px;
+            z-index: 10;
+
+            background-color: #FFF;
+            border: 1px solid #b5b5b5;
+            border-top: none;
+
+            .button {
+              width: 39px;
+            }
+            &:hover {
+              display: block;
+            }
+          }
+
+          &:hover .submenu {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+  .content-area {
+    line-height: 1.5;
+    padding: 15px 12px;
+
+    .visual-view {
+      outline: none;
+      min-height: 12rem;
+
+      p {
+        margin: 12px 0;
+      }
+    }
+
+    .html-view {
+      width: 100%;
+      height: 200px;
+
+      border: none;
+      display: none;
+      outline: none;
+      resize: none;
+    }
+  }
+
+  .modal {
+    display: none;
+    z-index: 40;
+
+    .modal-wrapper {
+      position: fixed;
+
+      left: 50%;
+      top: 50%;
+
+      background-color: white;
+      min-height: 10rem;
+      padding: 1rem;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      width: 20rem;
+      z-index: 41;
+
+      .close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+
+        cursor: pointer;
+      }
+
+      .modal-content {
+        flex-direction: column;
+
+        h3 {
+          margin-top: 0;
+        }
+
+        input {
+          margin: 1rem 0;
+          padding: .5rem;
+        }
+        input[type="text"] {
+          width: calc(100% - 1rem);
+        }
+
+        .row label {
+          margin-left: .5rem;
+        }
+
+        button {
+          background-color: #D2434F;
+          border: 0;
+          color: white;
+
+          cursor: pointer;
+          padding: .5rem 1.2rem;
+        }
+      }
+    }
+  }
+
+  .modal-bg {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* -- Colour picker -- */
+.colour-picker-brightness {
+  display: inline;
+  position: absolute;
+
+  border-radius: 50%;
+  background: rgb(0, 0, 0);
+  height: 8.25rem;
+  width: 8.25rem;
+
+  opacity: 0;
+}
+.colour-picker-container {
+  background: none;
+  border-radius: 50%;
+  height: 12rem;
+  width: 15rem;
+
+  opacity: 1;
+}
+.colour-picker-container img {
+  opacity: 1;
+}
+.colour-picker-hue {
+  position: absolute;
+
+  border-radius: 50%;
+  background: black;
+  height: 8.25rem;
+  width: 8.25rem;
+}
+.colour-picker-mask {
+  position: relative;
+  bottom: 2rem;
+
+  border-radius: 50%;
+  background: none;
+  height: 8.25rem;
+  width: 8.25rem;
+}
+.colour-picker-cursor {
+  position: relative;
+
+  border-radius: 50%;
+  height: 12px;
+  width: 12px;
+
+  border: 1px solid black;
+  box-shadow: 0px 0px 1px 1px white;
+  left: calc((8.25rem/2) - 6px);
+  top: calc((8.25rem/2) - 6px - 1.15rem);
+
+  transition: left 0.25s ease, top 0.25s ease, background 0.25s ease;
+}
+
+.brightness-range-container {
+  display: inline-block;
+  position: relative;
+  width: 200%;
+
+  bottom: calc(3.5rem);
+}
+.opacity-range-container {
+  position: relative;
+  bottom: calc(3.5rem + 12px);
+}
+.rgb-inputs {
+  position: relative;
+
+  bottom: 10rem;
+  left: 9rem;
+  height: 3.25rem;
+
+  font-size: 1rem;
+}
+.rgb-inputs > input {
+  width: 2rem;
+
+  color: black;
+  font-size: 1rem;
+}
+.rgb-inputs > input::-webkit-outer-spin-button, .rgb-inputs > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.opacity-range-container, .brightness-range-container {
+  position: relative;
+  bottom: 4.5rem;
+  margin: 0px;
+
+  .small-header {
+    margin-left: 0.5rem;
+  }
+}
