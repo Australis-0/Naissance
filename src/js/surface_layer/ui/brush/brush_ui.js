@@ -5,11 +5,11 @@
       //Set cursor
       {
         //Remove previous cursor
-        if (window.cursor)
-          cursor.remove();
+        if (main.brush.cursor)
+          main.brush.cursor.remove();
 
         //Set new cursor
-        cursor = LGeo.circle(e.latlng, brush.radius, {
+        main.brush.cursor = LGeo.circle(e.latlng, main.brush.radius, {
           color: RGBToHex(0, 0, 0),
           dashArray: 4,
           fill: false,
@@ -20,23 +20,23 @@
       //Left click to paint
       if (mouse_pressed) {
         if (window.left_mouse) {
-          //Initialise current_union if not defined
-          if (!window.current_union)
-            window.current_union = cursor;
+          //Initialise main.brush.current_path if not defined
+          if (!main.brush.current_path)
+            main.brush.current_path = main.brush.cursor;
 
-          current_union = union(current_union, cursor);
+           main.brush.current_path = union( main.brush.current_path, main.brush.cursor);
 
-          brush.brush_change = true;
+          main.brush.brush_change = true;
         } else if (window.right_mouse) {
-          //Only delete if current_union exists
-          if (window.current_union)
+          //Only delete if  main.brush.current_path exists
+          if (main.brush.current_path)
             try {
-              current_union = difference(current_union, cursor);
+               main.brush.current_path = difference( main.brush.current_path, main.brush.cursor);
 
               brush.brush_change = true;
             } catch {
               //The selection has been completely deleted
-              delete window.current_union;
+              delete window. main.brush.current_path;
             }
         }
 
@@ -48,9 +48,9 @@
     //Brush cursor outline
     L.DomEvent.on(L.DomUtil.get("map"), "mousewheel", function (e) {
       if (e.wheelDeltaY < 0)
-        brush.radius = brush.radius*1.1;
+        main.brush.radius = main.brush.radius*1.1;
       if (e.wheelDeltaY > 0)
-        brush.radius = brush.radius*0.9;
+        main.brush.radius = main.brush.radius*0.9;
     });
   }
 
@@ -60,21 +60,21 @@
     var selected_id = "";
 
     if (brush_obj.brush_change) {
-      if (window.current_union) {
-        if (window.selection)
-          selected_id = window.selection.options.className;
+      if ( main.brush.current_path) {
+        if (main.brush.current_selection)
+          selected_id = main.brush.current_selection.options.className;
 
         //Mask processing
         {
           //Iterate over all mask_add entities
-          for (var i = 0; i < brush_obj.mask_add.length; i++) {
-            var local_value = brush_obj.mask_add[i];
+          for (var i = 0; i < main.brush.masks.add.length; i++) {
+            var local_value = main.brush.masks.add[i];
 
             var local_id = local_value.options.className;
 
             if (local_id != selected_id)
               if (local_value._latlngs) {
-                var local_coords = difference(local_value._latlngs, current_union);
+                var local_coords = difference(local_value._latlngs,  main.brush.current_path);
 
                 local_value.setLatLngs(local_coords);
 
@@ -84,11 +84,11 @@
           }
 
           //Iterate over all mask_intersect_add entities
-          if (brush_obj.mask_intersect_add.length > 0) {
-            var combined_union = getTurfObject(brush_obj.mask_intersect_add[0]._latlngs);
+          if (main.brush.masks.intersect_add.length > 0) {
+            var combined_union = getTurfObject(main.brush.masks.intersect_add[0]._latlngs);
 
-            for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
-              var local_value = brush_obj.mask_intersect_add[i];
+            for (var i = 0; i < main.brush.masks.intersect_add.length; i++) {
+              var local_value = main.brush.masks.intersect_add[i];
 
               var local_id = local_value.options.className;
 
@@ -98,26 +98,26 @@
             }
 
             //Fetch the area that perfectly overlaps with the intersection
-            current_union = intersection(current_union, combined_union);
+             main.brush.current_path = intersection( main.brush.current_path, combined_union);
 
             //Overwrite intersection area
-            if (current_union) {
+            if ( main.brush.current_path) {
               //Buffer by 1m on a deep copy to make sure we don't have issues
-              var old_current_union = JSON.parse(JSON.stringify(current_union));
-              current_union = buffer(current_union, {
+              var old_current_path = JSON.parse(JSON.stringify(main.brush.current_path));
+              main.brush.current_path = buffer(main.brush.current_path, {
                 radius: 0.001,
                 units: "kilometers"
               });
 
-              for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
-                var local_value = brush_obj.mask_intersect_add[i];
+              for (var i = 0; i < main.brush.masks.intersect_add.length; i++) {
+                var local_value = main.brush.masks.intersect_add[i];
 
                 var local_entity_id = local_value.options.className;
 
                 if (local_entity_id != selected_id)
                   if (local_value._latlngs) {
 
-                    local_value._latlngs = difference(local_value._latlngs, current_union);
+                    local_value._latlngs = difference(local_value._latlngs, main.brush.current_path);
                     createHistoryFrame(local_entity_id, date, {}, local_value._latlngs);
 
                     local_value.removeFrom(map);
@@ -126,29 +126,29 @@
               }
 
               //Push selection to mask now in order to make sure it masks the entire group
-              if (window.selection)
-                brush_obj.mask_intersect_add.push({
+              if (main.brush.current_selection)
+                main.brush.masks.intersect_add.push({
                   selection: true,
 
-                  options: window.selection.options,
-                  _latlngs: old_current_union
+                  options: main.brush.current_selection.options,
+                  _latlngs: old_current_path
                 });
 
-              for (var i = 0; i < brush_obj.mask_intersect_add.length; i++) {
-                var local_value = brush_obj.mask_intersect_add[i];
+              for (var i = 0; i < main.brush.masks.intersect_add.length; i++) {
+                var local_value = main.brush.masks.intersect_add[i];
 
                 if (local_value.selection)
-                  current_union = union(local_value._latlngs, current_union);
+                  main.brush.current_path = union(local_value._latlngs, main.brush.current_path);
               }
             }
           }
 
           //Iterate over all mask_intersect_overlay entities
-          if (brush_obj.mask_intersect_overlay.length > 0) {
-            var combined_union = getTurfObject(brush_obj.mask_intersect_overlay[0]._latlngs);
+          if (main.brush.masks.intersect_overlay.length > 0) {
+            var combined_union = getTurfObject(main.brush.masks.intersect_overlay[0]._latlngs);
 
-            for (var i = 0; i < brush_obj.mask_intersect_overlay.length; i++) {
-              var local_value = brush_obj.mask_intersect_overlay[i];
+            for (var i = 0; i < main.brush.masks.intersect_overlay.length; i++) {
+              var local_value = main.brush.masks.intersect_overlay[i];
 
               var local_id = local_value.options.className;
 
@@ -157,25 +157,25 @@
                   combined_union = union(local_value._latlngs, combined_union);
             }
 
-            current_union = intersection(current_union, combined_union);
+            main.brush.current_path = intersection(main.brush.current_path, combined_union);
           }
 
           //Iterate over all mask_subtract entities
-          for (var i = 0; i < brush_obj.mask_subtract.length; i++) {
-            var local_value = brush_obj.mask_subtract[i];
+          for (var i = 0; i < main.brush.masks.subtract.length; i++) {
+            var local_value = main.brush.masks.subtract[i];
 
             var local_id = local_value.options.className;
 
             if (local_id != selected_id)
               if (local_value._latlngs)
-                current_union = difference(current_union, local_value._latlngs);
+                main.brush.current_path = difference(main.brush.current_path, local_value._latlngs);
           }
         }
 
         //Simplify processing
-        if (brush_obj.auto_simplify_when_editing)
-          if (current_union)
-            current_union = simplify(current_union, window.simplify_tolerance);
+        if (main.brush.auto_simplify_when_editing)
+          if (main.brush.current_path)
+            main.brush.current_path = simplify(main.brush.current_path, main.brush.simplify_tolerance);
 
         //Set new poly now
         refreshBrush();
@@ -189,15 +189,15 @@
   function refreshBrush () {
     //Refresh polity
     {
-      if (window.selection)
-        window.selection.remove();
-      if (window.current_union)
-        window.selection = L.polygon(current_union, window.polity_options).addTo(map);
+      if (main.brush.current_selection)
+        main.brush.current_selection.remove();
+      if (main.brush.current_path)
+        main.brush.current_selection = L.polygon(main.brush.current_path, main.brush.polity_options).addTo(map);
 
       //Bind tooltip to selection
-      if (window.selection) {
-        L.setOptions(selection, window.polity_options);
-        selection.on("click", function (e) {
+      if (main.brush.current_selection) {
+        L.setOptions(main.brush.current_selection, main.brush.polity_options);
+        main.brush.current_selection.on("click", function (e) {
           entityUI(e, true);
         });
       }

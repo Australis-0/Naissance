@@ -8,8 +8,8 @@
     var deleted = false;
 
     //Iterate over all layers to delete
-    for (var i = 0; i < window.layers.length; i++) {
-      var local_groups = window[`${layers[i]}_groups`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_groups = window[`${main.all_layers[i]}_groups`];
 
       var all_local_groups = Object.keys(local_groups);
 
@@ -219,12 +219,12 @@
     if (typeof group_id == "object") return group_id;
 
     //Iterate over all layers for group ID
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_groups`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer = window[`${main.all_layers[i]}_groups`];
 
       if (local_layer[group_id])
         if (options.return_layer) {
-          return layers[i];
+          return main.all_layers[i];
         } else {
           return (!options.return_key) ? local_layer[group_id] : group_id;
         }
@@ -277,8 +277,8 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Iterate over all layers; groups for subgroups
-    for (var i = 0; i < layers.length; i++) {
-      var local_key = `${layers[i]}_groups`;
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_key = `${main.all_layers[i]}_groups`;
 
       var local_layer = window[local_key];
 
@@ -333,7 +333,7 @@
         removeEntityMask(entity_obj);
 
         if (new_group.mask)
-          window.brush[`mask_${new_group.mask}`].push(entity_obj);
+          main.brush.masks[new_group.mask].push(entity_obj);
       }
     }
   }

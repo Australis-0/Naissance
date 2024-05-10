@@ -7,20 +7,20 @@
     //Clear brush; reload brush in masks
     clearBrushInMasks();
 
-    if (window.selection) {
-      if (window.selection.options.className)
+    if (main.brush.current_selection) {
+      if (main.brush.current_selection.options.className)
         for (var i = 0; i < reserved.mask_types.length; i++) {
-          var local_key = `mask_${reserved.mask_types[i]}`;
+          var local_key = reserved.mask_types[i];
 
-          brush_obj[local_key] = reloadEntityInArray(brush_obj[local_key], window.selection.options.className);
+          brush_obj.masks[local_key] = reloadEntityInArray(brush_obj.masks[local_key], main.brush.current_selection.options.className);
         }
 
-      selection.remove();
-      delete window.selection;
+      main.brush.current_selection.remove();
+      delete main.brush.current_selection;
     }
 
-    delete window.current_union;
-    delete window.editing_entity;
+    delete main.brush.current_path;
+    delete main.brush.editing_entity;
   }
 
   /*
@@ -33,10 +33,7 @@
   */
   function getBrush () {
     //Declare local instance variables
-    var brush_obj = window.brush;
-
-    //Set extraneous brush options
-    brush_obj.simplify_tolerance = window.simplify_tolerance;
+    var brush_obj = main.brush;
 
     //Return statement
     return brush_obj;

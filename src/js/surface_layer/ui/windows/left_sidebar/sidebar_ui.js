@@ -157,7 +157,7 @@
     var local_el = document.createElement("div");
     var local_entities_el = document.createElement("div");
     var local_groups = window[`${layer}_groups`];
-    var local_layer = window[`${layer}_layer`];
+    var local_layer = main.layers[layer];
     var local_subgroups_el = document.createElement("div");
 
     var group_obj = local_groups[group_id];
@@ -286,7 +286,7 @@
 
     //Declare local instance variables
     var local_groups = window[`${layer}_groups`];
-    var local_layer = window[`${layer}_layer`];
+    var local_layer = main.layers[layer];
 
     var all_local_groups = Object.keys(local_groups);
     var grouped_entities = [];
@@ -480,22 +480,22 @@
       sidebar_el.innerHTML = "";
 
     //Create all layer elements
-    for (var i = 0; i < layers.length; i++) {
-      var layer_el = sidebar_el.querySelectorAll(`[id='${layers[i]}']`);
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var layer_el = sidebar_el.querySelectorAll(`[id='${main.all_layers[i]}']`);
 
       //Create a new layer container element if only if it doesn't already exist
       if (layer_el.length == 0) {
         var local_header_el = document.createElement("input");
         var local_layer_el = document.createElement("div");
 
-        local_layer_el.setAttribute("id", layers[i]);
+        local_layer_el.setAttribute("id", main.all_layers[i]);
         local_layer_el.setAttribute("class", "layer");
-        local_layer_el.setAttribute("onclick", `selectLayer('${layers[i]}');`);
+        local_layer_el.setAttribute("onclick", `selectLayer('${main.all_layers[i]}');`);
 
         //Append header
         local_header_el.setAttribute("class", "layer-input");
 
-        local_header_el.value = layers[i];
+        local_header_el.value = main.all_layers[i];
         local_layer_el.appendChild(local_header_el);
 
         //Append to sidebar_el
@@ -504,14 +504,14 @@
     }
 
     //Iterate over all window.layers
-    for (var i = 0; i < layers.length; i++) {
-      var local_groups = window[`${layers[i]}_groups`];
-      var local_layer = window[`${layers[i]}_layer`];
-      var local_layer_el = sidebar_el.querySelector(`[id='${layers[i]}']`);
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_groups = window[`${main.all_layers[i]}_groups`];
+      var local_layer = main.layers[main.all_layers[i]];
+      var local_layer_el = sidebar_el.querySelector(`[id='${main.all_layers[i]}']`);
 
       var all_local_groups = Object.keys(local_groups);
       var first_layer_groups = [];
-      var ungrouped_entities = getUngroupedEntities(layers[i]);
+      var ungrouped_entities = getUngroupedEntities(main.all_layers[i]);
 
       //Check for first layer groups
       for (var x = 0; x < all_local_groups.length; x++) {
@@ -524,7 +524,7 @@
 
       //Initialise first layer group HTML with entities
       for (var x = 0; x < first_layer_groups.length; x++) {
-        var local_group_el = getRecursiveGroupElement(layers[i], first_layer_groups[x]);
+        var local_group_el = getRecursiveGroupElement(main.all_layers[i], first_layer_groups[x]);
 
         if (!local_layer_el.querySelector(`[id='${first_layer_groups[x]}']`))
           local_layer_el.appendChild(local_group_el);
@@ -532,7 +532,7 @@
 
       //Append ungrouped entities to end of list
       for (var x = 0; x < ungrouped_entities.length; x++) {
-        var local_entity_el = createEntityElement(layers[i], ungrouped_entities[x]);
+        var local_entity_el = createEntityElement(main.all_layers[i], ungrouped_entities[x]);
 
         if (!local_layer_el.querySelector(`[id='${ungrouped_entities[x]}']`))
           local_layer_el.appendChild(local_entity_el);
@@ -566,7 +566,7 @@
     });
 
     //Select current selected layer
-    selectLayer(selected_layer);
+    selectLayer(main.brush.selected_layer);
   }
 
   function selectLayer (arg0_layer) {
@@ -637,8 +637,8 @@
     var do_not_refresh = arg0_do_not_refresh;
 
     //Iterate over all layers
-    for (var i = 0; i < layers.length; i++)
-      updateGroups(layers[i], do_not_refresh);
+    for (var i = 0; i < main.all_layers.length; i++)
+      updateGroups(main.all_layers[i], do_not_refresh);
   }
 
   function updateGroups (arg0_layer, arg1_do_not_refresh) { //[WIP] - Add layer elements

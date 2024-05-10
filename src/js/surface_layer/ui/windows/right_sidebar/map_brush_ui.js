@@ -23,7 +23,7 @@
   function printBrush () {
     //Declare local instance variables
     var brush_info_el = document.getElementById("brush-information-container");
-    var brush_obj = getBrush();
+    var brush_obj = main.brush;
 
     //Format brush_string
     var brush_string = [];
@@ -34,16 +34,16 @@
     //Additional information handler
     {
       //Selected entity editing
-      if (window.editing_entity) {
-        var entity_name = getEntityName(window.editing_entity, window.date);
+      if (main.brush.editing_entity) {
+        var entity_name = getEntityName(main.brush.editing_entity, window.date);
 
         brush_string.push(`Selected Entity: ${entity_name}`);
       }
 
       //Simplification handler
-      if (brush_obj.auto_simplify_when_editing)
+      if (main.brush.auto_simplify_when_editing)
         brush_string.push(`Auto-Simplify`);
-      if (brush_obj.simplify_tolerance)
+      if (main.brush.auto_simplify_when_editing && brush_obj.simplify_tolerance)
         brush_string.push(`Simplify Tolerance: ${parseNumber(brush_obj.simplify_tolerance, { display_float: true })}`);
     }
 
@@ -90,17 +90,17 @@
       var auto_simplify_when_editing_el = document.getElementById("auto-simplify-when-editing");
       var simplify_tolerance_el = document.getElementById("simplify-tolerance");
 
-      simplify_tolerance_el.value = parseInt(window.simplify_tolerance*Math.pow(10, 3));
+      simplify_tolerance_el.value = parseInt(main.brush.simplify_tolerance*Math.pow(10, 3));
 
       //Set listener events
       auto_simplify_when_editing_el.onclick = function (e) {
         //Set global flag
-        window.brush.auto_simplify_when_editing = e.target.checked;
+        main.brush.auto_simplify_when_editing = e.target.checked;
       };
 
       onRangeChange(simplify_tolerance_el, function (e) {
         //Set global flag
-        window.simplify_tolerance = getSimplifyTolerance(e.target.value);
+        main.brush.simplify_tolerance = getSimplifyTolerance(e.target.value);
       });
     }
   }

@@ -33,7 +33,7 @@
     //Mode handling
     if (mode == "add") {
       if (group_el_class) {
-        //Get all selected entities and add to window.brush.mask_add
+        //Get all selected entities and add to main.brush.masks.mask_add
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_add = appendArrays(brush.mask_add, all_selected_entities);
@@ -41,7 +41,7 @@
       }
     } else if (mode == "intersect_add") {
       if (group_el_class) {
-        //Get all selected entities and add to window.brush.mask_add
+        //Get all selected entities and add to main.brush.masks.intersect_add
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_intersect_add = appendArrays(brush.mask_intersect_add, all_selected_entities);
@@ -49,7 +49,7 @@
       }
     } else if (mode == "intersect_overlay") {
       if (group_el_class) {
-        //Get all selected entities and add to window.brush.mask_add
+        //Get all selected entities and add to main.brush.masks.intersect_overlay
         var all_selected_entities = getGroupEntities(group_obj.id);
 
         brush.mask_intersect_overlay = appendArrays(brush.mask_intersect_overlay, all_selected_entities);
@@ -57,9 +57,10 @@
       }
     } else if (mode == "subtract") {
       if (group_el_class) {
+        //Get all selected entities and add to main.brush.masks.subtract
         var all_selected_entities = getGroupEntities(group_obj.id);
 
-        brush.mask_subtract = appendArrays(brush.mask_subtract, all_selected_entities);
+        main.brush.mask_subtract = appendArrays(main.brush.mask_subtract, all_selected_entities);
         group_obj.mask = "subtract";
       }
     }
@@ -76,7 +77,7 @@
 
   function clearBrushInMasks () {
     for (var i = 0; i < reserved.mask_types.length; i++) {
-      var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+      var local_mask = main.brush.masks[reserved.mask_types[i]];
 
       //Remove all .selection from masks
       for (var x = local_mask.length - 1; x >= 0; x--) {
@@ -106,7 +107,7 @@
 
     //Iterate over all mask types
     for (var i = 0; i < reserved.mask_types.length; i++) {
-      var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+      var local_mask = main.brush.masks[reserved.mask_types[i]];
 
       //Remove entity_id from mask
       for (var x = local_mask.length - 1; x >= 0; x--) {
@@ -146,7 +147,7 @@
 
       //Get all selected_entities and remove from all masks
       for (var i = 0; i < reserved.mask_types.length; i++) {
-        var local_mask = window.brush[`mask_${reserved.mask_types[i]}`];
+        var local_mask = main.brush.masks[reserved.mask_types[i]];
 
         //Remove all_selected_entity_keys from mask
         for (var x = local_mask.length - 1; x >= 0; x--) {
@@ -161,13 +162,13 @@
       delete group_obj.mask;
 
       //Reload entity editing
-      if (window.selection) {
+      if (main.brush.current_selection) {
         var selected_entity_id;
 
         //Finish entity; initialise selected_entity_id
-        if (window.selection.options)
-          if (window.selection.options.className)
-            selected_entity_id = window.selection.options.className;
+        if (main.brush.current_selection.options)
+          if (main.brush.current_selection.options.className)
+            selected_entity_id = main.brush.current_selection.options.className;
         if (!selected_entity_id) {
           selected_entity_id = finishEntity();
         } else {

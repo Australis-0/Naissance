@@ -40,8 +40,8 @@
     } catch {}
 
     //Remove entity from all groups
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer_groups = window[`${layers[i]}_groups`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer_groups = window[`${main.all_layers[i]}_groups`];
 
       var all_layer_groups = Object.keys(local_layer_groups);
 
@@ -57,8 +57,8 @@
     }
 
     //Remove entity from all layers
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_layer`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer = main.layers[main.all_layers[i]];
 
       for (var x = 0; x < local_layer.length; x++)
         if (local_layer[x].options.className == entity_id) {
@@ -81,22 +81,22 @@
     //Close popups relating to entity first
     closeEntityUI(entity_id);
 
-    //finishEntity() if current_union has something in it
+    //finishEntity() if main.brush.current_path has something in it
     try {
-      if (window.current_union)
+      if (main.brush.current_path)
         finishEntity();
     } catch {}
 
     if (entity_obj) {
-      window.editing_entity = entity_id;
-      window.polity_options = entity_obj.options;
+      main.brush.editing_entity = entity_id;
+      main.brush.polity_options = entity_obj.options;
 
       //Remove old entity_obj from map
       entity_obj.remove();
 
       //Set brush to this
-      window.current_union = entity_obj._latlngs;
-      window.selection = L.polygon(window.current_union, window.polity_options).addTo(map);
+      main.brush.current_path = entity_obj._latlngs;
+      main.brush.current_selection = L.polygon(main.brush.current_path, main.brush.polity_options).addTo(map);
 
       //Set entityUI for current selected entity
       selection.on("click", function (e) {
@@ -136,12 +136,12 @@
 
   function finishEntity () {
     //Declare local instance variables
-    var coords = convertToNaissance(current_union);
+    var coords = convertToNaissance(main.brush.current_path);
     var date_string = getTimestamp(date);
     var entity_id;
     var entity_name;
     var new_entity = {
-      options: window.selection.options
+      options: main.brush.current_selection.options
     };
 
     //Set new_entity.options
@@ -159,7 +159,7 @@
         new_entity.options.className = (new_entity.options.className) ?
           new_entity.options.className + ` ${entity_id}` :
           entity_id.toString();
-        if (selection.options.entity_name)
+        if (main.brush.current_selection.options.entity_name)
           entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
         new_entity.options.has_id = true;
       }
@@ -170,17 +170,17 @@
       var entity_exists = getEntity(new_entity.options.className);
 
       if (!entity_exists) {
-        var new_entity_obj = L.polygon(current_union, new_entity.options);
+        var new_entity_obj = L.polygon(main.brush.current_path, new_entity.options);
 
-        window[`${window.selected_layer}_layer`].push(new_entity_obj);
+        main.layers[main.brush.selected_layer].push(new_entity_obj);
         setEntityName(entity_id, entity_name, window.date);
       }
     }
 
     //Set selection.options
     {
-      delete window.editing_entity;
-      delete window.polity_options;
+      delete main.brush.editing_entity;
+      delete main.brush.polity_options;
 
       clearBrush();
     }
@@ -199,10 +199,14 @@
       var local_id = generateRandomID();
 
       //Check to see if ID is taken in polities_layer
-      for (var i = 0; i < polities_layer.length; i++)
-        if (polities_layer[i].options.className)
-          if (polities_layer[i].options.className.includes(local_id))
-            id_taken = true;
+      for (var i = 0; i < main.all_layers.length; i++) {
+        var local_layer = main.layers[main.all_layers[i]];
+
+        for (var x = 0; x < local_layer.length; x++)
+          if (local_layer[x].options.className)
+            if (local_layer[x].options.className.includes(local_id))
+              id_taken = true;
+      }
 
       if (!id_taken) {
         return local_id;
@@ -232,17 +236,17 @@
 
     if (!layer) {
       //Iterate over all layers for .options.className
-      for (var i = 0; i < layers.length; i++) {
-        var local_layer = window[`${layers[i]}_layer`];
+      for (var i = 0; i < main.all_layers.length; i++) {
+        var local_layer = main.layers[main.all_layers[i]];
 
         //Iterate over local_layer for .options.className
         for (var x = 0; x < local_layer.length; x++)
           if (local_layer[x].options.className == entity_id)
             local_entity = (!options.return_key) ?
-              local_layer[x] : [`${layers[i]}_layer`, x];
+              local_layer[x] : [main.all_layers[i], x];
       }
     } else {
-      var local_layer = window[`${layer}_layer`];
+      var local_layer = main.layers[layer];
 
       //Iterate over local_layer for .options.className
       for (var i = 0; i < local_layer.length; i++)
@@ -260,8 +264,8 @@
     var entity_id = arg0_entity_id;
 
     //Iterate over all layers and subgroups
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_groups`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer = window[`${main.all_layers[i]}_groups`];
 
       var all_local_groups = Object.keys(local_layer);
 
@@ -299,7 +303,7 @@
 
 
       if (!entity_name)
-        if (window.current_union)
+        if (main.brush.current_path)
           if (selection.options.className == entity_id)
             entity_name = selection.options.entity_name;
     }
@@ -326,13 +330,17 @@
 
     //Iterate over array
     for (var i = 0; i < array.length; i++)
-      if (array[i].options) {
-        var local_id = array[i].options.className;
+      if (array[i]) {
+        if (array[i].options) {
+          var local_id = array[i].options.className;
 
-        if (local_id == entity_id && !array[i].selection) {
-          array[i].removeFrom(map);
-          array[i] = entity_obj;
+          if (local_id == entity_id && !array[i].selection) {
+            array[i].removeFrom(map);
+            array[i] = entity_obj;
+          }
         }
+      } else {
+        console.log(array);
       }
 
     //Return statement
@@ -348,8 +356,8 @@
     refreshSidebar();
 
     //Add Polity UI's to all polities
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_layer`];
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer = main.layers[main.all_layers[i]];
 
       //Iterate over local_layer
       for (var x = 0; x < local_layer.length; x++)

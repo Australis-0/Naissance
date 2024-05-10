@@ -11,25 +11,25 @@ function loadSave (arg0_file_name) {
 
   //Load all layers for window.layers array
   var all_save_data_keys = Object.keys(save_data);
-  window.layers = [];
+  main.all_layers = [];
 
   for (var i = 0; i < all_save_data_keys.length; i++)
     if (!all_save_data_keys[i].includes("_groups"))
-      layers.push(all_save_data_keys[i]);
+      main.all_layers.push(all_save_data_keys[i]);
 
   //Populate all layers
-  for (var i = 0; i < layers.length; i++) {
-    var local_layer = window[`${layers[i]}_layer`];
+  for (var i = 0; i < main.all_layers.length; i++) {
+    var local_layer = main.layers[main.all_layers[i]];
 
     //Load layer entities
-    for (var x = 0; x < save_data[layers[i]].length; x++)
+    for (var x = 0; x < save_data[main.all_layers[i]].length; x++)
       local_layer.push(
-        L.polygon(save_data[layers[i]][x].coords, save_data[layers[i]][x].options)
+        L.polygon(save_data[main.all_layers[i]][x].coords, save_data[main.all_layers[i]][x].options)
       );
 
     //Load layer groups
-    if (save_data[`${layers[i]}_groups`])
-      window[`${layers[i]}_groups`] = save_data[`${layers[i]}_groups`];
+    if (save_data[`${main.all_layers[i]}_groups`])
+      window[`${main.all_layers[i]}_groups`] = save_data[`${main.all_layers[i]}_groups`];
   }
 
   //Render all polities and units
@@ -38,8 +38,8 @@ function loadSave (arg0_file_name) {
   loadDate();
 
   //Load Brush option save
-  for (var i = 0; i < layers.length; i++) {
-    var local_groups = window[`${layers[i]}_groups`];
+  for (var i = 0; i < main.all_layers.length; i++) {
+    var local_groups = window[`${main.all_layers[i]}_groups`];
 
     var all_local_groups = Object.keys(local_groups);
 
@@ -60,11 +60,11 @@ function writeSave (arg0_file_name) {
   var save_data = {};
 
   //Iterate over all layers and save
-  for (var i = 0; i < layers.length; i++) {
-    var local_layer = window[`${layers[i]}_layer`];
+  for (var i = 0; i < main.all_layers.length; i++) {
+    var local_layer = main.layers[main.all_layers[i]];
 
     //Initialise save_data[${layers[i]}]
-    save_data[layers[i]] = [];
+    save_data[main.all_layers[i]] = [];
 
     for (var x = 0; x < local_layer.length; x++) {
       var local_entity = local_layer[x];
@@ -74,14 +74,14 @@ function writeSave (arg0_file_name) {
         do_not_display: true
       });
 
-      save_data[layers[i]].push({
+      save_data[main.all_layers[i]].push({
         coords: convertToNaissance(local_layer[x]._latlngs),
         options: local_layer[x].options
       });
     }
 
     //Save layer groups
-    save_data[`${layers[i]}_groups`] = window[`${layers[i]}_groups`];
+    save_data[`${main.all_layers[i]}_groups`] = window[`${main.all_layers[i]}_groups`];
   }
 
   //Write save_data to file

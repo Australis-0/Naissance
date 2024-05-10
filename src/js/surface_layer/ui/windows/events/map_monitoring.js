@@ -2,9 +2,9 @@
 map.on("zoom", function (e) {
   var zoom_level = e.target._zoom;
 
-  for (var i = 0; i < layers.length; i++) {
-    var local_layer = window[`${layers[i]}_layer`];
-    var local_render_order = getLayerRenderingOrder(layers[i], { exclude_selection: true });
+  for (var i = 0; i < main.all_layers.length; i++) {
+    var local_layer = main.layers[main.all_layers[i]];
+    var local_render_order = getLayerRenderingOrder(main.all_layers[i], { exclude_selection: true });
 
     //Remove all local_layer entities from map
     for (var x = 0; x < local_layer.length; x++)
@@ -15,7 +15,7 @@ map.on("zoom", function (e) {
       var local_key = getEntity(local_render_order[x], { return_key: true });
 
       if (local_key) {
-        var local_entity = window[local_key[0]][local_key[1]];
+        var local_entity = main.layers[local_key[0]][local_key[1]];
         var local_entity_maximum_zoom = getEntityProperty(local_entity, "maximum_zoom_level", window.date);
         var local_entity_minimum_zoom = getEntityProperty(local_entity, "minimum_zoom_level", window.date);
 
@@ -30,7 +30,7 @@ map.on("zoom", function (e) {
           if (!map.hasLayer(local_entity)) {
             var entity_id = local_entity.options.className;
 
-            if (entity_id != window.editing_entity) {
+            if (entity_id != main.brush.editing_entity) {
               var is_hidden = isPolityHidden(entity_id, window.date);
 
               if (!is_hidden)
@@ -43,9 +43,9 @@ map.on("zoom", function (e) {
     }
 
     //Selection refresh
-    if (window.selection) {
-      window.selection.removeFrom(map);
-      window.selection.addTo(map);
+    if (main.brush.current_selection) {
+      main.brush.current_selection.removeFrom(map);
+      main.brush.current_selection.addTo(map);
     }
   }
 });

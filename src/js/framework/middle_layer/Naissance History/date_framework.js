@@ -187,17 +187,17 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var old_date = arg0_old_date;
 
     //Iterate over all entities in all layers and update their history
-    for (var i = 0; i < layers.length; i++) {
-      var local_layer = window[`${layers[i]}_layer`];
-      var local_render_order = getLayerRenderingOrder(layers[i]);
+    for (var i = 0; i < main.all_layers.length; i++) {
+      var local_layer = main.layers[main.all_layers[i]];
+      var local_render_order = getLayerRenderingOrder(main.all_layers[i]);
 
       for (var x = 0; x < local_render_order.length; x++) {
         var entity_key = getEntity(local_render_order[x], { return_key: true });
 
         if (entity_key) {
-          var local_entity = window[entity_key[0]][entity_key[1]];
+          var local_entity = main.layers[entity_key[0]][entity_key[1]];
           var local_entity_id = local_entity.options.className;
-          var local_history = getPolityHistory(local_entity_id, date, { layer: layers[i] });
+          var local_history = getPolityHistory(local_entity_id, date, { layer: main.all_layers[i] });
 
           //Reload object; add to map
           local_entity.remove();
@@ -232,7 +232,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
                 });
 
                 //This is the current selected polity, re-add cursor
-                if (window.editing_entity == local_entity.options.className)
+                if (main.brush.editing_entity == local_entity.options.className)
                   clearBrush();
               }
           }

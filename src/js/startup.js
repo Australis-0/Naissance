@@ -1,28 +1,57 @@
 //Import modules
 window.fs = require("fs");
 
-//Brush variables
-window.current_union;
-window.cursor;
-window.selected_layer = "polities";
-
-//Brush settings
+//Init global
 {
-  window.brush = {
-    //Basic options
+  window.main = {};
+
+  //Layer handling
+  main.all_layers = ["polities"];
+  main.brush = {
+    //Specify main brush/selection variables
+    cursor: undefined,
+
+    current_selection: undefined, //Renamed selection. The selection entity currently being edited.
+    current_path: undefined, //The raw path currently being edited.
+    editing_entity: undefined, //The entity ID currently being edited
+    polity_options: {}, //Used to store the options of the entity selected.
+
+    selected_layer: "polities", //The current selected layer.
+    simplify_tolerance: getSimplifyTolerance(10), //The current simplify tolerance for brushes.
+
+    //Brush settings
     auto_simplify_when_editing: true,
-    brush_change: false, //Is updated on brush change
     radius: 50000,
 
-    //Masks
-    brush_only_mask: false, //Whether the mask only apply to the current brush, and not the entire selection. False by default
-    mask_add: [], //Mask override (Array<Object, Polity>)
-    mask_intersect_add: [], //Mask intersect override (Array<Object, Polity>)
-    mask_intersect_overlay: [], //Mask intersect overlap (Array<Object, Polity>)
-    mask_subtract: [] //Overrides mask (Array<Object, Polity>)
+    //Brush cache variables
+    brush_change: false, //Is updated on brush change
+
+    //Subobjects and masks
+    masks: {
+      brush_only_mask: false, //Whether the mask only apply to the current brush, and not the entire selection. False by default
+      add: [], //Mask override (Array<Object, Polity>)
+      intersect_add: [], //Mask intersect override (Array<Object, Polity>)
+      intersect_overlay: [], //Mask intersect overlap (Array<Object, Polity>)
+      subtract: [] //Overrides mask (Array<Object, Polity>)
+    }
   };
-  window.polity_options;
-  window.simplify_tolerance = getSimplifyTolerance(10); //To be folded in later
+  main.date = {
+    year: current_date.getFullYear(),
+    month: current_date.getMonth() + 1,
+    day: current_date.getDate(),
+    hour: current_date.getHours(),
+    minute: current_date.getMinutes()
+  };
+  main.events = {
+    keys: {},
+
+    left_mouse: false,
+    mouse_pressed: false,
+    right_mouse: false
+  };
+  main.layers = {
+    polities: []
+  };
 }
 
 //Date variables
@@ -53,9 +82,7 @@ window.date = {
 */
 
 //Entity renderer
-window.layers = ["polities"];
 window.polities_groups = {};
-window.polities_layer = [];
 
 //Key events
 window.keys = {};

@@ -246,7 +246,7 @@ global.opened_popups = {};
     var to_pin = !pin;
 
     //Fetch is_being_edited, pin status
-    if (window.editing_entity == entity_id)
+    if (main.brush.editing_entity == entity_id)
       is_being_edited = true;
 
     //Format data_select_ui
@@ -825,17 +825,17 @@ global.opened_popups = {};
       if (!window.simplify_all_keyframes_el) window.simplify_all_keyframes_el = false;
 
       //Auto-populate based on global settings
-      if (window.brush.auto_simplify_when_editing)
+      if (main.brush.auto_simplify_when_editing)
         auto_simplify_when_editing_el.checked = true;
       if (window.simplify_all_keyframes_el)
         simplify_all_keyframes_el.checked = true;
-      if (window.simplify_tolerance)
-        simplify_tolerance_el.value = parseInt(window.simplify_tolerance*Math.pow(10, 3));
+      if (main.brush.simplify_tolerance)
+        simplify_tolerance_el.value = parseInt(main.brush.simplify_tolerance*Math.pow(10, 3));
 
       //Set listener events
       auto_simplify_when_editing_el.onclick = function (e) {
         //Set global flag
-        window.brush.auto_simplify_when_editing = e.target.checked;
+        main.brush.auto_simplify_when_editing = e.target.checked;
       };
       simplify_all_keyframes_el.onclick = function (e) {
         //Set global flag
@@ -854,7 +854,7 @@ global.opened_popups = {};
 
       onRangeChange(simplify_tolerance_el, function (e) {
         //Set global flag
-        window.simplify_tolerance = getSimplifyTolerance(e.target.value);
+        main.brush.simplify_tolerance = getSimplifyTolerance(e.target.value);
       });
     }
   }
@@ -1476,8 +1476,8 @@ document.body.addEventListener("keyup", (e) => {
       console.error(e);
     }
 
-    //current_union handler
-    if (window.selection)
+    //Selection handler
+    if (main.brush.current_selection)
       selection.options.entity_name = entity_name;
   }
 });

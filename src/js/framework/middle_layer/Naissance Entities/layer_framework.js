@@ -68,10 +68,10 @@
     {
       var selected_id = "";
 
-      if (window.selection)
-        if (selection.options)
-          if (selection.options.className)
-            selected_id = selection.options.className;
+      if (main.brush.current_selection)
+        if (main.brush.current_selection.options)
+          if (main.brush.current_selection.options.className)
+            selected_id = main.brush.current_selection.options.className;
 
       //Splice from rendering order
       if (selected_id != "") {
