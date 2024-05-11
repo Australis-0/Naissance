@@ -1,15 +1,20 @@
 //Direct Brush UI functions
 {
   function initBrush () {
+    //Declare local instance variables
+    var brush_obj = main.brush;
+    var cursor_obj = main.brush.cursor;
+
+    //On mousemove event for map
     map.on("mousemove", function (e) {
       //Set cursor
       {
         //Remove previous cursor
-        if (main.brush.cursor)
-          main.brush.cursor.remove();
+        if (cursor_obj)
+          cursor_obj.remove();
 
         //Set new cursor
-        main.brush.cursor = LGeo.circle(e.latlng, main.brush.radius, {
+        brush_obj.cursor = LGeo.circle(e.latlng, brush_obj.radius, {
           color: RGBToHex(0, 0, 0),
           dashArray: 4,
           fill: false,
@@ -20,23 +25,23 @@
       //Left click to paint
       if (main.events.mouse_pressed) {
         if (main.events.left_mouse) {
-          //Initialise main.brush.current_path if not defined
-          if (!main.brush.current_path)
-            main.brush.current_path = main.brush.cursor;
+          //Initialise brush_obj.current_path if not defined
+          if (!brush_obj.current_path)
+            brush_obj.current_path = brush_obj.cursor;
 
-           main.brush.current_path = union( main.brush.current_path, main.brush.cursor);
+           brush_obj.current_path = union( brush_obj.current_path, brush_obj.cursor);
 
-          main.brush.brush_change = true;
+          brush_obj.brush_change = true;
         } else if (main.events.right_mouse) {
-          //Only delete if  main.brush.current_path exists
-          if (main.brush.current_path)
+          //Only delete if  brush_obj.current_path exists
+          if (brush_obj.current_path)
             try {
-               main.brush.current_path = difference( main.brush.current_path, main.brush.cursor);
+               brush_obj.current_path = difference( brush_obj.current_path, brush_obj.cursor);
 
               brush.brush_change = true;
             } catch {
               //The selection has been completely deleted
-              delete window. main.brush.current_path;
+              delete window. brush_obj.current_path;
             }
         }
 
@@ -48,9 +53,9 @@
     //Brush cursor outline
     L.DomEvent.on(L.DomUtil.get("map"), "mousewheel", function (e) {
       if (e.wheelDeltaY < 0)
-        main.brush.radius = main.brush.radius*1.1;
+        brush_obj.radius = brush_obj.radius*1.1;
       if (e.wheelDeltaY > 0)
-        main.brush.radius = main.brush.radius*0.9;
+        brush_obj.radius = brush_obj.radius*0.9;
     });
   }
 
