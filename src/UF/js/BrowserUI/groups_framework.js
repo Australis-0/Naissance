@@ -9,7 +9,7 @@
 
     //Iterate over all layers to delete
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_groups = window[`${main.all_layers[i]}_groups`];
+      var local_groups = main.groups[main.all_layers[i]];
 
       var all_local_groups = Object.keys(local_groups);
 
@@ -49,7 +49,7 @@
 
     var selected_layer_el = sidebar_el.querySelector(`[id='${selected_layer}']`);
 
-    window[`${selected_layer}_groups`][group_id] = group_obj;
+    main.groups[selected_layer][group_id] = group_obj;
 
     //Create actual UI element
     var group_el = createGroupElement(selected_layer, group_id);
@@ -127,10 +127,10 @@
         }
 
       //Delete group
-      delete window[`${group_layer}_groups`][group_id];
+      delete main.groups[group_layer][group_id];
 
       //Remove all mentions of group_id from subgroups in layer
-      var layer_groups = window[`${group_layer}_groups`];
+      var layer_groups = main.groups[group_layer];
 
       var all_layer_groups = Object.keys(layer_groups);
 
@@ -220,7 +220,7 @@
 
     //Iterate over all layers for group ID
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = window[`${main.all_layers[i]}_groups`];
+      var local_layer = main.groups[main.all_layers[i]];
 
       if (local_layer[group_id])
         if (options.return_layer) {
@@ -278,7 +278,7 @@
 
     //Iterate over all layers; groups for subgroups
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_key = `${main.all_layers[i]}_groups`;
+      var local_key = main.groups[main.all_layers[i]];
 
       var local_layer = window[local_key];
 

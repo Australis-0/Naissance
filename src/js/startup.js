@@ -55,6 +55,9 @@ window.fs = require("fs");
     mouse_pressed: false,
     right_mouse: false
   };
+  main.groups = {
+    polities: {}
+  };
   main.layers = {
     polities: []
   };
@@ -76,9 +79,6 @@ window.fs = require("fs");
     entities: ["38179137582", "38179137583"] //Entity ID's
   }
 */
-
-//Entity renderer
-window.polities_groups = {};
 
 //Optimisation
 window.reserved = {

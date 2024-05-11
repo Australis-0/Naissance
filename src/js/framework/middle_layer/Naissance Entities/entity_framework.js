@@ -41,7 +41,7 @@
 
     //Remove entity from all groups
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer_groups = window[`${main.all_layers[i]}_groups`];
+      var local_layer_groups = main.groups[main.all_layers[i]];
 
       var all_layer_groups = Object.keys(local_layer_groups);
 
@@ -265,7 +265,7 @@
 
     //Iterate over all layers and subgroups
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = window[`${main.all_layers[i]}_groups`];
+      var local_layer = main.groups[main.all_layers[i]];
 
       var all_local_groups = Object.keys(local_layer);
 

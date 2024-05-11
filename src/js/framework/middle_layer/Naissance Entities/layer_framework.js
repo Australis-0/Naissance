@@ -22,7 +22,7 @@
     if (group_obj.subgroups)
       for (var i = 0; i < group_obj.subgroups.length; i++) {
         var local_subgroup = (options.layer) ?
-          window[`${options.layer}_groups`][group_obj.subgroups[i]] :
+          main.groups[options.layer][group_obj.subgroups[i]] :
           getGroup(group_obj.subgroups[i]);
         var new_options = JSON.parse(JSON.stringify(options));
 
@@ -46,7 +46,7 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
-    var layer_groups = window[`${layer}_groups`];
+    var layer_groups = main.groups[layer];
     var rendering_order = [];
     var ungrouped_entities = getUngroupedEntities(layer);
 

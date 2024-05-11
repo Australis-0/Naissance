@@ -29,7 +29,7 @@ function loadSave (arg0_file_name) {
 
     //Load layer groups
     if (save_data[`${main.all_layers[i]}_groups`])
-      window[`${main.all_layers[i]}_groups`] = save_data[`${main.all_layers[i]}_groups`];
+      main.groups[main.all_layers[i]] = save_data[`${main.all_layers[i]}_groups`];
   }
 
   //Render all polities and units
@@ -39,7 +39,7 @@ function loadSave (arg0_file_name) {
 
   //Load Brush option save
   for (var i = 0; i < main.all_layers.length; i++) {
-    var local_groups = window[`${main.all_layers[i]}_groups`];
+    var local_groups = main.groups[main.all_layers[i]];
 
     var all_local_groups = Object.keys(local_groups);
 
@@ -81,7 +81,7 @@ function writeSave (arg0_file_name) {
     }
 
     //Save layer groups
-    save_data[`${main.all_layers[i]}_groups`] = window[`${main.all_layers[i]}_groups`];
+    save_data[`${main.all_layers[i]}_groups`] = main.groups[main.all_layers[i]];
   }
 
   //Write save_data to file

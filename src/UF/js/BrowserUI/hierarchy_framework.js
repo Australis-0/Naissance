@@ -169,7 +169,7 @@
     var header_el = document.createElement("input");
     var local_el = document.createElement("div");
     var local_entities_el = document.createElement("div");
-    var local_groups = window[`${layer}_groups`];
+    var local_groups = main.groups[layer];
     var local_layer = main.layers[layer];
     var local_subgroups_el = document.createElement("div");
 
@@ -270,7 +270,7 @@
     var element = (arg2_el) ? arg2_el : createGroupElement(layer, group_id);
 
     //Declare local instance variables
-    var local_groups = window[`${layer}_groups`];
+    var local_groups = main.groups[layer];
 
     var all_local_groups = Object.keys(local_groups);
     var local_group = local_groups[group_id];
@@ -298,7 +298,7 @@
     var layer = arg0_layer;
 
     //Declare local instance variables
-    var local_groups = window[`${layer}_groups`];
+    var local_groups = main.groups[layer];
     var local_layer = main.layers[layer];
 
     var all_local_groups = Object.keys(local_groups);
@@ -518,7 +518,7 @@
 
     //Iterate over all window.layers
     for (var i = 0; i < main.all_layers.length; i++) {
-      var local_groups = window[`${main.all_layers[i]}_groups`];
+      var local_groups = main.groups[main.all_layers[i]];
       var local_layer = main.layers[main.all_layers[i]];
       var local_layer_el = sidebar_el.querySelector(`[id='${main.all_layers[i]}']`);
 
@@ -722,7 +722,7 @@
     }
 
     //Set window[<layer>_groups] as groups_obj; refreshSidebar();
-    window[`${layer}_groups`] = groups_obj;
+    main.groups[layer] = groups_obj;
 
     if (!do_not_refresh)
       refreshSidebar();
