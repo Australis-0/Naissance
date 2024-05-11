@@ -224,7 +224,7 @@ global.opened_popups = {};
 
     //Close entity UI, call editEntity()
     closeEntityUI();
-    window.date = parseTimestamp(timestamp);
+    main.date = parseTimestamp(timestamp);
     loadDate();
     editEntity(entity_id);
   }
@@ -731,7 +731,7 @@ global.opened_popups = {};
         var all_history_entries = Object.keys(entity_obj.options.history);
         var first_history_entry = entity_obj.options.history[all_history_entries[0]];
 
-        var time_difference = parseTimestamp(getTimestamp(window.date) - getTimestamp(first_history_entry.id));
+        var time_difference = parseTimestamp(getTimestamp(main.date) - getTimestamp(first_history_entry.id));
 
         generateDateRangeFields(`clean-keyframes-date-threshold-container-${entity_id}`, prefix, time_difference);
       }
@@ -984,7 +984,7 @@ global.opened_popups = {};
         all_jump_to_btns[i].onclick = function (e) {
           var local_timestamp = parseInt(this.getAttribute("timestamp"));
 
-          window.date = parseTimestamp(local_timestamp);
+          main.date = parseTimestamp(local_timestamp);
           loadDate();
         };
     } else {
@@ -1341,8 +1341,8 @@ global.opened_popups = {};
         underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
 
         //Populate default values
-        var current_maximum_zoom_value = getEntityProperty(entity_obj, "maximum_zoom_level", window.date);
-        var current_minimum_zoom_value = getEntityProperty(entity_obj, "minimum_zoom_level", window.date);
+        var current_maximum_zoom_value = getEntityProperty(entity_obj, "maximum_zoom_level", main.date);
+        var current_minimum_zoom_value = getEntityProperty(entity_obj, "minimum_zoom_level", main.date);
 
         if (current_maximum_zoom_value)
           maximum_zoom_level_el.value = current_maximum_zoom_value;
@@ -1353,7 +1353,7 @@ global.opened_popups = {};
         maximum_zoom_level_el.onchange = function (e) {
           var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
-          createHistoryFrame(entity_id, window.date, {
+          createHistoryFrame(entity_id, main.date, {
             maximum_zoom_level: local_value
           });
           populateEntityBio(entity_id);
@@ -1365,7 +1365,7 @@ global.opened_popups = {};
         minimum_zoom_level_el.onchange = function (e) {
           var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
 
-          createHistoryFrame(entity_id, window.date, {
+          createHistoryFrame(entity_id, main.date, {
             minimum_zoom_level: local_value
           });
           populateEntityBio(entity_id);
@@ -1462,7 +1462,7 @@ document.body.addEventListener("keyup", (e) => {
   if (local_id == "polity-name") {
     try {
       if (getEntityName(entity_obj, date) != entity_name) {
-        setEntityName(entity_obj, entity_name, window.date);
+        setEntityName(entity_obj, entity_name, main.date);
       } else {
         var local_history = getPolityHistory(local_class, date);
 

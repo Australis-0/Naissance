@@ -35,7 +35,7 @@
     {
       //Selected entity editing
       if (main.brush.editing_entity) {
-        var entity_name = getEntityName(main.brush.editing_entity, window.date);
+        var entity_name = getEntityName(main.brush.editing_entity, main.date);
 
         brush_string.push(`Selected Entity: ${entity_name}`);
       }

@@ -18,8 +18,8 @@
       }
 
       //Left click to paint
-      if (mouse_pressed) {
-        if (window.left_mouse) {
+      if (main.events.mouse_pressed) {
+        if (main.events.left_mouse) {
           //Initialise main.brush.current_path if not defined
           if (!main.brush.current_path)
             main.brush.current_path = main.brush.cursor;
@@ -27,7 +27,7 @@
            main.brush.current_path = union( main.brush.current_path, main.brush.cursor);
 
           main.brush.brush_change = true;
-        } else if (window.right_mouse) {
+        } else if (main.events.right_mouse) {
           //Only delete if  main.brush.current_path exists
           if (main.brush.current_path)
             try {
@@ -79,7 +79,7 @@
                 local_value.setLatLngs(local_coords);
 
                 //Set new ._latlngs to coords of current history frame
-                createHistoryFrame(local_value.options.className, window.date, {}, local_coords);
+                createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
               }
           }
 

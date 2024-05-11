@@ -16,8 +16,8 @@ map.on("zoom", function (e) {
 
       if (local_key) {
         var local_entity = main.layers[local_key[0]][local_key[1]];
-        var local_entity_maximum_zoom = getEntityProperty(local_entity, "maximum_zoom_level", window.date);
-        var local_entity_minimum_zoom = getEntityProperty(local_entity, "minimum_zoom_level", window.date);
+        var local_entity_maximum_zoom = getEntityProperty(local_entity, "maximum_zoom_level", main.date);
+        var local_entity_minimum_zoom = getEntityProperty(local_entity, "minimum_zoom_level", main.date);
 
         var entity_meets_requirements = false;
 
@@ -31,7 +31,7 @@ map.on("zoom", function (e) {
             var entity_id = local_entity.options.className;
 
             if (entity_id != main.brush.editing_entity) {
-              var is_hidden = isPolityHidden(entity_id, window.date);
+              var is_hidden = isPolityHidden(entity_id, main.date);
 
               if (!is_hidden)
                 local_entity.addTo(map);

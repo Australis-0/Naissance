@@ -111,7 +111,7 @@
     if (entity_obj) {
       var entity_id = entity_obj.options.className;
       var header_el = document.createElement("input");
-      var is_hidden = isPolityHidden(entity_id, window.date);
+      var is_hidden = isPolityHidden(entity_id, main.date);
       var local_el = document.createElement("div");
 
       var entity_class = `entity${(window.sidebar_selected_entities.includes(entity_id)) ? " selected" : ""}`;
@@ -124,7 +124,7 @@
       local_el.setAttribute("id", entity_id);
 
       header_el.setAttribute("onkeyup", "updateAllGroups(true);");
-      header_el.value = getEntityName(entity_id, window.date);
+      header_el.value = getEntityName(entity_id, main.date);
 
       //Append all formatted elements
       local_el.appendChild(header_el);

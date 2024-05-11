@@ -86,7 +86,7 @@
         if (local_entity.selection) {
           local_mask.splice(x, 1);
         } else {
-          var is_hidden = isPolityHidden(local_entity, window.date);
+          var is_hidden = isPolityHidden(local_entity, main.date);
 
           if (is_hidden)
             local_mask.splice(x, 1);

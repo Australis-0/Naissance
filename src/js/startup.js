@@ -3,6 +3,10 @@ window.fs = require("fs");
 
 //Init global
 {
+  //Declare local initialisation constants
+  var current_date = new Date();
+
+  //Initialise global.main
   window.main = {};
 
   //Layer handling
@@ -43,8 +47,10 @@ window.fs = require("fs");
     minute: current_date.getMinutes()
   };
   main.events = {
+    //Key events
     keys: {},
 
+    //Mouse events
     left_mouse: false,
     mouse_pressed: false,
     right_mouse: false
@@ -53,16 +59,6 @@ window.fs = require("fs");
     polities: []
   };
 }
-
-//Date variables
-var current_date = new Date();
-window.date = {
-  year: current_date.getFullYear(),
-  month: current_date.getMonth() + 1,
-  day: current_date.getDate(),
-  hour: current_date.getHours(),
-  minute: current_date.getMinutes()
-};
 
 /*
   Hierarchy group data structure:
@@ -83,13 +79,6 @@ window.date = {
 
 //Entity renderer
 window.polities_groups = {};
-
-//Key events
-window.keys = {};
-
-//Mouse events
-window.mouse_pressed = false;
-window.right_mouse = false;
 
 //Optimisation
 window.reserved = {

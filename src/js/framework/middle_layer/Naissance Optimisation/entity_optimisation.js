@@ -34,7 +34,7 @@
         var all_history_entries = Object.keys(entity_obj.options.history);
 
         for (var i = 0; i < all_history_entries.length; i++)
-          if (parseInt(all_history_entries[i]) >= (getTimestamp(window.date) - tolerance)) {
+          if (parseInt(all_history_entries[i]) >= (getTimestamp(main.date) - tolerance)) {
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
 
@@ -116,7 +116,7 @@
 
       //Set history entry to reflect actual_coords
       if (entity_obj.options.history) {
-        var current_history_entry = getPolityHistory(entity_obj, window.date);
+        var current_history_entry = getPolityHistory(entity_obj, main.date);
 
         current_history_entry.coords = convertToNaissance(simplified_coords);
       }

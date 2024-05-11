@@ -9,7 +9,7 @@
 
     if (entity_obj)
       if (entity_obj.options.selected_keyframes) {
-        var current_history_entry = getPolityHistory(entity_id, window.date);
+        var current_history_entry = getPolityHistory(entity_id, main.date);
 
         for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++) {
           var local_history_entry = entity_obj.options.history[entity_obj.options.selected_keyframes[i]];
@@ -113,7 +113,7 @@
     var conditional_function = arg2_conditional_function;
 
     //Declare local instance variables
-    var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+    var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var has_property;
 
@@ -137,7 +137,7 @@
   function finishEntity () {
     //Declare local instance variables
     var coords = convertToNaissance(main.brush.current_path);
-    var date_string = getTimestamp(date);
+    var date_string = getTimestamp(main.date);
     var entity_id;
     var entity_name;
     var new_entity = {
@@ -148,7 +148,7 @@
     if (!new_entity.options.type) new_entity.options.type = "polity";
 
     //Create history entry; sort history object
-    createHistoryFrame(new_entity, date, {}, coords);
+    createHistoryFrame(new_entity, main.date, {}, coords);
     new_entity.options.history = sortObject(new_entity.options.history, "numeric_ascending");
 
     //Edit options; append ID and HTML
@@ -173,7 +173,7 @@
         var new_entity_obj = L.polygon(main.brush.current_path, new_entity.options);
 
         main.layers[main.brush.selected_layer].push(new_entity_obj);
-        setEntityName(entity_id, entity_name, window.date);
+        setEntityName(entity_id, entity_name, main.date);
       }
     }
 
@@ -352,7 +352,7 @@
     var ignore_date = arg0_ignore_date;
 
     //Load date and refresh sidebar
-    loadDate((!ignore_date) ? date : undefined);
+    loadDate((!ignore_date) ? main.date : undefined);
     refreshSidebar();
 
     //Add Polity UI's to all polities
@@ -371,7 +371,7 @@
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
-    var date = (arg2_date) ? getTimestamp(arg2_date) : window.date;
+    var date = (arg2_date) ? getTimestamp(arg2_date) : main.date;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
@@ -399,7 +399,7 @@
         is_unnamed_entity = true;
 
       entity_name = (is_unnamed_entity) ? `Unnamed Polity` : element.value;
-      createHistoryFrame(entity_obj, window.date, { entity_name: entity_name });
+      createHistoryFrame(entity_obj, main.date, { entity_name: entity_name });
     }
 
     //Return statement

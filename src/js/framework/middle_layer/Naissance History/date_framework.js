@@ -197,7 +197,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
         if (entity_key) {
           var local_entity = main.layers[entity_key[0]][entity_key[1]];
           var local_entity_id = local_entity.options.className;
-          var local_history = getPolityHistory(local_entity_id, date, { layer: main.all_layers[i] });
+          var local_history = getPolityHistory(local_entity_id, main.date, { layer: main.all_layers[i] });
 
           //Reload object; add to map
           local_entity.remove();
@@ -215,9 +215,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
             //Run through each options type
             if (local_entity.options.type == "polity")
               //Make sure polity is not extinct
-              if (!isPolityHidden(local_entity_id, window.date)) {
+              if (!isPolityHidden(local_entity_id, main.date)) {
                 //Deprecating this makes Naissance crash for some reason
-                var local_history_frame = getHistoryFrame(local_entity, window.date);
+                var local_history_frame = getHistoryFrame(local_entity, main.date);
                 var local_options = JSON.parse(JSON.stringify(local_entity.options));
 
                 //Overwrite local_options with local_history_options

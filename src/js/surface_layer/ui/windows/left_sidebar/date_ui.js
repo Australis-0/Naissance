@@ -1,13 +1,13 @@
 //Date UI functions
 {
   function autoFillDate () {
-    year_type_field.value = (date.year >= 0) ? "AD" : "BC";
-    year_field.value = Math.abs(date.year);
-    month_field.value = months[date.month - 1];
-    day_field.value = ordinalise(date.day);
+    year_type_field.value = (main.date.year >= 0) ? "AD" : "BC";
+    year_field.value = Math.abs(main.date.year);
+    month_field.value = months[main.date.month - 1];
+    day_field.value = ordinalise(main.date.day);
 
-    hour_field.value = (date.hour < 10) ? "0" + date.hour : date.hour;
-    minute_field.value = (date.minute < 10) ? "0" + date.minute : date.minute;
+    hour_field.value = (main.date.hour < 10) ? "0" + main.date.hour : main.date.hour;
+    minute_field.value = (main.date.minute < 10) ? "0" + main.date.minute : main.date.minute;
   }
 
   function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element) {
@@ -167,7 +167,7 @@
     var hour_el = document.getElementById(arg3_hour_element);
     var minute_el = document.getElementById(arg4_minute_element);
     var year_type_el = document.getElementById(arg5_year_type_element);
-    var date = (arg6_date) ? arg6_date : window.date; //Feed in a custom date to populate with
+    var date = (arg6_date) ? arg6_date : main.date; //Feed in a custom date to populate with
 
     //Declare local instance variables
     var days_html = [];
@@ -257,7 +257,7 @@
     var day_el = document.getElementById(arg2_day_element);
     var hour_el = document.getElementById(arg3_hour_element);
     var minute_el = document.getElementById(arg4_minute_element);
-    var date = (arg5_date) ? arg5_date : window.date; //Feed in a custom date to populate with
+    var date = (arg5_date) ? arg5_date : main.date; //Feed in a custom date to populate with
 
     //Set all the innerHTMLs for year_el, month_el, day_el, minute_el, based on date
     year_el.value = (date.year) ? date.year : 0;

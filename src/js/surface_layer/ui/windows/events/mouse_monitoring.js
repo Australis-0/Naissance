@@ -25,18 +25,18 @@ document.getElementById("map").onmousedown = function (e) {
   var sidebar_container_el = document.querySelector("sidebar-ui-container:hover");
 
   if (!(e.which == 2 || e.button == 4) && !sidebar_container_el) {
-    window.mouse_pressed = true;
+    main.events.mouse_pressed = true;
     map.dragging.disable();
   }
 
   if (e.button == 2)
-    window.right_mouse = true;
-  window.left_mouse = (!window.right_mouse);
+    main.events.right_mouse = true;
+  main.events.left_mouse = (!main.events.right_mouse);
 };
 
 document.body.onmouseup = function (e) {
-  window.mouse_pressed = false;
-  window.right_mouse = false;
+  main.events.mouse_pressed = false;
+  main.events.right_mouse = false;
 
   map.dragging.enable();
 

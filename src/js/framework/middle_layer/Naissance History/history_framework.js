@@ -163,7 +163,7 @@
     var previous_property = arg3_previous_property;
 
     //Declare local instance variables
-    var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+    var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
     var entity_value;
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
@@ -236,7 +236,7 @@
   function getHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var date = (arg1_date) ? arg1_date : window.date;
+    var date = (arg1_date) ? arg1_date : main.date;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
@@ -312,7 +312,7 @@
   function getEntityCoords (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var date = (arg1_date) ? arg1_date : window.date;
+    var date = (arg1_date) ? arg1_date : main.date;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
