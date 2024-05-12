@@ -3,15 +3,14 @@
   function initBrush () {
     //Declare local instance variables
     var brush_obj = main.brush;
-    var cursor_obj = main.brush.cursor;
 
     //On mousemove event for map
     map.on("mousemove", function (e) {
       //Set cursor
       {
         //Remove previous cursor
-        if (cursor_obj)
-          cursor_obj.remove();
+        if (brush_obj.cursor)
+          brush_obj.cursor.remove();
 
         //Set new cursor
         brush_obj.cursor = LGeo.circle(e.latlng, brush_obj.radius, {
