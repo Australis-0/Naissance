@@ -76,27 +76,28 @@
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var entity_obj = getEntity(entity_id);
 
     //Close popups relating to entity first
     closeEntityUI(entity_id);
 
-    //finishEntity() if main.brush.current_path has something in it
+    //finishEntity() if brush_obj.current_path has something in it
     try {
-      if (main.brush.current_path)
+      if (brush_obj.current_path)
         finishEntity();
     } catch {}
 
     if (entity_obj) {
-      main.brush.editing_entity = entity_id;
-      main.brush.polity_options = entity_obj.options;
+      brush_obj.editing_entity = entity_id;
+      brush_obj.polity_options = entity_obj.options;
 
       //Remove old entity_obj from map
       entity_obj.remove();
 
       //Set brush to this
-      main.brush.current_path = entity_obj._latlngs;
-      main.brush.current_selection = L.polygon(main.brush.current_path, main.brush.polity_options).addTo(map);
+      brush_obj.current_path = entity_obj._latlngs;
+      brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
 
       //Set entityUI for current selected entity
       selection.on("click", function (e) {
@@ -136,12 +137,13 @@
 
   function finishEntity () {
     //Declare local instance variables
-    var coords = convertToNaissance(main.brush.current_path);
+    var brush_obj = main.brush;
+    var coords = convertToNaissance(brush_obj.current_path);
     var date_string = getTimestamp(main.date);
     var entity_id;
     var entity_name;
     var new_entity = {
-      options: main.brush.current_selection.options
+      options: brush_obj.current_selection.options
     };
 
     //Set new_entity.options
@@ -159,7 +161,7 @@
         new_entity.options.className = (new_entity.options.className) ?
           new_entity.options.className + ` ${entity_id}` :
           entity_id.toString();
-        if (main.brush.current_selection.options.entity_name)
+        if (brush_obj.current_selection.options.entity_name)
           entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
         new_entity.options.has_id = true;
       }
@@ -170,17 +172,17 @@
       var entity_exists = getEntity(new_entity.options.className);
 
       if (!entity_exists) {
-        var new_entity_obj = L.polygon(main.brush.current_path, new_entity.options);
+        var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
 
-        main.layers[main.brush.selected_layer].push(new_entity_obj);
+        main.layers[brush_obj.selected_layer].push(new_entity_obj);
         setEntityName(entity_id, entity_name, main.date);
       }
     }
 
     //Set selection.options
     {
-      delete main.brush.editing_entity;
-      delete main.brush.polity_options;
+      delete brush_obj.editing_entity;
+      delete brush_obj.polity_options;
 
       clearBrush();
     }
@@ -285,6 +287,7 @@
     var date = arg1_date;
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var entity_name;
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
@@ -303,7 +306,7 @@
 
 
       if (!entity_name)
-        if (main.brush.current_path)
+        if (brush_obj.current_path)
           if (selection.options.className == entity_id)
             entity_name = selection.options.entity_name;
     }

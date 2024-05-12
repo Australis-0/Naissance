@@ -236,9 +236,9 @@ global.opened_popups = {};
     var pin = arg1_pin;
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var data_graph_types = [{ id: "land_area", name: "Land Area" }];
     var data_select_ui = [];
-
     var entity_id = e.target.options.className;
     var entity_obj = getEntity(entity_id);
     var is_pinned = pin;
@@ -246,7 +246,7 @@ global.opened_popups = {};
     var to_pin = !pin;
 
     //Fetch is_being_edited, pin status
-    if (main.brush.editing_entity == entity_id)
+    if (brush_obj.editing_entity == entity_id)
       is_being_edited = true;
 
     //Format data_select_ui
@@ -674,6 +674,7 @@ global.opened_popups = {};
 
     //Declare local instance variables
     var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
+    var brush_obj = main.brush;
     var entity_obj = getEntity(entity_id);
 
     //Close previously attached menus
@@ -825,17 +826,17 @@ global.opened_popups = {};
       if (!window.simplify_all_keyframes_el) window.simplify_all_keyframes_el = false;
 
       //Auto-populate based on global settings
-      if (main.brush.auto_simplify_when_editing)
+      if (brush_obj.auto_simplify_when_editing)
         auto_simplify_when_editing_el.checked = true;
       if (window.simplify_all_keyframes_el)
         simplify_all_keyframes_el.checked = true;
-      if (main.brush.simplify_tolerance)
-        simplify_tolerance_el.value = parseInt(main.brush.simplify_tolerance*Math.pow(10, 3));
+      if (brush_obj.simplify_tolerance)
+        simplify_tolerance_el.value = parseInt(brush_obj.simplify_tolerance*Math.pow(10, 3));
 
       //Set listener events
       auto_simplify_when_editing_el.onclick = function (e) {
         //Set global flag
-        main.brush.auto_simplify_when_editing = e.target.checked;
+        brush_obj.auto_simplify_when_editing = e.target.checked;
       };
       simplify_all_keyframes_el.onclick = function (e) {
         //Set global flag
@@ -854,7 +855,7 @@ global.opened_popups = {};
 
       onRangeChange(simplify_tolerance_el, function (e) {
         //Set global flag
-        main.brush.simplify_tolerance = getSimplifyTolerance(e.target.value);
+        brush_obj.simplify_tolerance = getSimplifyTolerance(e.target.value);
       });
     }
   }
@@ -924,8 +925,6 @@ global.opened_popups = {};
     if (entity_obj) {
       var actual_timestamp;
       var all_histories = Object.keys(entity_obj.options.history);
-
-      console.log(`TRUE 1`);
 
       //Set actual_timestamp
       if (context_menu_el)
@@ -1453,6 +1452,8 @@ global.opened_popups = {};
 
 //Field reaction
 document.body.addEventListener("keyup", (e) => {
+  //Declare local instance variables
+  var brush_obj = main.brush;
   var entity_name = e.target.value;
   var local_class = e.target.getAttribute("class");
   var local_id = e.target.id;
@@ -1477,7 +1478,7 @@ document.body.addEventListener("keyup", (e) => {
     }
 
     //Selection handler
-    if (main.brush.current_selection)
+    if (brush_obj.current_selection)
       selection.options.entity_name = entity_name;
   }
 });

@@ -473,6 +473,7 @@
     var do_not_refresh = arg0_do_not_refresh;
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var sidebar_el = document.getElementById("hierarchy");
 
     //Reset HTML
@@ -566,7 +567,7 @@
     });
 
     //Select current selected layer
-    selectLayer(main.brush.selected_layer);
+    selectLayer(brush_obj.selected_layer);
   }
 
   function selectLayer (arg0_layer) {

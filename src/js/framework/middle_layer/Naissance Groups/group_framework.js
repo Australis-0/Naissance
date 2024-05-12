@@ -300,6 +300,7 @@
     var group_id = arg1_group_id;
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var new_group = getGroup(group_id);
     var old_group = getEntityGroup(entity_id);
@@ -333,7 +334,7 @@
         removeEntityMask(entity_obj);
 
         if (new_group.mask)
-          main.brush.masks[new_group.mask].push(entity_obj);
+          brush_obj.masks[new_group.mask].push(entity_obj);
       }
     }
   }

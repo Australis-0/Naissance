@@ -1,5 +1,7 @@
 //Add event listeners
 map.on("zoom", function (e) {
+  //Declare local instance variables
+  var brush_obj = main.brush;
   var zoom_level = e.target._zoom;
 
   for (var i = 0; i < main.all_layers.length; i++) {
@@ -30,7 +32,7 @@ map.on("zoom", function (e) {
           if (!map.hasLayer(local_entity)) {
             var entity_id = local_entity.options.className;
 
-            if (entity_id != main.brush.editing_entity) {
+            if (entity_id != brush_obj.editing_entity) {
               var is_hidden = isPolityHidden(entity_id, main.date);
 
               if (!is_hidden)
@@ -43,9 +45,11 @@ map.on("zoom", function (e) {
     }
 
     //Selection refresh
-    if (main.brush.current_selection) {
-      main.brush.current_selection.removeFrom(map);
-      main.brush.current_selection.addTo(map);
+    var current_selection = brush_obj.current_selection;
+
+    if (current_selection) {
+      current_selection.removeFrom(map);
+      current_selection.addTo(map);
     }
   }
 });

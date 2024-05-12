@@ -46,6 +46,7 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
+    var brush_obj = main.brush;
     var layer_groups = main.groups[layer];
     var rendering_order = [];
     var ungrouped_entities = getUngroupedEntities(layer);
@@ -68,10 +69,10 @@
     {
       var selected_id = "";
 
-      if (main.brush.current_selection)
-        if (main.brush.current_selection.options)
-          if (main.brush.current_selection.options.className)
-            selected_id = main.brush.current_selection.options.className;
+      if (brush_obj.current_selection)
+        if (brush_obj.current_selection.options)
+          if (brush_obj.current_selection.options.className)
+            selected_id = brush_obj.current_selection.options.className;
 
       //Splice from rendering order
       if (selected_id != "") {

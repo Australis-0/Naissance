@@ -192,17 +192,20 @@
   }
 
   function refreshBrush () {
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
     //Refresh polity
     {
-      if (main.brush.current_selection)
-        main.brush.current_selection.remove();
-      if (main.brush.current_path)
-        main.brush.current_selection = L.polygon(main.brush.current_path, main.brush.polity_options).addTo(map);
+      if (brush_obj.current_selection)
+        brush_obj.current_selection.remove();
+      if (brush_obj.current_path)
+        brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
 
       //Bind tooltip to selection
-      if (main.brush.current_selection) {
-        L.setOptions(main.brush.current_selection, main.brush.polity_options);
-        main.brush.current_selection.on("click", function (e) {
+      if (brush_obj.current_selection) {
+        L.setOptions(brush_obj.current_selection, brush_obj.polity_options);
+        brush_obj.current_selection.on("click", function (e) {
           entityUI(e, true);
         });
       }

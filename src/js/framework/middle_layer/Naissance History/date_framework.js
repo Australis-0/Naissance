@@ -186,6 +186,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     //Convert from parameters
     var old_date = arg0_old_date;
 
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
     //Iterate over all entities in all layers and update their history
     for (var i = 0; i < main.all_layers.length; i++) {
       var local_layer = main.layers[main.all_layers[i]];
@@ -232,7 +235,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
                 });
 
                 //This is the current selected polity, re-add cursor
-                if (main.brush.editing_entity == local_entity.options.className)
+                if (brush_obj.editing_entity == local_entity.options.className)
                   clearBrush();
               }
           }
