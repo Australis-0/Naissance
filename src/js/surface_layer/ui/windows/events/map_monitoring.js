@@ -44,7 +44,7 @@ map.on("zoom", function (e) {
       }
     }
 
-    //Selection refresh
+    //Selection refresh to make sure it always sits on top of the current layer
     var current_selection = brush_obj.current_selection;
 
     if (current_selection) {

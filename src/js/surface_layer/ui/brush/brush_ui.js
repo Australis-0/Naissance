@@ -35,12 +35,14 @@
           //Only delete if  brush_obj.current_path exists
           if (brush_obj.current_path)
             try {
-               brush_obj.current_path = difference( brush_obj.current_path, brush_obj.cursor);
+              brush_obj.current_path = difference(brush_obj.current_path, brush_obj.cursor);
 
-              brush.brush_change = true;
-            } catch {
+              brush_obj.brush_change = true;
+            } catch (e) {
               //The selection has been completely deleted
-              delete window. brush_obj.current_path;
+              delete brush_obj.current_path;
+
+              brush_obj.brush_change = true;
             }
         }
 
@@ -196,8 +198,10 @@
 
     //Refresh polity
     {
-      if (brush_obj.current_selection)
+      if (brush_obj.current_selection) {
         brush_obj.current_selection.remove();
+        delete brush_obj.current_selection; //current_selection has to actually be deleted to avoid refresh errors
+      }
       if (brush_obj.current_path)
         brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
 
