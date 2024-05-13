@@ -102,8 +102,7 @@
         <input id = "${prefix}-year" class = "year-input" type = "number">
       </center>
       <center>
-        <input id = "${prefix}-hour" class = "hour-input" type = "number" min = "0" max = "23"> :
-        <input id = "${prefix}-minute" class = "minute-input" type = "number" min = "0" max = "59">
+        <input id = "${prefix}-hour" class = "hour-input" type = "number" min = "0" max = "23"> : <input id = "${prefix}-minute" class = "minute-input" type = "number" min = "0" max = "59">
 
         <select id = "${prefix}-year-type"></select>
       </center>
@@ -305,7 +304,7 @@
 
   function readDate () {
     //Declare local instance variables
-    var new_date = JSON.parse(JSON.stringify(date));
+    var new_date = JSON.parse(JSON.stringify(main.date));
 
     //Check if year is valid
     if (!isNaN(year_field.value)) {
@@ -379,8 +378,8 @@
       new_date[all_fields[i]] = parseInt(new_date[all_fields[i]]);
 
     //Set date
-    var old_date = JSON.parse(JSON.stringify(date));
-    date = new_date;
+    var old_date = JSON.parse(JSON.stringify(main.date));
+    main.date = new_date;
 
     autoFillDate();
     loadDate(old_date);
