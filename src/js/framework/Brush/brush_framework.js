@@ -2,7 +2,7 @@
 {
   function clearBrush () {
     //Declare local instance variables
-    var brush_obj = brush_obj;
+    var brush_obj = main.brush;
 
     //Clear brush; reload brush in masks
     clearBrushInMasks();
