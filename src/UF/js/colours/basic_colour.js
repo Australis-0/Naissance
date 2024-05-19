@@ -20,8 +20,8 @@ function componentToHex (c) {
   Returns: (Number)
 */
 function deltaE (rgbA, rgbB) {
-  var labA = RGB2Lab(rgbA);
-  var labB = RGB2Lab(rgbB);
+  var labA = RGBToLab(rgbA);
+  var labB = RGBToLab(rgbB);
   var deltaL = labA[0] - labB[0];
   var deltaA = labA[1] - labB[1];
   var deltaB = labA[2] - labB[2];
@@ -114,10 +114,10 @@ function RGBToHex (r, g, b) {
 /*
   RGB2Lab() - Converts an RGB value to lab distance.
   rgb: (Array<Number, Number, Number>) - The RGB value to pass.
-  
+
   Returns: (Array<Number, Number, Number>)
 */
-function RGB2Lab (rgb) {
+function RGBToLab (rgb) {
   let r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255, x, y, z;
   r = (r > 0.04045) ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
   g = (g > 0.04045) ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;

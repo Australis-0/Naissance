@@ -1,7 +1,7 @@
 //String framework commands
 {
   //Basic framework functions
-  function capitaliseWords (arg0_string) {
+  function capitaliseWords (arg0_string) { //REDUNDANT
     //Convert from parameters
     var separate_words = arg0_string.split(" ");
 
@@ -13,7 +13,7 @@
     return separate_words.join(" ");
   }
 
-  function cleanStringify (arg0_object) {
+  function cleanStringify (arg0_object) { //REDUNDANT
     //Convert from parameters
     var object = arg0_object;
 
@@ -42,11 +42,11 @@
     }
   }
 
-  function equalsIgnoreCase (arg0, arg1) {
+  function equalsIgnoreCase (arg0, arg1) { //REDUNDANT
     return (arg0.toLowerCase() == arg1.toLowerCase());
   }
 
-  function formaliseString (arg0_string) {
+  function formaliseString (arg0_string) { //REDUNDANT
     //Convert from parameters
     var string = arg0_string;
 
@@ -54,11 +54,11 @@
     return string.replace(/_/g, " ").replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
   }
 
-  function getCurrentDate () {
+  function getCurrentDate () { //REDUNDANT
     return module.exports.getDate(main.date);
   }
 
-  function getDate (arg0_date_obj) {
+  function getDate (arg0_date_obj) { //REDUNDANT
     //Convert from parameters
     var date_obj = arg0_date_obj;
 
@@ -66,7 +66,7 @@
     return `${module.exports.ordinalise(date_obj.day)} ${module.exports.months[date_obj.month - 1]} ${date_obj.year}, ${Math.round(date_obj.hour).toString().padStart(2, "0")}:00`;
   }
 
-  function ordinalise (arg0_number) {
+  function ordinalise (arg0_number) { //REDUNDANT
     //Convert from parameters
     var i = arg0_number;
 
@@ -86,7 +86,7 @@
     return `${negative_suffix}${i}th`;
   }
 
-  function parseBoolean (arg0_boolean) {
+  function parseBoolean (arg0_boolean) { //REDUNDANT
     ///Convert from parameters
     var boolean = arg0_boolean;
 
@@ -94,7 +94,7 @@
     return (boolean) ? "Yes" : "No";
   }
 
-  function parseDate (arg0_timestamp) {
+  function parseDate (arg0_timestamp) { //REDUNDANT
     var a = new Date(arg0_timestamp);
     var year = a.getFullYear();
     var month = months[a.getMonth()];
@@ -107,7 +107,7 @@
     return time;
   }
 
-  function parseList (arg0_list) {
+  function parseList (arg0_list) { //REDUNDANT
     //Convert from parameters
     var name_array = arg0_list;
 
@@ -185,7 +185,7 @@
     return processed_string.split("_").join(" ").replace(/(^| )(\w)/g, s => s.toUpperCase());
   }
 
-  function processOrdinalString (arg0_string) {
+  function processOrdinalString (arg0_string) { //REDUNDANT
   	//Convert from parameters
   	var current_string = arg0_string.toString().trim();
   	var trim_patterns = [
@@ -214,7 +214,7 @@
   	return current_string;
   }
 
-  function stripMarkdown (arg0_string) {
+  function stripMarkdown (arg0_string) { //REDUNDANT
     //Convert from parameters
     var processed_string = arg0_string.toString();
 
@@ -222,7 +222,7 @@
     return processed_string.replace(/(__)|(\*\*)/gm, "");
   }
 
-  function stripNonNumerics (arg0_string) {
+  function stripNonNumerics (arg0_string) { //REDUNDANT
     //Convert from parameters
     var processed_string = arg0_string.toString().trim();
 
@@ -230,7 +230,7 @@
     return processed_string.replace(/\D/g, "");
   }
 
-  function truncateString (arg0_string, arg1_number, arg2_do_not_show_dots) {
+  function truncateString (arg0_string, arg1_number, arg2_do_not_show_dots) { //REDUNDANT
     //Convert from parameters
     var string = arg0_string;
     var number = arg1_number;

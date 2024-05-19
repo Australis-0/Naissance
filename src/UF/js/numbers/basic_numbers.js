@@ -5,18 +5,18 @@
 */
 function alphabetiseNumber (arg0_string) {
   //Convert from parameters
-  var string = arg0_strin.toString();
+  var string = arg0_string.toString();
 
   //Declare local instance variables
   var alphabet_array = "abcdefghij";
 	var alphabetised_string = "";
 
   //Iterate over number to alphabetise it
-	for (var i = 0; i < number.length; i++)
-		if (!isNaN(parseInt(number[i]))) {
-			alphabetised_string += alphabet_array[parseInt(number[i])];
+	for (var i = 0; i < string.length; i++)
+		if (!isNaN(parseInt(string[i]))) {
+			alphabetised_string += alphabet_array[parseInt(string[i])];
 		} else {
-			alphabetised_string += number[i];
+			alphabetised_string += string[i];
 		}
 
 	//Return statement
@@ -160,6 +160,46 @@ function generateRandomID (arg0_object) {
   } else {
     return random_id;
   }
+}
+
+/*
+  getAverage() - Returns an average from an array. Legacy function.
+  arg0_numbers: (Array<Number>) - The array of numbers to input.
+
+  Returns: (Number)
+*/
+function getAverage (arg0_numbers) {
+  //Convert from parameters
+  var numbers = getList(arg0_numbers);
+
+  //Iterate over numbers array and return average
+  var total_sum = 0;
+
+  for (var i = 0; i < numbers.length; i++)
+    total_sum += numbers[i];
+
+  //Return statement
+  return total_sum/numbers.length;
+}
+
+/*
+  getSum() - Returns the sum of an array. Legacy function.
+  arg0_numbers: (Array<Number>) - The array of numbers to input.
+
+  Returns: (Number)
+*/
+function getSum (arg0_numbers) {
+  //Convert from parameters
+  var numbers = getList(arg0_numbers);
+
+  //Iterate over numbers array and return sum
+  var total_sum = 0;
+
+  for (var i = 0; i < numbers.length; i++)
+    total_sum += numbers[i];
+
+  //Return statement
+  return total_sum;
 }
 
 /*

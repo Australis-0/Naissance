@@ -103,6 +103,23 @@ function flattenArray (arg0_input_array) {
 }
 
 /*
+  findDuplicates() - Returns all duplicates in an array.
+  arg0_array: (Array) - The array to input.
+
+  Returns: (Array)
+*/
+function findDuplicates (arg0_array) {
+  //Convert from parameters
+  var array = arg0_array;
+
+  //Declare local instance variables
+  var local_duplicates = (arr) => arr.filter((item, index) => arr.indexOf(item) != index)
+
+  //Return statement
+  return [... new Set(local_duplicates(array))];
+}
+
+/*
   getCardinality() - Fetches the cardinality of an array/object/variable.
   arg0_variable: (Variable) - The variable to input.
 
@@ -152,6 +169,45 @@ function getList (arg0_variable) {
 }
 
 /*
+  hasDuplicate() - Determines whether an array has duplicates or not.
+  arg0_array: (Array) - The array to input.
+
+  Returns: (Boolean)
+*/
+function hasDuplicate (arg0_array) {
+  //Convert from parameters
+  var array = arg0_array;
+
+  //Declare local instance variables
+  var array_duplicates = findDuplicates(array);
+
+  //Return statement
+  return (array_duplicates > 0);
+}
+
+/*
+  hasDuplicateElement() - Determines whether an array has duplicates of a given element or not.
+  arg0_array: (Array) - The array to input.
+  arg1_element: (Variable) - The element to check for duplicates.
+
+  Returns: (Boolean)
+*/
+function hasDuplicateElement (arg0_array, arg1_element) {
+  //Convert from parameters
+  var array = arg0_array;
+  var element = arg1_element;
+
+  //Declare local instance variables
+  var element_count = 0;
+
+  for (var i = 0; i < array.length; i++)
+    if (element == array[i]) element_count++;
+
+  //Return statement
+  return (element_count > 0);
+}
+
+/*
   isArrayEmpty() - Checks whether an array is empty.
   arg0_input_array: (Array) - The array to input.
 
@@ -163,6 +219,97 @@ function isArrayEmpty (arg0_input_array) {
 
   //Return statement
   return (array.length == 0 || array.every((element) => element == undefined));
+}
+
+/*
+  moveElement() - Moves an element in an array.
+  arg0_array: (Array) - The array to input.
+  arg1_old_index: (Number) - The 1st index to move.
+  arg2_new_index: (Number) - The 2nd index to move the first index to.
+
+  Returns: (Array)
+*/
+function moveElement (arg0_array, arg1_old_index, arg2_new_index) {
+  //Convert from parameters
+  var array = arg0_array;
+  var old_index = arg1_old_index;
+  var new_index = arg2_new_index;
+
+  //Move element in array
+  if (new_index >= array.length) {
+    var local_index = new_index - array.length + 1;
+    while (k--)
+      array.push(undefined);
+  }
+  array.splice(new_index, 0, array.splice(old_index, 1)[0]);
+
+  //Return statement
+  return array;
+}
+
+/*
+  randomElement() - Returns a random element from an array.
+  arg0_array: (Array) - The array to input.
+
+  Returns: (Variable)
+*/
+function randomElement (arg0_array) {
+  //Convert from parameters
+  var array = arg0_array;
+
+  //Return statement
+  return array[Math.floor(Math.random()*array.length)];
+}
+
+/*
+  removeElement() - Removes an element from an array.
+  arg0_array: (Array) - The array to remove an element from.
+  arg1_element: (Variable) - The contents of the element to remove.
+
+  Returns: (Array)
+*/
+function removeElement (arg0_array, arg1_element) {
+  //Convert from parameters
+  var array = arg0_array;
+  var element = arg1_element;
+
+  //Declare local instance variables and splice element
+  try {
+    var local_index = array.indexOf(element);
+    if (local_index != -1) array.splice(local_index, 1);
+  } catch {}
+
+  //Return statement
+  return array;
+}
+
+/*
+  shuffleArray() - Shuffles an array (Fisher-Yates).
+  arg0_array: (Array) - The array to input.
+
+  Returns: (Array)
+*/
+function shuffleArray (arg0_array) {
+  //Convert from parameters
+  var array = arg0_array;
+
+  //Declare local instance variables
+  var shuffled_array = array;
+  var current_index = array.length,
+    temporary_value,
+    random_index;
+
+  //Shufle array (Fisher-Yates)
+  while (0 != current_index) {
+    random_index = Math.floor(Math.random()*current_index);
+    current_index--;
+    temporary_value = shuffled_array[current_index];
+    shuffled_array[current_index] = shuffled_array[random_index];
+    shuffled_array[random_index] = temporary_value;
+  }
+
+  //Return statement
+  return shuffled_array;
 }
 
 /*
@@ -186,13 +333,13 @@ function truncateArray (arg0_input_array, arg1_length) {
 
 /*
   reverseArray() - Reverses an input array.
-  arg0_input_array: (Array) - The array to reverse.
+  arg0_array: (Array) - The array to reverse.
 
   Returns: (Array)
 */
-function reverseArray (arg0_input_array) {
+function reverseArray (arg0_array) {
   //Convert from parameters
-  var input_array = arg0_input_array;
+  var input_array = arg0_array;
 
   //Return statement
   if (Array.isArray(input_array)) {
@@ -203,9 +350,28 @@ function reverseArray (arg0_input_array) {
 }
 
 /*
+  unique() - Filters out non-unique elements from an array. Legacy function.
+  arg0_array: (Array) - The array to input.
+
+  Returns: (Array)
+*/
+function unique (arg0_array) {
+  //Convert from parameters
+  var a = arg0_array;
+
+  //Declare local instance variables
+  var seen = {};
+
+  //Return statement
+  return a.filter(function(item) {
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  });
+}
+
+/*
   uniqueArray() - Removes any duplicate elements from an input array.
   arg0_input_array: (Array) - The array to input.
-  
+
   Returns: (Array)
 */
 function uniqueArray (arg0_input_array) {
