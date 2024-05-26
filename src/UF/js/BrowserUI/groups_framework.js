@@ -235,7 +235,7 @@
     getGroupEntities() - Recursively fetches an array of entity objects from groups and subgroups
 
     options: {
-      return_keys: truie/false, - Whether to return keys. False by default
+      return_keys: true/false, - Whether to return keys. False by default
       surface_layer: true/false - Whether to only get surface layer entities. False by default
     }
   */

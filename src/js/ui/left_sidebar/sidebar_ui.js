@@ -27,6 +27,17 @@
 
 //Sidebar Context Menu UI functions
 {
+  function closeSidebarContextMenu () { //DONE
+    //Declare local instance variables
+    var context_menu_el = document.querySelector(`#hierarchy-context-menu`);
+
+    //Close context menu
+    if (!context_menu_el.getAttribute("class").includes("display-none"))
+      context_menu_el.setAttribute("class",
+        context_menu_el.getAttribute("class") + " display-none"
+      );
+    context_menu_el.removeAttribute("group");
+  }
   function closeSidebarSubcontextMenu () {
     //Declare local instance variables
     var hierarchy_subcontext_el = document.getElementById("hierarchy-context-menu-two");
@@ -75,18 +86,6 @@
 
 //Sidebar UI functions
 {
-  function closeSidebarContextMenu () { //DONE
-    //Declare local instance variables
-    var context_menu_el = document.querySelector(`#hierarchy-context-menu`);
-
-    //Close context menu
-    if (!context_menu_el.getAttribute("class").includes("display-none"))
-      context_menu_el.setAttribute("class",
-        context_menu_el.getAttribute("class") + " display-none"
-      );
-    context_menu_el.removeAttribute("group");
-  }
-
   function createEntityElement (arg0_layer, arg1_entity_id) { //DONE
     //Convert from parameters
     var layer = arg0_layer;
@@ -709,7 +708,7 @@
       groups_obj[local_id] = group_obj;
     }
 
-    //Set window[<layer>_groups] as groups_obj; refreshSidebar();
+    //Set main.groups[<layer>_groups] as groups_obj; refreshSidebar();
     main.groups[layer] = groups_obj;
 
     if (!do_not_refresh)
