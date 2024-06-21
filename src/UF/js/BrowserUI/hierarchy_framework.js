@@ -5,7 +5,7 @@
   /*
     initHierarchy() - Initialises a hierarchy within a given HTMLElement.
     arg0_element: (HTMLElement) - The context menu element representing the hierarchy.
-    arg1_context_menu_element: (HTMLElement) - The subcontext menu for the hierarchy to open/close, if it exists
+    arg1_hierarchy_key: (HTMLElement) - The subcontext menu for the hierarchy to open/close, if it exists
     arg2_options: (Object)
       context_menu_selectors: (Array<String>) - An array of given context menu query selectors to handle
   */
