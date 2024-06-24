@@ -49,7 +49,7 @@
     var brush_obj = main.brush;
     var layer_groups = main.groups[layer];
     var rendering_order = [];
-    var ungrouped_entities = getUngroupedEntities(layer);
+    var ungrouped_entities = getUngroupedEntities("hierarchy", layer);
 
     var all_layer_groups = Object.keys(layer_groups);
 

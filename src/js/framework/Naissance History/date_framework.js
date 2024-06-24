@@ -191,6 +191,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Iterate over all entities in all layers and update their history
     for (var i = 0; i < main.all_layers.length; i++) {
+      //Init layer first
+      initHierarchyLayer("hierarchy", main.all_layers[i]);
+
       var local_layer = main.layers[main.all_layers[i]];
       var local_render_order = getLayerRenderingOrder(main.all_layers[i]);
 

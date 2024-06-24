@@ -7,6 +7,7 @@
     arg0_element: (HTMLElement) - The context menu element representing the hierarchy.
     arg1_hierarchy_key: (HTMLElement) - The subcontext menu for the hierarchy to open/close, if it exists
     arg2_options: (Object)
+      create_new_group_selector: (String) - The query selector of the 'Create New Group' button
       context_menu_selectors: (Array<String>) - An array of given context menu query selectors to handle
   */
   function initHierarchy (arg0_hierarchy_el, arg1_hierarchy_key, arg2_options) {
@@ -29,9 +30,14 @@
     var hierarchy_obj = hierarchies_obj[hierarchy_key];
 
     //Button handlers for hierarchy_el
-    hierarchy_el.querySelector(`#hierarchy-create-new-group`).onclick = function () {
+    var create_new_group_el = (options.create_new_group_selector) ?
+      options.create_new_group_selector :
+      hierarchy_el.querySelector(`#hierarchy-create-new-group`);
+
+    create_new_group_el.onclick = function () {
       createGroup();
     };
+
 
     //Context menu handling for hierarchy
     if (options.context_menu_selectors)
@@ -100,9 +106,9 @@
     var header_el = document.createElement("input");
     var is_hidden = options.is_hidden;
     var local_el = document.createElement("div");
-    var selected_entities = options.selected_entities;
+    var selected_entities = (options.selected_entities) ? options.selected_entities : [];
 
-    var entity_class = `entity${(options.selected_entities.includes(entity_id)) ? " selected" : ""}`;
+    var entity_class = `entity${(selected_entities.includes(entity_id)) ? " selected" : ""}`;
 
     //Initialise local instance variables
     if (is_hidden)
@@ -142,6 +148,9 @@
       if (options.information_el)
         updateHierarchySelectionInformation(options.information_el, options);
     };
+
+    //Return statement
+    return local_el;
   }
 
   /*
@@ -158,17 +167,22 @@
     //Declare local instance variables
     var ctx_menu_el = document.createElement("img");
     var group_class = `group`;
-    var header_el = document.document.createElement("input");
+    var header_el = document.createElement("input");
     var hierarchy_obj = main.hierarchies[hierarchy_key];
     var local_el = document.createElement("div");
     var local_entities_el = document.createElement("div");
     var local_groups = hierarchy_obj.groups[layer];
+    var local_layer = hierarchy_obj.layers[layer];
     var local_subgroups_el = document.createElement("div");
+
+    var groups_obj = hierarchy_obj.groups[layer];
+    var group_obj = groups_obj[group_id];
 
     //Initialise local instance variables
     {
-      if (group_obj.mask)
-        group_class += ` mask-${group_obj.mask}`;
+      if (group_obj)
+        if (group_obj.mask)
+          group_class += ` mask-${group_obj.mask}`;
     }
 
     //Set element formatting
@@ -197,8 +211,19 @@
       if (group_obj.entities)
         for (var i = 0; i < group_obj.entities.length; i++)
           try {
+            var local_entity = getEntityInLayer(hierarchy_key, layer, group_obj.entities[i]);
+            var local_entity_name;
+
+            //Initialise local_entity parameters
+            if (local_entity)
+              if (local_entity.options)
+                local_entity_name = (local_entity.options.entity_name) ? local_entity.options.entity_name : "Unnamed Entity";
+
             local_entities_el.appendChild(
-              createEntityElement(layer, group_obj.entities[i])
+              createEntityElement(hierarchy_key,  {
+                id: group_obj.entities[i],
+                name: local_entity_name
+              })
             );
           } catch (e) {
             console.warn(e);
@@ -266,6 +291,49 @@
     }
   }
 
+  function getEntityID (arg0_hierarchy_key, arg1_layer, arg2_entity_obj) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var layer = arg1_layer;
+    var entity_obj = arg2_entity_obj;
+
+    //Check if entity_obj is of a Leaflet type
+    if (entity_obj._latlngs) {
+      if (entity_obj.options.className)
+        return entity_obj.options.className;
+    } else {
+      if (entity_obj.id)
+        return entity_obj.id;
+    }
+  }
+
+  function getEntityInLayer (arg0_hierarchy_key, arg1_layer, arg2_entity_id) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var layer = arg1_layer;
+    var entity_id = arg2_entity_id;
+
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+    var local_layer = hierarchy_obj.layers[layer];
+
+    if (Array.isArray(local_layer)) {
+      for (var i = 0; i < local_layer.length; i++)
+        if (local_layer[i]._latlngs) {
+          //Leaflet handler
+          if (local_layer[i].options.className == entity_id)
+            return local_layer[i];
+        } else {
+          //Non-leaflet handler
+          if (local_layer[i].id == entity_id)
+            return local_layer[i];
+        }
+    } else {
+      //Return statement
+      return local_layer[entity_id];
+    }
+  }
+
   /*
     getRecursiveGroupElement() - Fetches a group element recursively, within a given subgroup (1st-order)
     arg0_hierarchy_key: (String) - The hierarchy key to reference.
@@ -280,7 +348,7 @@
     var hierarchy_key = arg0_hierarchy_key;
     var layer = arg1_layer;
     var group_id = arg2_group_id;
-    var group_el = arg3_group_el;
+    var group_el = (arg3_group_el) ? arg3_group_el : createGroupElement(hierarchy_key, layer, group_id);
 
     //Declare local instance variables
     var hierarchy_obj = main.hierarchies[hierarchy_key];
@@ -295,15 +363,15 @@
         if (local_group.subgroups.length > 0)
         for (var i = 0; i < local_group.subgroups.length; i++) {
           var local_subgroup = local_groups[local_group.subgroups[i]];
-          var local_subgroup_el = getRecursiveGroupElement(hierarchy_key, local_group.subgroups[i]);
+          var local_subgroup_el = getRecursiveGroupElement(hierarchy_key, layer, local_group.subgroups[i]);
 
           //Append everything else
           if (local_subgroup_el)
-            element.querySelector(`[id='${group_id}-subgroups']`).appendChild(local_subgroup_el);
+            group_el.querySelector(`[id='${group_id}-subgroups']`).appendChild(local_subgroup_el);
         }
 
     //Return statement
-    return element;
+    return group_el;
   }
 
   /*
@@ -319,11 +387,15 @@
     var layer = arg1_layer;
 
     //Declare local instance variables
+    var grouped_entities = [];
     var hierarchy_obj = main.hierarchies[hierarchy_key];
     var local_groups = hierarchy_obj.groups[layer];
     var local_layer = hierarchy_obj.layers[layer];
+    var ungrouped_entities = [];
 
     //Iterate over all_local_groups to push to grouped_entities
+    var all_local_groups = Object.keys(local_groups);
+
     for (var i = 0; i < all_local_groups.length; i++) {
       var local_group = local_groups[all_local_groups[i]];
 
@@ -337,10 +409,46 @@
     if (layer)
       for (var i = 0; i < local_layer.length; i++)
         if (!grouped_entities.includes(local_layer[i].name))
-          ungrouped_entities.push(local_layer[i].name);
+          ungrouped_entities.push(
+            getEntityID(hierarchy_key, layer, local_layer[i])
+          );
 
     //Return statement
     return ungrouped_entities;
+  }
+
+  /*
+    initHierarchyLayer() - Initialises a hierarchy layer.
+    arg0_hierarchy_key: (String)
+    arg1_layer: (String)
+    arg2_options: (Object)
+      load_layer: (Object)
+      load_groups: (Object)
+
+      layer_is_leaflet_array: (Boolean)
+  */
+  function initHierarchyLayer (arg0_hierarchy_key, arg1_layer, arg2_options) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var layer = arg1_layer;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+
+    //Add to hierarchy_obj
+    if (!hierarchy_obj.groups[layer])
+      hierarchy_obj.groups[layer] = {};
+
+      if (options.load_groups)
+        hierarchy_obj.groups[layer] = options.load_groups;
+    if (!hierarchy_obj.layers[layer])
+      hierarchy_obj.layers[layer] = {};
+
+      if (options.layer_is_leaflet_array)
+        hierarchy_obj.is_leaflet = true;
+      if (options.load_layer)
+        hierarchy_obj.layers[layer] = options.load_layer;
   }
 
   /*
