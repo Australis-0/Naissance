@@ -205,10 +205,12 @@
 
   /*
     getGroup() - Returns a group object or key.
-    {
+    arg0_group_id: (String)
+    arg1_options: (Object)
       return_layer: true/false - Whether to return the layer key instead of object
       return_key: true/false - Whether to return the key instead of object
-    }
+
+    Returns: (Object, Group; String)
   */
   function getGroup (arg0_group_id, arg1_options) {
     //Convert from parameters
@@ -233,11 +235,12 @@
 
   /*
     getGroupEntities() - Recursively fetches an array of entity objects from groups and subgroups
-
-    options: {
+    arg0_group_id: (String)
+    arg1_options: (Object)
       return_keys: truie/false, - Whether to return keys. False by default
       surface_layer: true/false - Whether to only get surface layer entities. False by default
-    }
+
+    Returns: (Array<Object, Leaflet; String>)
   */
   function getGroupEntities (arg0_group_id, arg1_options) {
     //Convert from parameters

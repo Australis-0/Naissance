@@ -41,6 +41,24 @@ function cleanObject (arg0_object, arg1_options) {
 }
 
 /*
+  equateObject() - Equates two objects on an interval.
+  arg0_object: (Object) - The 1st object to set.
+  arg1_object: (Object) - The 2nd object to reference.
+  arg2_interval: (Number) - Optional. The number of ms on which to equate the two objects. 100 by default.
+*/
+function equateObject (arg0_object, arg1_object, arg2_interval) {
+  //Convert from parameters
+  var object = arg0_object;
+  var ot_object = arg1_object;
+  var interval = (arg2_interval) ? arg2_interval : 100;
+
+  //Return statement; Set the first object to be equal to the second
+  return setInterval(function(object, ot_object){
+    object = ot_object;
+  }, interval, object, ot_object);
+}
+
+/*
   flattenObject() - Moves all keys into the 1st nesting.
   arg0_object: (Object) - The object to pass.
 

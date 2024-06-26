@@ -35,7 +35,7 @@
 
         local_layer_el.setAttribute("id", main.all_layers[i]);
         local_layer_el.setAttribute("class", "layer");
-        local_layer_el.setAttribute("onclick", `selectLayer('${main.all_layers[i]}');`);
+        local_layer_el.setAttribute("onclick", `selectLayer(document.getElementById("hierarchy-ui-container"), '${main.all_layers[i]}');`);
 
         //Append header
         local_header_el.setAttribute("class", "layer-input");

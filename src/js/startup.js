@@ -138,4 +138,9 @@ window.reserved = {
 //Test scripts
 setTimeout(function(){
   loadSave("atlas");
+
+  //Sync hierarchies
+  var hierarchies_obj = main.hierarchies;
+
+  main.equate_groups_interval = equateObject(main.groups, hierarchies_obj.hierarchy);
 }, 100);
