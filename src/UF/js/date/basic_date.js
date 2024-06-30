@@ -21,22 +21,8 @@ function daysInMonths (arg0_date_object) {
 }
 
 /*
-  getDate() - Returns a generic date string of a regularised date object.
-
-  Returns: (String)
-*/
-function getDate (arg0_date_obj) {
-  //Convert from parameters
-  var date_obj = arg0_date_obj;
-
-  //Return statement
-  return `${module.exports.ordinalise(date_obj.day)} ${module.exports.months[date_obj.month - 1]} ${date_obj.year}, ${Math.round(date_obj.hour).toString().padStart(2, "0")}:00`;
-}
-
-/*
   getDateString() - Returns a formatted string from a date object.
   arg0_date_object: (Object, Date) - The date object to pass to the function.
-
   Returns: (String)
 */
 function getDateString (arg0_date_object) { //[WIP] - Finish function body

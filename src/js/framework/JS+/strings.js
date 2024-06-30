@@ -1,47 +1,5 @@
 //String framework commands
 {
-  //Basic framework functions
-  function capitaliseWords (arg0_string) { //REDUNDANT
-    //Convert from parameters
-    var separate_words = arg0_string.split(" ");
-
-    for (var i = 0; i < separate_words.length; i++) {
-      separate_words[i] = separate_words[i].charAt(0).toUpperCase();
-      separate_words[i].substring(1);
-    }
-
-    return separate_words.join(" ");
-  }
-
-  function cleanStringify (arg0_object) { //REDUNDANT
-    //Convert from parameters
-    var object = arg0_object;
-
-    if (object && typeof object === 'object') {
-      object = copyWithoutCircularReferences([object], object);
-    }
-    return JSON.stringify(object);
-
-    function copyWithoutCircularReferences(references, object) {
-      var cleanObject = {};
-      Object.keys(object).forEach(function(key) {
-        var value = object[key];
-        if (value && typeof value === 'object') {
-          if (references.indexOf(value) < 0) {
-            references.push(value);
-            leanObject[key] = copyWithoutCircularReferences(references, value);
-            references.pop();
-          } else {
-            cleanObject[key] = '###_Circular_###';
-          }
-        } else if (typeof value !== 'function') {
-          cleanObject[key] = value;
-        }
-      });
-      return cleanObject;
-    }
-  }
-
   function equalsIgnoreCase (arg0, arg1) { //REDUNDANT
     return (arg0.toLowerCase() == arg1.toLowerCase());
   }

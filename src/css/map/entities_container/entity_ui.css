@@ -120,7 +120,6 @@
 }
 
 /* -- Container styling: Entity UI header -- */
-
 .entity-ui-title {
   height: 100%;
   width: calc(100% - 8px);
@@ -142,7 +141,6 @@
 }
 
 /* -- Container styling: Timeline/Data -- */
-
 .entity-ui-container.timeline {
   padding-bottom: calc(0.5vw + 8px)
 }
@@ -236,7 +234,6 @@
 }
 
 /* -- Container styling: Timeline/Data Animations -- */
-
 .bio-add-keyframe-icon:hover, .bio-context-menu-icon:hover, .bio-jump-to-icon:hover {
   cursor: pointer;
 }

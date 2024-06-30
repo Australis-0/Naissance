@@ -38,7 +38,7 @@ function createAction (arg0_action_key, arg1_options) {
 /*
   deleteAction() - Deletes an action from the action config.
   arg0_action_key: (String) - The key of the action to delete.
-
+  
   Returns: (Object, Action)
 */
 function deleteAction (arg0_action_key) {

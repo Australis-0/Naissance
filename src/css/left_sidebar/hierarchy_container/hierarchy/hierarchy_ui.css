@@ -14,6 +14,10 @@
 }
 
 /* -- Group styling -- */
+div.group {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 .group.mask-add {
   background-color: rgba(60, 240, 60, 0.3);
 }

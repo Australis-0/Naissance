@@ -163,46 +163,6 @@ function generateRandomID (arg0_object) {
 }
 
 /*
-  getAverage() - Returns an average from an array. Legacy function.
-  arg0_numbers: (Array<Number>) - The array of numbers to input.
-
-  Returns: (Number)
-*/
-function getAverage (arg0_numbers) {
-  //Convert from parameters
-  var numbers = getList(arg0_numbers);
-
-  //Iterate over numbers array and return average
-  var total_sum = 0;
-
-  for (var i = 0; i < numbers.length; i++)
-    total_sum += numbers[i];
-
-  //Return statement
-  return total_sum/numbers.length;
-}
-
-/*
-  getSum() - Returns the sum of an array. Legacy function.
-  arg0_numbers: (Array<Number>) - The array of numbers to input.
-
-  Returns: (Number)
-*/
-function getSum (arg0_numbers) {
-  //Convert from parameters
-  var numbers = getList(arg0_numbers);
-
-  //Iterate over numbers array and return sum
-  var total_sum = 0;
-
-  for (var i = 0; i < numbers.length; i++)
-    total_sum += numbers[i];
-
-  //Return statement
-  return total_sum;
-}
-
-/*
   log() - Calculates log/natural log
   arg0_x: (Number) - The x to calculate the log for.
   arg1_y: (Number) - The y to calculate the log for.
@@ -538,42 +498,38 @@ function sigfig (arg0_number, arg1_sigfigs) {
 }
 
 /*
-  splitNumber() - Splits a number into roughly equivalent parts within a specified tolerance.
-  arg0_n: (Number) - The number to be split.
-  arg1_x: (Number) - The number of parts to split the number into.
-  arg2_tolerance: (Number) - The tolerance within which the parts can vary.
+  splitNumber() - Splits a number randomly into multiple parts.
+  arg0_number: (Number) - The number to split.
+  arg1_parts: (Number) - How many parts to split it into.
 
-  Returns: (Array<Number>) - Array of parts that sum up to the original number.
+  Returns: (Array<Number, ...>)
 */
-function splitNumber (arg0_n, arg1_x, arg2_tolerance) {
+function splitNumber (arg0_number, arg1_parts) {
   //Convert from parameters
-  var n = arg0_n;
-  var tolerance = (arg2_tolerance) ? arg2_tolerance : n*0.15;
-  var x = arg1_x;
-
-  //Declare local instance variables
-  var base_part;
-  var parts_array = [];
-  var remaining;
-  var variation;
-
-  //Guard clauses
-  if (x <= 0) return [];
-  if (tolerance < 0) return [];
-
-  //Function body
-  base_part = n / x;
-
-  for (var i = 0; i < x; i++) {
-    variation = (Math.random() * 2 - 1) * tolerance;
-    parts_array.push(base_part + variation);
-  }
-
-  remaining = n - parts_array.reduce((acc, part) => acc + part, 0);
-  parts_array[0] += remaining; // Adjust the first part to make sure the sum is correct.
+  var number = arg0_number;
+  var parts = arg1_parts;
 
   //Return statement
-  return parts_array;
+  return [...module.exports.splitNumberParts(number, parts)];
+}
+
+//splitNumberParts() - Internal helper function for splitNumber()
+function* splitNumberParts (arg0_number, arg1_parts) {
+  //Convert from parameters
+  var number = arg0_number;
+  var parts = arg1_parts;
+
+  //Declare local instance variables
+  var sum_parts = 0;
+
+  //Split number randomly
+  for (var i = 0; i < parts - 1; i++) {
+    var part_number = Math.random()*(number - sum_parts);
+    yield part_number;
+    sum_parts += part_number;
+  }
+
+  yield number - sum_parts;
 }
 
 /*

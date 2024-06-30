@@ -41,21 +41,25 @@ function cleanObject (arg0_object, arg1_options) {
 }
 
 /*
-  equateObject() - Equates two objects on an interval.
-  arg0_object: (Object) - The 1st object to set.
-  arg1_object: (Object) - The 2nd object to reference.
-  arg2_interval: (Number) - Optional. The number of ms on which to equate the two objects. 100 by default.
+  equateObject() - Equates two objects over an interval.
+  arg0_object: (Object)
+  arg1_key: (String)
+  arg2_object: (Object)
+  arg3_key: (String)
+  arg4_interval: (Number) - Optional. 100 by default.
 */
-function equateObject (arg0_object, arg1_object, arg2_interval) {
+function equateObject (arg0_object, arg1_key, arg2_object, arg3_key, arg4_interval) {
   //Convert from parameters
   var object = arg0_object;
-  var ot_object = arg1_object;
-  var interval = (arg2_interval) ? arg2_interval : 100;
+  var key = arg1_key;
+  var ot_object = arg2_object;
+  var ot_key = arg3_key;
+  var interval = (arg4_interval) ? arg4_interval : 100;
 
-  //Return statement; Set the first object to be equal to the second
-  return setInterval(function(object, ot_object){
-    object = ot_object;
-  }, interval, object, ot_object);
+  //Return statement; set interval
+  return setInterval(function(object, key, ot_object, ot_key){
+    object[key] = ot_object[ot_key];
+  }, interval, object, key, ot_object, ot_key, interval);
 }
 
 /*
@@ -349,23 +353,6 @@ function mergeObjects (arg0_object, arg1_object, arg2_options) {
 
   //Return statement
   return merged_obj;
-}
-
-/*
-  pickDefined() - Picks the defined variable in an array of two.
-
-  Returns: (Variable)
-*/
-function pickDefined (arg0_variable, arg1_variable) {
-  //Convert from parameters
-  var variable = arg0_variable;
-  var ot_variable = arg1_variable;
-
-  //Return statement
-  if (variable != undefined)
-    return variable;
-  if (ot_variable != undefined)
-    return ot_variable;
 }
 
 /*

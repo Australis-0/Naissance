@@ -50,7 +50,7 @@ function checkObjectHistory (arg0_object, arg1_date_object, arg2_conditional_fun
   var conditional_function = arg2_conditional_function;
 
   //Declare local instance variables
-  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
   var has_property;
 
   //Check if object has history
@@ -111,7 +111,7 @@ function createObjectHistory (arg0_object, arg1_date_object, arg2_options, arg3_
       local_object.options.history[date_string] = {
         id: timestampToInt(date_string),
         coords: actual_coords,
-        options: {};
+        options: {}
       };
 
     //Manually transcribe options to avoid recursion
@@ -119,7 +119,7 @@ function createObjectHistory (arg0_object, arg1_date_object, arg2_options, arg3_
     var local_history = local_object.options.history[date_string];
 
     local_history.coords = actual_coords;
-    if (!local_history.options) local_history.options);
+    if (!local_history.options) local_history.options = {};
 
     //Iterate over all_option_keys
     for (var i = 0; i < all_option_keys.length; i++)
@@ -192,7 +192,7 @@ function getFirstHistoryFrame (arg0_object) {
       var all_history_frames = Object.keys(local_object.options.history);
       var history_frame = {
         coords: [],
-        options: {};
+        options: {}
       };
 
       if (all_history_frames.length >= 1) {

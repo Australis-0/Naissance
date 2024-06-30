@@ -1,4 +1,13 @@
 /* -- Brush context menu styling -- */
+/* -- Pointer events -- */
+.brush-map-container {
+  pointer-events: none;
+}
+.brush-map-container > div {
+  pointer-events: all;
+}
+
+/* -- Brush UI container -- */
 .brush-context-menu-container {
   position: fixed;
   bottom: 10px;

@@ -7,17 +7,22 @@
 		<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300;400;500;600;700&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Slabo+27px&display=swap" rel="stylesheet">
 
 		<!-- CSS Stylesheets -->
-		<link rel = "stylesheet" href = "./css/brush_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/context_menu_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/date_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/entity_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/file_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/global.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/icons.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/map.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/map_brush.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/sidebar_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/topbar_ui.css" type = "text/css">
+
+		<link rel = "stylesheet" href = "./css/left_sidebar/date_container/date_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/file/file_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/context_menu_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_ui.css" type = "text/css">
+
+		<link rel = "stylesheet" href = "./css/map/map.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/map/brush/brush.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/map/entities_container/entity_ui.css" type = "text/css">
+
+		<link rel = "stylesheet" href = "./css/right_sidebar/brush_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/right_sidebar/mapmode_ui.css" type = "text/css">
+
+		<link rel = "stylesheet" href = "./css/topbar/tabs_ui.css" type = "text/css">
 
 		<!-- HTML2Canvas, Leaflet.js, Leaflet Geodesy, Sortable, Tippy.js, Turf.js -->
 		<script type = "text/javascript" src="./libraries/leaflet.min.js"></script>
@@ -39,43 +44,57 @@
     <!-- UF, JS Imports -->
     <script src = "UF/js/ABRS/framework_ABRS.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/actions/caching_actions.js" type = "text/javascript"></script>
-    <script src = "UF/js/actions/timelines_actions.js" type = "text/javascript"></script>
+		<script src = "UF/js/actions/caching_actions.js" type = "text/javascript"></script>
+		<script src = "UF/js/actions/timelines_actions.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/arrays/basic_arrays.js" type = "text/javascript"></script>
-    <script src = "UF/js/arrays/conversion_arrays.js" type = "text/javascript"></script>
-    <script src = "UF/js/arrays/dataframes_arrays.js" type = "text/javascript"></script>
-    <script src = "UF/js/arrays/maths_arrays.js" type = "text/javascript"></script>
-    <script src = "UF/js/arrays/search_sort_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/basic_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/conversion_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/dataframes_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/maths_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/search_sort_arrays.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/colours/basic_colour.js" type = "text/javascript"></script>
+		<script src = "UF/js/ai/basic_ai.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/files/basic_files.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/basic_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/conversion_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/dataframes_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/maths_arrays.js" type = "text/javascript"></script>
+		<script src = "UF/js/arrays/search_sort_arrays.js" type = "text/javascript"></script>
+
+		<script src = "UF/js/BrowserUI/basic_html.js" type = "text/javascript"></script>
+		<script src = "UF/js/BrowserUI/context_menus.js" type = "text/javascript"></script>
+		<script src = "UF/js/BrowserUI/groups_framework.js" type = "text/javascript"></script>
+		<script src = "UF/js/BrowserUI/hierarchy_framework.js" type = "text/javascript"></script>
+
+		<script src = "UF/js/colours/basic_colour.js" type = "text/javascript"></script>
+
+		<script src = "UF/js/curl/basic_curl.js" type = "text/javascript"></script>
+
+		<script src = "UF/js/date/basic_date.js" type = "text/javascript"></script>
+		<script src = "UF/js/date/conversion_date.js" type = "text/javascript"></script>
+		<script src = "UF/js/date/format_date.js" type = "text/javascript"></script>
+		<script src = "UF/js/date/history_date.js" type = "text/javascript"></script>
+
+		<script src = "UF/js/files/basic_files.js" type = "text/javascript"></script>
 
 		<script src = "UF/js/localisation/basic_localisation.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/log/basic_log.js" type = "text/javascript"></script>
+		<script src = "UF/js/log/basic_log.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/numbers/basic_numbers.js" type = "text/javascript"></script>
-    <script src = "UF/js/numbers/ranges_numbers.js" type = "text/javascript"></script>
+		<script src = "UF/js/numbers/basic_numbers.js" type = "text/javascript"></script>
+		<script src = "UF/js/numbers/ranges_numbers.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/objects/basic_objects.js" type = "text/javascript"></script>
-    <script src = "UF/js/objects/maths_objects.js" type = "text/javascript"></script>
-    <script src = "UF/js/objects/smart_search_objects.js" type = "text/javascript"></script>
+		<script src = "UF/js/objects/basic_objects.js" type = "text/javascript"></script>
+		<script src = "UF/js/objects/maths_objects.js" type = "text/javascript"></script>
+		<script src = "UF/js/objects/smart_search_objects.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/pathfinding/a_star_pathfinding.js" type = "text/javascript"></script>
+		<script src = "UF/js/pathfinding/a_star_pathfinding.js" type = "text/javascript"></script>
 
 		<script src = "UF/js/statistics/basic_demographics.js" type = "text/javascript"></script>
 
-    <script src = "UF/js/strings/basic_strings.js" type = "text/javascript"></script>
-    <script src = "UF/js/strings/cleaning_strings.js" type = "text/javascript"></script>
-    <script src = "UF/js/strings/split_strings.js" type = "text/javascript"></script>
-
-    <!--Browser UF-->
-    <script src = "UF/js/BrowserUI/basic_html.js" type = "text/javascript"></script>
-    <script src = "UF/js/BrowserUI/context_menus.js" type = "text/javascript"></script>
-    <script src = "UF/js/BrowserUI/groups_framework.js" type = "text/javascript"></script>
-    <script src = "UF/js/BrowserUI/hierarchy_framework.js" type = "text/javascript"></script>
+		<script src = "UF/js/strings/basic_strings.js" type = "text/javascript"></script>
+		<script src = "UF/js/strings/cleaning_strings.js" type = "text/javascript"></script>
+		<script src = "UF/js/strings/split_strings.js" type = "text/javascript"></script>
 	</head>
 	<body>
 		<!-- Map container -->

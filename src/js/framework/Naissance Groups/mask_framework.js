@@ -68,11 +68,13 @@
 
     //A delay tick is required to set the DOM class update
     setTimeout(function(){
-      if (reserved.mask_types.includes(mode)) {
-        var group_el = document.getElementById(window.temp_mask_el.id);
+      if (reserved.mask_types.includes(mode))
+        if (global.temp_mask_el)
+          if (global.temp_mask_el.id) {
+            var group_el = document.getElementById(global.temp_mask_el.id);
 
-        group_el.setAttribute("class", `group mask-${mode}`);
-      }
+            group_el.setAttribute("class", `group mask-${mode}`);
+          }
     }, 1);
   }
 

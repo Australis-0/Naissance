@@ -262,3 +262,20 @@ function cleanStringify (arg0_input_object) {
 		return current_string;
   }
 }
+
+function equalsIgnoreCase (arg0_string, arg1_string) {
+  //Convert from parameters
+  var string = arg0_string;
+  var ot_string = arg1_string;
+
+  //Return statement
+  return (string.toLowerCase() == ot_string.toLowerCase());
+}
+
+function formaliseString (arg0_string) { //REDUNDANT
+  //Convert from parameters
+  var string = arg0_string;
+
+  //Return statement
+  return string.replace(/_/g, " ").replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
+}
