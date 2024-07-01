@@ -5,7 +5,9 @@
 
     initHierarchy(hierarchy_el, "hierarchy", {
       create_new_group_selector: `#hierarchy-create-new-group`,
-      context_menu_selectors: [`#hierarchy-context-menu`, `#hierarchy-context-menu-two`]
+      context_menu_selectors: [`#hierarchy-context-menu`, `#hierarchy-context-menu-two`],
+
+      context_menu_function: "handleSidebarContextMenu"
     });
   }
 }

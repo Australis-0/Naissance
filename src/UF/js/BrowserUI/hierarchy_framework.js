@@ -8,6 +8,7 @@
     arg1_hierarchy_key: (HTMLElement) - The subcontext menu for the hierarchy to open/close, if it exists
     arg2_options: (Object)
       create_new_group_selector: (String) - The query selector of the 'Create New Group' button
+      context_menu_function: (String) - Optional. The name of the context menu function to call upon being clicked. Accepts parameters: (arg0_hierarchy_key, arg1_group_id)
       context_menu_selectors: (Array<String>) - An array of given context menu query selectors to handle
       global_selectors: (Boolean)
   */
@@ -52,6 +53,8 @@
             global_selectors: options.global_selectors
           });
       };
+    if (options.context_menu_function)
+      hierarchy_obj.context_menu_function = options.context_menu_function;
   }
 }
 
@@ -227,7 +230,7 @@
     ctx_menu_el.setAttribute("class", "group-context-menu-icon");
     ctx_menu_el.setAttribute("draggable", "false");
     ctx_menu_el.setAttribute("src", "./gfx/interface/context_menu_icon.png");
-    ctx_menu_el.setAttribute("onclick", `toggleHierarchyContextMenu("#${hierarchy_key}", "${group_id}", "#hierarchy-context-menu");`); //[WIP]
+    ctx_menu_el.setAttribute("onclick", `toggleHierarchyContextMenu("${hierarchy_key}", "${group_id}", "#hierarchy-context-menu");`); //[WIP]
 
     local_el.setAttribute("class", group_class);
     local_el.setAttribute("id", group_id);
@@ -783,23 +786,20 @@
 
   /*
     toggleHierarchyContextMenu() - Toggles hierarchy context menus based on their context selector.
-    arg0_hierarchy_el: (HTMLElement)
+    arg0_hierarchy_key: (String)
     arg1_group_id: (String)
     arg2_context_selector: (String)
-    arg3_function: (Function) - Optional.
   */
-  function toggleHierarchyContextMenu (arg0_hierarchy_el, arg1_group_id, arg2_context_selector, arg3_function) {
+  function toggleHierarchyContextMenu (arg0_hierarchy_key, arg1_group_id, arg2_context_selector) {
     //Convert from parameters
-    var hierarchy_el = arg0_hierarchy_el;
+    var hierarchy_key = arg0_hierarchy_key;
     var group_id = arg1_group_id;
     var context_selector = arg2_context_selector;
-    var local_function = arg3_function;
-
-    //hierarchy_el string handler
-    if (typeof hierarchy_el == "string")
-      hierarchy_el = document.querySelector(hierarchy_el);
 
     //Declare local instance variables
+    var hierarchy_el = document.querySelector(`#${hierarchy_key}`);
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+
     var context_menu_els = document.querySelectorAll(context_selector);
     var group_el = hierarchy_el.querySelector(`div.group[id="${group_id}"]`);
     var offset_top = group_el.offsetTop - hierarchy_el.scrollTop;
@@ -815,8 +815,8 @@
     context_menu_els[0].style.top = `${offset_top}px`;
 
     //Apply function
-    if (local_function)
-      local_function(context_menu_el);
+    if (hierarchy_obj.context_menu_function)
+      global[hierarchy_obj.context_menu_function](hierarchy_key, group_id);
   }
 
   /*

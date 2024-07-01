@@ -65,16 +65,19 @@
 {
   /*
     createGroup() - Creates a group in a given hierarchy and its corresponding element.
-    arg0_parent_group_id: (String) - Optional. The parent group ID. Undefined by default.
-    arg1_options: (Object)
-      hierarchy_el: (HTMLElement)
-    arg2_do_not_refresh: (Boolean)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_parent_group_id: (String) - Optional. The parent group ID. Undefined by default.
+    arg2_options: (Object)
+      do_not_refresh: (Boolean) - Optional. False by default.
+      hierarchy_el: (HTMLElement) - Optional. '#hierarchy' by default.
+
+    Returns: (Object)
   */
-  function createGroup (arg0_parent_group_id, arg1_options, arg2_do_not_refresh) {
+  function createGroup (arg0_hierarchy_key, arg1_parent_group_id, arg2_options) {
     //Convert from parameters
-    var parent_group_id = arg0_parent_group_id;
-    var options = (arg1_options) ? arg1_options : {};
-    var do_not_refresh = arg2_do_not_refresh;
+    var hierarchy_key = arg0_hierarchy_key;
+    var parent_group_id = arg1_parent_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var group_id = generateGroupID();
@@ -84,15 +87,17 @@
 
       parent_group: (parent_group_id) ? parent_group_id : undefined
     };
+    var hierarchy_key = (options.hierarchy_key) ? options.hierarchy_key : "hierarchy";
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
     var selected_layer = main.brush.selected_layer;
-    var sidebar_el = (options.hierarchy_el) ? options.hierarchy_el : document.getElementById("hierarchy");
+    var sidebar_el = (options.hierarchy_el) ? options.hierarchy_el : document.getElementById(hierarchy_key);
 
     var selected_layer_el = sidebar_el.querySelector(`[id='${selected_layer}']`);
 
     main.groups[selected_layer][group_id] = group_obj;
 
     //Create actual UI element
-    var group_el = createGroupElement(selected_layer, group_id);
+    var group_el = createGroupElement(hierarchy_key, selected_layer, group_id);
 
     //If group_obj.parent_group is not defined, we know we're creating it directly in a layer
     if (!group_obj.parent_group) {
@@ -124,7 +129,7 @@
     }
 
     //Refresh sidebar
-    if (!do_not_refresh) {
+    if (!options.do_not_refresh) {
       refreshSidebar();
 
       //Focus on newly created group
@@ -140,12 +145,13 @@
 
   /*
     deleteGroup() - Deletes a group in a given hierarchy and its corresponding element.
-    arg0_group_id: (String)
-    arg1_options: (Object)
+    arg0_hierarchy_key: (String)
+    arg1_group_id: (String)
+    arg2_options: (Object)
+      do_not_refresh: (Boolean) - Optional. False by default.
       hierarchy_context_el: (HTMLElement)
-    arg2_do_not_refresh: (Boolean)
   */
-  function deleteGroup (arg0_group_id, arg1_options, arg2_do_not_refresh) {
+  function deleteGroup (arg0_group_id, arg1_options, arg2_do_not_refresh) { //[WIP] - Refactor function.
     //Convert from parameters
     var group_id = arg0_group_id;
     var options = (arg1_options) ? arg1_options : {};
@@ -255,6 +261,34 @@
         clearInterval(clear_subgroups_loop);
       }
     }, 0);
+  }
+
+  /*
+    generateGroupID() - Generates a random non-conflicting Group ID for a given hierarchy.
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+
+    Returns: (String)
+  */
+  function generateGroupID (arg0_hierarchy_key) { //[WIP] - Make this work for multiple hierarchies
+    //Convert from parameters
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+
+    var all_hierarchy_groups = Object.keys(hierarchy_obj.groups);
+
+    //While loop to find ID, just in case of conflicting random IDs:
+    while (true) {
+      var id_taken = false;
+      var local_id = generateRandomID();
+
+      //Return statement; once valid ID is found
+      if (!all_hierarchy_groups.includes(local_id)) {
+        return local_id;
+        break;
+      }
+    }
   }
 
   /*
