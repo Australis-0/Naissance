@@ -15,29 +15,27 @@
 //Sidebar UI functions
 {
   /*
-  onSidebarDragEnd() - Handles the end of a drag event in a nested sortable hierarchy.
-  arg0_event: (Object) - The event object from the drag event.
+    onSidebarDragEnd() - Handles the end of a drag event in a nested sortable hierarchy.
+    arg0_event: (Object) - The event object from the drag event.
 
-  Returns: (undefined)
-*/
-function onSidebarDragEnd(arg0_event) {
+    Returns: (undefined)
+  */
+  function onSidebarDragEnd(arg0_event) {
     //Convert from parameters
     var e = arg0_event;
 
     //Declare local instance variables
+    var element_id, old_index, new_index, group_children;
     var element_obj = e.item;
     var target_obj = e.to;
     var target_id, target_parent, subgroups_el, entities_el, group_element, group_obj, selector;
-    var element_id, old_index, new_index, group_children;
 
     //Guard clauses
-    if (!element_obj || !target_obj) {
-        return;
-    }
+    if (!element_obj || !target_obj) return;
 
     if (target_obj.id === "hierarchy") {
-        e.from.append(element_obj);
-        return;
+      e.from.append(element_obj);
+      return;
     }
 
     // Determine the nesting levels
@@ -53,59 +51,54 @@ function onSidebarDragEnd(arg0_event) {
     target_parent = target_obj.parentElement;
 
     // Handle group dragging
-    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("group")) {
-        if (!target_id.includes("-subgroups")) {
-            try {
-                subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
+    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("group"))
+      if (!target_id.includes("-subgroups"))
+        try {
+          subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
 
-                if (subgroups_el) {
-                    subgroups_el.appendChild(element_obj);
-                } else {
-                    target_obj.appendChild(element_obj);
-                }
-            } catch (error) {
-                target_obj.appendChild(element_obj);
-            }
-        }
-    }
-
-    // Handle entity dragging
-    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("entity")) {
-        entities_el = target_obj.querySelector(`[id='${target_id}-entities']`) ||
-                      target_parent.querySelector(`[id='${target_parent.id}-entities']`);
-
-        if (entities_el) {
-            entities_el.appendChild(element_obj);
-        } else {
+          (subgroups_el) ?
+            subgroups_el.appendChild(element_obj) :
             target_obj.appendChild(element_obj);
+        } catch (error) {
+          target_obj.appendChild(element_obj);
         }
+
+    //Handle entity dragging
+    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("entity")) {
+      entities_el = target_obj.querySelector(`[id='${target_id}-entities']`) ||
+        target_parent.querySelector(`[id='${target_parent.id}-entities']`);
+
+      (entities_el) ?
+        entities_el.appendChild(element_obj) :
+        target_obj.appendChild(element_obj);
     }
 
-    // Update group and entity belonging
+    //Update group and entity belonging
     element_id = element_obj.id;
-    group_element = element_obj.closest('.group'); // Adjust the class name based on your structure
+    group_element = element_obj.closest('.group');
+
     if (group_element) {
-        group_obj = getGroup(group_element.id);
-        selector = "";
+      group_obj = getGroup(group_element.id);
+      selector = "";
 
-        if (element_obj.getAttribute("class").includes("entity")) {
-            moveEntityToGroup(element_id, group_element.id);
-            selector = "entities";
-        }
-        if (element_obj.getAttribute("class").includes("group")) {
-            moveGroupToGroup(element_id, group_element.id);
-            selector = "subgroups";
-        }
+      if (element_obj.getAttribute("class").includes("entity")) {
+        moveEntityToGroup(element_id, group_element.id);
+        selector = "entities";
+      }
+      if (element_obj.getAttribute("class").includes("group")) {
+        moveGroupToGroup(element_id, group_element.id);
+        selector = "subgroups";
+      }
 
-        if (group_obj) {
-            group_children = Array.from(element_obj.parentElement.children);
-            old_index = group_obj[selector].indexOf(element_id);
-            new_index = group_children.indexOf(element_obj);
+      if (group_obj) {
+        group_children = Array.from(element_obj.parentElement.children);
+        old_index = group_obj[selector].indexOf(element_id);
+        new_index = group_children.indexOf(element_obj);
 
-            moveElement(group_obj[selector], old_index, new_index);
-        }
+        moveElement(group_obj[selector], old_index, new_index);
+      }
     }
-}
+  }
 
 
   function refreshSidebar (arg0_do_not_refresh) {

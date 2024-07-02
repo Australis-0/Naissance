@@ -1,66 +1,3 @@
-//Helper functions
-{
-  /*
-    removeGroupFromAllSubgroups() - Removes a group from all subgroups.
-    arg0_group_id: (String)
-    arg1_options: (Object)
-      hierarchy_key: (String) - The hierarchy key to provide.
-  */
-  function removeGroupFromAllSubgroups (arg0_group_id, arg1_options) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
-    var options = (arg1_options) ? arg1_options : {};
-
-    //Declare local instance variables
-    var deleted = false;
-
-    if (options.hierarchy_key) {
-      var hierarchy_obj = main.hierarchies[options.hierarchy_key];
-
-      var all_layers = Object.keys(hierarchy_obj.layers);
-
-      //Iterate over all layers to delete
-      for (var i = 0; i < all_layers.length; i++) {
-        var local_groups = hierarchy_obj.groups[all_layers[i]];
-
-        var all_local_groups = Object.keys(local_groups);
-
-        for (var x = 0; x < all_local_groups.length; x++) {
-          var local_group = local_groups[all_local_groups[x]];
-
-          if (local_group.subgroups)
-            for (var y = local_group.subgroups.length - 1; y >= 0; y--)
-              if (local_group.subgroups[y] == group_id) {
-                local_group.subgroups.splice(y, 1);
-                deleted = true;
-              }
-        }
-      }
-    } else {
-      //Iterate over all layers to delete
-      for (var i = 0; i < main.all_layers.length; i++) {
-        var local_groups = main.groups[main.all_layers[i]];
-
-        var all_local_groups = Object.keys(local_groups);
-
-        for (var x = 0; x < all_local_groups.length; x++) {
-          var local_group = local_groups[all_local_groups[x]];
-
-          if (local_group.subgroups)
-            for (var y = local_group.subgroups.length - 1; y >= 0; y--)
-              if (local_group.subgroups[y] == group_id) {
-                local_group.subgroups.splice(y, 1);
-                deleted = true;
-              }
-        }
-      }
-    }
-
-    //Return statement
-    return deleted;
-  }
-}
-
 //Group functions
 {
   /*
@@ -115,7 +52,7 @@
 
       //Make sure it exists in new parent .subgroups
       if (parent_group_id) {
-        var parent_group = getGroup(parent_group_id);
+        var parent_group = getGroup("hierarchy", parent_group_id);
 
         if (parent_group) {
           if (!parent_group.subgroups) parent_group.subgroups = [];
@@ -145,23 +82,24 @@
 
   /*
     deleteGroup() - Deletes a group in a given hierarchy and its corresponding element.
-    arg0_hierarchy_key: (String)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
     arg1_group_id: (String)
     arg2_options: (Object)
       do_not_refresh: (Boolean) - Optional. False by default.
-      hierarchy_context_el: (HTMLElement)
+      hierarchy_context_el: (HTMLElement) - Optional. '#hierarchy-context-menu' by default.
   */
-  function deleteGroup (arg0_group_id, arg1_options, arg2_do_not_refresh) { //[WIP] - Refactor function.
+  function deleteGroup (arg0_hierarchy_key, arg1_group_id, arg2_options) { //[WIP] - Refactor function.
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var options = (arg1_options) ? arg1_options : {};
-    var do_not_refresh = arg2_do_not_refresh;
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var context_menu_el = (options.hierarchy_context_el) ? options.hierarchy_context_el : document.getElementById("hierarchy-context-menu");
-    var group_layer = getGroup(group_id, { return_layer: true });
-    var group_obj = getGroup(group_id);
-    var parent_group = getGroupGroup(group_id);
+    var group_layer = getGroup(hierarchy_key, group_id, { return_layer: true });
+    var group_obj = getGroup(hierarchy_key, group_id);
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+    var parent_group = getGroupGroup(hierarchy_key, group_id);
 
     if (group_obj) {
       //KEEP AT TOP! - Remove group options first
@@ -170,7 +108,15 @@
       }
 
       //Make sure to move all subgroups and entities out into group's parent element if it exists (change parent_group)
-      if (parent_group)
+      if (parent_group) {
+        if (group_obj.entities) {
+          if (!parent_group.entities) parent_group.entities = [];
+
+          //Add all current entities to parent_group.entities if not already there
+          for (var i = 0; i < group_obj.entities.length; i++)
+            if (!parent_group.entities.includes(group_obj.entities[i]))
+              parent_group.entities.push(group_obj.entities[i]);
+        }
         if (group_obj.subgroups) {
           if (!parent_group.subgroups) parent_group.subgroups = [];
 
@@ -179,15 +125,17 @@
             if (!parent_group.subgroups.includes(group_obj.subgroups[i]))
               parent_group.subgroups.push(group_obj.subgroups[i]);
         }
+      }
 
       //Delete group
-      delete main.groups[group_layer][group_id];
+      delete hierarchy_obj.groups[group_layer][group_id];
 
       //Remove all mentions of group_id from subgroups in layer
-      var layer_groups = main.groups[group_layer];
+      var layer_groups = hierarchy_obj.groups[group_layer];
 
       var all_layer_groups = Object.keys(layer_groups);
 
+      //Iterate over all_layer_groups
       for (var i = 0; i < all_layer_groups.length; i++) {
         var local_group = layer_groups[all_layer_groups[i]];
 
@@ -211,38 +159,47 @@
       }
 
       //Refresh sidebar
-      if (!do_not_refresh)
+      if (!options.do_not_refresh)
         refreshSidebar();
     }
   }
 
   /*
     deleteGroupRecursively() - Deletes a group recursively, including all sub-elements.
-    arg0_group_id: (String)
-    arg1_options: (Object)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_group_id: (String)
+    arg2_options: (Object)
       hierarchy_context_el: (HTMLElement)
   */
-  function deleteGroupRecursively (arg0_group_id, arg1_options) {
+  function deleteGroupRecursively (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
+    var hierarchy_key = arg0_hierarchy_key;
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var context_menu_el = (options.hierarchy_context_el) ? options.hierarchy_context_el : document.getElementById("hierarchy-context-menu");
-    var group_layer = getGroup(group_id, { return_layer: true });
-    var group_obj = getGroup(group_id);
-    var parent_group = getGroupGroup(group_id);
+    var group_layer = getGroup(hierarchy_key, group_id, { return_layer: true });
+    var group_obj = getGroup(hierarchy_key, group_id);
+    var parent_group = getGroupGroup(hierarchy_key, group_id);
     var still_has_subgroups = true;
 
     //Delete all subgroups first to move everything to the base group until group_obj has no subgroups
     var clear_subgroups_loop = setInterval(function(){
+      //Delete if there's nothing in group_obj.subgroups
+      if (group_obj.subgroups)
+        if (group_obj.subgroups.length == 0)
+          delete group_obj.subgroups;
+
       if (!group_obj.subgroups) {
         still_has_subgroups = false;
-      } else
+      } else {
         try {
           if (group_obj.subgroups)
             for (var i = 0; i < group_obj.subgroups.length; i++)
-              deleteGroup(group_obj.subgroups[i], true);
+              deleteGroup(hierarchy_key, group_obj.subgroups[i]);
         } catch {}
+      }
 
       if (!still_has_subgroups) {
         //Delete all entities remaining in base group
@@ -251,7 +208,7 @@
             deleteEntity(group_obj.entities[i]);
 
         //Delete group proper
-        deleteGroup(group_id, true);
+        deleteGroup(hierarchy_key, group_id);
 
         //Refresh sidebar; reload map
         refreshSidebar();
@@ -293,26 +250,34 @@
 
   /*
     getGroup() - Returns a group object or key.
-    arg0_group_id: (String)
-    arg1_options: (Object)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_group_id: (String)
+    arg2_options: (Object)
       hierarchy_id: (String) - Optional. Whether to fetch a group inside a custom hierarchy.
       return_layer: (Object) - Optional. Whether to return the layer key instead of object. False by default.
       return_key: (Object) - Optional. Whether to return the key instead of object. False by default.
 
     Returns: (String/Object/String)
   */
-  function getGroup (arg0_group_id, arg1_options) {
+  function getGroup (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var options = (arg1_options) ? arg1_options : {};
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Guard clause for object
     if (typeof group_id == "object") return group_id;
 
-    //Check whether options.hierarchy_id is defined
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = main.groups[main.all_layers[i]];
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
 
+    var all_layers = Object.keys(hierarchy_obj.groups);
+
+    //Iterate over all_layers
+    for (var i = 0; i < all_layers.length; i++) {
+      var local_layer = hierarchy_obj.groups[main.all_layers[i]];
+
+      //Return statement
       if (local_layer[group_id])
         if (options.return_layer) {
           return main.all_layers[i];
@@ -324,25 +289,27 @@
 
   /*
     getGroupEntities() - Recursively fetches an array of entity objects from groups and subgroups.
-    arg0_group_id: (String)
-    arg1_options: (Object)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_group_id: (String)
+    arg2_options: (Object)
       return_keys: (Boolean) - Optional. Whether to return keys. False by default
       surface_layer: (Boolean) - Optional. Whether to only get surface layer entities. False by default
 
     Returns: (Array<Object>)
   */
-  function getGroupEntities (arg0_group_id, arg1_options) {
+  function getGroupEntities (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var options = (arg1_options) ? arg1_options : {};
+    var hierarchy_key = arg0_hierarchy_key;
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var entity_array = [];
-    var group_obj = getGroup(group_id);
+    var group_obj = getGroup(hierarchy_key, group_id);
 
     if (group_obj.entities) {
       for (var i = 0; i < group_obj.entities.length; i++) {
-        var local_entity = getEntity(group_obj.entities[i]);
+        var local_entity = getEntity(hierarchy_key, group_obj.entities[i]);
 
         entity_array.push((!options.return_keys) ? local_entity : local_entity.options.className);
       }
@@ -350,7 +317,7 @@
     if (group_obj.subgroups) {
       for (var i = 0; i < group_obj.subgroups.length; i++)
         //Call function recursively
-        entity_array = appendArrays(entity_array, getGroupEntities(group_obj.subgroups[i], options));
+        entity_array = appendArrays(entity_array, getGroupEntities(hierarchy_key, group_obj.subgroups[i], options));
     }
 
     //Return statement
@@ -358,22 +325,29 @@
   }
 
   /*
-    getGroupGroup() - Fetches the parent group of a child group. [WIP] - Debug for multiple hierarchies
-    arg0_group_id: (String)
-    arg1_options: (Object)
+    getGroupGroup() - Fetches the parent group of a child group. [WIP] - Debug for multiple hierarchies.
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_group_id: (String)
+    arg2_options: (Object)
       return_key: (Boolean) - Optional. Whether to return the key. False by default, returns [`<layer>_groups`, `key`] if true
 
     Returns: (Object/Array<String, String>)
   */
-  function getGroupGroup (arg0_group_id, arg1_options) {
+  function getGroupGroup (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var options = (arg1_options) ? arg1_options : {};
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+
+    var all_layers = Object.keys(hierarchy_obj.groups);
 
     //Iterate over all layers; groups for subgroups
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_key = main.all_layers[i];
-      var local_layer = main.layers[main.all_layers[i]];
+    for (var i = 0; i < all_layers.length; i++) {
+      var local_key = all_layers[i];
+      var local_layer = main.groups[all_layers[i]];
 
       var all_local_groups = Object.keys(local_layer);
 
@@ -389,18 +363,20 @@
 
   /*
     moveEntityToGroup() - Moves an entity to a given group. [WIP] - Debug for multiple hierarchies
-    arg0_entity_id: (String)
-    arg1_group_id: (String)
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_entity_id: (String)
+    arg2_group_id: (String)
   */
-  function moveEntityToGroup (arg0_entity_id, arg1_group_id) {
+  function moveEntityToGroup (arg0_hierarchy_key, arg1_entity_id, arg2_group_id) {
     //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var group_id = arg1_group_id;
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var entity_id = arg1_entity_id;
+    var group_id = arg2_group_id;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-    var new_group = getGroup(group_id);
-    var old_group = getEntityGroup(entity_id);
+    var new_group = getGroup(hierarchy_key, group_id);
+    var old_group = getEntityGroup(hierarchy_key, entity_id);
 
     //Initialise local instance variables
     entity_id = entity_obj.options.className;
@@ -438,19 +414,21 @@
 
   /*
     moveGroupToGroup() - Moves a group inside another group. [WIP] - Debug for multiple hierarchies
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
     arg0_group_id: (String)
     arg1_group_id: (String)
   */
-  function moveGroupToGroup (arg0_group_id, arg1_group_id) {
+  function moveGroupToGroup (arg0_hierarchy_key, arg1_group_id, arg2_group_id) {
     //Convert from parameters
-    var child_group_id = arg0_group_id;
-    var parent_group_id = arg1_group_id;
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var child_group_id = arg1_group_id;
+    var parent_group_id = arg2_group_id;
 
     //Declare local instance variables
-    var new_group = (typeof parent_group_id != "object") ? getGroup(parent_group_id) : parent_group_id;
+    var new_group = (typeof parent_group_id != "object") ? getGroup(hierarchy_key, parent_group_id) : parent_group_id;
 
     //Remove group from all subgroups in all layers first
-    removeGroupFromAllSubgroups(child_group_id);
+    removeGroupFromAllSubgroups(hierarchy_key, child_group_id);
 
     //Add to new group
     if (new_group) {
@@ -468,5 +446,67 @@
       if (!is_in_group)
         new_group.subgroups.push(child_group_id);
     }
+  }
+
+  /*
+    removeGroupFromAllSubgroups() - Removes a group from all subgroups.
+    arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
+    arg1_group_id: (String)
+    arg2_options: (Object)
+      hierarchy_key: (String) - The hierarchy key to provide.
+  */
+  function removeGroupFromAllSubgroups (arg0_hierarchy_key, arg1_group_id, arg2_options) {
+    //Convert from parameters
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
+    var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var deleted = false;
+
+    if (options.hierarchy_key) {
+      var hierarchy_obj = main.hierarchies[options.hierarchy_key];
+
+      var all_layers = Object.keys(hierarchy_obj.layers);
+
+      //Iterate over all layers to delete
+      for (var i = 0; i < all_layers.length; i++) {
+        var local_groups = hierarchy_obj.groups[all_layers[i]];
+
+        var all_local_groups = Object.keys(local_groups);
+
+        for (var x = 0; x < all_local_groups.length; x++) {
+          var local_group = local_groups[all_local_groups[x]];
+
+          if (local_group.subgroups)
+            for (var y = local_group.subgroups.length - 1; y >= 0; y--)
+              if (local_group.subgroups[y] == group_id) {
+                local_group.subgroups.splice(y, 1);
+                deleted = true;
+              }
+        }
+      }
+    } else {
+      //Iterate over all layers to delete
+      for (var i = 0; i < main.all_layers.length; i++) {
+        var local_groups = main.groups[main.all_layers[i]];
+
+        var all_local_groups = Object.keys(local_groups);
+
+        for (var x = 0; x < all_local_groups.length; x++) {
+          var local_group = local_groups[all_local_groups[x]];
+
+          if (local_group.subgroups)
+            for (var y = local_group.subgroups.length - 1; y >= 0; y--)
+              if (local_group.subgroups[y] == group_id) {
+                local_group.subgroups.splice(y, 1);
+                deleted = true;
+              }
+        }
+      }
+    }
+
+    //Return statement
+    return deleted;
   }
 }

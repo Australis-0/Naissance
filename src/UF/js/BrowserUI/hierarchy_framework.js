@@ -686,21 +686,23 @@
     //Declare local instance variables
     var hierarchy_obj = main.hierarchies[hierarchy_key];
 
-    var all_layers = Object.keys(hierarchy_obj.layers);
+    var all_layers = Object.keys(hierarchy_obj.groups);
 
     //Reset HTML
     if (!do_not_refresh)
       hierarchy_el.innerHTML = "";
 
+    console.log(`Refresh hierarchy called!`);
+
     //Create all layer elements
     for (var i = 0; i < all_layers.length; i++) {
       var local_groups = hierarchy_obj.groups[all_layers[i]];
       var local_layer = hierarchy_obj.layers[all_layers[i]];
-      var local_layer_el = sidebar_el.querySelector(`[id='${all_layers[i]}']`);
+      var local_layer_el = hierarchy_el.querySelector(`[id='${all_layers[i]}']`);
 
       var all_local_groups = Object.keys(local_groups);
       var first_layer_groups = [];
-      var ungrouped_entities = getUngroupedEntities(all_layers[i]);
+      var ungrouped_entities = getUngroupedEntities(hierarchy_key, all_layers[i]);
 
       //Check for first layer groups
       for (var x = 0; x < all_local_groups.length; x++) {
@@ -713,15 +715,17 @@
 
       //Initialise first layer group HTML with entities
       for (var x = 0; x < first_layer_groups.length; x++) {
-        var local_group_el = getRecursiveGroupElement(all_layers[i], first_layer_groups[x]);
+        var local_group_el = getRecursiveGroupElement(hierarchy_key, all_layers[i], first_layer_groups[x]);
 
         if (!local_layer_el.querySelector(`[id='${first_layer_groups[x]}']`))
           local_layer_el.appendChild(local_group_el);
       }
 
       //Append ungrouped entities to end of list
+      console.log(`Ungrouped entities:`, ungrouped_entities);
       for (var x = 0; x < ungrouped_entities.length; x++) {
-        var local_entity_el = createEntityElement(all_layers[i], ungrouped_entities[x]);
+        var local_entity_el = createEntityElement(hierarchy_key, all_layers[i], ungrouped_entities[x]);
+        console.log(local_entity_el);
 
         if (!local_layer_el.querySelector(`[id='${ungrouped_entities[x]}']`))
           local_layer_el.appendChild(local_entity_el);
@@ -869,7 +873,7 @@
       var local_id = all_groups[i].getAttribute("id");
       var local_subgroups = [];
 
-      var group_obj = getGroup(/*hierarchy_key, */local_id);
+      var group_obj = getGroup(hierarchy_key, local_id);
 
       var local_entities_el = all_groups[i].querySelector(`[id='${local_id}-entities']`);
       var local_subgroups_el = all_groups[i].querySelector(`[id='${local_id}-subgroups']`);
@@ -921,7 +925,7 @@
     hierarchy_obj.groups[layer] = groups_obj;
 
     if (!do_not_refresh)
-      refreshHierarchy(hierarchy_el, do_not_refresh);
+      refreshHierarchy(hierarchy_el, hierarchy_key, do_not_refresh);
   }
 
   /*

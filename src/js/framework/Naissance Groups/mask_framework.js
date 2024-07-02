@@ -19,7 +19,7 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var group_obj = getGroup(group_id);
+    var group_obj = getGroup("hierarchy", group_id);
 
     var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
     var group_el_class;
@@ -59,7 +59,7 @@
     } else if (mode == "subtract") {
       if (group_el_class) {
         //Get all selected entities and add to brush_obj.masks.subtract
-        var all_selected_entities = getGroupEntities(group_obj.id);
+        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
         brush_obj.mask_subtract = appendArrays(brush_obj.mask_subtract, all_selected_entities);
         group_obj.mask = "subtract";
@@ -143,7 +143,7 @@
     //Declare local instance variables
     var brush_obj = main.brush;
     var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
-    var group_obj = getGroup(group_id);
+    var group_obj = getGroup("hierarchy", group_id);
 
     //Edit class display
     if (group_el) {
