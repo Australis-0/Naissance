@@ -19,11 +19,13 @@
     var create_subgroup_btn = context_menu_el.querySelector(`#context-menu-create-subgroup-button`);
     var delete_all_btn = context_menu_el.querySelector(`#context-menu-delete-all-button`);
     var delete_group_btn = context_menu_el.querySelector("#context-menu-delete-group-button");
+    var set_mask_btn = context_menu_el.querySelector(`#context-menu-mask-group-button`);
 
     //Set button functionality
     create_subgroup_btn.setAttribute("onclick", `createGroup("hierarchy", "${group_id}");`);
     delete_group_btn.setAttribute("onclick", `deleteGroup("hierarchy", "${group_id}");`);
     delete_all_btn.setAttribute("onclick", `deleteGroupRecursively("hierarchy", "${group_id}");`);
+    set_mask_btn.setAttribute("onclick", `handleSidebarMaskContextMenu("hierarchy", "${group_id}");`);
   }
 
   function handleSidebarMaskContextMenu (arg0_hierarchy_key, arg1_group_id) {
@@ -32,33 +34,30 @@
     var group_id = arg1_group_id;
 
     //Declare local instance variables
-    var group_el = document.querySelector(`div.group[id=${group_id}]`);
-    var hierarchy_container_el = document.querySelector(`#${hierarchy_key}-context-menu-two`);
-    var hierarchy_subcontext_el = document.getElementById(`#hierarchy-context-menu-two`);
-    var offset_top = group_el.offsetTop - hierarchy_container_el.scrollTop;
+    var context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu-two`);
+    var group_el = document.querySelector(`div.group[id="${group_id}"]`);
+    var offset_top = group_el.offsetTop - context_menu_el.scrollTop;
 
     //Check mode
     if (group_el) {
-      showElement(hierarchy_subcontext_el);
-      hierarchy_subcontext_el.setAttribute("style", `top: calc(${offset_top}px);`);
+      showElement(context_menu_el);
+      context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
 
-      if (mode == "mask") {
-        hierarchy_subcontext_el.innerHTML = `
-          <div id = "mask-context-menu-text" class = "context-menu-text">
-            <b>Set Mask:</b><br>
-            <select id = "group-mask-${group_id}">
-              <option value = "add">Add (Brush > Mask)</option>
-              <option value = "intersect_add">Intersect Add (Brush > Intersection)</option>
-              <option value = "intersect_overlay">Intersect Overlay (Brush in Intersection)</option>
-              <option value = "subtract">Subtract (Mask > Brush)</option>
-              <option value = "clear">None</option>
-            </select>
-          </div>
-          <div id = "mask-context-menu-confirm" class = "context-menu-button confirm" onclick = "setGroupMask('${group_id}');">
-            <img src = "gfx/interface/checkmark_icon.png" class = "icon small negative" draggable = "false"> Confirm
-          </div>
-        `;
-      }
+      context_menu_el.innerHTML = `
+        <div id = "mask-context-menu-text" class = "context-menu-text">
+          <b>Set Mask:</b><br>
+          <select id = "group-mask-${group_id}">
+            <option value = "add">Add (Brush > Mask)</option>
+            <option value = "intersect_add">Intersect Add (Brush > Intersection)</option>
+            <option value = "intersect_overlay">Intersect Overlay (Brush in Intersection)</option>
+            <option value = "subtract">Subtract (Mask > Brush)</option>
+            <option value = "clear">None</option>
+          </select>
+        </div>
+        <div id = "mask-context-menu-confirm" class = "context-menu-button confirm" onclick = "setGroupMask('${group_id}');">
+          <img src = "gfx/interface/checkmark_icon.png" class = "icon small negative" draggable = "false"> Confirm
+        </div>
+      `;
     }
   }
 }

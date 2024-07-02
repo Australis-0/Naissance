@@ -35,7 +35,7 @@
     if (mode == "add") {
       if (group_el_class) {
         //Get all selected entities and add to brush_obj.masks.mask_add
-        var all_selected_entities = getGroupEntities(group_obj.id);
+        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
         brush_obj.mask_add = appendArrays(brush_obj.mask_add, all_selected_entities);
         group_obj.mask = "add";
@@ -43,7 +43,7 @@
     } else if (mode == "intersect_add") {
       if (group_el_class) {
         //Get all selected entities and add to brush_obj.masks.intersect_add
-        var all_selected_entities = getGroupEntities(group_obj.id);
+        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
         brush_obj.mask_intersect_add = appendArrays(brush_obj.mask_intersect_add, all_selected_entities);
         group_obj.mask = "intersect_add";
@@ -51,7 +51,7 @@
     } else if (mode == "intersect_overlay") {
       if (group_el_class) {
         //Get all selected entities and add to brush_obj.masks.intersect_overlay
-        var all_selected_entities = getGroupEntities(group_obj.id);
+        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
         brush_obj.mask_intersect_overlay = appendArrays(brush_obj.mask_intersect_overlay, all_selected_entities);
         group_obj.mask = "intersect_overlay";
