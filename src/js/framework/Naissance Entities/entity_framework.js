@@ -100,7 +100,7 @@
       brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
 
       //Set entityUI for current selected entity
-      selection.on("click", function (e) {
+      brush_obj.current_selection.on("click", function (e) {
         entityUI(e);
       });
     }

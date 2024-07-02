@@ -82,10 +82,15 @@
               if (local_value._latlngs) {
                 var local_coords = difference(local_value._latlngs,  brush_obj.current_path);
 
-                local_value.setLatLngs(local_coords);
+                //If local_coords is defined, set it - otherwise hide it
+                if (local_coords) {
+                  local_value.setLatLngs(local_coords);
 
-                //Set new ._latlngs to coords of current history frame
-                createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
+                  //Set new ._latlngs to coords of current history frame
+                  createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
+                } else {
+                  hidePolity(local_value.options.className, main.date);
+                }
               }
           }
 

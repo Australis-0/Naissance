@@ -1,15 +1,14 @@
 //Declare Mask framework functions
 {
   /*
-    addGroupMask() - Sets an entire group to have a mask according to mode
-
-    mode: "add"/"clear"/"subtract",
+    addGroupMask() - Sets an entire group to have a mask according to mode.
+    arg0_group_id: (String)
+    arg1_mode: (String) - "add"/"clear"/"subtract",
       - "add" allows the group to subtract from current selection,
       - "clear" removes all group masks from current selection,
       - "subtract" allows the current selection to subtract from all entities in group
-    options: {
-      do_not_override_entity_masks: true/false - Whether to override entity masks. [REVISIT] - To be implemented in future
-    }
+    arg2_options: (Object)
+      do_not_override_entity_masks: (Boolean) - Whether to override entity masks. [REVISIT] - To be implemented in future
   */
   function addGroupMask (arg0_group_id, arg1_mode, arg2_options) {
     //Convert from parameters
@@ -32,39 +31,14 @@
     removeGroupMask(group_obj.id, options);
 
     //Mode handling
-    if (mode == "add") {
+    if (["add", "intersect_add", "intersect_overlay", "subtract"].includes(mode))
       if (group_el_class) {
-        //Get all selected entities and add to brush_obj.masks.mask_add
         var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
-        brush_obj.mask_add = appendArrays(brush_obj.mask_add, all_selected_entities);
-        group_obj.mask = "add";
+        //Get all selected entities and add to brush_obj.masks[mode]
+        brush_obj.masks[mode] = appendArrays(brush_obj.masks[mode], all_selected_entities);
+        group_obj.mask = mode;
       }
-    } else if (mode == "intersect_add") {
-      if (group_el_class) {
-        //Get all selected entities and add to brush_obj.masks.intersect_add
-        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
-
-        brush_obj.mask_intersect_add = appendArrays(brush_obj.mask_intersect_add, all_selected_entities);
-        group_obj.mask = "intersect_add";
-      }
-    } else if (mode == "intersect_overlay") {
-      if (group_el_class) {
-        //Get all selected entities and add to brush_obj.masks.intersect_overlay
-        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
-
-        brush_obj.mask_intersect_overlay = appendArrays(brush_obj.mask_intersect_overlay, all_selected_entities);
-        group_obj.mask = "intersect_overlay";
-      }
-    } else if (mode == "subtract") {
-      if (group_el_class) {
-        //Get all selected entities and add to brush_obj.masks.subtract
-        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
-
-        brush_obj.mask_subtract = appendArrays(brush_obj.mask_subtract, all_selected_entities);
-        group_obj.mask = "subtract";
-      }
-    }
 
     //A delay tick is required to set the DOM class update
     setTimeout(function(){
@@ -131,9 +105,8 @@
   /*
     removeGroupMask() - Sets an entire group to no longer have a mask
 
-    options: {
+    arg1_options: (Object)
       do_not_override_entity_masks: true/false - Whether to override entity masks. [REVISIT] - To be implemented in future
-    }
   */
   function removeGroupMask (arg0_group_id, arg1_options) {
     //Convert from parameters
@@ -147,7 +120,7 @@
 
     //Edit class display
     if (group_el) {
-      var all_selected_entity_keys = getGroupEntities(group_obj.id, { return_keys: true });
+      var all_selected_entity_keys = getGroupEntities("hierarchy", group_obj.id, { return_keys: true });
       var new_class = removeClasses(group_el, reserved.mask_classes);
 
       //Strip classes

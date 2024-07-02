@@ -43,16 +43,19 @@
 
 
     //Context menu handling for hierarchy
-    if (options.context_menu_selectors)
+    if (options.context_menu_selector) {
+      hierarchy_obj.context_menu_selector = options.context_menu_selector;
+
       hierarchy_el.onclick = function (e) {
         if (
           !arrayHasElementAttribute(e.composedPath(), "id", "hierarchy-context-menu") &&
           !arrayHasElementAttribute(e.composedPath(), "class", "group-context-menu-icon")
         )
-          closeHierarchyContextMenus(hierarchy_el, options.context_menu_selectors, {
+          closeHierarchyContextMenus(hierarchy_el, options.context_menu_selector, {
             global_selectors: options.global_selectors
           });
       };
+    }
     if (options.context_menu_function)
       hierarchy_obj.context_menu_function = options.context_menu_function;
   }
@@ -230,7 +233,7 @@
     ctx_menu_el.setAttribute("class", "group-context-menu-icon");
     ctx_menu_el.setAttribute("draggable", "false");
     ctx_menu_el.setAttribute("src", "./gfx/interface/context_menu_icon.png");
-    ctx_menu_el.setAttribute("onclick", `toggleHierarchyContextMenu("${hierarchy_key}", "${group_id}", "#hierarchy-context-menu");`); //[WIP]
+    ctx_menu_el.setAttribute("onclick", `toggleHierarchyContextMenu("${hierarchy_key}", "${group_id}", ${(hierarchy_obj.context_menu_selector) ? `"${hierarchy_obj.context_menu_selector}"` : undefined});`); //[WIP]
 
     local_el.setAttribute("class", group_class);
     local_el.setAttribute("id", group_id);
@@ -804,17 +807,19 @@
 
     var context_menu_els = document.querySelectorAll(context_selector);
     var group_el = hierarchy_el.querySelector(`div.group[id="${group_id}"]`);
-    var offset_top = group_el.offsetTop - hierarchy_el.scrollTop;
+    var offset_top = group_el.getBoundingClientRect().top;
 
-    //Iterate over all context_menu_els
+    //Set first context_menu_el to be visible upon click
+    if (context_menu_els[0].getAttribute("class").includes("display-none"))
+      context_menu_els[0].setAttribute("class",
+        context_menu_els[0].getAttribute("class")
+          .replace(" instant-display-none", "")
+          .replace(" display-none", "")
+      );
+
+    //Iterate over all context_menu_els to set their vertical offset position
     for (var i = 0; i < context_menu_els.length; i++)
-      if (context_menu_els[0].getAttribute("class").includes("display-none"))
-        context_menu_els[0].setAttribute("class",
-          context_menu_els[0].getAttribute("class")
-            .replace(" instant-display-none", "")
-            .replace(" display-none", "")
-        );
-    context_menu_els[0].style.top = `${offset_top}px`;
+      context_menu_els[i].style.top = `${offset_top}px`;
 
     //Apply function
     if (hierarchy_obj.context_menu_function)

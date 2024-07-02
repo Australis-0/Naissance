@@ -36,12 +36,12 @@
     //Declare local instance variables
     var context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu-two`);
     var group_el = document.querySelector(`div.group[id="${group_id}"]`);
-    var offset_top = group_el.offsetTop - context_menu_el.scrollTop;
+    var main_context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu`);
 
     //Check mode
     if (group_el) {
       showElement(context_menu_el);
-      context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
+      //context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
 
       context_menu_el.innerHTML = `
         <div id = "mask-context-menu-text" class = "context-menu-text">

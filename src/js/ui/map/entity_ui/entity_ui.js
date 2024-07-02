@@ -600,8 +600,8 @@ global.opened_popups = {};
         extinct: true
       });
 
-      populateEntityBio(entity_id);
-      populateTimelineGraph(entity_id);
+      try { populateEntityBio(entity_id); } catch {}
+      try { populateTimelineGraph(entity_id); } catch {}
 
       if (!do_not_reload)
         loadDate();

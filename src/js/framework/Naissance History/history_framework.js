@@ -57,10 +57,11 @@
     //Declare local instance variables
     var date_string = getTimestamp(date);
     var entity_key = getEntity(entity_id, { return_key: true });
+    var hierarchy_obj = main.hierarchies.hierarchy;
     var old_history_entry = getPolityHistory(entity_id, date);
 
     var entity_obj = (typeof entity_id != "object") ?
-      window[entity_key[0]][entity_key[1]] : entity_id;
+      hierarchy_obj.layers[entity_key[0]][entity_key[1]] : entity_id;
 
     if (entity_obj) {
       //Make sure history object is initailised
