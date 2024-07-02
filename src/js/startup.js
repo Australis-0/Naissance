@@ -142,6 +142,6 @@ setTimeout(function(){
   //Sync hierarchies
   var hierarchies_obj = main.hierarchies;
 
-
   main.equate_groups_interval = equateObject(hierarchies_obj.hierarchy, "groups", global.main, "groups");
+  main.equate_layers_interval = equateObject(hierarchies_obj.hierarchy, "layers", global.main, "layers");
 }, 100);

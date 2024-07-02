@@ -692,8 +692,6 @@
     if (!do_not_refresh)
       hierarchy_el.innerHTML = "";
 
-    console.log(`Refresh hierarchy called!`);
-
     //Create all layer elements
     for (var i = 0; i < all_layers.length; i++) {
       var local_groups = hierarchy_obj.groups[all_layers[i]];

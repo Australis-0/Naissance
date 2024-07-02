@@ -202,9 +202,9 @@
       }
 
       if (!still_has_subgroups) {
-        //Delete all entities remaining in base group
+        //Delete all entities remaining in base group; reverse for-loop
         if (group_obj.entities)
-          for (var i = 0; i < group_obj.entities.length; i++)
+          for (var i = group_obj.entities.length - 1; i >= 0; i--)
             deleteEntity(group_obj.entities[i]);
 
         //Delete group proper
