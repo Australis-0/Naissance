@@ -100,7 +100,6 @@
     }
   }
 
-
   function refreshSidebar (arg0_do_not_refresh) {
     //Convert from parameters
     var do_not_refresh = arg0_do_not_refresh;

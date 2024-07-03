@@ -27,7 +27,7 @@ function createTimeline (arg0_parent_timeline, arg1_options) {
   root_action.id = new_timeline_id;
   root_action.parent_timeline_id = parent_timeline_id;
   root_action.parent_timeline_index = (options.timeline_index) ?
-    options.timeline_index : parent_timeline_array[parent_timeline_array.length - 1];
+    options.timeline_index : Math.max(parent_timeline_array.length - 1, 0);
 
   //Push root_action to timeline
   new_timeline.push(root_action);
@@ -135,12 +135,22 @@ function deleteTimeline (arg0_timeline_id) {
     x_offset: (Number) - Optional. The current x offset. 0 by default.
     y_offset: (Number) - Optional. The current y offset. 0 by default.
 
+    excluded_timelines: (Array<String>) - Optional. Optimisation parameter.
+    is_recursive: (Boolean) - Optional. Whether this is a recursive call. Optimisation parameter.
+
   Returns: (Object) - A timeline graph object to render.
 */
 function generateTimelineGraph (arg0_timeline_id, arg1_options) {
   //Convert from parameters
-  var timeline_id = arg0_timeline_id;
+  var timeline_id = (arg0_timeline_id) ? arg0_timeline_id : global.actions.initial_timeline;
   var options = (arg1_options) ? arg1_options : {};
+
+  //Initialise options
+  if (!options.excluded_timelines) options.excluded_timelines = [];
+
+  //Guard clause for excluded_timelines
+  if (options.recursive && !arg0_timeline_id) return {};
+  if (options.excluded_timelines.includes(timeline_id)) return {};
 
   //Declare local instance variables
   var all_timelines = Object.keys(global.timelines);
@@ -151,57 +161,97 @@ function generateTimelineGraph (arg0_timeline_id, arg1_options) {
   var x_offset = returnSafeNumber(options.x_offset);
   var y_offset = returnSafeNumber(options.y_offset);
 
-  //Produce graph at this layer only for the current timeline and immediate all_timelines connected to it, then call
-  for (var i = 0; i < all_timelines.length; i++) {
-    var local_timeline = global.timelines[all_timelines[i]];
+  //Create list of .child_timelines first
+  if (timeline_id == global.actions.initial_timeline) {
+    for (var i = 0; i < all_timelines.length; i++) {
+      var local_child_timelines = [];
+      var local_timeline = global.timelines[all_timelines[i]];
 
-    if (local_timeline[0])
-      if (local_timeline[0].parent_timeline_id == timeline_id) {
-        var local_timeline_width = getTimelineWidth(all_timelines[i]);
+      for (var x = 0; x < all_timelines.length; x++) {
+        var local_second_timeline = global.timelines[all_timelines[x]];
+
+        if (local_second_timeline[0])
+          if (local_second_timeline[0].parent_timeline_id == all_timelines[i]) {
+            var local_parent_timeline_id = local_second_timeline[0].parent_timeline_id;
+
+            var local_parent_timeline = global.timelines[local_parent_timeline_id];
+
+            if (!local_child_timelines.includes(all_timelines[x]) && all_timelines[x] != all_timelines[i])
+              local_child_timelines.push(all_timelines[x]);
+          }
+      }
+
+      if (!local_timeline[0] && local_child_timelines.length > 0)
+        local_timeline.push({});
+      if (local_child_timelines.length > 0)
+        local_timeline[0].child_timelines = local_child_timelines;
+    }
+  }
+
+  //Produce graph at this layer only for the current timeline and immediate all_timelines connected to it, then call recursively
+  if (timeline_array[0])
+    if (timeline_array[0].child_timelines) {
+      for (var i = 0; i < timeline_array[0].child_timelines.length; i++) {
+        var local_child_timeline = global.timelines[timeline_array[0].child_timelines[i]];
+        var local_child_timeline_id = timeline_array[0].child_timelines[i];
+
+        var child_timeline_width = getTimelineWidth(local_child_timeline_id);
 
         //Calculate x_offset; y_offset
-        var local_x_offset = x_offset + returnSafeNumber(local_timeline[0].parent_timeline_index);
-        var local_y_offset = y_offset + current_y_offset + local_timeline_width;
+        var local_x_offset = x_offset + returnSafeNumber(local_child_timeline[0].parent_timeline_index);
+        var local_y_offset = y_offset + current_y_offset + child_timeline_width;
 
-        current_y_offset += local_timeline_width;
+        current_y_offset += child_timeline_width;
 
-        //Iterate recursively
-        var new_timeline_graph = generateTimelineGraph(all_timelines[i], {
+        //Iterate recursively - This causes a max. stack call size error for some reason
+        var new_timeline_graph = generateTimelineGraph(local_child_timeline_id, {
           x_offset: local_x_offset,
           y_offset: local_y_offset,
 
           x_original: x_offset,
-          y_original: y_offset
+          y_original: y_offset,
+
+          is_recursive: true
         });
 
-        timeline_graph = mergeObjects(timeline_graph, new_timeline_graph);
-      }
-  }
+        var all_new_timeline_keys = Object.keys(new_timeline_graph);
 
-  //Iterate over current timeline_array
+        for (var x = 0; x < all_new_timeline_keys.length; x++)
+          timeline_graph[all_new_timeline_keys[x]] = new_timeline_graph[all_new_timeline_keys[x]];
+      }
+    }
+
+  //Parse connections
+  var last_id = "";
+
+  //Iterate over current timeline_array; parse connection_ids
   for (var i = 0; i < timeline_array.length; i++) {
-    var local_connections = [];
+    var local_connection_ids = [];
     var local_id = generateRandomID(timeline_graph);
 
     timeline_graph[local_id] = {};
 
     //.x_original/.y_original handler
     if (options.x_original != undefined && options.y_original != undefined)
-      local_connections.push([options.x_original, options.y_original]);
+      local_connection_ids.push([last_id]);
 
-    //Connecttions handler
-    if (local_connections.length > 0)
-      timeline_graph[local_id].connections = local_connections;
+    //Connections handler
+    if (local_connection_ids.length > 0)
+      timeline_graph[local_id].connection_ids = local_connection_ids;
 
     //Add .data field
     timeline_graph[local_id].data = timeline_array[i];
     timeline_graph[local_id].x = i;
     timeline_graph[local_id].y = 0;
+
+    //Set last_id
+    last_id = local_id;
   }
 
-  //Add x_offset; y_offset to timeline_graph and to connections
+  //Add x_offset; y_offset to timeline graph and to connections
   var all_elements = Object.keys(timeline_graph);
 
+  //Iterate over all_elements to adjust x_offset; y_offset
   for (var i = 0; i < all_elements.length; i++) {
     var local_element = timeline_graph[all_elements[i]];
 
@@ -209,14 +259,114 @@ function generateTimelineGraph (arg0_timeline_id, arg1_options) {
     local_element.y += y_offset;
 
     if (local_element.connections)
-      for (var i = 0; i < local_element.connections.length; i++) {
-        local_element.connections[i][0] += x_offset;
-        local_element.connections[i][1] += y_offset;
+      for (var x = 0; x < local_element.connections.length; x++) {
+        local_element.connections[x][0] += x_offset;
+        local_element.connections[x][1] += y_offset;
       }
   }
 
   //Return statement
   return timeline_graph;
+}
+
+/*
+  getFlippedTimeline() - Flips a timeline's .x, .y coordinates.
+  arg0_graph: (Object) - The graph of the timeline to pass to the function.
+
+  Returns: (Object)
+*/
+function getFlippedTimeline (arg0_graph) {
+  //Convert from parameters
+  var graph = arg0_graph;
+
+  //Declare local instance variables
+  var all_graph_keys = Object.keys(graph);
+
+  //Iterate over all_graph_keys
+  for (var i = 0; i < all_graph_keys.length; i++) {
+    var local_graph_entry = graph[all_graph_keys[i]];
+
+    //Check to make sure local_graph_entry coordinates exist
+    if (local_graph_entry.x != undefined && local_graph_entry.y != undefined) {
+      var old_x = JSON.parse(JSON.stringify(local_graph_entry.x));
+      var old_y = JSON.parse(JSON.stringify(local_graph_entry.y));
+
+      //Flip coordinates
+      local_graph_entry.x = old_y;
+      local_graph_entry.y = old_x;
+    }
+  }
+
+  //Return statement
+  return graph;
+}
+
+/*
+  getLastAction() - Fetches the last action loaded in the current timeline.
+
+  Returns: (Object)
+*/
+function getLastAction () {
+  //Declare local instance variables
+  var current_timeline = global.timelines[global.actions.current_timeline];
+
+  var current_action = current_timeline[global.actions.current_index];
+
+  //Return statement
+  if (current_action)
+    return current_action;
+}
+
+/*
+  getTimelineMaxX() - Fetches the maximum .x value in a timeline graph.
+  arg0_graph: (Object) - The timeline graph to insert.
+
+  Returns: (Number)
+*/
+function getTimelineMaxX (arg0_graph) {
+  //Convert from parameters
+  var graph = arg0_graph;
+
+  //Declare local instance variables
+  var all_graph_keys = Object.keys(graph);
+  var max_x = 0;
+
+  //Iterate over all_graph_keys
+  for (var i = 0; i < all_graph_keys.length; i++) {
+    var local_graph_entry = graph[all_graph_keys[i]];
+
+    if (local_graph_entry.x > max_x)
+      max_x = local_graph_entry.x;
+  }
+
+  //Return statement
+  return max_x;
+}
+
+/*
+  getTimelineMaxY() - Fetches the maximum .y value in a timeline graph.
+  arg0_graph: (Object) - The timeline graph to insert.
+
+  Returns: (Number)
+*/
+function getTimelineMaxY (arg0_graph) {
+  //Convert from parameters
+  var graph = arg0_graph;
+
+  //Declare local instance variables
+  var all_graph_keys = Object.keys(graph);
+  var max_y = 0;
+
+  //Iterate over all_graph_keys
+  for (var i = 0; i < all_graph_keys.length; i++) {
+    var local_graph_entry = graph[all_graph_keys[i]];
+
+    if (local_graph_entry.y > max_y)
+      max_y = local_graph_entry.y;
+  }
+
+  //Return statement
+  return max_y;
 }
 
 /*
@@ -230,16 +380,22 @@ function getTimelineWidth (arg0_timeline_id) {
   var timeline_id = arg0_timeline_id;
 
   //Declare local instance variables
-  var all_timelines = Object.keys(timeline_id);
+  var all_timelines = Object.keys(global.timelines);
+  var timeline_array = global.timelines[timeline_id];
   var timeline_width = 0;
 
-  //Iterate over timeline_array
-  for (var i = 0; i < all_timelines.length; i++) {
-    var local_timeline = global.timelines[all_timelines[i]];
+  //Check if array has .child_timelines
+  if (timeline_array) {
+    if (!timeline_array[0])
+      timeline_array.push({});
+    if (timeline_array[0])
+      if (timeline_array[0].child_timelines)
+        for (var i = 0; i < timeline_array[0].child_timelines.length; i++) {
+          var local_child_timeline_id = timeline_array[0].child_timelines[i];
 
-    if (local_timeline[0])
-      if (local_timeline[0].parent_timeline_id == timeline_id)
-        timeline_width += getTimelineWidth(all_timelines[i]);
+          timeline_width += timeline_array[0].child_timelines.length;
+          timeline_width += getTimelineWidth(local_child_timeline_id);
+        }
   }
 
   //Return statement
@@ -302,7 +458,7 @@ function jumpToTimeline (arg0_timeline_id) {
 
 /*
   redoAction() - Redoes an action in the current timeline.
-  
+
   Returns: (Boolean) - Whether the action was successfully redone
 */
 function redoAction () {
@@ -356,21 +512,35 @@ function performAction (arg0_options) {
     undo_function_parameters: options.undo_function_parameters
   };
 
-  //If the current_index is not the same as the length of the current timeline - 1, split off a new timeline; and set current_timeline to that.
-  if (current_index != current_timeline.length - 1) {
-    var new_timeline = createTimeline(global.actions.current_timeline);
+  //Check if action was grouped
+  var action_grouped = groupActions(new_action);
 
-    new_timeline.push(new_action);
+  if (!action_grouped)
+    //If the current_index is not the same as the length of the current timeline - 1, split off a new timeline; and set current_timeline to that.
+    if (!global.no_undo_redo_trees) {
+      if (current_index != current_timeline.length - 1) {
+        var new_timeline = createTimeline(global.actions.current_timeline);
 
-    //Set current_timeline; current_index to new_timeline
-    global.actions.current_timeline = new_timeline[0].id;
-    global.actions.current_index = 1;
-  } else {
-    current_timeline.push(new_action);
+        new_timeline.push(new_action);
 
-    //Set current_index
-    global.actions.current_index = current_timeline.length - 1;
-  }
+        //Set current_timeline; current_index to new_timeline
+        global.actions.current_timeline = new_timeline[0].id;
+        global.actions.current_index = 1;
+      } else {
+        current_timeline.push(new_action);
+
+        //Set current_index
+        global.actions.current_index = current_timeline.length - 1;
+      }
+    } else {
+      //Splice element into current_timeline
+      current_timeline.splice(global.actions.current_index + 1, 0, new_action);
+
+      //Set current_index
+      global.actions.current_index++;
+
+      global.actions.current_index = Math.min(global.actions.current_index, current_timeline.length - 1);
+    }
 }
 
 /*
@@ -379,7 +549,7 @@ function performAction (arg0_options) {
   Returns: (Boolean) - Whether the action was successfully undone.
 */
 function undoAction () {
-  //Declare localk instance variables
+  //Declare local instance variables
   var current_index = returnSafeNumber(global.actions.current_index);
   var current_timeline = global.timelines[global.actions.current_timeline];
 
