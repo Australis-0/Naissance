@@ -72,6 +72,7 @@
     return element.innerHTML;
   }
 
+  //initialiseUndoRedoUI()
   function initialiseUndoRedoUI () {
     //Declare local instance variables
     var undo_redo_ui_el = document.getElementById(`undo-redo-ui-container`);
@@ -79,7 +80,7 @@
     //Create global.undo_redo_loop
     global.undo_redo_loop = setInterval(function(){
       //Generate timeline table element
-      generateTimelineTableElement(undo_redo_ui_el);
+      //generateTimelineTableElement(undo_redo_ui_el);
     }, 1000);
   }
 }

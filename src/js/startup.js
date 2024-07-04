@@ -128,6 +128,12 @@ window.reserved = {
   //Initialise Sidebar handling
   initSidebar();
 
+  //KEEP AT BOTTOM!
+  //Initialise Undo/Redo
+  initialiseUndoRedo();
+  initialiseUndoRedoActions();
+
+
   //UI loop
   setInterval(function(){
     //Update bottom-right sidebar UI
