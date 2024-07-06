@@ -6,7 +6,7 @@
     arg1_options: (Object)
       flipped: (Boolean) - Optional. True by default.
   */
-  function generateTimelineTableElement (arg0_element, arg1_options) { //[WIP] - Fix lines
+  function generateTimelineTableElement (arg0_element, arg1_options) { //[WIP] - Fix lines and finish function body
     //Convert from parameters
     var element = arg0_element;
     var options = (arg1_options) ? arg1_options : {};
@@ -72,7 +72,7 @@
     return element.innerHTML;
   }
 
-  //initialiseUndoRedoUI()
+  //initialiseUndoRedoUI() - Initialises undo/redo elements in UI. [WIP] - Finish function body
   function initialiseUndoRedoUI () {
     //Declare local instance variables
     var undo_redo_ui_el = document.getElementById(`undo-redo-ui-container`);
