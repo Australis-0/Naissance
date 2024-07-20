@@ -47,7 +47,7 @@ div.group {
   background-color: rgba(0, 0, 0, 0.85);
 }
 .hierarchy-elements-container {
-  height: calc(65vh - 2.5vh - 2.5vh);
+  height: calc(65vh - 7.5vh);
   overflow-y: auto;
 
   color: white;

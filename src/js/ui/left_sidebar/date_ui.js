@@ -402,7 +402,7 @@
   }
 }
 
-//Initialise date functions
+//Initialise Date UI functions
 {
   function initDate () {
     //Populate UI
@@ -413,5 +413,25 @@
       date_fields[i].addEventListener("keyup", function (e) {
         if (e.key == "Enter") readDate();
       });
+  }
+
+  function initDateUI () {
+    //Declare local instance variables
+    var bottom_left_date_ui = createContextMenu({
+      anchor: `#date-ui-container`,
+      class: `date-ui`,
+      id: "date-ui",
+      name: `Date:`,
+
+      date_input: {
+        id: "date-input",
+        name: "Date:",
+        type: "date",
+        multiple_rows: true,
+
+        x: 0,
+        y: 0
+      }
+    });
   }
 }

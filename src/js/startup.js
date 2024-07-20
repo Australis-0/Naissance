@@ -133,6 +133,7 @@ window.reserved = {
   initialiseUndoRedo();
   initialiseUndoRedoActions();
 
+  initDateUI();
 
   //UI loop
   setInterval(function(){

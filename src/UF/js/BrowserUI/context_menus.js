@@ -8,7 +8,6 @@
   biuf
 */
 
-
 //Requires: html2canvas
 /*
   createContextMenu() - Creates a context menu within the DOM.
@@ -349,6 +348,9 @@ function createInput (arg0_options) {
     if (options.name)
       html_string.push(`<span>${options.name}</span>`);
   } else if (["color", "colour"].includes(options.type)) {
+    if (options.name)
+      html_string.push(`<div class = "header">${options.name}</div>`);
+
     //High-intensity - take a page from Naissance colour wheels
     html_string.push(`<div class = "colour-picker-container">`);
       //Onload handler
@@ -382,6 +384,8 @@ function createInput (arg0_options) {
       html_string.push(`</span>`);
     html_string.push(`</div>`);
   } else if (options.type == "datalist") {
+    if (options.name)
+      html_string.push(`<div class = "header">${options.name}</div>`);
     html_string.push(`<datalist class = "datalist">`);
       //Add .options to datalist
       var all_options = Object.keys(options.options);
@@ -396,10 +400,11 @@ function createInput (arg0_options) {
     html_string.push(`</datalist>`);
   } else if (options.type == "date") {
     if (options.name)
-      html_string.push(options.name);
+      html_string.push(`<div class = "header">${options.name}</div>`);
 
     //High-intensity - create date framework first
     //Day/month/year container
+    if (options.multiple_rows) html_string.push(`<div class = "row-one">`);
     html_string.push(`<input id = "day-input" class = "day-input" placeholder = "1st" size = "4">`);
     html_string.push(`<input id = "month-input" class = "month-input" list = "months" placeholder = "January">`);
     html_string.push(`
@@ -425,11 +430,14 @@ function createInput (arg0_options) {
         <option value = "BC">BC</option>
       </select>
     `);
+    if (options.multiple_rows) html_string.push(`</div>`);
     //Hour-minute container
+    if (options.multiple_rows) html_string.push(`<div class = "row-two">`);
     html_string.push(`
       <input id = "hour-input" value = "00" placeholder = "00" size = "2"> :
       <input id = "minute-input" value = "00" placeholder = "00" size = "2">
     `);
+    if (options.multiple_rows) html_string.push(`</div>`);
   } else if (options.type == "date_length") {
     if (options.name)
       html_string.push(options.name);
@@ -478,10 +486,14 @@ function createInput (arg0_options) {
 
     html_string.push(`<input type = "range" id = "range-input"${name_string} ${objectToAttributes(options.attributes)}`);
   } else if (options.type == "reset") {
+    if (options.name)
+      html_string.push(`<div class = "header">${options.name}</div>`);
     html_string.push(`<input type = "reset" id = "reset-button" value = "Reset">`);
   } else if (options.type == "search_select") {
     //High-intensity; requires searchable list - scratch it up in Codepen
   } else if (options.type == "select") {
+    if (options.name)
+      html_string.push(`<div class = "header">${options.name}</div>`);
     //Similar to datalist
     html_string.push(`<select class = "select-menu" ${objectToAttributes(options.attributes)}>`);
       //Add .options to select
@@ -496,6 +508,8 @@ function createInput (arg0_options) {
       }
     html_string.push(`</select>`);
   } else if (options.type == "submit") {
+    if (options.name)
+      html_string.push(`<div class = "header">${options.name}</div>`);
     html_string.push(`<input type = "submit" value = "${(options.name) ? options.name : "Submit"}" ${objectToAttributes(options.attributes)}>`);
   } else if (["tel", "telephone"].includes(options.type)) {
     if (options.name)
