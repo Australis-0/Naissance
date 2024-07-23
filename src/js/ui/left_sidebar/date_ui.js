@@ -1,6 +1,16 @@
 //Date UI functions
 {
   function autoFillDate () {
+    //Declare local instance variables
+    var day_field = getUISelector(`day_el`);
+    var month_field = getUISelector(`month_el`);
+    var year_field = getUISelector(`year_el`);
+    var year_type_field = getUISelector(`year_type_el`);
+
+    var hour_field = getUISelector(`hour_el`);
+    var minute_field = getUISelector(`minute_el`);
+
+    //Update filled values to recent context
     year_type_field.value = (main.date.year >= 0) ? "AD" : "BC";
     year_field.value = Math.abs(main.date.year);
     month_field.value = months[main.date.month - 1];
@@ -304,6 +314,13 @@
 
   function readDate () {
     //Declare local instance variables
+    var day_field = getUISelector(`day_el`);
+    var month_field = getUISelector(`month_el`);
+    var year_field = getUISelector(`year_el`);
+    var year_type_field = getUISelector(`year_type_el`);
+
+    var hour_field = getUISelector(`hour_el`);
+    var minute_field = getUISelector(`minute_el`);
     var new_date = JSON.parse(JSON.stringify(main.date));
 
     //Check if year is valid
@@ -405,6 +422,9 @@
 //Initialise Date UI functions
 {
   function initDate () {
+    //Declare local instance variables
+    var date_fields = getUISelector("date_fields", true);
+
     //Populate UI
     autoFillDate();
 
@@ -418,7 +438,7 @@
   function initDateUI () {
     //Declare local instance variables
     var bottom_left_date_ui = createContextMenu({
-      anchor: `#date-ui-container`,
+      anchor: `#date-container`,
       class: `date-ui`,
       id: "date-ui",
       name: `Date:`,
@@ -433,5 +453,8 @@
         y: 0
       }
     });
+
+    //Initialise date only after Date UI has first been loaded
+    initDate();
   }
 }

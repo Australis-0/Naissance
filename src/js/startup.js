@@ -122,9 +122,6 @@ window.reserved = {
   initBrush();
   initBrushUI();
 
-  //Initialise Date handling
-  initDate();
-
   //Initialise Sidebar handling
   initSidebar();
 

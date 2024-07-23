@@ -32,7 +32,7 @@ function switchTopbarTab (arg0_tab) {
 }
 
 //Declare listener events
-document.getElementById("topbar-container").onclick = function (e) {
+getUISelector("topbar").onclick = function (e) {
   var parent_el = e.target.parentElement;
   var target_el = e.target;
 

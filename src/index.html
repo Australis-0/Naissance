@@ -95,13 +95,16 @@
 		<script src = "UF/js/strings/basic_strings.js" type = "text/javascript"></script>
 		<script src = "UF/js/strings/cleaning_strings.js" type = "text/javascript"></script>
 		<script src = "UF/js/strings/split_strings.js" type = "text/javascript"></script>
+
+		<!-- Import config -->
+		<script src = "./js/ui/ui_config.js" type = "text/javascript"></script>
 	</head>
 	<body>
 		<!-- Map container -->
 		<div id = "map" class = "map-container"></div>
 
 		<!-- Topbar UI -->
-		<div id = "topbar-container" class = "topbar-container">
+		<div id = "topbar" class = "topbar-container">
 			<ul>
 				<li class = "file"><a href = "#">File</a></li>
 				<li class = "map active"><a href = "#">Map</a></li>
@@ -109,9 +112,9 @@
 		</div>
 
 		<!-- Left Sidebar -->
-		<div id = "sidebar-ui-container" class = "sidebar-container">
-			<div id = "file-ui-container" class = "file-container hidden" page = "true">
-				<div id = "file-ui-body-contianer" class = "hierarchy-body-container">
+		<div id = "left-sidebar" class = "sidebar-container">
+			<div id = "file-tab" class = "file-container hidden" page = "true">
+				<div id = "file-container" class = "hierarchy-body-container">
 					<div id = "file-header" class = "hierarchy-header">SAVE/LOAD</div>
 					<hr class = "hierarchy-header-line">
 					<br>
@@ -126,8 +129,8 @@
 					</div>
 				</div>
 			</div>
-			<div id = "hierarchy-ui-container" class = "hierarchy-container" page = "true">
-				<div id = "hierarchy-ui-body-container" class = "hierarchy-body-container">
+			<div id = "hierarchy-tab" class = "hierarchy-container" page = "true">
+				<div id = "hierarchy-container" class = "hierarchy-body-container">
 					<div id = "hierarchy-header" class = "hierarchy-header">HIERARCHY</div>
 					<hr class = "hierarchy-header-line">
 					<br>
@@ -175,84 +178,49 @@
 				</div>
 			</div>
 
-			<div id = "date-ui-container" class = "date-container">
-				<center>
-					<div id = "date-header" class = "date-header">DATE</div>
-					<hr class = "date-header-line">
-					<br>
-					<div class = "full-date-container">
-						<input id = "day-input" value = "12th" placeholder = "1st">
-						<input list = "months" id = "month-input" placeholder = "January" value = "August">
-						<datalist id = "months" name = "month">
-							<option value = "January">1</option>
-							<option value = "February">2</option>
-							<option value = "March">3</option>
-							<option value = "April">4</option>
-							<option value = "May">5</option>
-							<option value = "June">6</option>
-							<option value = "July">7</option>
-							<option value = "August">8</option>
-							<option value = "September">9</option>
-							<option value = "October">10</option>
-							<option value = "November">11</option>
-							<option value = "December">12</option>
-						</datalist>
-						<input id = "year-input" value = "2022" placeholder = "2022">
-						<select id = "year-type">
-							<option value = "AD">AD</option>
-							<option value = "BC">BC</option>
-						</select>
-					</div>
-					<div class = "full-clock-container">
-						<input id = "hour-input" value = "00" placeholder = "00"> :
-						<input id = "minute-input" value = "00" placeholder = "00">
-					</div>
-					<br>
-					<div id = "date-error" class = "date-error-ui"></div>
-				</center>
-			</div>
+			<div id = "date-container" class = "date-container"></div>
 		</div>
 
 		<!-- Brush/Mapmode UI. This is in reverse order for bottom anchor -->
-		<div id = "brush-mapmode-ui-container" class = "brush-map-container">
-			<!-- 4th container -->
-			<div id = "brush-container" class = "brush-container">
-				<div id = "brush-options-container" class = "brush-options-container">
-					<div id = "brush-options-subheader" class = "brush-options subheader">Brush Options</div>
-					<div id = "brush-information-container" class = "brush-information-container"></div>
-					<div id = "brush-buttons-container" class = "brush-buttons-container">
-						<img src = "gfx/interface/simplify_icon.png" class = "small button" id = "simplify-brush-btn" draggable = "false" context = "true" onclick = "printBrushOptions('simplify');">
+		<div id = "right-sidebar">
+			<div id = "brush-mapmode-container" class = "brush-map-container">
+				<!-- 4th container -->
+				<div id = "brush-container" class = "brush-container">
+					<div id = "brush-options-container" class = "brush-options-container">
+						<div id = "brush-options-subheader" class = "brush-options subheader">Brush Options</div>
+						<div id = "brush-information-container" class = "brush-information-container"></div>
+						<div id = "brush-buttons-container" class = "brush-buttons-container">
+							<img src = "gfx/interface/simplify_icon.png" class = "small button" id = "simplify-brush-btn" draggable = "false" context = "true" onclick = "printBrushOptions('simplify');">
+						</div>
 					</div>
+				</div>
+
+				<!-- 3rd container -->
+				<div id = "mapmode-settings-container" class = "mapmode-settings-container hidden">
+				</div>
+				<div id = "mapmode-settings-header-container" class = "mapmode-settings-header-container">
+					<span id = "mapmode-settings-subheader" class = "bottom-right subheader">Mapmode Settings
+						<img src = "gfx/interface/empty_icon.png" class = "small button reverse-minimise-icon right-align" id = "toggle-mapmode-settings-btn" onclick = "toggleMapmodeSettings();">
+					</span>
+				</div>
+
+				<!-- 2nd container -->
+				<div id = "select-mapmode-container" class = "select-mapmode-container">
+				</div>
+				<div id = "select-mapmode-header-container" class = "select-mapmode-header-container">
+					<span id = "select-mapmode-subheader" class = "bottom-right subheader">Select Mapmode
+						<img src = "gfx/interface/empty_icon.png" class = "small button minimise-icon right-align" id = "toggle-select-mapmode-btn" onclick = "toggleSelectMapmode();">
+					</span>
+				</div>
+
+				<!-- Topmost container -->
+				<div id = "mapmode-search-container" class = "mapmode-search-container">
+					<input id = "mapmode-search" class = "mapmode-search" placeholder = "Mapmode search ...">
 				</div>
 			</div>
 
-			<!-- 3rd container -->
-			<div id = "mapmode-settings-container" class = "mapmode-settings-container hidden">
-			</div>
-			<div id = "mapmode-settings-header-container" class = "mapmode-settings-header-container">
-				<span id = "mapmode-settings-subheader" class = "bottom-right subheader">Mapmode Settings
-					<img src = "gfx/interface/empty_icon.png" class = "small button reverse-minimise-icon right-align" id = "toggle-mapmode-settings-btn" onclick = "toggleMapmodeSettings();">
-				</span>
-			</div>
-
-			<!-- 2nd container -->
-			<div id = "select-mapmode-container" class = "select-mapmode-container">
-			</div>
-			<div id = "select-mapmode-header-container" class = "select-mapmode-header-container">
-				<span id = "select-mapmode-subheader" class = "bottom-right subheader">Select Mapmode
-					<img src = "gfx/interface/empty_icon.png" class = "small button minimise-icon right-align" id = "toggle-select-mapmode-btn" onclick = "toggleSelectMapmode();">
-				</span>
-			</div>
-
-			<!-- Topmost container -->
-			<div id = "mapmode-search-container" class = "mapmode-search-container">
-				<input id = "mapmode-search" class = "mapmode-search" placeholder = "Mapmode search ...">
-			</div>
-		</div>
-
-		<!-- Brush options container -->
-		<div id = "brush-context-menu-container" class = "brush-context-menu-container hidden">
-			Test
+			<!-- Brush options container -->
+			<div id = "brush-options-container" class = "brush-context-menu-container hidden"></div>
 		</div>
 
 		<!-- Import framework -->
