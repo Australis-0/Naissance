@@ -2,6 +2,8 @@
 if (!global.config) global.config = {};
 
 global.config.ui = {
+  map: "map",
+
   left_sidebar: "#left-sidebar",
   right_sidebar: "#right-sidebar",
   topbar: "#topbar",
