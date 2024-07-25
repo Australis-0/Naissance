@@ -106,9 +106,9 @@
 
   /*
     removeGroupMask() - Sets an entire group to no longer have a mask
-
+    arg0_group_id: (String) - The group ID to reference in the current hierarchy.
     arg1_options: (Object)
-      do_not_override_entity_masks: true/false - Whether to override entity masks. [REVISIT] - To be implemented in future
+      do_not_override_entity_masks: (Boolean) - Whether to override entity masks. [REVISIT] - To be implemented in future
   */
   function removeGroupMask (arg0_group_id, arg1_options) {
     //Convert from parameters
