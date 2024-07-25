@@ -34,13 +34,12 @@
 
     //Button handlers for hierarchy_el
     var create_new_group_el = (options.create_new_group_selector) ?
-      options.create_new_group_selector :
+      document.querySelector(options.create_new_group_selector) :
       hierarchy_el.querySelector(`#hierarchy-create-new-group`);
 
     create_new_group_el.onclick = function () {
       createGroup();
     };
-
 
     //Context menu handling for hierarchy
     if (options.context_menu_selector) {
@@ -73,7 +72,7 @@
   function closeHierarchyContextMenus (arg0_hierarchy_el, arg1_context_menu_selectors, arg2_options) {
     //Convert from parameters
     var hierarchy_el = arg0_hierarchy_el;
-    var context_menu_selectors = arg1_context_menu_selectors;
+    var context_menu_selectors = getList(arg1_context_menu_selectors);
     var options = (arg2_options) ? arg2_options : {};
 
     //Close context menus by iterating over context_menu_selectors

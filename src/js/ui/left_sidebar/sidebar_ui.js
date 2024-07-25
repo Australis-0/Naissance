@@ -78,15 +78,15 @@
     group_element = element_obj.closest('.group');
 
     if (group_element) {
-      group_obj = getGroup(group_element.id);
+      group_obj = getGroup("hierarchy", group_element.id);
       selector = "";
 
       if (element_obj.getAttribute("class").includes("entity")) {
-        moveEntityToGroup(element_id, group_element.id);
+        moveEntityToGroup("hierarchy", element_id, group_element.id);
         selector = "entities";
       }
       if (element_obj.getAttribute("class").includes("group")) {
-        moveGroupToGroup(element_id, group_element.id);
+        moveGroupToGroup("hierarchy", element_id, group_element.id);
         selector = "subgroups";
       }
 
@@ -123,7 +123,7 @@
 
         local_layer_el.setAttribute("id", main.all_layers[i]);
         local_layer_el.setAttribute("class", "layer");
-        local_layer_el.setAttribute("onclick", `selectLayer(document.getElementById("hierarchy-ui-container"), '${main.all_layers[i]}');`);
+        local_layer_el.setAttribute("onclick", `selectLayer(document.querySelector("${config.ui.hierarchy}"), '${main.all_layers[i]}');`);
 
         //Append header
         local_header_el.setAttribute("class", "layer-input");
