@@ -28,28 +28,30 @@
       window.temp_mask_el = group_el;
     }
 
-    removeGroupMask(group_obj.id, options);
+    if (group_obj) {
+      removeGroupMask(group_obj.id, options);
 
-    //Mode handling
-    if (["add", "intersect_add", "intersect_overlay", "subtract"].includes(mode))
-      if (group_el_class) {
-        var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
+      //Mode handling
+      if (["add", "intersect_add", "intersect_overlay", "subtract"].includes(mode))
+        if (group_el_class) {
+          var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
 
-        //Get all selected entities and add to brush_obj.masks[mode]
-        brush_obj.masks[mode] = appendArrays(brush_obj.masks[mode], all_selected_entities);
-        group_obj.mask = mode;
-      }
+          //Get all selected entities and add to brush_obj.masks[mode]
+          brush_obj.masks[mode] = appendArrays(brush_obj.masks[mode], all_selected_entities);
+          group_obj.mask = mode;
+        }
 
-    //A delay tick is required to set the DOM class update
-    setTimeout(function(){
-      if (reserved.mask_types.includes(mode))
-        if (global.temp_mask_el)
-          if (global.temp_mask_el.id) {
-            var group_el = document.getElementById(global.temp_mask_el.id);
+      //A delay tick is required to set the DOM class update
+      setTimeout(function(){
+        if (reserved.mask_types.includes(mode))
+          if (global.temp_mask_el)
+            if (global.temp_mask_el.id) {
+              var group_el = document.getElementById(global.temp_mask_el.id);
 
-            group_el.setAttribute("class", `group mask-${mode}`);
-          }
-    }, 1);
+              group_el.setAttribute("class", `group mask-${mode}`);
+            }
+      }, 1);
+    }
   }
 
   function clearBrushInMasks () {
