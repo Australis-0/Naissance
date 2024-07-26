@@ -122,15 +122,12 @@ window.reserved = {
   initBrush();
   initBrushUI();
 
-  //Initialise Sidebar handling
-  initSidebar();
-
   //KEEP AT BOTTOM!
   //Initialise Undo/Redo
   initialiseUndoRedo();
   initialiseUndoRedoActions();
 
-  initDateUI();
+  initialiseUI();
 
   //UI loop
   setInterval(function(){

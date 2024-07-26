@@ -9,7 +9,8 @@ global.config.ui = {
   topbar: "#topbar",
 
   //Left sidebar
-  hierarchy: "#hierarchy-container",
+  hierarchy: "#hierarchy",
+  hierarchy_container: "#hierarchy-container",
   date_fields: `#date-container input`,
     hour_el: `#date-container #hour-input`,
     minute_el: `#date-container #minute-input`,

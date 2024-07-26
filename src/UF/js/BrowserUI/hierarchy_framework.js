@@ -396,6 +396,17 @@
     }
   }
 
+  function getHierarchyID (arg0_hierarchy_el) {
+    //Convert from parameters
+    var hierarchy_el = arg0_hierarchy_el;
+
+    //Iterate over elements until hierarchy is found
+    while (hierarchy_el) {
+      if (hierarchy_el.className == "hierarchy") return hierarchy_el.id;
+      hierarchy_el = hierarchy_el.parentNode;
+    }
+  }
+
   /*
     getRecursiveGroupElement() - Fetches a group element recursively, within a given subgroup (1st-order)
     arg0_hierarchy_key: (String) - The hierarchy key to reference.

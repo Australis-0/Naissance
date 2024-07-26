@@ -1,6 +1,6 @@
 //Initialise Sidebar functions
 {
-  function initSidebar () {
+  function initSidebarUI () {
     var hierarchy_el = document.getElementById("hierarchy");
 
     initHierarchy(hierarchy_el, "hierarchy", {
@@ -9,95 +9,101 @@
 
       context_menu_function: "handleSidebarContextMenu"
     });
+    initialiseSidebarEvents();
   }
 }
 
 //Sidebar UI functions
 {
-  /*
-    onSidebarDragEnd() - Handles the end of a drag event in a nested sortable hierarchy.
-    arg0_event: (Object) - The event object from the drag event.
-
-    Returns: (undefined)
-  */
-  function onSidebarDragEnd(arg0_event) {
-    //Convert from parameters
-    var e = arg0_event;
-
+  function initialiseSidebarEvents () {
     //Declare local instance variables
-    var element_id, old_index, new_index, group_children;
-    var element_obj = e.item;
-    var target_obj = e.to;
-    var target_id, target_parent, subgroups_el, entities_el, group_element, group_obj, selector;
+    var dragged;
+    var hierarchy_el = getUISelector("hierarchy");
 
-    //Guard clauses
-    if (!element_obj || !target_obj) return;
+    //Function body
+    var placeholder = document.createElement("div");
+    placeholder.className = "placeholder";
 
-    if (target_obj.id === "hierarchy") {
-      e.from.append(element_obj);
-      return;
-    }
+    //DragStart handler on placeholder
+    hierarchy_el.addEventListener("dragstart", function (e) {
+      dragged = e.target;
+      e.target.style.opacity = 0.8;
+    });
 
-    // Determine the nesting levels
-    var target_nesting_level = parseInt(target_obj.getAttribute("data-nesting-level"), 10) || 0;
-    var element_nesting_level = parseInt(element_obj.getAttribute("data-nesting-level"), 10) || 0;
+    //DragEnd handler on placeholder
+    hierarchy_el.addEventListener("dragend", function (e) {
+      e.target.style.opacity = "";
+      if (placeholder.parentNode)
+        placeholder.parentNode.removeChild(placeholder);
+    });
 
-    // Adjust the nesting level and padding based on the drop target
-    element_obj.setAttribute("data-nesting-level", target_nesting_level + 1);
-    element_obj.style.paddingLeft = `${(target_nesting_level + 1) * 20}px`;
+    //DragOver handler for groups and entities
+    hierarchy_el.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      var target = e.target;
 
-    // Ensure target_id is properly defined
-    target_id = target_obj.getAttribute("id") || "";
-    target_parent = target_obj.parentElement;
+      //Check to make sure target is valid
+      if (target.className == "group" || target.className == "entity" || target.className == "hierarchy") {
+        var rect = target.getBoundingClientRect();
+        var offset = e.clientY - rect.top;
 
-    // Handle group dragging
-    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("group"))
-      if (!target_id.includes("-subgroups"))
-        try {
-          subgroups_el = target_obj.querySelector(`[id='${target_id}-subgroups']`);
+        (offset > rect.height/2) ?
+          target.parentNode.insertBefore(placeholder, target.nextSibling) :
+          target.parentNode.insertBefore(placeholder, target);
+      }
+    });
 
-          (subgroups_el) ?
-            subgroups_el.appendChild(element_obj) :
-            target_obj.appendChild(element_obj);
-        } catch (error) {
-          target_obj.appendChild(element_obj);
+    //Drop handler for groups and entities
+    hierarchy_el.addEventListener("drop", function (e) {
+      e.preventDefault();
+      var dragged_hierarchy = getHierarchyID(dragged);
+      var dragged_type = dragged.dataset.type;
+      var target = e.target;
+      var target_hierarchy = getHierarchyID(target);
+
+      //Guard clause; prevent cross-contamination between hierarchies
+      if (target_hierarchy != dragged_hierarchy) return;
+
+      //Group/entity/base-hierarchy handling
+      if (target.className == "group") {
+        if (dragged_type == "group" || dragged_type == "entity") {
+          dragged.parentNode.removeChild(dragged);
+          target.appendChild(dragged);
+        }
+      } else if (target.className == "entity" && dragged_type == "entity" && placeholder.parentNode) {
+        //Only allow entities to be dropped before or after other entities, not inside them
+        dragged.parentNode.removeChild(dragged);
+        placeholder.parentNode.replaceChild(dragged, placeholder);
+      } else if (target.className == "hierarchy") {
+        dragged.parentNode.removeChild(dragged);
+
+        //Check to see dragged_type
+        if (dragged_type == "group") {
+          insertGroupAtTop(target, dragged);
+        } else if (dragged_type == "entity") {
+          insertEntityAtBottom(target, dragged);
         }
 
-    //Handle entity dragging
-    if (element_obj.getAttribute("class") && element_obj.getAttribute("class").includes("entity")) {
-      entities_el = target_obj.querySelector(`[id='${target_id}-entities']`) ||
-        target_parent.querySelector(`[id='${target_parent.id}-entities']`);
-
-      (entities_el) ?
-        entities_el.appendChild(element_obj) :
-        target_obj.appendChild(element_obj);
-    }
-
-    //Update group and entity belonging
-    element_id = element_obj.id;
-    group_element = element_obj.closest('.group');
-
-    if (group_element) {
-      group_obj = getGroup("hierarchy", group_element.id);
-      selector = "";
-
-      if (element_obj.getAttribute("class").includes("entity")) {
-        moveEntityToGroup("hierarchy", element_id, group_element.id);
-        selector = "entities";
+        if (placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
       }
-      if (element_obj.getAttribute("class").includes("group")) {
-        moveGroupToGroup("hierarchy", element_id, group_element.id);
-        selector = "subgroups";
-      }
+    });
+  }
 
-      if (group_obj) {
-        group_children = Array.from(element_obj.parentElement.children);
-        old_index = group_obj[selector].indexOf(element_id);
-        new_index = group_children.indexOf(element_obj);
+  function insertEntityAtBottom (arg0_container_el, arg1_entity_el) {
+    //Convert from parameters
+    var container_el = arg0_container_el;
+    var entity_el = arg1_entity_el;
 
-        moveElement(group_obj[selector], old_index, new_index);
-      }
-    }
+    //Attempt to append child at end
+    container.appendChild(entity_el);
+  }
+
+  function insertGroupAtTop (arg0_container_el, arg1_group_el) { //[WIP] - Add controls bar later
+    //Convert from parameters
+    var container_el = arg0_container_el;
+    var group_el = arg1_group_el;
+
+    container.prepend(group);
   }
 
   function refreshSidebar (arg0_do_not_refresh) {
@@ -106,7 +112,7 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var sidebar_el = document.getElementById("hierarchy");
+    var sidebar_el = getUISelector("hierarchy");
 
     //Reset HTML
     if (!do_not_refresh)
@@ -123,7 +129,7 @@
 
         local_layer_el.setAttribute("id", main.all_layers[i]);
         local_layer_el.setAttribute("class", "layer");
-        local_layer_el.setAttribute("onclick", `selectLayer(document.querySelector("${config.ui.hierarchy}"), '${main.all_layers[i]}');`);
+        local_layer_el.setAttribute("onclick", `selectLayer(document.querySelector("${config.ui.hierarchy_container}"), '${main.all_layers[i]}');`);
 
         //Append header
         local_header_el.setAttribute("class", "layer-input");
@@ -195,7 +201,7 @@
         swapThreshold: 0.50,
 
         onEnd: function (e) {
-          onSidebarDragEnd(e);
+          //onSidebarDragEnd(e);
         }
       });
 
