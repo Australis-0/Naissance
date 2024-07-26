@@ -149,3 +149,25 @@ div.group {
 .hierarchy-elements-container div:hover {
   cursor: grab;
 }
+
+/* -- Fix this styling -- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.group, .entity {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.group {
+    background-color: #e1f5fe;
+}
+
+.entity {
+    background-color: #fff9c4;
+}
