@@ -61,7 +61,7 @@
     var old_history_entry = getPolityHistory(entity_id, date);
 
     var entity_obj = (typeof entity_id != "object") ?
-      hierarchy_obj.layers[entity_key[0]][entity_key[1]] : entity_id;
+      main.entities[entity_key] : entity_id;
 
     if (entity_obj) {
       //Make sure history object is initailised
@@ -277,10 +277,8 @@
 
   /*
     getPolityHistory() - Returns a polity history entry for the specified date
-    options: {
-      layer: "" - Layer the polity sits on. Used for optimisation
-      return_key: true/false - Whether to return the key instead of the object. False by default
-    }
+    options: (Object)
+      return_key: (Boolean) - Whether to return the key instead of the object. False by default
   */
   function getPolityHistory (arg0_entity_id, arg1_date, arg2_options) {
     //Convert from parameters
@@ -289,7 +287,7 @@
     var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id, options.layer) : entity_id;
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var entry_timestamp = getTimestamp(arg1_date);
 
     //Check that entity_obj actually exists

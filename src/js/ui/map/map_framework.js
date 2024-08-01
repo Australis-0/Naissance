@@ -1,13 +1,9 @@
 //Declare functions
 function clearMap () {
   //Clear entities
-  for (var i = 0; i < main.all_layers.length; i++) {
-    var local_layer = main.layers[main.all_layers[i]];
-
-    for (var x = 0; x < local_layer.length; x++)
-      local_layer[x].remove();
-    local_layer = [];
-  }
+  if (main.entities)
+    for (var i = 0; i < main.entities.length; i++)
+      main.entities[i].remove();
 
   try {
     clearBrush();

@@ -1,3 +1,43 @@
+function appendAfterSiblings (arg0_container_el, arg1_selector, arg2_new_element) {
+  //Convert from parameters
+  var container_el = arg0_container_el;
+  var selector = arg1_selector;
+  var new_el = arg2_new_element;
+
+  //Declare local instance variables
+  var all_elements = container_el.querySelectorAll(selector);
+
+  //Guard clause if no elements found
+  if (all_elements.length == 0) return;
+
+  var last_sibling = all_elements[all_elements.length - 1];
+  var parent_el = last_sibling.parentNode;
+  var sibling_index = Array.prototype.indexOf.call(parent_el.children, last_sibling);
+
+  //Call insert function
+  (sibling_index < parent_el.children.length - 1) ?
+    parent_el.insertBefore(new_el, parent_el.children[sibling_index + 1]) :
+    parent_el.appendChild(new_el);
+}
+
+function appendBeforeSiblings (arg0_container_el, arg1_selector, arg2_new_element) {
+  //Convert from parameters
+  var container_el = arg0_container_el;
+  var selector = arg1_selector;
+  var new_el = arg2_new_element;
+
+  //Declare local instance variables
+  var first_el = container_el.querySelector(selector);
+
+  //Guard clause if no element found
+  if (!first_el) return;
+
+  var parent_el = first_el.parentNode;
+
+  //Call insert function
+  parent_el.insertBefore(new_el, first_el);
+}
+
 /*
   arrayHasElement() - Checks if an array has an element.
   arg0_array: (Array<HTMLElement>) - The array of elements to look through

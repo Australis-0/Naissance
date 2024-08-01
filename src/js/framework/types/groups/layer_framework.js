@@ -2,14 +2,10 @@
 {
   /*
     getGroupRenderingOrder() - Fetches the group rendering order.
-    options: {
-      layer: "polities" - Optional. Optimisation parameter. Defines the layer the group is currently in
-    }
   */
-  function getGroupRenderingOrder (arg0_group_obj, arg1_options) {
+  function getGroupRenderingOrder (arg0_group_obj) {
     //Convert from parameters
     var group_obj = arg0_group_obj;
-    var options = (arg1_options) ? arg1_options : { layer: "polities" };
 
     //Declare local instance variables
     var rendering_order = [];
@@ -21,12 +17,9 @@
     //Render all subgroups next
     if (group_obj.subgroups)
       for (var i = 0; i < group_obj.subgroups.length; i++) {
-        var local_subgroup = (options.layer) ?
-          main.groups[options.layer][group_obj.subgroups[i]] :
-          getGroup(group_obj.subgroups[i]);
-        var new_options = JSON.parse(JSON.stringify(options));
+        var local_subgroup = main.groups[group_obj.subgroups[i]];
 
-        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_subgroup, new_options));
+        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_subgroup));
       }
 
     //Return statement
@@ -34,31 +27,28 @@
   }
 
   /*
-    getLayerRenderingOrder() - Renders polities within a layer.
-    options: {
-      exclude_selection: true/false, - Whether to exclude the selected ID. False by default
-      return_objects: true/false - Whether to return entity objects instead. False by default
-    }
+    getHierarchyRenderingOrder() - Renders polities within a hierarchy.
+    arg0_options (Object):
+      exclude_selection: (Boolean), - Whether to exclude the selected ID. False by default.
+      return_objects: (Boolean) - Whether to return entity objects instead. False by default.
   */
-  function getLayerRenderingOrder (arg0_layer, arg1_options) {
+  function getHierarchyRenderingOrder (arg0_options) {
     //Convert from parameters
-    var layer = arg0_layer;
-    var options = (arg1_options) ? arg1_options : {};
+    var options = (arg0_options) ? arg0_options : {};
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var layer_groups = main.groups[layer];
     var rendering_order = [];
-    var ungrouped_entities = getUngroupedEntities("hierarchy", layer);
+    var ungrouped_entities = getUngroupedEntities("hierarchy");
 
-    var all_layer_groups = Object.keys(layer_groups);
+    var all_groups = Object.keys(main.groups);
 
-    //Iterate over layer_groups and start only with surface groups
-    for (var i = 0; i < all_layer_groups.length; i++) {
-      var local_group = layer_groups[all_layer_groups[i]];
+    //Iterate over all_groups and start only with surface groups
+    for (var i = 0; i < all_groups.length; i++) {
+      var local_group = main.groups[all_groups[i]];
 
       if (!local_group.parent_group)
-        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_group, { layer: layer }));
+        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_group));
     }
 
     //Append ungrouped_entities to end of rendering order

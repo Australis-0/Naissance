@@ -89,6 +89,7 @@
     });
   }
 
-  function refreshSidebar (arg0_do_not_refresh) {
+  function refreshSidebar () {
+    renderHierarchy("hierarchy", { naissance_hierarchy: true });
   }
 }

@@ -188,61 +188,45 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Declare local instance variables
     var brush_obj = main.brush;
+    var render_order = getHierarchyRenderingOrder();
 
-    //Iterate over all entities in all layers and update their history
-    for (var i = 0; i < main.all_layers.length; i++) {
-      //Init layer first
-      initHierarchyLayer("hierarchy", main.all_layers[i], {
-        global_selectors: true
-      });
+    for (var i = 0; i < main.entities.length; i++) {
+      var local_entity = main.entities[i];
+      var local_entity_id = local_entity.options.className;
+      var local_history = getPolityHistory(local_entity_id, main.date);
 
-      var local_layer = main.layers[main.all_layers[i]];
-      var local_render_order = getLayerRenderingOrder(main.all_layers[i]);
+      //Reload object; add to map
+      if (local_history) {
+        //Update UIs for each open popup
+        var local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
 
-      for (var x = 0; x < local_render_order.length; x++) {
-        var entity_key = getEntity(local_render_order[x], { return_key: true });
+        if (local_popup) {
+          var name_field = local_popup.querySelector(`input#polity-name`);
 
-        if (entity_key) {
-          var local_entity = main.layers[entity_key[0]][entity_key[1]];
-          var local_entity_id = local_entity.options.className;
-          var local_history = getPolityHistory(local_entity_id, main.date, { layer: main.all_layers[i] });
+          name_field.value = getEntityName(local_entity_id);
+        }
 
-          //Reload object; add to map
-          local_entity.remove();
+        //Run through each options type
+        if (local_entity.options.type == "polity") {
+          //Make sure polity is not extinct
+          if (!isPolityHidden(local_entity_id, main.date)) {
+            var local_history_frame = getHistoryFrame(local_entity, main.date);
+            var local_options = JSON.parse(JSON.stringify(local_entity.options));
 
-          if (local_history) {
-            //Update UIs for each open popup
-            var local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
+            //Overwrite local_options with local_history_options
+            var all_local_history_options = Object.keys(local_history_frame.options);
 
-            if (local_popup) {
-              var name_field = local_popup.querySelector(`input#polity-name`);
+            for (var x = 0; x < all_local_history_options.length; x++)
+              local_options[all_local_history_options[x]] = local_history_frame.options[all_local_history_options[x]];
 
-              name_field.value = getEntityName(local_entity_id);
-            }
+            main.entities[i] = L.polygon(local_history_frame.coords, local_options).addTo(map);
+            main.entities[i].on("click", function (e) {
+              entityUI(e, false, true);
+            })
 
-            //Run through each options type
-            if (local_entity.options.type == "polity")
-              //Make sure polity is not extinct
-              if (!isPolityHidden(local_entity_id, main.date)) {
-                //Deprecating this makes Naissance crash for some reason
-                var local_history_frame = getHistoryFrame(local_entity, main.date);
-                var local_options = JSON.parse(JSON.stringify(local_entity.options));
-
-                //Overwrite local_options with local_history_options
-                var all_local_history_options = Object.keys(local_history_frame.options);
-
-                for (var y = 0; y < all_local_history_options.length; y++)
-                  local_options[all_local_history_options[y]] = local_history_frame.options[all_local_history_options[y]];
-
-                local_layer[entity_key[1]] = L.polygon(local_history_frame.coords, local_options).addTo(map);
-                local_layer[entity_key[1]].on("click", function (e) {
-                  entityUI(e, false, true);
-                });
-
-                //This is the current selected polity, re-add cursor
-                if (brush_obj.editing_entity == local_entity.options.className)
-                  clearBrush();
-              }
+            //If this is the current selected polity, re-add cursor
+            if (brush_obj.editing_entity == local_entity_id)
+              clearBrush();
           }
         }
       }

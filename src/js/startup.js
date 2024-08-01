@@ -10,7 +10,6 @@ window.fs = require("fs");
   window.main = {};
 
   //Layer handling
-  main.all_layers = ["polities"];
   main.brush = {
     //Specify main brush/selection variables
     cursor: undefined,
@@ -46,6 +45,7 @@ window.fs = require("fs");
     hour: current_date.getHours(),
     minute: current_date.getMinutes()
   };
+  main.entities = [];
   main.events = {
     //Key events
     keys: {},
@@ -57,9 +57,6 @@ window.fs = require("fs");
   };
   main.groups = {
     polities: {}
-  };
-  main.layers = {
-    polities: []
   };
 }
 
@@ -144,5 +141,5 @@ setTimeout(function(){
   var hierarchies_obj = main.hierarchies;
 
   main.equate_groups_interval = equateObject(hierarchies_obj.hierarchy, "groups", global.main, "groups");
-  main.equate_layers_interval = equateObject(hierarchies_obj.hierarchy, "layers", global.main, "layers");
+  main.equate_entities_interval = equateObject(hierarchies_obj.hierarchy, "entities", global.main, "entities");
 }, 100);

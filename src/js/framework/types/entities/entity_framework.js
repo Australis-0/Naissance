@@ -40,32 +40,24 @@
     } catch {}
 
     //Remove entity from all groups
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer_groups = main.groups[main.all_layers[i]];
+    var all_groups = Object.keys(main.groups);
 
-      var all_layer_groups = Object.keys(local_layer_groups);
+    for (var i = 0; i < all_groups.length; i++) {
+      var local_group = main.groups[all_groups[i]];
 
-      for (var x = 0; x < all_layer_groups.length; x++) {
-        var local_group = local_layer_groups[all_layer_groups[x]];
+      //Splice from entities
+      if (local_group.entities)
+        for (var x = 0; x < local_group.entities.length; x++)
+          if (local_group.entities[x] == entity_id)
+            local_group.entities.splice(x, 1);
+    }
 
-        //Splice from entities
-        if (local_group.entities)
-          for (var y = 0; y < local_group.entities.length; y++)
-            if (local_group.entities[y] == entity_id)
-              local_group.entities.splice(y, 1);
+    //Remove entity
+    for (var i = 0; i < main.entities.length; i++)
+      if (main.entities[i].options.className == entity_id) {
+        main.entities[i].remove();
+        main.entities.splice(i, 1);
       }
-    }
-
-    //Remove entity from all layers
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = main.layers[main.all_layers[i]];
-
-      for (var x = 0; x < local_layer.length; x++)
-        if (local_layer[x].options.className == entity_id) {
-          local_layer[x].remove();
-          local_layer.splice(x, 1);
-        }
-    }
 
     //Refresh sidebar
     refreshSidebar();
@@ -174,7 +166,7 @@
       if (!entity_exists) {
         var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
 
-        main.layers[brush_obj.selected_layer].push(new_entity_obj);
+        main.entities.push(new_entity_obj);
         setEntityName(entity_id, entity_name, main.date);
       }
     }
@@ -200,13 +192,13 @@
       var id_taken = false;
       var local_id = generateRandomID();
 
-      //Check to see if ID is taken in polities_layer
-      for (var i = 0; i < main.all_layers.length; i++) {
-        var local_layer = main.layers[main.all_layers[i]];
+      //Check to see if ID is taken in main.entities
+      for (var i = 0; i < main.entities.length; i++) {
+        var local_entity = main.entities[i];
 
-        for (var x = 0; x < local_layer.length; x++)
-          if (local_layer[x].options.className)
-            if (local_layer[x].options.className.includes(local_id))
+        if (local_entity.options)
+          if (local_entity.options.className)
+            if (local_entity.options.className.includes(local_id))
               id_taken = true;
       }
 
@@ -219,10 +211,9 @@
 
   /*
     getEntity() - Returns an entity object or [layer_key, index];
-    options: {
-      layer: "polities", - Optional. Optimisation parameter providing the layer
-      return_key: true/false - Optional. Whether to return a [layer_key, index] instead of an object. False by default
-    }
+    arg0_entity_id: (String)
+    arg1_options: (Object)
+      return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default
   */
   function getEntity (arg0_entity_id, arg1_options) {
     //Convert from parameters
@@ -230,55 +221,22 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Declare local isntance variables
-    var layer = options.layer;
-    var local_entity;
+    var entity_obj;
 
     //Guard clause
     if (typeof entity_id == "object") return entity_id;
 
-    if (!layer) {
-      //Iterate over all layers for .options.className
-      for (var i = 0; i < main.all_layers.length; i++) {
-        var local_layer = main.layers[main.all_layers[i]];
+    //Iterate over all main.entities for .options.className
+    for (var i = 0; i < main.entities.length; i++) {
+      var local_entity = main.entities[i];
 
-        //Iterate over local_layer for .options.className
-        for (var x = 0; x < local_layer.length; x++)
-          if (local_layer[x].options.className == entity_id)
-            local_entity = (!options.return_key) ?
-              local_layer[x] : [main.all_layers[i], x];
-      }
-    } else {
-      var local_layer = main.layers[layer];
-
-      //Iterate over local_layer for .options.className
-      for (var i = 0; i < local_layer.length; i++)
-        if (local_layer[i].options.className == entity_id)
-            local_entity = (!options.return_key) ?
-              local_layer[i] : [layer, i];
+      if (local_entity.options)
+        if (local_entity.options.className == entity_id)
+          entity_obj = (!options.return_key) ? main.entities[i] : i;
     }
 
     //Return statement
-    return local_entity;
-  }
-
-  function getEntityGroup (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Iterate over all layers and subgroups
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = main.groups[main.all_layers[i]];
-
-      var all_local_groups = Object.keys(local_layer);
-
-      for (var x = 0; x < all_local_groups.length; x++) {
-        var local_group = local_layer[all_local_groups[x]];
-
-        if (local_group.entities)
-          if (local_group.entities.includes(entity_id))
-            return local_group;
-      }
-    }
+    return entity_obj;
   }
 
   function getEntityName (arg0_entity_id, arg1_date) {
@@ -322,14 +280,10 @@
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ?
-      getEntity(entity_id, { return_key: true }) : entity_id;
-
-    //Initialise local instance variables
-    if (Array.isArray(entity_obj))
-      entity_obj = window[entity_obj[0]][entity_obj[1]];
+      getEntity(entity_id) : entity_id;
 
     if (entity_obj)
-      entity_id = entity_obj.options.class;
+      entity_id = entity_obj.options.className;
 
     //Iterate over array
     for (var i = 0; i < array.length; i++)
@@ -356,17 +310,14 @@
 
     //Load date and refresh sidebar
     loadDate((!ignore_date) ? main.date : undefined);
-    refreshSidebar();
 
     //Add Polity UI's to all polities
-    for (var i = 0; i < main.all_layers.length; i++) {
-      var local_layer = main.layers[main.all_layers[i]];
+    for (var i = 0; i < main.entities.length; i++) {
+      var local_entity = main.entities[i];
 
-      //Iterate over local_layer
-      for (var x = 0; x < local_layer.length; x++)
-        local_layer[x].on("click", function (e) {
-          entityUI(e, false, true);
-        });
+      local_entity.on("click", function (e) {
+        entityUI(e, false, true);
+      });
     }
   }
 

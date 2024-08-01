@@ -1186,12 +1186,12 @@ global.opened_popups = {};
     var r = parseInt(r_el.value);
 
     var current_colour = RGBToHex(r, g, b);
-    var current_history_entry = getPolityHistory(entity_id, date);
+    var current_history_entry = getPolityHistory(entity_id, main.date);
     var current_tab = window[`${entity_id}_page`];
 
     //Set entity fill colour
     if (current_tab == "fill") {
-      createHistoryFrame(entity_id, date, {
+      createHistoryFrame(entity_id, main.date, {
         fillColor: current_colour,
         fillOpacity: opacity_el.value/100
       });
@@ -1202,7 +1202,7 @@ global.opened_popups = {};
     }
 
     if (current_tab == "stroke") {
-      createHistoryFrame(entity_id, date, {
+      createHistoryFrame(entity_id, main.date, {
         color: current_colour,
         opacity: opacity_el.value/100
       });

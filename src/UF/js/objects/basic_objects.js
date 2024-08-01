@@ -40,6 +40,25 @@ function cleanObject (arg0_object, arg1_options) {
   return cleaned_object;
 }
 
+function dumbMergeObjects (arg0_object, arg1_object) {
+  //Convert from parameters
+  var object = arg0_object;
+  var ot_object = arg1_object;
+
+  //Declare local instance variables
+  var all_ot_object_keys = Object.keys(ot_object);
+
+  //Iterate over all_ot_object_keys
+  for (var i = 0; i < all_ot_object_keys.length; i++) {
+    var local_value = ot_object[all_ot_object_keys[i]];
+
+    object[all_ot_object_keys[i]] = local_value;
+  }
+
+  //Return statement
+  return object;
+}
+
 /*
   equateObject() - Equates two objects over an interval.
   arg0_object: (Object)
