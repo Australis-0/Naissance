@@ -4,6 +4,8 @@
   /*
     initHierarchy() - Initialises a new hierarchy.
     arg0_options: (Object)
+      hide_add_group: (Boolean) - Whether to hide the 'Add Group' button from .controls
+      hide_add_entity: (Booelan) - Whether to hide the 'Add Entity' button from .controls
       hierarchy_selector: (String) - The selector of the hierarchy container.
       id: (String) - The ID to initialise the hierarchy with.
   */
@@ -36,22 +38,27 @@
       controls_div.className = "controls";
 
       //Add Group button
-      var add_group_button = document.createElement("button");
-      add_group_button.textContent = `Add Group`;
-      add_group_button.addEventListener("click", function () {
-        addGroup(hierarchy_id);
-      });
+      if (!options.hide_add_group) {
+        var add_group_button = document.createElement("button");
+        add_group_button.textContent = `Add Group`;
+        add_group_button.addEventListener("click", function () {
+          addGroup(hierarchy_id);
+        });
+        controls_div.appendChild(add_group_button);
+      }
 
       //Add Entity button
-      var add_entity_button = document.createElement("button");
-      add_entity_button.textContent = `Add Entity`;
-      add_entity_button.addEventListener("click", function () {
-        addEntity(hierarchy_id);
-      });
+      if (!options.hide_add_entity) {
+        console.log(`TRUE`)
+        var add_entity_button = document.createElement("button");
+        add_entity_button.textContent = `Add Entity`;
+        add_entity_button.addEventListener("click", function () {
+          addEntity(hierarchy_id);
+        });
+        controls_div.appendChild(add_entity_button);
+      }
 
       //Populate controls_div
-      controls_div.appendChild(add_group_button);
-      controls_div.appendChild(add_entity_button);
       hierarchy_el.appendChild(controls_div);
     }
   }

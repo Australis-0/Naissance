@@ -1,17 +1,4 @@
 //Global Date Strings
-window.bc_leap_years = [
-  -45, -42, -39, -36, -33, -30, -27, -24, -21, -18, -15, -12, -9
-];
-window.days_in_months = [
-  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31
-];
-window.lowercase_months = [
-  "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"
-];
-window.months = [
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-];
-
 var date_error_field = document.getElementById("date-error");
 var day_field = document.getElementById("day-input");
 var month_field = document.getElementById("month-input");
@@ -190,6 +177,10 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     var brush_obj = main.brush;
     var render_order = getHierarchyRenderingOrder();
 
+    //Clear map first before rendering entities
+    clearMap();
+
+    //Iterate over all entities and render them
     for (var i = 0; i < main.entities.length; i++) {
       var local_entity = main.entities[i];
       var local_entity_id = local_entity.options.className;
@@ -232,6 +223,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
       }
     }
 
+    //Update Left Sidebar
     autoFillDate();
     refreshSidebar();
   }

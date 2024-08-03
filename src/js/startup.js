@@ -119,6 +119,9 @@ window.reserved = {
   initBrush();
   initBrushUI();
 
+  //Initialise Date
+  initDateFramework();
+
   //KEEP AT BOTTOM!
   //Initialise Undo/Redo
   initialiseUndoRedo();

@@ -2,7 +2,7 @@
 {
   function initialiseUI () {
     //Initialise left_sidebar
-    initSidebarUI();
     initDateUI();
+    initSidebarUI();
   }
 }

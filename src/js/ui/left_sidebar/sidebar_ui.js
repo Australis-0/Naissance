@@ -3,11 +3,13 @@
   function initSidebarUI () {
     var hierarchy_el = document.getElementById("hierarchy");
 
-    initHierarchy(hierarchy_el, "hierarchy", {
-      create_new_group_selector: `#hierarchy-create-new-group`,
+    initHierarchy({
       context_menu_selector: `#hierarchy-context-menu, #hierarchy-context-menu-two`,
 
-      context_menu_function: "handleSidebarContextMenu"
+      context_menu_function: "handleSidebarContextMenu",
+      hide_add_entity: true,
+      hierarchy_selector: "#hierarchy",
+      id: "hierarchy"
     });
     initialiseSidebarEvents();
   }
