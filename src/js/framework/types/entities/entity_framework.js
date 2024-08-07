@@ -27,6 +27,7 @@
   function deleteEntity (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
+    console.log(entity_id);
 
     //Declare local instance variables
     var current_entity_class;
@@ -167,7 +168,7 @@
         var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
 
         main.entities.push(new_entity_obj);
-        setEntityName(entity_id, entity_name, main.date);
+        renameEntity(entity_id, entity_name, main.date);
       }
     }
 
@@ -304,6 +305,22 @@
     return array;
   }
 
+  function renameEntity (arg0_entity_id, arg1_entity_name, arg2_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
+    var date = (arg2_date) ? getTimestamp(arg2_date) : main.date;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj)
+      createHistoryFrame(entity_obj, date, { entity_name: entity_name });
+
+    //Return statement
+    return entity_name;
+  }
+
   function renderEntities (arg0_ignore_date) {
     //Convert from parameters
     var ignore_date = arg0_ignore_date;
@@ -319,22 +336,6 @@
         entityUI(e, false, true);
       });
     }
-  }
-
-  function setEntityName (arg0_entity_id, arg1_entity_name, arg2_date) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
-    var date = (arg2_date) ? getTimestamp(arg2_date) : main.date;
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-
-    if (entity_obj)
-      createHistoryFrame(entity_obj, date, { entity_name: entity_name });
-
-    //Return statement
-    return entity_name;
   }
 
   function setEntityNameFromInput (arg0_entity_id, arg1_element) {

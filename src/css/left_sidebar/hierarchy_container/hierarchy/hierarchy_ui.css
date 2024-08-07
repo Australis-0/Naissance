@@ -94,16 +94,23 @@
 }
 
 /* -- Hierarchy item styling -- */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-}
 .group, .entity {
   margin: 10px;
   padding: 10px;
   border: 1px solid rgb(150, 150, 150);
   background-color: white;
+
+  font-family: "Barlow";
+  font-weight: 300;
+  font-size: 1rem;
+
   cursor: pointer;
+}
+.group input, .entity input {
+  background-color: rgba(0, 0, 0, 0);
+  color: black;
+  max-width: 95%;
+  width: 95%;
 }
 
 .entity {

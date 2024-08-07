@@ -2,12 +2,39 @@
 //Initialisation functions
 {
   /*
+    getHierarchyFromID() - Fetches hierarchy from hierarchy ID.
+    arg0_hierarchy_id: (String)
+    arg1_options: (Object)
+      return_key: (Boolean)
+  */
+  function getHierarchyFromID (arg0_hierarchy_id, arg1_options) {
+    //Convert from parmaeters
+    var hierarchy_id  = arg0_hierarchy_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var all_hierarchies = Object.keys(main.hierarchy_options);
+
+    //Iterate over all_hierarchies
+    for (var i = 0; i < all_hierarchies.length; i++) {
+      var hierarchy_obj = main.hierarchy_options[all_hierarchies[i]];
+
+      if (hierarchy_obj.id == hierarchy_id)
+        //Return statement
+        return (!options.return_key) ? hierarchy_obj : all_hierarchies[i];
+    }
+  }
+
+  /*
     initHierarchy() - Initialises a new hierarchy.
     arg0_options: (Object)
       hide_add_group: (Boolean) - Whether to hide the 'Add Group' button from .controls
       hide_add_entity: (Booelan) - Whether to hide the 'Add Entity' button from .controls
       hierarchy_selector: (String) - The selector of the hierarchy container.
       id: (String) - The ID to initialise the hierarchy with.
+
+      delete_function: (String) - The function to apply when an entity is deleted
+      rename_function: (String) - The function to apply when an entity is renamed
   */
   function initHierarchy (arg0_options) {
     //Convert from parameters
@@ -16,16 +43,27 @@
     //Make sure main.hierarchies exists
     if (!global.main) global.main = {};
     if (!global.main.hierarchies) global.main.hierarchies = {};
+    if (!global.main.hierarchy_options) global.main.hierarchy_options = {};
 
     //Declare local instance variables
     var hierarchy_el = (options.hierarchy_selector) ?
       document.querySelector(options.hierarchy_selector) : document.querySelector("#hierarchy");
     var hierarchies = main.hierarchies;
     var hierarchy_id = (options.id) ? options.id : generateRandomID(hierarchies);
+    var hierarchy_options = main.hierarchy_options;
 
     hierarchies[hierarchy_id] = {
       groups: {}
     };
+    hierarchy_options[hierarchy_id] = {
+      id: hierarchy_id
+    };
+    var hierarchy_obj = hierarchies[hierarchy_id];
+    var hierarchy_options_obj = hierarchy_options[hierarchy_id];
+
+    //Set function options
+    hierarchy_options_obj.delete_function = options.delete_function;
+    hierarchy_options_obj.rename_function = options.rename_function;
 
     //Create hierarchy_div
     hierarchy_div = document.createElement("div");
@@ -49,7 +87,6 @@
 
       //Add Entity button
       if (!options.hide_add_entity) {
-        console.log(`TRUE`)
         var add_entity_button = document.createElement("button");
         add_entity_button.textContent = `Add Entity`;
         add_entity_button.addEventListener("click", function () {
@@ -84,7 +121,7 @@
     var new_entity = createEntity((options.name) ? options.name : "New Entity", options);
     var parent_el = (options.parent_group) ? hierarchy_el.querySelector(`.group[data-id="${options.parent_group}"]`) : hierarchy_el;
 
-    renderList(hierarchy_el, [new_entity]);
+    renderList(hierarchy_id, hierarchy_el, [new_entity]);
 
     if (options.parent_group) {
       var entity_el = hierarchy_el.querySelector(`.entity[data-id="${options.id}"]`);
@@ -110,7 +147,7 @@
     var new_group = createGroup((options.name) ? options.name : "New Group", undefined, options);
     var parent_el = (options.parent_group) ? hierarchy_el.querySelector(`.group[data-id="${options.parent_group}"]`) : hierarchy_el;
 
-    renderList(parent_el, [new_group]);
+    renderList(hierarchy_id, parent_el, [new_group]);
     insertGroupAtTop(parent_el, parent_el.lastChild);
     setupDragAndDrop();
   }
@@ -151,11 +188,18 @@
     return group_obj;
   }
 
-  function deleteItem (arg0_el) {
+  function deleteItem (arg0_hierarchy_id, arg1_el) {
     //Convert from parameters
-    var local_el = arg0_el;
+    var hierarchy_id = arg0_hierarchy_id;
+    var local_el = arg1_el;
 
-    //Remove element
+    //Declare local instance variables
+    var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
+
+    //Remove element and send function if necessary
+    if (hierarchy_options.delete_function)
+      global[hierarchy_options.delete_function](local_el.dataset.id);
     local_el.parentNode.removeChild(local_el);
   }
 
@@ -176,8 +220,9 @@
     for (var i = 0; i < hierarchy_divs.length; i++) {
       var hierarchy_div = hierarchy_divs[i];
       var hierarchy_id = hierarchy_div.id;
-      hierarchies_obj[hierarchy_id] = {};
       var local_hierarchy_obj = main.hierarchies[hierarchy_id];
+
+      hierarchies_obj[hierarchy_id] = {};
 
       //Process local groups
       var groups = {};
@@ -359,23 +404,33 @@
     var has_entity_el = container_el.querySelector(".entity");
 
     (!has_entity_el) ?
-      appendAfterSiblings(container_el, `.group`, group_el) :
-      appendBeforeSiblings(container_el, `.entity`, group_el);
+      appendAfterSiblings(container_el, `#hierarchy > .group`, group_el) :
+      appendBeforeSiblings(container_el, `#hierarchy > .entity`, group_el);
   }
 
-  function renameItem (arg0_element) {
+  function renameItem (arg0_hierarchy_id, arg1_element) {
     //Convert from parameters
-    var element = arg0_element;
+    var hierarchy_id = arg0_hierarchy_id;
+    var element = arg1_element;
 
     //Declare local instance variables
+    var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
     var new_name;
 
     var input = document.createElement("input");
     input.type = "text";
     input.value = element.textContent;
+
+    //Input onchange event listener
     input.addEventListener("blur", function () {
+      var parent_el = input.parentNode.parentNode;
       new_name = input.value;
       element.textContent = new_name;
+
+      //Check for hierarchy_obj.rename_function
+      if (hierarchy_options.rename_function)
+        global[hierarchy_options.rename_function](parent_el.dataset.id, new_name);
     });
 
     element.textContent = "";
@@ -504,10 +559,11 @@
     }
   }
 
-  function renderList (arg0_parent_el, arg1_items) {
+  function renderList (arg0_hierarchy_id, arg1_parent_el, arg2_items) {
     //Convert from parameters
-    var parent_el = arg0_parent_el;
-    var items = getList(arg1_items);
+    var hierarchy_id = arg0_hierarchy_id;
+    var parent_el = arg1_parent_el;
+    var items = getList(arg2_items);
 
     //Iterate over all items
     for (var i = 0; i < items.length; i++) {
@@ -519,16 +575,20 @@
       local_div.dataset.id = local_item.id;
       local_div.dataset.type = local_item.type;
 
+      //Create name_div
       var name_div = document.createElement("div");
+      name_div.setAttribute("class", "item-name");
+
       name_div.textContent = local_item.name;
       name_div.addEventListener("click", function (e) {
-        renameItem(e.target);
+        renameItem(hierarchy_id, e.target);
       });
 
+      //Create delete_button
       var delete_button = document.createElement("button");
       delete_button.textContent = "Delete";
       delete_button.addEventListener("click", function (e) {
-        renameItem(e.target);
+        deleteItem(hierarchy_id, local_div);
       });
 
       //Append name_div, delete_button to local_div
@@ -538,7 +598,7 @@
 
       //Recursively render list
       if (local_item.type == "group")
-        renderList(local_div, local_item.children);
+        renderList(hierarchy_id, local_div, local_item.children);
     }
   }
 

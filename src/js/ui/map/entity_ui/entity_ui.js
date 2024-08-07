@@ -1463,7 +1463,7 @@ document.body.addEventListener("keyup", (e) => {
   if (local_id == "polity-name") {
     try {
       if (getEntityName(entity_obj, date) != entity_name) {
-        setEntityName(entity_obj, entity_name, main.date);
+        renameEntity(entity_obj, entity_name, main.date);
       } else {
         var local_history = getPolityHistory(local_class, date);
 
