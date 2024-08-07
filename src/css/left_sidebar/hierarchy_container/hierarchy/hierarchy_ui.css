@@ -91,20 +91,46 @@
 #hierarchy {
   max-height: 58vh;
   overflow-y: auto;
+  width: calc(100% - 0.5rem);
 }
 
 /* -- Hierarchy item styling -- */
 .group, .entity {
-  margin: 10px;
-  padding: 10px;
+  margin-bottom: 0.1rem;
+  margin-top: 0.1rem;
+  padding-left: 10px;
+
   border: 1px solid rgb(150, 150, 150);
   background-color: white;
-
   font-family: "Barlow";
   font-weight: 300;
   font-size: 1rem;
 
   cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+
+  .interaction-container {
+    float: right;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    width: 4rem;
+
+    .context-menu-button {
+      height: 1rem;
+      width: 1rem;
+    }
+    .context-menu-button, .delete-button {
+      vertical-align: middle;
+    }
+  }
+
+  .item-name {
+    display: inline-block;
+    max-width: calc(100% - 4.5rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 .group input, .entity input {
   background-color: rgba(0, 0, 0, 0);

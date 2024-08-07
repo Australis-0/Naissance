@@ -28,8 +28,9 @@
   /*
     initHierarchy() - Initialises a new hierarchy.
     arg0_options: (Object)
-      hide_add_group: (Boolean) - Whether to hide the 'Add Group' button from .controls
-      hide_add_entity: (Booelan) - Whether to hide the 'Add Entity' button from .controls
+      hide_add_group: (Boolean) - Optional. Whether to hide the 'Add Group' button from .controls. False by default.
+      hide_add_entity: (Booelan) - Optional. Whether to hide the 'Add Entity' button from .controls. False by default.
+      hide_context_menus: (Boolean) - Optional. Whether to hide context menus. False by default.
       hierarchy_selector: (String) - The selector of the hierarchy container.
       id: (String) - The ID to initialise the hierarchy with.
 
@@ -565,6 +566,10 @@
     var parent_el = arg1_parent_el;
     var items = getList(arg2_items);
 
+    //Declare local instance variables
+    var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
+
     //Iterate over all items
     for (var i = 0; i < items.length; i++) {
       var local_div = document.createElement("div");
@@ -584,16 +589,32 @@
         renameItem(hierarchy_id, e.target);
       });
 
+      //Create container interaction_el
+      var interaction_container_el = document.createElement("span");
+      interaction_container_el.setAttribute("class", "interaction-container");
+
       //Create delete_button
-      var delete_button = document.createElement("button");
-      delete_button.textContent = "Delete";
-      delete_button.addEventListener("click", function (e) {
-        deleteItem(hierarchy_id, local_div);
-      });
+      {
+        var delete_button = document.createElement("button");
+        delete_button.textContent = "Delete";
+        delete_button.setAttribute("class", "delete-button");
+        delete_button.addEventListener("click", function (e) {
+          deleteItem(hierarchy_id, local_div);
+        });
+        interaction_container_el.appendChild(delete_button);
+      }
+
+      //Create context menu buttons if necessary
+      if (!hierarchy_options.hide_context_menus) {
+        var context_menu_button = document.createElement("img");
+        context_menu_button.setAttribute("class", "context-menu-button");
+        context_menu_button.setAttribute("src", "./gfx/interface/context_menu_icon.png");
+        interaction_container_el.appendChild(context_menu_button);
+      }
 
       //Append name_div, delete_button to local_div
       local_div.appendChild(name_div);
-      local_div.appendChild(delete_button);
+      local_div.appendChild(interaction_container_el);
       parent_el.appendChild(local_div);
 
       //Recursively render list
@@ -639,38 +660,32 @@
     //Drop handler
     document.addEventListener("drop", function (e) {
       e.preventDefault();
-      var dragged_hierarchy = getHierarchyID(dragged);
+      var dragged_hierachy = getHierarchyID(target);
       var dragged_type = dragged.dataset.type;
       var target = e.target;
-      var target_hierarchy = getHierarchyID(target);
+      var target_hierarchy = getHierarchyID(dragged);
 
       //Guard clause to prevent cross-contamination between hierarchies
-      if (target_hierarchy != dragged_hierarchy) return;
+      if (target_hierarchy != dragged_hierachy) return;
 
-      //Ensure placeholder in the correct position
-      if (placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+      if (target.className == "group") {
+        if (dragged_type == "group" || dragged_type == "entity") {
+          dragged.parentNode.removeChild(dragged);
+          target.appendChild(dragged);
+        }
+      } else if (target.className == "entity" && dragged_type == "entity" && placeholder.parentNode) {
+        dragged.parentNode.removeChild(dragged);
+        placehodler.parentNode.replaceChild(dragged, placeholder);
+      } else if (target.className == "hierarchy") {
+        dragged.parentNode.removeChild(dragged);
 
-      //Define parent
-      var parent = target.closest(".hierarchy, .group");
-
-      //Group/Entity handling
-      if (dragged_type == "group") {
-        //Ensure groups are not dropped inside entities
-        if (target.className == "entity") parent = target.closest(".hierarchy, .group");
-
-        //If dropping a group, insert before the first entity or at the end if no entities
-        var first_entity = parent.querySelector(".entity");
-
-        (first_entity && first_entity.parentNode == parent) ?
-          parent.insertBefore(dragged, first_entity) :
-          parent.appendChild(dragged);
-      } else if (dragged_type == "entity") {
-        //If dropping an entity, insert after the last group or at the end if no groups
-        var last_group = parent.querySelector(".group:last-of-type");
-
-        (last_group && last_group.parentNode == parent) ?
-          parent.insertBefore(dragged, last_group.nextSibling) :
-          parent.appendChild(dragged);
+        if (dragged_type == "group") {
+          insertGroupAtTop(target, dragged);
+        } else if (dragged_type == "entity") {
+          insertEntityAtBottom(target, dragged);
+        }
+        if (placeholder.parentNode)
+          placeholder.parentNode.removeChild(placeholder);
       }
     });
   }

@@ -138,11 +138,22 @@ window.reserved = {
 
 //Test scripts
 setTimeout(function(){
+  var hierarchies_obj = main.hierarchies;
+  var hierarchy_el = document.querySelector(config.ui.hierarchy);
   loadSave("atlas");
 
-  //Sync hierarchies
-  var hierarchies_obj = main.hierarchies;
-
-  main.equate_groups_interval = equateObject(hierarchies_obj.hierarchy, "groups", global.main, "groups");
+  //Sync entities
   main.equate_entities_interval = equateObject(hierarchies_obj.hierarchy, "entities", global.main, "entities");
+  main.previous_hierarchy_el_length = hierarchy_el.innerHTML.length;
+
+  //Sync groups
+  setInterval(function() {
+    if (main.previous_hierarchy_el_length != hierarchy_el.innerHTML.length) {
+      var exported_hierarchies = exportHierarchies({ naissance_hierarchy: "hierarchy" });
+
+      hierarchies_obj.hierarchy.groups = exported_hierarchies.hierarchy.groups;
+      main.groups = hierarchies_obj.hierarchy.groups;
+      main.previous_hierarchy_el_length = hierarchy_el.innerHTML.length;
+    }
+  }, 1000);
 }, 100);

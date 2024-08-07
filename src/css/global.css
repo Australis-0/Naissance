@@ -1,4 +1,4 @@
-html,head,body {
+html, head, body {
   margin: 0px;
   height: 100%;
 }
@@ -41,6 +41,21 @@ td {
 }
 .uppercase {
   text-transform: uppercase;
+}
+
+/* -- Scrollbar styling -- */
+::-webkit-scrollbar {
+  width: 0.25rem;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(200, 200, 200);
+  border-radius: 0.125rem;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: white;
 }
 
 /* -- Text styling -- */
