@@ -382,6 +382,7 @@ function showElement (arg0_element) {
   //Declare local instance variables
   var class_name = element.getAttribute("class");
 
+  //Remove ` hidden` from class
   if (class_name)
     element.setAttribute("class", class_name.replace(/ hidden/gm, ""));
 }

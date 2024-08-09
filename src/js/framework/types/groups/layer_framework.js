@@ -3,12 +3,10 @@
   /*
     getGroupRenderingOrder() - Fetches the group rendering order.
   */
-  function getGroupRenderingOrder (arg0_group_obj) {
+  function getGroupRenderingOrder (arg0_group_obj, arg1_rendering_order) {
     //Convert from parameters
     var group_obj = arg0_group_obj;
-
-    //Declare local instance variables
-    var rendering_order = [];
+    var rendering_order = (arg1_rendering_order) ? arg1_rendering_order : [];
 
     //Render all entities first
     if (group_obj.entities)
@@ -18,8 +16,8 @@
     if (group_obj.subgroups)
       for (var i = 0; i < group_obj.subgroups.length; i++) {
         var local_subgroup = main.groups[group_obj.subgroups[i]];
-
-        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_subgroup));
+        
+        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_subgroup, rendering_order));
       }
 
     //Return statement

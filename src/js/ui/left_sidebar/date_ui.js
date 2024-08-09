@@ -439,7 +439,7 @@
     //Declare local instance variables
     var bottom_left_date_ui = createContextMenu({
       anchor: `#date-container`,
-      class: `date-ui`,
+      class: `date-ui unique`,
       id: "date-ui",
       name: `Date:`,
 

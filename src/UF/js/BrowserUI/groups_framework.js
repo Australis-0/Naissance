@@ -100,15 +100,17 @@
     if (group_obj) {
       //KEEP AT TOP! - Remove group options first
       {
-        removeGroupMask(group_id, { do_not_override_entity_masks: true });
+        //removeGroupMask(group_id, { do_not_override_entity_masks: true });
       }
 
-      //Make sure to move all subgroups and entities out into group's parent element if it exists (change parent_group)
+      //1. Make sure to move all extant subgroups and entities out into .parent_group
+      var all_groups = Object.keys(hierarchy_obj.groups);
+
+      //1.1. Move out all entities; subgroups to .parent_group
       if (parent_group) {
         if (group_obj.entities) {
           if (!parent_group.entities) parent_group.entities = [];
 
-          //Add all current entities to parent_group.entities if not already there
           for (var i = 0; i < group_obj.entities.length; i++)
             if (!parent_group.entities.includes(group_obj.entities[i]))
               parent_group.entities.push(group_obj.entities[i]);
@@ -116,40 +118,41 @@
         if (group_obj.subgroups) {
           if (!parent_group.subgroups) parent_group.subgroups = [];
 
-          //Add all current subgroups to parent_group.subgroups if not already there
           for (var i = 0; i < group_obj.subgroups.length; i++)
             if (!parent_group.subgroups.includes(group_obj.subgroups[i]))
               parent_group.subgroups.push(group_obj.subgroups[i]);
         }
       }
 
-      //Delete group
-      delete hierarchy_obj.groups[group_id];
-
-      //Remove all mentions of group_id from subgroups in main.groups
-      var all_groups = Object.keys(main.groups);
-
+      //1.2. Update all subgroups' .parent_group
       for (var i = 0; i < all_groups.length; i++) {
-        var local_group = main.groups[all_groups[i]];
+        var local_group = hierarchy_obj.groups[all_groups[i]];
+
+        if (parent_group) {
+          if (local_group.parent_group == group_id)
+            local_group.parent_group = parent_group.id;
+        } else {
+          delete local_group.parent_group;
+        }
+      }
+
+      //2. Remove group_id from all .subgroups
+      for (var i = 0; i < all_groups.length; i++) {
+        var local_group = hierarchy_obj.groups[all_groups[i]];
 
         if (local_group.subgroups)
           for (var x = 0; x < local_group.subgroups.length; x++)
-            if (local_group.subgroups[x] == group_id)
+            if (local_group.subgroups[x] == group_id) {
               local_group.subgroups.splice(x, 1);
-
-        //Delete local_group.subgroups key if nothing is left
-        if (local_group.subgroups)
-          if (local_group.subgroups.length == 0)
-            delete local_group.subgroups;
+              break;
+            }
       }
 
-      //Close context menu if attached to current group
-      var context_menu_group = context_menu_el.getAttribute("group");
+      //3. Delete actual hierarchy_obj.groups[group_id]
+      delete hierarchy_obj.groups[group_id];
 
-      if (context_menu_group == group_id) {
-        closeSidebarContextMenu();
-        closeSidebarSubcontextMenu();
-      }
+      //Close context menus
+      closeHierarchyContextMenus("hierarchy");
 
       //Refresh sidebar
       if (!options.do_not_refresh)
@@ -177,7 +180,7 @@
     var still_has_subgroups = true;
 
     //Delete all subgroups first to move everything to the base group until group_obj has no subgroups
-    var clear_subgroups_loop = setInterval(function(){
+    global.clear_subgroups_loop = setInterval(function(){
       //Delete if there's nothing in group_obj.subgroups
       if (group_obj.subgroups)
         if (group_obj.subgroups.length == 0)
@@ -194,6 +197,9 @@
       }
 
       if (!still_has_subgroups) {
+        //Clear interval
+        clearInterval(global.clear_subgroups_loop);
+
         //Delete all entities remaining in base group; reverse for-loop
         if (group_obj.entities)
           for (var i = group_obj.entities.length - 1; i >= 0; i--)
@@ -205,9 +211,6 @@
         //Refresh sidebar; reload map
         refreshSidebar();
         loadDate();
-
-        //Clear interval
-        clearInterval(clear_subgroups_loop);
       }
     }, 0);
   }
@@ -269,7 +272,8 @@
       var local_group = hierarchy_obj.groups[all_groups[i]];
 
       //Return statement
-      return (!options.return_key) ? local_group : all_groups[i];
+      if (all_groups[i] == group_id)
+        return (!options.return_key) ? local_group : all_groups[i];
     }
   }
 
@@ -331,7 +335,7 @@
     //Iterate over all_groups; groups for entities
     for (var i = 0; i < all_groups.length; i++) {
       var local_group = main.groups[all_groups[i]];
-      
+
       if (local_group.entities)
         if (local_group.entities.includes(entity_id))
           return (!options.return_key) ? local_group : all_groups[i];

@@ -63,6 +63,9 @@
     var hierarchy_options_obj = hierarchy_options[hierarchy_id];
 
     //Set function options
+    hierarchy_options_obj.context_menu_selector = options.context_menu_selector;
+
+    hierarchy_options_obj.context_menu_function = options.context_menu_function;
     hierarchy_options_obj.delete_function = options.delete_function;
     hierarchy_options_obj.rename_function = options.rename_function;
 
@@ -149,8 +152,54 @@
     var parent_el = (options.parent_group) ? hierarchy_el.querySelector(`.group[data-id="${options.parent_group}"]`) : hierarchy_el;
 
     renderList(hierarchy_id, parent_el, [new_group]);
-    insertGroupAtTop(parent_el, parent_el.lastChild);
+    try {
+      insertGroupAtTop(parent_el, parent_el.lastChild);
+    } catch (e) {
+      console.log(`Could not find parent_el at addGroup():`, options.parent_group, hierarchy_el, parent_el);
+      console.log(`Attempting to add group`, options, `at`, hierarchy_id);
+      console.log(e);
+    }
     setupDragAndDrop();
+  }
+
+  /*
+    adjustHierarchyContextMenus() - Adjusts the Y position of all context menus given in a hierarchy based on their selector.
+    arg0_hierarchy_key: (String)
+    arg1_item_el: (HTMLElement) - The item element to sync context menus to.
+  */
+  function adjustHierarchyContextMenus (arg0_hierarchy_key, arg1_item_el) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var item_el = arg1_item_el;
+
+    //Declare local instance variables
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
+
+    //Open context menus
+    if (hierarchy_options.context_menu_selector) {
+      var all_context_menu_els = document.querySelectorAll(hierarchy_options.context_menu_selector);
+
+      for (var i = 0; i < all_context_menu_els.length; i++) {
+        all_context_menu_els[i].style.position = "absolute";
+        all_context_menu_els[i].style.top = `${item_el.getBoundingClientRect().top}px`;
+      }
+    }
+  }
+
+  function closeHierarchyContextMenus (arg0_hierarchy_key) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+
+    //Declare local instance variables
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
+
+    //Close context menus
+    if (hierarchy_options.context_menu_selector) {
+      var all_context_menu_els = document.querySelectorAll(hierarchy_options.context_menu_selector);
+
+      for (var i = 0; i < all_context_menu_els.length; i++)
+        hideElement(all_context_menu_els[i]);
+    }
   }
 
   function createEntity (arg0_name, arg1_options) {
@@ -252,16 +301,22 @@
           groups[group_id] = new_group;
           if (local_hierarchy_obj.groups)
             if (local_hierarchy_obj.groups[group_id])
-              groups[group_id] = mergeObjects(new_group, local_hierarchy_obj.groups[group_id], { overwrite: true });
+              groups[group_id] = dumbMergeObjects(new_group, local_hierarchy_obj.groups[group_id]);
+
+          var group_entities = groups[group_id].entities;
+          var group_subgroups = groups[group_id].subgroups;
 
           //Iterate over children and add them
           for (var x = 0; x < local_children.length; x++) {
             var local_child = local_children[x];
+            var local_id = local_child.dataset.id;
 
             if (local_child.className == "entity") {
-              groups[group_id].entities.push(local_child.dataset.id);
+              if (!group_entities.includes(local_id))
+                group_entities.push(local_id);
             } else if (local_child.className == "group") {
-              groups[group_id].subgroups.push(local_child.dataset.id);
+              if (!group_subgroups.includes(local_id))
+                group_subgroups.push(local_id);
             }
           }
         } else if (element.className == "entity") {
@@ -599,7 +654,9 @@
         delete_button.textContent = "Delete";
         delete_button.setAttribute("class", "delete-button");
         delete_button.addEventListener("click", function (e) {
-          deleteItem(hierarchy_id, local_div);
+          (local_item.type == "group") ?
+            deleteGroup(hierarchy_key, local_item.id) :
+            deleteItem(hierarchy_id, local_div);
         });
         interaction_container_el.appendChild(delete_button);
       }
@@ -609,13 +666,24 @@
         var context_menu_button = document.createElement("img");
         context_menu_button.setAttribute("class", "context-menu-button");
         context_menu_button.setAttribute("src", "./gfx/interface/context_menu_icon.png");
+
+        if (hierarchy_options.context_menu_function)
+          context_menu_button.addEventListener("click", function (e) {
+            global[hierarchy_options.context_menu_function](hierarchy_key, local_item.id);
+          });
+
         interaction_container_el.appendChild(context_menu_button);
       }
 
       //Append name_div, delete_button to local_div
       local_div.appendChild(name_div);
       local_div.appendChild(interaction_container_el);
-      parent_el.appendChild(local_div);
+      try {
+        parent_el.appendChild(local_div);
+      } catch (e) {
+        console.log(`Could not find parent_el at renderList():`, parent_el, local_div);
+        console.log(e)
+      }
 
       //Recursively render list
       if (local_item.type == "group")

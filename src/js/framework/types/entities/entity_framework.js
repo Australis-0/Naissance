@@ -27,7 +27,6 @@
   function deleteEntity (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    console.log(entity_id);
 
     //Declare local instance variables
     var current_entity_class;

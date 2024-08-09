@@ -1,0 +1,14 @@
+#hierarchy-context-menu {
+  left: calc(var(--sidebar-width) + var(--context-menu-x-margin));
+}
+#hierarchy-context-menu-two {
+  left: calc(var(--sidebar-width) + var(--context-menu-width) + var(--context-menu-x-margin)*2);
+
+  .context-menu {
+    width: calc(var(--context-menu-width)*1.5);
+  }
+  .context-menu * {
+    max-width: 100%;
+    width: 100%;
+  }
+}

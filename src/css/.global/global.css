@@ -89,11 +89,14 @@ td {
 
 /* -- CSS Variables -- */
 :root {
+  /* -- Context Menus -- */
+  --context-menu-width: calc(10rem);
+  --context-menu-x-margin: calc(0.5rem);
+
   /* -- Entity UI: Timeline/Data Graph -- */
   --canvas-height: 4vw;
   --canvas-x-axis-margin-right: 12px;
   --canvas-y-axis-margin-left: calc(0.2vw);
-  --context-menu-width: calc(8vw);
   --entity-ui-header-buttons: 3;
   --entity-ui-width: calc(20vw + 24px);
   --graph-label-font-size: calc(0.5vw);

@@ -7,12 +7,14 @@
 		<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300;400;500;600;700&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Slabo+27px&display=swap" rel="stylesheet">
 
 		<!-- CSS Stylesheets -->
-		<link rel = "stylesheet" href = "./css/global.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/icons.css" type = "text/css">
+
+		<link rel = "stylesheet" href = "./css/.global/context_menus.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/.global/global.css" type = "text/css">
 
 		<link rel = "stylesheet" href = "./css/left_sidebar/date_container/date_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/file/file_ui.css" type = "text/css">
-		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/context_menu_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_context_menus.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_ui.css" type = "text/css">
 
 		<link rel = "stylesheet" href = "./css/map/map.css" type = "text/css">
@@ -144,35 +146,9 @@
 					<div id = "hierarchy-selection-info" class = "hierarchy-selection-info-container">
 					</div>
 
-					<!-- Hierarchy Context Menu -->
-					<div id = "hierarchy-context-menu" class = "context-menu-container instant-display-none"> <!-- Add instant-display-none to class later -->
-						<div id = "context-menu-create-subgroup-button" class = "context-menu-button">
-							<img src = "gfx/interface/plus_icon.png" class = "icon small negative" draggable = "false"> Create Subgroup
-						</div>
-						<div id = "context-menu-mask-group-button" class = "context-menu-button">
-							<img src = "gfx/interface/mask_icon.png" class = "icon small negative" draggable = "false"> Set Mask
-						</div>
-						<div id = "context-menu-move-group-button" class = "context-menu-button">
-							<img src = "gfx/interface/jump_to_icon.png" class = "icon small negative" draggable = "false"> Move Group
-						</div>
-						<div id = "context-menu-delete-group-button" class = "context-menu-button delete">
-							<img src = "gfx/interface/delete_filled_icon.png" class = "icon small negative" draggable = "false"> Delete
-						</div>
-						<div id = "context-menu-delete-all-button" class = "context-menu-button delete">
-							<img src = "gfx/interface/delete_filled_icon.png" class = "icon small negative" draggable = "false"> Delete All
-						</div>
-					</div>
-
-					<!-- Hierarchy Second Context menu -->
-					<div id = "hierarchy-context-menu-two" class = "context-menu-container two hidden">
-						<div id = "hierarchy-context-menu-text" class = "context-menu-text">
-							<b>Test</b>
-						</div>
-					</div>
-
-					<div id = "hierarchy-action-context-menu" class = "hierarchy-action-context-menu-container instant-display-none">
-
-					</div>
+					<!-- Hierarchy Context Menus -->
+					<div id = "hierarchy-context-menu" class = "context-menu-container one hidden"></div>
+					<div id = "hierarchy-context-menu-two" class = "context-menu-container two hidden"></div>
 				</div>
 			</div>
 
@@ -246,13 +222,14 @@
 		<!-- Import localisation -->
 		<script src = "./js/localisation/entity_localisation.js" type = "text/javascript"></script>
 
-		<!-- Import ui -->
+		<!-- Import UI -->
 		<script src = "./js/ui/left_sidebar/date_ui.js" type = "text/javascript"></script>
 		<script src = "./js/ui/left_sidebar/file_ui.js" type = "text/javascript"></script>
-		<script src = "./js/ui/left_sidebar/hierarchy_ui.js" type = "text/javascript"></script>
 		<script src = "./js/ui/left_sidebar/mask_ui.js" type = "text/javascript"></script>
 		<script src = "./js/ui/left_sidebar/sidebar_ui.js" type = "text/javascript"></script>
 		<script src = "./js/ui/left_sidebar/undo_redo_ui.js" type = "text/javascript"></script>
+
+		<script src = "./js/ui/left_sidebar/hierarchy/hierarchy_context_menus.js" type = "text/javascript"></script>
 
 		<script src = "./js/ui/map/brush/brush_ui.js" type = "text/javascript"></script>
 		<script src = "./js/ui/map/entity_ui/entity_ui.js" type = "text/javascript"></script>

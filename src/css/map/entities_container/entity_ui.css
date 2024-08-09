@@ -6,7 +6,7 @@
 }
 
 /* -- Button styling -- */
-.button {
+.leaflet-popup .button {
   height: calc(2.25vw);
   width: calc(2.25vw);
   margin-left: 3px;
@@ -19,7 +19,7 @@
 
   transition: all 1s, background-color 0.5s;
 }
-.button:hover {
+.leaflet-popup .button:hover {
   background-color: rgba(255, 255, 255, 0.3);
 
   transition: all 1s, background-color 0.5s;

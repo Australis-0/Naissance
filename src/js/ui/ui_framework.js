@@ -40,17 +40,6 @@
     }
   }
 
-  function showElement (arg0_element) {
-    //Convert from parameters
-    var element = arg0_element;
-
-    //Declare local instance variables
-    var class_name = element.getAttribute("class");
-
-    if (class_name)
-      element.setAttribute("class", class_name.replace(/ hidden/gm, ""));
-  }
-
   function toggleElementVisibility (arg0_element, arg1_button_element) {
     //Convert from parameters
     var element = arg0_element;

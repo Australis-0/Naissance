@@ -4,13 +4,15 @@
     var hierarchy_el = document.getElementById("hierarchy");
 
     initHierarchy({
-      context_menu_selector: `#hierarchy-context-menu, #hierarchy-context-menu-two`,
-      context_menu_function: "handleSidebarContextMenu",
-
       hide_add_entity: true,
       hierarchy_selector: "#hierarchy",
       id: "hierarchy",
 
+      //Selectors
+      context_menu_selector: `#hierarchy-context-menu, #hierarchy-context-menu-two`,
+
+      //Functions
+      context_menu_function: "printHierarchyContextMenu",
       delete_function: "deleteEntity",
       rename_function: "renameEntity"
     });

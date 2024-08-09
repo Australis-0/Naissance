@@ -1,0 +1,48 @@
+.context-menu-container {
+  position: fixed;
+}
+.context-menu:not([class*="unique"]) {
+  position: absolute;
+
+  background-color: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: var(--context-menu-width);
+
+  font-family: "Karla";
+  font-size: 1rem;
+  font-weight: 400;
+
+  > table {
+    width: 100%;
+  }
+}
+
+.context-menu td:has(div span.button) {
+  width: 100%;
+
+  background-color: white;
+  transition: all 0.5s;
+
+  > div {
+    padding: 0rem;
+  }
+}
+.context-menu td:has(div span.button):hover {
+  background-color: rgba(200, 200, 200, 0.3);
+  cursor: pointer;
+}
+
+/* -- Button -- */
+.context-menu span.button {
+  display: inline-block;
+  padding: 0.5rem;
+
+  height: 100%;
+  width: 100%;
+}
+
+/* -- Select -- */
+.context-menu select {
+  max-width: calc(var(--context-menu-width) - 2rem);
+}
