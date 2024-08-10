@@ -18,9 +18,9 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var group_obj = getGroup("hierarchy", group_id);
+    var group_obj = main.hierarchies.hierarchy.groups[group_id];
 
-    var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
+    var group_el = document.querySelector(`#hierarchy .group[data-id="${group_id}"]`);
     var group_el_class;
 
     if (group_el) {
@@ -40,17 +40,6 @@
           brush_obj.masks[mode] = appendArrays(brush_obj.masks[mode], all_selected_entities);
           group_obj.mask = mode;
         }
-
-      //A delay tick is required to set the DOM class update
-      setTimeout(function(){
-        if (reserved.mask_types.includes(mode))
-          if (global.temp_mask_el)
-            if (global.temp_mask_el.id) {
-              var group_el = document.getElementById(global.temp_mask_el.id);
-
-              group_el.setAttribute("class", `group mask-${mode}`);
-            }
-      }, 1);
     }
   }
 

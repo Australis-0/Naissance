@@ -285,7 +285,7 @@
 
       //Iterate over all descendent groups
       groups_container.forEach(function (element) {
-        if (element.className == "group") {
+        if (element.className.includes("group")) {
           var group_id = element.dataset.id;
           var group_name = element.querySelector("div").textContent;
           var local_children = element.children;
@@ -319,7 +319,7 @@
                 group_subgroups.push(local_id);
             }
           }
-        } else if (element.className == "entity") {
+        } else if (element.className.includes("entity")) {
           var local_entity_id = element.dataset.id;
           var new_entity = {
             id: local_entity_id,
@@ -623,6 +623,7 @@
 
     //Declare local instance variables
     var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
     var hierarchy_options = main.hierarchy_options[hierarchy_key];
 
     //Iterate over all items
@@ -683,6 +684,16 @@
       } catch (e) {
         console.log(`Could not find parent_el at renderList():`, parent_el, local_div);
         console.log(e)
+      }
+
+      //Naissance handling
+      {
+        if (local_item.type == "group") {
+          var group_obj = hierarchy_obj.groups[local_item.id];
+
+          if (group_obj.mask)
+            local_div.className = `${local_div.className} ${group_obj.mask}`;
+        }
       }
 
       //Recursively render list

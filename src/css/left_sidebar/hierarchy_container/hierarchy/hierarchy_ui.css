@@ -13,20 +13,6 @@
   pointer-events: all;
 }
 
-/* -- Group styling -- */
-.group.mask-add {
-  background-color: rgba(60, 240, 60, 0.3);
-}
-.group.mask-intersect_add {
-  background-color: rgba(235, 220, 50, 0.3);
-}
-.group.mask-intersect_overlay {
-  background-color: rgba(60, 60, 240, 0.3);
-}
-.group.mask-subtract {
-  background-color: rgba(240, 60, 60, 0.3);
-}
-
 /* -- Hierarchy Styling-- */
 .hierarchy-body-container {
   margin-left: 15px;
@@ -109,6 +95,20 @@
   cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
+
+  /* -- Group styling -- */
+  .add, .add *:is(.group, .entity) {
+    background-color: rgba(60, 240, 60, 0.3);
+  }
+  .intersect_add, .intersect_add *:is(.group, .entity) {
+    background-color: rgba(235, 220, 50, 0.3);
+  }
+  .intersect_overlay, .intersect_overlay *:is(.group, .entity) {
+    background-color: rgba(60, 60, 240, 0.3);
+  }
+  .subtract, .subtract *:is(.group, .entity) {
+    background-color: rgba(240, 60, 60, 0.3);
+  }
 
   .interaction-container {
     float: right;

@@ -45,8 +45,9 @@
     for (var i = 0; i < all_groups.length; i++) {
       var local_group = main.groups[all_groups[i]];
 
-      if (!local_group.parent_group)
-        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_group));
+      if (local_group)
+        if (!local_group.parent_group)
+          rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_group));
     }
 
     //Append ungrouped_entities to end of rendering order
