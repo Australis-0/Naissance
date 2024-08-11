@@ -31,7 +31,7 @@ window.fs = require("fs");
 
     //Subobjects and masks
     masks: {
-      brush_only_mask: false, //Whether the mask only apply to the current brush, and not the entire selection. False by default
+      brush_only_mask: false, //Whether the masks only apply to the current brush, and not the entire selection. False by default
       add: [], //Mask override (Array<Object, Polity>)
       intersect_add: [], //Mask intersect override (Array<Object, Polity>)
       intersect_overlay: [], //Mask intersect overlap (Array<Object, Polity>)

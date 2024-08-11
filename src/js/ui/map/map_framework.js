@@ -1,13 +1,17 @@
 //Declare functions
-function clearMap () {
+function clearMap (arg0_options) {
+  //Convert from parameters
+  var options = (arg0_options) ? arg0_options : {};
+
   //Clear entities
   if (main.entities)
     for (var i = 0; i < main.entities.length; i++)
       main.entities[i].remove();
 
-  try {
-    clearBrush();
-  } catch {}
+  if (options.clear_brush)
+    try {
+      clearBrush();
+    } catch {}
 }
 
 function returnLoop (arg0_map_element, arg1_styling) {

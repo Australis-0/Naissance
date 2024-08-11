@@ -79,8 +79,8 @@
             var local_id = local_value.options.className;
 
             if (local_id != selected_id)
-              if (local_value._latlngs) {
-                var local_coords = difference(local_value._latlngs,  brush_obj.current_path);
+              if (local_value._latlngs && brush_obj.current_path) {
+                var local_coords = difference(local_value._latlngs, brush_obj.current_path);
 
                 //If local_coords is defined, set it - otherwise hide it
                 if (local_coords) {
@@ -96,6 +96,7 @@
 
           //Iterate over all mask_intersect_add entities
           if (brush_obj.masks.intersect_add.length > 0) {
+            //1. Fetch combined_union
             var combined_union = getTurfObject(brush_obj.masks.intersect_add[0]._latlngs);
 
             for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
@@ -103,54 +104,56 @@
 
               var local_id = local_value.options.className;
 
-              if (local_id != selected_id || local_value.selection)
+              if (local_id != selected_id)
                 if (local_value._latlngs)
                   combined_union = union(local_value._latlngs, combined_union);
             }
 
-            //Fetch the area that perfectly overlaps with the intersection
-             brush_obj.current_path = intersection( brush_obj.current_path, combined_union);
-
-            //Overwrite intersection area
-            if ( brush_obj.current_path) {
-              //Buffer by 1m on a deep copy to make sure we don't have issues
+            //2. Set brush_obj.current_path to intersection of brush and combined_union
+            brush_obj.current_path = intersection(brush_obj.current_path, combined_union);
+            if (brush_obj.current_path) {
               var old_current_path = JSON.parse(JSON.stringify(brush_obj.current_path));
               brush_obj.current_path = buffer(brush_obj.current_path, {
                 radius: 0.001,
                 units: "kilometers"
               });
+            }
 
-              for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
-                var local_value = brush_obj.masks.intersect_add[i];
+            //3. Now, iterate over brush_obj.masks.intersect_add with brush_obj.masks.add logic
+            for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
+              var local_value = brush_obj.masks.intersect_add[i];
 
-                var local_entity_id = local_value.options.className;
+              var local_id = local_value.options.className;
 
-                if (local_entity_id != selected_id)
-                  if (local_value._latlngs) {
+              if (local_id != selected_id)
+                if (local_value._latlngs && brush_obj.current_path) {
+                  var local_coords = difference(local_value._latlngs, brush_obj.current_path);
 
-                    local_value._latlngs = difference(local_value._latlngs, brush_obj.current_path);
-                    createHistoryFrame(local_entity_id, date, {}, local_value._latlngs);
+                  //If local_coords is defined, set it - otherwise hide it
+                  if (local_coords) {
+                    local_value.setLatLngs(local_coords);
 
-                    local_value.removeFrom(map);
-                    local_value.addTo(map);
+                    //Set new ._latlngs to coords of current history frame
+                    createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
+                  } else {
+                    hidePolity(local_value.options.className, main.date);
                   }
-              }
+                }
+            }
 
-              //Push selection to mask now in order to make sure it masks the entire group
-              if (brush_obj.current_selection)
-                brush_obj.masks.intersect_add.push({
-                  selection: true,
+            //4. Push selection to mask now to make sure it masks the entire group
+            if (brush_obj.current_selection)
+              brush_obj.masks.intersect_add.push({
+                selection: true,
 
-                  options: brush_obj.current_selection.options,
-                  _latlngs: old_current_path
-                });
+                options: brush_obj.current_selection.options,
+                _latlngs: old_current_path
+              });
+            for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
+              var local_value = brush_obj.masks.intersect_add[i];
 
-              for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
-                var local_value = brush_obj.masks.intersect_add[i];
-
-                if (local_value.selection)
-                  brush_obj.current_path = union(local_value._latlngs, brush_obj.current_path);
-              }
+              if (local_value.selection)
+                brush_obj.current_path = union(local_value._latlngs, brush_obj.current_path);
             }
           }
 
