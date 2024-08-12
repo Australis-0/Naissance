@@ -47,9 +47,9 @@
     //Declare local instance variables
     var brush_obj = main.brush;
 
-    //Iterate over all reserved.mask_types
-    for (var i = 0; i < reserved.mask_types.length; i++) {
-      var local_mask = brush_obj.masks[reserved.mask_types[i]];
+    //Iterate over all config.mask_types
+    for (var i = 0; i < config.mask_types.length; i++) {
+      var local_mask = brush_obj.masks[config.mask_types[i]];
 
       //Remove all .selection from masks
       for (var x = local_mask.length - 1; x >= 0; x--) {
@@ -79,8 +79,8 @@
     entity_id = entity_obj.options.className;
 
     //Iterate over all mask types
-    for (var i = 0; i < reserved.mask_types.length; i++) {
-      var local_mask = brush_obj.masks[reserved.mask_types[i]];
+    for (var i = 0; i < config.mask_types.length; i++) {
+      var local_mask = brush_obj.masks[config.mask_types[i]];
 
       //Remove entity_id from mask
       for (var x = local_mask.length - 1; x >= 0; x--) {
@@ -106,20 +106,20 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var group_el = document.querySelector(`#hierarchy .group[id="${group_id}"]`);
+    var group_el = document.querySelector(`#hierarchy .group[data-id="${group_id}"]`);
     var group_obj = getGroup("hierarchy", group_id);
 
     //Edit class display
     if (group_el) {
       var all_selected_entity_keys = getGroupEntities("hierarchy", group_obj.id, { return_keys: true });
-      var new_class = removeClasses(group_el, reserved.mask_classes);
+      var new_class = removeClasses(group_el, config.mask_classes);
 
       //Strip classes
       group_el.setAttribute("class", new_class);
 
       //Get all selected_entities and remove from all masks
-      for (var i = 0; i < reserved.mask_types.length; i++) {
-        var local_mask = brush_obj.masks[reserved.mask_types[i]];
+      for (var i = 0; i < config.mask_types.length; i++) {
+        var local_mask = brush_obj.masks[config.mask_types[i]];
 
         //Remove all_selected_entity_keys from mask
         for (var x = local_mask.length - 1; x >= 0; x--) {

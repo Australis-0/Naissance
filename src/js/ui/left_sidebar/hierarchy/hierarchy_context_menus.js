@@ -3,11 +3,14 @@
     printHierarchyContextMenu() - Handles click and input events for the main map entities hierarchy.
     arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
     arg1_group_id: (String)
+    arg2_options: (Object)
+      do_not_show: (Boolean)
   */
-  function printHierarchyContextMenu (arg0_hierarchy_key, arg1_group_id) {
+  function printHierarchyContextMenu (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
     var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
     var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu`);
@@ -16,7 +19,8 @@
     var hierarchy_obj = main.hierarchies[hierarchy_key];
 
     //Make sure context_menu_el is visible; move context_menu_el to group_el position
-    showElement(context_menu_el);
+    if (!options.do_not_show)
+      showElement(context_menu_el);
     adjustHierarchyContextMenus(hierarchy_key, group_el);
 
     //Set context menu
@@ -66,12 +70,16 @@
         onclick: `printHierarchyMaskContextMenu('hierarchy', '${group_id}');`
       }
     });
+
+    //Print subcontext menus without showing them
+    printHierarchyMaskContextMenu(hierarchy_key, group_id, { do_not_show: true });
   }
 
-  function printHierarchyMaskContextMenu (arg0_hierarchy_key, arg1_group_id) {
+  function printHierarchyMaskContextMenu (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
     var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
     var group_id = arg1_group_id;
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu-two`);
@@ -80,8 +88,8 @@
 
     //Check mode
     if (group_el) {
-      showElement(context_menu_el);
-      //context_menu_el.setAttribute("style", `top: calc(${offset_top}px);`);
+      if (!options.do_not_show)
+        showElement(context_menu_el);
 
       context_menu_el.innerHTML = createContextMenu({
         anchor: `#${hierarchy_key}-context-menu-two`,

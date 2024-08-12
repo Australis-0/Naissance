@@ -9,8 +9,8 @@
 
     if (brush_obj.current_selection) {
       if (brush_obj.current_selection.options.className)
-        for (var i = 0; i < reserved.mask_types.length; i++) {
-          var local_key = reserved.mask_types[i];
+        for (var i = 0; i < config.mask_types.length; i++) {
+          var local_key = config.mask_types[i];
 
           brush_obj.masks[local_key] = reloadEntityInArray(brush_obj.masks[local_key], brush_obj.current_selection.options.className);
         }

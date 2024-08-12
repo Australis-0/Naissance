@@ -81,6 +81,17 @@
 }
 
 /* -- Hierarchy item styling -- */
+#hierarchy {
+  .controls {
+    max-height: 2rem;
+
+    position: fixed;
+    transform: translate(0%, 0%);
+  }
+  .controls + * {
+    margin-top: 2rem; /* Add margin under .controls */
+  }
+}
 .group, .entity {
   margin-bottom: 0.1rem;
   margin-top: 0.1rem;

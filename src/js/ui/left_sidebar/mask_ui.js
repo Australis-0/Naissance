@@ -9,7 +9,9 @@
 
     //If mask_select_el exists, read and set mask
     if (mask_select_el) {
-      addGroupMask(group_id, mask_select_el.value);
+      (mask_select_el.value != "clear") ?
+        addGroupMask(group_id, mask_select_el.value) :
+        removeGroupMask(group_id, mask_select_el.value);
       refreshSidebar();
     }
   }

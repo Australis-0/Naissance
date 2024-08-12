@@ -78,16 +78,15 @@ window.fs = require("fs");
 */
 
 //Optimisation
-window.reserved = {
-  mask_classes: [],
-  mask_types: ["add", "intersect_add", "intersect_overlay", "subtract"]
-};
+if (!global.config) global.config = {};
+  if (!config.mask_classes) config.mask_classes = [];
+  if (!config.mask_types) config.mask_types = ["add", "intersect_add", "intersect_overlay", "subtract"];
 
 //Process optimisation
 {
   //Masks
-  for (var i = 0; i < reserved.mask_types.length; i++)
-    reserved.mask_classes.push(` mask-${reserved.mask_types[i]}`);
+  for (var i = 0; i < config.mask_types.length; i++)
+    config.mask_classes.push(` ${config.mask_types[i]}`);
 }
 
 //UI
