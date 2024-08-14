@@ -9,6 +9,11 @@ global.config.ui = {
   topbar: "#topbar",
 
   //Left sidebar
+  //Pages
+  file_page: `#file-tab`,
+  map_page: `#hierarchy-tab`,
+
+  //Other selectors
   hierarchy: "#hierarchy",
   hierarchy_container: "#hierarchy-container",
   date_fields: `#date-container input`,
@@ -18,11 +23,15 @@ global.config.ui = {
     day_el: `#date-container #day-input`,
     month_el: `#date-container #month-input`,
     year_el: `#date-container #year-input`,
-    year_type_el: `#date-container #year-type`
+    year_type_el: `#date-container #year-type`,
+  left_sidebar_pages: `#left-sidebar [page="true"]`,
 
   //Right sidebar
 
   //Topbar
+  topbar_tab_buttons: `#topbar > ul li`,
+    file_button_el: `#topbar .file`,
+    map_button_el: `#topbar .map`
 };
 
 
