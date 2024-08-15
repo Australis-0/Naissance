@@ -1,6 +1,6 @@
 //Initialise Sidebar functions
 {
-  function initSidebarUI () {
+  function initHierarchyUI () {
     var hierarchy_el = document.getElementById("hierarchy");
 
     initHierarchy({
@@ -12,17 +12,18 @@
       context_menu_selector: `#hierarchy-context-menu, #hierarchy-context-menu-two`,
 
       //Functions
-      context_menu_function: "printHierarchyContextMenu",
       delete_function: "deleteEntity",
+      entity_context_menu_function: "printHierarchyEntityContextMenu",
+      group_context_menu_function: "printHierarchyGroupContextMenu",
       rename_function: "renameEntity"
     });
-    initialiseSidebarEvents();
+    initHierarchyEvents();
   }
 }
 
 //Sidebar UI functions
 {
-  function initialiseSidebarEvents () {
+  function initHierarchyEvents () {
     //Declare local instance variables
     var dragged;
     var hierarchy_el = getUISelector("hierarchy");
@@ -96,7 +97,7 @@
     });
   }
 
-  function refreshSidebar () {
+  function refreshHierarchy () {
     renderHierarchy("hierarchy", { naissance_hierarchy: true });
   }
 }

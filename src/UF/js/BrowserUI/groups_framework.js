@@ -64,7 +64,7 @@
 
     //Refresh sidebar
     if (!options.do_not_refresh) {
-      refreshSidebar();
+      refreshHierarchy();
 
       //Focus on newly created group
       var actual_group_el = sidebar_el.querySelectorAll(`[id='${group_id}'].group > input`);
@@ -156,7 +156,7 @@
 
       //Refresh sidebar
       if (!options.do_not_refresh)
-        refreshSidebar();
+        refreshHierarchy();
     }
   }
 
@@ -209,7 +209,7 @@
         deleteGroup(hierarchy_key, group_id);
 
         //Refresh sidebar; reload map
-        refreshSidebar();
+        refreshHierarchy();
         loadDate();
       }
     }, 0);

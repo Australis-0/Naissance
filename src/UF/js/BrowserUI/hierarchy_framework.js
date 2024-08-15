@@ -67,6 +67,9 @@
 
     hierarchy_options_obj.context_menu_function = options.context_menu_function;
     hierarchy_options_obj.delete_function = options.delete_function;
+    hierarchy_options_obj.entity_context_menu_function = options.entity_context_menu_function;
+    hierarchy_options_obj.group_context_menu_function = options.group_context_menu_function;
+
     hierarchy_options_obj.rename_function = options.rename_function;
 
     //Create hierarchy_div
@@ -302,6 +305,9 @@
           if (local_hierarchy_obj.groups)
             if (local_hierarchy_obj.groups[group_id])
               groups[group_id] = dumbMergeObjects(new_group, local_hierarchy_obj.groups[group_id]);
+          //Make sure group_entities; group_subgroups are refreshed
+          groups[group_id].entities = [];
+          groups[group_id].subgroups = [];
 
           var group_entities = groups[group_id].entities;
           var group_subgroups = groups[group_id].subgroups;
@@ -311,12 +317,10 @@
             var local_child = local_children[x];
             var local_id = local_child.dataset.id;
 
-            if (local_child.className == "entity") {
-              if (!group_entities.includes(local_id))
-                group_entities.push(local_id);
-            } else if (local_child.className == "group") {
-              if (!group_subgroups.includes(local_id))
-                group_subgroups.push(local_id);
+            if (local_child.className.includes("entity")) {
+              group_entities.push(local_id);
+            } else if (local_child.className.includes("group")) {
+              group_subgroups.push(local_id);
             }
           }
         } else if (element.className.includes("entity")) {
@@ -500,6 +504,7 @@
     arg0_hierarchy_key: (String)
     arg1_options: (Object)
       depth: (Number)
+      entity_rendering_order: (Array<String>)
       excluded_entities: (Array<String>)
       excluded_groups: (Array<String>)
       naissance_hierarchy: (Boolean)
@@ -511,6 +516,7 @@
 
     //Initialise optimisation parameters
     if (!options.depth) options.depth = -1;
+    if (!options.entity_rendering_order) options.entity_rendering_order = getHierarchyRenderingOrder();
     if (!options.excluded_entities) options.excluded_entities = [];
     if (!options.excluded_groups) options.excluded_groups = [];
 
@@ -588,8 +594,8 @@
         excluded_entities.push(all_ungrouped_entities[i]);
       }
     //Render nth-layer entities
-    for (var i = 0; i < hierarchy_obj.entities.length; i++) {
-      var local_entity = hierarchy_obj.entities[i];
+    for (var i = 0; i < options.entity_rendering_order.length; i++) {
+      var local_entity = getEntity(options.entity_rendering_order[i]);
       var local_entity_id;
       var local_entity_name;
 
@@ -672,6 +678,16 @@
           context_menu_button.addEventListener("click", function (e) {
             global[hierarchy_options.context_menu_function](hierarchy_key, local_item.id);
           });
+        if (hierarchy_options.group_context_menu_function)
+          if (local_item.type == "group")
+            context_menu_button.addEventListener("click", function (e) {
+              global[hierarchy_options.group_context_menu_function](hierarchy_key, local_item.id);
+            });
+        if (hierarchy_options.entity_context_menu_function)
+          if (local_item.type == "entity")
+            context_menu_button.addEventListener("click", function (e) {
+              global[hierarchy_options.entity_context_menu_function](hierarchy_key, local_item.id);
+            });
 
         interaction_container_el.appendChild(context_menu_button);
       }

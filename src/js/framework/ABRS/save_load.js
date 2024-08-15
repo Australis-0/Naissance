@@ -58,6 +58,7 @@
     }
 
     //Save .groups
+    main.groups = exportHierarchies({ naissance_hierarchy: "hierarchy" }).hierarchy.groups;
     save_data.groups = main.groups;
 
     //Write save_data to file

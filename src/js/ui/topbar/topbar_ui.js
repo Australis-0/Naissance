@@ -1,4 +1,7 @@
 //Declare functions
+{
+
+}
 function switchTopbarTab (arg0_tab) {
   //Convert from parameters
   var tab = arg0_tab.toLowerCase();
@@ -26,10 +29,20 @@ function switchTopbarTab (arg0_tab) {
   showElement(current_page_el);
 }
 
-//Declare listener events
-getUISelector("file_button_el").onclick = function (e) {
-  switchTopbarTab("file");
-};
-getUISelector("map_button_el").onclick = function (e) {
-  switchTopbarTab("map");
-};
+//Initialise Topbar UI functions
+{
+  function initTopbar () {
+    //Declare listener events
+    getUISelector("file_button_el").onclick = function (e) {
+      switchTopbarTab("file");
+    };
+    getUISelector("map_button_el").onclick = function (e) {
+      switchTopbarTab("map");
+    };
+  }
+  
+  function initTopbarUI () {
+    //Initialise topbar only after Topbar UI has first been loaded
+    initTopbar();
+  }
+}

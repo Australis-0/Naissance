@@ -10,14 +10,19 @@
 
     //Render all entities first
     if (group_obj.entities)
-      rendering_order = appendArrays(rendering_order, group_obj.entities);
+      for (var i = 0; i < group_obj.entities.length; i++)
+        if (!rendering_order.includes(group_obj.entities[i]))
+          rendering_order.push(group_obj.entities[i]);
 
     //Render all subgroups next
     if (group_obj.subgroups)
       for (var i = 0; i < group_obj.subgroups.length; i++) {
         var local_subgroup = main.groups[group_obj.subgroups[i]];
-        
-        rendering_order = appendArrays(rendering_order, getGroupRenderingOrder(local_subgroup, rendering_order));
+        var local_subgroup_rendering_order = getGroupRenderingOrder(local_subgroup, rendering_order);
+
+        for (var x = 0; x < local_subgroup_rendering_order.length; x++)
+          if (!rendering_order.includes(local_subgroup_rendering_order[x]))
+            rendering_order.push(local_subgroup_rendering_order[x]);
       }
 
     //Return statement

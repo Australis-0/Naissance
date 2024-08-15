@@ -226,13 +226,12 @@
 
   /*
     getHistoryFrame() - Returns the history frame of an entity.
-    Returns: {
-      is_founding: true/false, - Whether this frame is the founding frame
+    Returns: (Object)
+      is_founding: (Boolean), - Whether this frame is the founding frame
 
-      id: "1943983189043", - The current history timestamp
-      coords: [], - An array of Naissance coords representing the poly
+      id: (String), - The current history timestamp
+      coords: (Array<Array<Number, Number>>), - An array of Naissance coords representing the poly
       options: {} - A list of customisation options
-    }
   */
   function getHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
@@ -325,9 +324,8 @@
 
   /*
     getLastCoords() - Fetches the last valid .coords field from a Naissance entity.
-    options: {
-      different_coords: true/false - Optional. Whether the coords are required to be different. False by default.
-    }
+    arg2_options: (Object)
+      different_coords: (Boolean) - Optional. Whether the coords are required to be different. False by default.
   */
   function getLastCoords (arg0_entity_id, arg1_history_frame, arg2_options) {
     //Convert from parameters

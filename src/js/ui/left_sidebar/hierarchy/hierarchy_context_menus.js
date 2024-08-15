@@ -1,12 +1,23 @@
+//Initialise context menu functions
 {
+  function printHierarchyEntityContextMenu (arg0_hierarchy_key, arg1_entity_id, arg2_options) { //[WIP] - Finish function after entity_ui.js recode
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var entity_id = arg1_entity_id;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Call printEntityContextMenu()
+    printEntityContextMenu(entity_id);
+  }
+
   /*
-    printHierarchyContextMenu() - Handles click and input events for the main map entities hierarchy.
+    printHierarchyGroupContextMenu() - Handles click and input events for the main map entities hierarchy.
     arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
     arg1_group_id: (String)
     arg2_options: (Object)
       do_not_show: (Boolean)
   */
-  function printHierarchyContextMenu (arg0_hierarchy_key, arg1_group_id, arg2_options) {
+  function printHierarchyGroupContextMenu (arg0_hierarchy_key, arg1_group_id, arg2_options) {
     //Convert from parameters
     var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
     var group_id = arg1_group_id;

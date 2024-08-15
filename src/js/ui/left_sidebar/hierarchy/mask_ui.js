@@ -12,7 +12,7 @@
       (mask_select_el.value != "clear") ?
         addGroupMask(group_id, mask_select_el.value) :
         removeGroupMask(group_id, mask_select_el.value);
-      refreshSidebar();
+      refreshHierarchy();
     }
   }
 }

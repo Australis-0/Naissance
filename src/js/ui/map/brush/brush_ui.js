@@ -217,7 +217,7 @@
       if (brush_obj.current_selection) {
         L.setOptions(brush_obj.current_selection, brush_obj.polity_options);
         brush_obj.current_selection.on("click", function (e) {
-          entityUI(e, true);
+          printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: true });
         });
       }
     }

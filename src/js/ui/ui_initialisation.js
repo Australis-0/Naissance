@@ -3,6 +3,9 @@
   function initialiseUI () {
     //Initialise left_sidebar
     initDateUI();
-    initSidebarUI();
+    initHierarchyUI();
+
+    //Initialise topbar
+    initTopbarUI();
   }
 }

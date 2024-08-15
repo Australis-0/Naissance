@@ -60,7 +60,7 @@
       }
 
     //Refresh sidebar
-    refreshSidebar();
+    refreshHierarchy();
   }
 
   function editEntity (arg0_entity_id) {
@@ -93,7 +93,7 @@
 
       //Set entityUI for current selected entity
       brush_obj.current_selection.on("click", function (e) {
-        entityUI(e);
+        printEntityContextMenu(e.target.options.className);
       });
     }
   }
@@ -179,8 +179,8 @@
       clearBrush();
     }
 
-    //Render entities - KEEP AT BOTTOM!
-    renderEntities(true);
+    //Reload date
+    loadDate();
 
     //Return statement
     return entity_id;
@@ -318,23 +318,6 @@
 
     //Return statement
     return entity_name;
-  }
-
-  function renderEntities (arg0_ignore_date) {
-    //Convert from parameters
-    var ignore_date = arg0_ignore_date;
-
-    //Load date and refresh sidebar
-    loadDate((!ignore_date) ? main.date : undefined);
-
-    //Add Polity UI's to all polities
-    for (var i = 0; i < main.entities.length; i++) {
-      var local_entity = main.entities[i];
-
-      local_entity.on("click", function (e) {
-        entityUI(e, false, true);
-      });
-    }
   }
 
   function setEntityNameFromInput (arg0_entity_id, arg1_element) {

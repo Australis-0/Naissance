@@ -212,8 +212,8 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
             main.entities[i] = L.polygon(local_history_frame.coords, local_options).addTo(map);
             main.entities[i].on("click", function (e) {
-              entityUI(e, false, true);
-            })
+              printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: false, pin: true });
+            });
 
             //If this is the current selected polity, re-add cursor
             if (brush_obj.editing_entity == local_entity_id)
@@ -225,6 +225,6 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Update Left Sidebar
     autoFillDate();
-    refreshSidebar();
+    refreshHierarchy();
   }
 }
