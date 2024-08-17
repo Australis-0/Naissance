@@ -8,7 +8,6 @@
       is_being_edited: (Boolean) - Optional. Whether the entity is currently being edited. False by default.
       pin: (Boolean) - Optional. Whether the entity is currently pinned. False by default.
   */
-  //e, arg0_is_being_edited, arg1_pin
   function printEntityContextMenu (arg0_entity_id, arg1_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -377,5 +376,14 @@
 
     //Return statement
     return popup;
+  }
+
+  //Initialise entity
+  {
+    /*function adjustTime (arg0_entity_id, arg1_timestamp) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var timestamp = arg1_timestamp;
+    }*/
   }
 }

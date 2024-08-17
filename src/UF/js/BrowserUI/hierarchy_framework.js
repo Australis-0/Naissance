@@ -707,8 +707,9 @@
         if (local_item.type == "group") {
           var group_obj = hierarchy_obj.groups[local_item.id];
 
-          if (group_obj.mask)
-            local_div.className = `${local_div.className} ${group_obj.mask}`;
+          if (group_obj)
+            if (group_obj.mask)
+              local_div.className = `${local_div.className} ${group_obj.mask}`;
         }
       }
 

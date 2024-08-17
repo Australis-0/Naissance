@@ -1,9 +1,9 @@
 global.opened_interfaces = {};
 global.opened_popups = {};
 
-//Declare Entity UI functions - REFERENCE
+//Declare Entity UI functions - DEPRECATE AND REFERENCE.
 {
-  function adjustTime (arg0_entity_id, arg1_timestamp) { //[WIP] - Finish rest of function
+  function adjustTime (arg0_entity_id, arg1_timestamp) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var timestamp = arg1_timestamp;
@@ -20,15 +20,12 @@ global.opened_popups = {};
 
     //Show date field and append to context menu
     context_menu_el.after(context_menu_date_el);
-
-    (context_menu_date_el.getAttribute("class").includes("display-none")) ?
-      context_menu_date_el.setAttribute("class",
-        context_menu_date_el.getAttribute("class")
-          .replace(" instant-display-none", "")
-          .replace(" display-none", "")
-      ) :
-      context_menu_date_el.setAttribute("class",
-      context_menu_date_el.getAttribute("class") + " display-none");
+    if (context_menu_date_el.getAttribute("class").includes("display-none")) {
+      removeClass(context_menu_date_el, " instant-display-none");
+      removeClass(context_menu_date_el, " display-none");
+    } else {
+      addClass(context_menu_date_el, " display-none");
+    }
 
     //Button listeners
     change_date_btn_el.onclick = function () {
@@ -149,8 +146,8 @@ global.opened_popups = {};
     var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
 
     //Set to display-none
-    if (!context_menu_date_el.getAttribute("class").includes("instant-display-none"))
-      context_menu_date_el.setAttribute("class", context_menu_date_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
+    if (!context_menu_date_el.getAttribute("class").includes("display-none"))
+      addClass(context_menu_date_el, ` ${(instant) ? "instant-" : ""}display-none`);
   }
 
   function closeActionContextMenu (arg0_entity_id, arg1_instant) { //[WIP] - Update when new menus are attached
@@ -163,7 +160,7 @@ global.opened_popups = {};
 
     //Set to display-none
     if (!actions_context_menu_el.getAttribute("class").includes("display-none"))
-      actions_context_menu_el.setAttribute("class", actions_context_menu_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
+      addClass(actions_context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
 
     //Close attached menus
   }
@@ -178,7 +175,7 @@ global.opened_popups = {};
 
     //Set to display-none
     if (!context_menu_el.getAttribute("class").includes("display-none"))
-      context_menu_el.setAttribute("class", context_menu_el.getAttribute("class") + ` ${(instant) ? "instant-" : ""}display-none`);
+      addClass(context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
 
     //Close attached menus
     closeContextDateMenu(entity_id);
@@ -200,7 +197,7 @@ global.opened_popups = {};
     }
   }
 
-  function deleteKeyframe (arg0_entity_id, arg1_timestamp) {
+  function deleteKeyframe (arg0_entity_id, arg1_timestamp) { //[WIP] - Check whether deleting a keyframe actually updates the bio
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var timestamp = arg1_timestamp;
