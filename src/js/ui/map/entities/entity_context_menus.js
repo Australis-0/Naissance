@@ -192,14 +192,13 @@
       </div>
 
       <!-- Actions Context Menu -->
-      <div id = "entity-ui-actions-menu-${entity_id}" class = "actions-context-menu-container instant-display-none">
-      </div>
+      <div id = "entity-action-context-menu-${entity_id}" class = "actions-context-menu-container instant-display-none"></div>
 
       ${local_actions_ui}
 
       <!--  Bio Entry Context Menu -->
 
-      <div id = "entity-ui-context-menu-${entity_id}" class = "bio-context-menu-container instant-display-none">
+      <div id = "entity-keyframe-context-menu-${entity_id}" class = "bio-context-menu-container instant-display-none">
         <div id = "context-menu-adjust-time-button" class = "context-menu-button">
           <img src = "gfx/interface/clock_empty_icon.png" class = "icon small negative" draggable = "false"> Adjust Time
         </div>
@@ -212,7 +211,7 @@
       </div>
 
         <! -- Bio Entry Context Menu - Adjust Date Prompt -->
-        <div id = "context-date-menu-${entity_id}" class = "bio-context-menu-date-container instant-display-none">
+        <div id = "entity-keyframe-context-menu-two-${entity_id}" class = "bio-context-menu-date-container instant-display-none">
           <center>
             <select id = "context-date-menu-${entity_id}-day" class = "day-input"></select>
             <select id = "context-date-menu-${entity_id}-month" class = "month-input"></select>
@@ -308,7 +307,7 @@
               if (e.composedPath()[0].getAttribute("class"))
                 if (e.composedPath()[0].getAttribute("class").includes("bio-context-menu-icon"))
                   //Set context menu to be visible and teleport to selected element; close previously attached menus
-                  openContextMenu(entity_id, e.composedPath()[1]);
+                  printKeyframeContextMenu(entity_id, e.composedPath()[1]);
 
               //Actions
               if (e.composedPath()[0].getAttribute("id")) {
@@ -333,15 +332,15 @@
             //Case 2 - Context menu should be closed if the context menu itself or the button isn't a parent in the path
             try {
               if (
-                !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-context-menu-${entity_id}`) &&
-                !arrayHasElementAttribute(e.composedPath(), "id", `context-date-menu-${entity_id}`) &&
+                !arrayHasQuerySelector(e.composedPath(), `${config.ui.entity_keyframe_context_menu}-${entity_id}`) &&
+                !arrayHasQuerySelector(e.composedPath(), `${config.ui.entity_keyframe_context_menu_two}-${entity_id}`) &&
                 !arrayHasElementAttribute(e.composedPath(), "class", `bio-context-menu-icon`)
               )
-                closeContextMenu(entity_id);
+                closeKeyframeContextMenu(entity_id);
 
               //Logic handling for closing action context menu assuming keyframes aren't open
               if (
-                !arrayHasElementAttribute(e.composedPath(), "id", `entity-ui-actions-menu-${entity_id}`) &&
+                !arrayHasElementAttribute(e.composedPath(), "id", `${config.ui.entity_action_context_menu}-${entity_id}`) &&
                 !arrayHasElementAttribute(e.composedPath(), "context", "true") &&
                 !window[`${entity_id}_keyframes_open`]
               )
@@ -360,7 +359,6 @@
                   ) {
                     closeActionContextMenu(entity_id);
                     closeApplyPath(entity_id);
-                    closeApplyPath(entity_id);
 
                     setTimeout(function(e) {
                       e.target.setAttribute("toggle", "false");
@@ -378,12 +376,195 @@
     return popup;
   }
 
-  //Initialise entity
+  //Initialise Entity Keyframe context menus
   {
-    /*function adjustTime (arg0_entity_id, arg1_timestamp) {
+    function closeActionContextMenu (arg0_entity_id, arg1_instant) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var instant = arg1_instant;
+
+      //Declare local instance variables
+      var actions_context_menu_el = document.querySelector(`${config.ui.entity_action_context_menu}-${entity_id}`);
+
+      //Set to display-none
+      if (!actions_context_menu_el.getAttribute("class").includes("display-none"))
+        addClass(actions_context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
+    }
+
+    function closeKeyframeContextMenu (arg0_entity_id, arg1_instant) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var instant = arg1_instant;
+
+      //Declare local instance variables
+      var keyframe_context_menu_el = document.querySelector(`${config.ui.entity_keyframe_context_menu}-${entity_id}`);
+
+      //Set to display-none
+      if (!keyframe_context_menu_el.getAttribute("class").includes("display-none"))
+        addClass(keyframe_context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
+
+      //Close attached menus
+      closeKeyframeContextMenuTwo(entity_id);
+    }
+
+    function closeKeyframeContextMenuTwo (arg0_entity_id, arg1_instant) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var instant = arg1_instant;
+
+      //Declare local instance variables
+      var keyframe_context_menu_two_el = document.querySelector(`${config.ui.entity_keyframe_context_menu_two}-${entity_id}`);
+
+      //Set to display-none
+      if (!keyframe_context_menu_two_el.getAttribute("class").includes("display-none"))
+        addClass(keyframe_context_menu_two_el, ` ${(instant) ? "instant-" : ""}display-none`);
+    }
+
+    function printAdjustTimeContextMenu (arg0_entity_id, arg1_timestamp) {
       //Convert from parameters
       var entity_id = arg0_entity_id;
       var timestamp = arg1_timestamp;
-    }*/
+
+      //Declare local instance variables
+      var keyframe_context_menu_two_selector = `${config.ui.entity_keyframe_context_menu_two}-${entity_id}`;
+
+      var keyframe_context_menu_el = document.querySelector(`${config.ui.entity_keyframe_context_menu}-${entity_id}`);
+      var keyframe_context_menu_two_el = document.querySelector(`${keyframe_context_menu_two_selector}`);
+
+      //Create local context menu
+      var adjust_time_context_menu_ui = createContextMenu({
+        anchor: `#entity-keyframe-context-menu-two-${entity_id}`, //Replace with #entity-keyframe-context-menu-two
+        class: `entity-adjust-time-ui`,
+        id: `entity-adjust-time-ui`,
+        name: "Adjust Time:",
+
+        date_input: {
+          id: `date-input`,
+          name: "Adjust Time:",
+          type: "date",
+          multiple_rows: true,
+
+          x: 0,
+          y: 0
+        },
+        change_date_button: {
+          id: "change-date-button",
+          name: "Change Date",
+          type: "button",
+
+          x: 0,
+          y: 1
+        }
+      });
+
+      //Populate date fields
+      var date_input_prefix = `${config.ui.entity_keyframe_context_menu_two}-${entity_id} ${config.ui.entity_keyframe_date_input}`;
+      populateDateFields(
+        `${date_input_prefix} #year-input`,
+        `${date_input_prefix} #month-input`,
+        `${date_input_prefix} #day-input`,
+        `${date_input_prefix} #hour-input`,
+        `${date_input_prefix} #minute-input`,
+        `${date_input_prefix} #year-type`,
+        parseTimestamp(timestamp));
+
+      //Set adjust_time_context_menu_ui to be visible
+      keyframe_context_menu_el.after(keyframe_context_menu_two_el);
+      //keyframe_context_menu_two_el = document.querySelector(`${keyframe_context_menu_two_selector}`);
+      if (keyframe_context_menu_two_el.getAttribute("class").includes("display-none")) {
+        removeClass(keyframe_context_menu_two_el, " instant-display-none");
+        removeClass(keyframe_context_menu_two_el, " display-none");
+      } else {
+        addClass(keyframe_context_menu_two_el, " display-none");
+      }
+
+      //Button listeners
+      var change_date_button = `${config.ui.entity_keyframe_context_menu_two}-${entity_id} ${config.ui.entity_keyframe_change_date_button}`;
+      change_date_button.onclick = function () {
+        var new_date = getDateFromFields(`${date_input_prefix}-year`, `${date_input_prefix}-month`, `${date_input_prefix}-day`, `${date_input_prefix}-hour`, `${date_input_prefix}-minute`, `${date_input_prefix}-year-type`);
+
+        //Adjust polity history now
+        adjustPolityHistory(entity_id, timestamp, new_date);
+      };
+    }
+
+    function printKeyframeContextMenu (arg0_entity_id, arg1_parent_el) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var parent_el = arg1_parent_el;
+
+      //Declare local instance variables
+      var keyframe_context_menu_selector = `${config.ui.entity_keyframe_context_menu}-${entity_id}`;
+      var timestamp = parent_el.parentElement.getAttribute("timestamp");
+
+      //Calculate top_string
+      var bio_container_el = document.querySelector(`${config.ui.entity_bio_container}-${entity_id}`);
+      var header_el = document.querySelector(`${config.ui.entity_ui_header}`);
+      var keyframe_context_menu_el = document.querySelector(keyframe_context_menu_selector);
+      var keyframe_context_menu_two_el = document.querySelector(`${config.ui.entity_keyframe_context_menu_two}-${entity_id}`);
+      var timeline_graph_el = document.querySelector(`${config.ui.entity_timeline_graph_el}-${entity_id}`);
+      var timeline_header_el = document.querySelector(`${config.ui.entity_timeline_header}`);
+      var top_bio_header_el = document.querySelector(`${config.ui.entity_top_bio_header}`);
+
+      var offset_top = parent_el.offsetTop - bio_container_el.scrollTop;
+      var top_string = `calc(${header_el.offsetHeight}px + ${timeline_graph_el.offsetHeight}px + ${timeline_header_el.offsetHeight}px + ${top_bio_header_el.offsetHeight}px + ${offset_top}px + 0.5rem)`;
+
+      //Create local context menu
+      var keyframe_context_menu_ui = createContextMenu({
+        anchor: keyframe_context_menu_selector,
+        class: `entity-keyframe-ui`,
+        id: `entity-keyframe-ui`,
+        name: "Entity Keyframe:",
+
+        adjust_time_button: {
+          id: "adjust-time-button",
+          name: "Adjust Time",
+          type: "button",
+          attributes: {
+            timestamp: `${timestamp}`
+          },
+
+          x: 0,
+          y: 0,
+
+          onclick: `printAdjustTimeContextMenu('${entity_id}', '${timestamp}');`
+        },
+        edit_keyframe_button: {
+          id: "edit-keyframe-button",
+          name: "Edit Keyframe",
+          type: "button",
+          attributes: {
+            timestamp: `${timestamp}`
+          },
+
+          x: 0,
+          y: 1,
+
+          onclick: `editKeyframe('${entity_id}', '${timestamp}');`
+        },
+        delete_keyframe_button: {
+          id: "delete-keyframe-button",
+          name: "Delete Keyframe",
+          type: "button",
+          attributes: {
+            timestamp: `${timestamp}`
+          },
+
+          x: 0,
+          y: 2,
+
+          onclick: `deleteKeyframe('${entity_id}', '${timestamp}');`
+        }
+      });
+
+      //Set keyframe_context_menu_el to be visible; hide previous attached menus
+      keyframe_context_menu_el.style.top = top_string;
+      keyframe_context_menu_two_el.style.top = top_string;
+
+      parent_el.after(keyframe_context_menu_el);
+      closeKeyframeContextMenuTwo(entity_id);
+      removeClass(keyframe_context_menu_el, " instant-display-none");
+      removeClass(keyframe_context_menu_el, " display-none");
+    }
   }
 }

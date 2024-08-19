@@ -3,39 +3,6 @@ global.opened_popups = {};
 
 //Declare Entity UI functions - DEPRECATE AND REFERENCE.
 {
-  function adjustTime (arg0_entity_id, arg1_timestamp) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var timestamp = arg1_timestamp;
-
-    //Declare local instance variables
-    var change_date_btn_el = document.querySelector(`#context-date-menu-${entity_id} #change-date`);
-    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-    var history_entry = getPolityHistory(entity_id, timestamp);
-    var prefix = `context-date-menu-${entity_id}`;
-
-    //Populate date fields
-    populateDateFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`, parseTimestamp(timestamp));
-
-    //Show date field and append to context menu
-    context_menu_el.after(context_menu_date_el);
-    if (context_menu_date_el.getAttribute("class").includes("display-none")) {
-      removeClass(context_menu_date_el, " instant-display-none");
-      removeClass(context_menu_date_el, " display-none");
-    } else {
-      addClass(context_menu_date_el, " display-none");
-    }
-
-    //Button listeners
-    change_date_btn_el.onclick = function () {
-      var new_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
-
-      //Adjust polity history now
-      adjustPolityHistory(entity_id, timestamp, new_date);
-    };
-  }
-
   function applyPath (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -135,50 +102,6 @@ global.opened_popups = {};
       delete window[`${entity_id}_apply_path`];
       delete window[`${entity_id}_keyframes_open`];
     }
-  }
-
-  function closeContextDateMenu (arg0_entity_id, arg1_instant) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var instant = arg1_instant;
-
-    //Declare local instance variables
-    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
-
-    //Set to display-none
-    if (!context_menu_date_el.getAttribute("class").includes("display-none"))
-      addClass(context_menu_date_el, ` ${(instant) ? "instant-" : ""}display-none`);
-  }
-
-  function closeActionContextMenu (arg0_entity_id, arg1_instant) { //[WIP] - Update when new menus are attached
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var instant = arg1_instant;
-
-    //Declare local instance variables
-    var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
-
-    //Set to display-none
-    if (!actions_context_menu_el.getAttribute("class").includes("display-none"))
-      addClass(actions_context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
-
-    //Close attached menus
-  }
-
-  function closeContextMenu (arg0_entity_id, arg1_instant) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var instant = arg1_instant;
-
-    //Declare local instance variables
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-
-    //Set to display-none
-    if (!context_menu_el.getAttribute("class").includes("display-none"))
-      addClass(context_menu_el, ` ${(instant) ? "instant-" : ""}display-none`);
-
-    //Close attached menus
-    closeContextDateMenu(entity_id);
   }
 
   function closeEntityUI (arg0_entity_id) {
@@ -313,18 +236,13 @@ global.opened_popups = {};
     var mode = arg1_mode;
 
     //Declare local instance variables
-    var actions_context_menu_el = document.querySelector(`#entity-ui-actions-menu-${entity_id}`);
+    var actions_context_menu_el = document.querySelector(`${config.ui.entity_action_context_menu}-${entity_id}`);
     var brush_obj = main.brush;
     var entity_obj = getEntity(entity_id);
 
-    //Close previously attached menus
-
     //Set actions_context_menu_el to be visible
-    actions_context_menu_el.setAttribute("class",
-      actions_context_menu_el.getAttribute("class")
-        .replace(" instant-display-none", "")
-        .replace(" display-none", "")
-    );
+    removeClass(actions_context_menu_el, " instant-display-none");
+    removeClass(actions_context_menu_el, " display-none");
 
     //Set actions_context_menu_el content according to mode
     if (mode == "apply_path") {
@@ -500,55 +418,6 @@ global.opened_popups = {};
     }
   }
 
-  function openContextMenu (arg0_entity_id, arg1_parent_el) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var parent_el = arg1_parent_el;
-
-    //Declare local instance variables
-    var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
-    var context_menu_el = document.querySelector(`#entity-ui-context-menu-${entity_id}`);
-    var context_menu_date_el = document.querySelector(`#context-date-menu-${entity_id}`);
-    var header_el = document.getElementById(`entity-ui-header`);
-    var offset_top = parent_el.offsetTop - bio_container_el.scrollTop;
-    var timeline_graph_el = document.getElementById(`entity-ui-timeline-graph-container-${entity_id}`);
-    var timeline_header_el = document.getElementById(`entity-ui-timeline-data-header`);
-    var top_bio_header_el = document.querySelector(`.top-bio-header`);
-
-    //Move context_menu_el to parent_el; close previously attached menus
-    parent_el.after(context_menu_el);
-    closeContextDateMenu(entity_id);
-
-    context_menu_el.setAttribute("class",
-      context_menu_el.getAttribute("class")
-        .replace(" instant-display-none", "")
-        .replace(" display-none", "")
-    );
-
-    var top_string = `calc(${header_el.offsetHeight}px + ${timeline_graph_el.offsetHeight}px + ${timeline_header_el.offsetHeight}px + ${top_bio_header_el.offsetHeight}px + ${offset_top}px + 8px)`;
-
-    context_menu_el.style.top = top_string;
-    context_menu_date_el.style.top = top_string;
-
-    //Add timestamp attribute for querySelectorAll(`.context-menu-button`)
-    var all_context_menu_buttons = document.querySelectorAll(`#entity-ui-context-menu-${entity_id} .context-menu-button`);
-    var local_timestamp = parent_el.parentElement.getAttribute("timestamp");
-
-    //Populate context menu buttons
-    for (var i = 0; i < all_context_menu_buttons.length; i++) {
-      var local_id = all_context_menu_buttons[i].id;
-
-      all_context_menu_buttons[i].setAttribute("timestamp", local_timestamp);
-
-      if (local_id == "context-menu-adjust-time-button")
-        all_context_menu_buttons[i].setAttribute("onclick", `adjustTime('${entity_id}', '${local_timestamp}');`);
-      if (local_id == "context-menu-delete-keyframe-button")
-        all_context_menu_buttons[i].setAttribute("onclick", `deleteKeyframe('${entity_id}', '${local_timestamp}');`);
-      if (local_id == "context-menu-edit-keyframe-button")
-        all_context_menu_buttons[i].setAttribute("onclick", `editKeyframe('${entity_id}', '${local_timestamp}');`);
-    }
-  }
-
   function populateEntityBio (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -574,7 +443,7 @@ global.opened_popups = {};
       //Move context_menu_el back to popup_el; then repopulate bio
       popup_el.after(context_menu_el);
       popup_el.after(context_menu_date_el);
-      closeContextMenu(entity_id, true); //Close context menu
+      closeKeyframeContextMenu(entity_id, true); //Close context menu
 
       //Format bio_string; populate header
       bio_string.push(`<tr class = "no-select top-bio-header">

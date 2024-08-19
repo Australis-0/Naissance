@@ -133,7 +133,7 @@
 
         if (context_menu_el) {
           popup_el.after(context_menu_el);
-          closeContextMenu(entity_id);
+          closeKeyframeContextMenu(entity_id);
 
           populateEntityBio(entity_id);
         }

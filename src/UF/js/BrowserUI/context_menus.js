@@ -132,25 +132,34 @@ function createContextMenu (arg0_options) { //[WIP] - Finish function body.
       var local_row = table_rows[local_option.y];
       var local_x;
 
-      local_el_html.push(`<td${(local_option.width) ? ` colspan = "${local_option.width}"` : ""}${(local_option.height) ? ` rowspan = "${local_option.height}"` : ""}>`);
-        local_el_html.push(local_input_html);
-      local_el_html.push(`</td>`);
+      if (local_input_html) {
+        local_el_html.push(`<td${(local_option.width) ? ` colspan = "${local_option.width}"` : ""}${(local_option.height) ? ` rowspan = "${local_option.height}"` : ""}>`);
+          local_el_html.push(local_input_html);
+        local_el_html.push(`</td>`);
 
-      if (local_option.x != undefined) {
-        local_x = local_option.x;
+        if (local_option.x != undefined) {
+          local_x = local_option.x;
+        } else {
+          local_x = local_row.length;
+        }
+
+        //Set local_row[local_x]
+        local_row[local_x] = local_el_html.join("");
       } else {
-        local_x = local_row.length;
+        console.error(`Error when attempting to add UI element with options:`, local_option);
       }
-
-      //Set local_row[local_x]
-      local_row[local_x] = local_el_html.join("");
     }
   }
 
   //3. Push table_rows to html_string
   for (var i = 0; i < table_rows.length; i++)
-    html_string.push(`<tr>${table_rows[i].join("")}</tr>`);
-
+    if (table_rows[i]) {
+      html_string.push(`<tr>${table_rows[i].join("")}</tr>`);
+    } else {
+      //Add a blank row if specified
+      html_string.push(`<tr></tr>`);
+    }
+    
   html_string.push(`</table>`);
 
   //Close html_string

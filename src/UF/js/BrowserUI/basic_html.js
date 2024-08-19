@@ -126,7 +126,7 @@
   */
   function arrayHasElementAttribute (arg0_array, arg1_attribute_type, arg2_attribute_content) {
     //Convert from parameters
-    var array = arg0_array;
+    var array = getList(arg0_array);
     var attribute_type = arg1_attribute_type;
     var attribute_content = arg2_attribute_content;
 
@@ -134,10 +134,42 @@
     if (array)
       for (var i = 0; i < array.length; i++)
         try {
+          //Return statement
           if (array[i].getAttribute(attribute_type) == attribute_content) return true;
         } catch {}
   }
 
+  /*
+    arrayHasQuerySelector() - Checks if an array of elements has an element matching the given query selector.
+    arg0_array: (Array<HTMLElement>) - The array of elements to pass to the function.
+    arg1_selector: (String) - The selector to match for.
+
+    Returns: (Boolean)
+  */
+  function arrayHasQuerySelector (arg0_array, arg1_selector) {
+    //Convert from parameters
+    var array = getList(arg0_array);
+    var selector = arg1_selector;
+
+    //Iterate over array
+    if (array)
+      for (var i = 0; i < array.length; i++)
+        try {
+          //Return statement
+          if (array[i].matches(selector)) return true;
+        } catch {}
+  }
+
+  /*
+    closestPointInCircle() - Fetches the closest [x, y] point in a circle if the point is outside the circle.
+    arg0_circle_x: (Number) - The centre X coordinate of the circle.
+    arg1_circle_y: (Number) - The centre Y coordinate of the circle.
+    arg2_point_x: (Number) - The X point outside/inside the circle.
+    arg3_point_y: (Number) - The Y point outside/inside the circle.
+    arg4_radius: (Number) - The radius of the circle.
+
+    Returns: (Array<Number, Number>)
+  */
   function closestPointInCircle (arg0_circle_x, arg1_circle_y, arg2_point_x, arg3_point_y, arg4_radius) {
     //Convert from parameters
     var cX = arg0_circle_x;

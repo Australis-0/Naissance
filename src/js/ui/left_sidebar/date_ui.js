@@ -170,12 +170,12 @@
 
   function populateDateFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element, arg6_date) {
     //Convert from parameters
-    var year_el = document.getElementById(arg0_year_element);
-    var month_el = document.getElementById(arg1_month_element);
-    var day_el = document.getElementById(arg2_day_element);
-    var hour_el = document.getElementById(arg3_hour_element);
-    var minute_el = document.getElementById(arg4_minute_element);
-    var year_type_el = document.getElementById(arg5_year_type_element);
+    var year_el = document.querySelector(arg0_year_element);
+    var month_el = document.querySelector(arg1_month_element);
+    var day_el = document.querySelector(arg2_day_element);
+    var hour_el = document.querySelector(arg3_hour_element);
+    var minute_el = document.querySelector(arg4_minute_element);
+    var year_type_el = document.querySelector(arg5_year_type_element);
     var date = (arg6_date) ? arg6_date : main.date; //Feed in a custom date to populate with
 
     //Declare local instance variables

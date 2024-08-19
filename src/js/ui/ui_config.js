@@ -31,7 +31,20 @@ global.config.ui = {
   //Topbar
   topbar_tab_buttons: `#topbar > ul li`,
     file_button_el: `#topbar .file`,
-    map_button_el: `#topbar .map`
+    map_button_el: `#topbar .map`,
+
+  //Map
+  entity_bio_container: `#entity-ui-timeline-bio-container`,
+  entity_timeline_graph_el: `#entity-ui-timeline-graph-container`,
+  entity_timeline_header: `#entity-ui-timeline-data-header`,
+  entity_top_bio_header: `.top-bio-header`,
+  entity_ui_header: `#entity-ui-header`,
+
+  entity_action_context_menu: `#entity-action-context-menu`, //Has suffix
+  entity_keyframe_context_menu: `#entity-keyframe-context-menu`, //Has suffix
+    entity_keyframe_context_menu_two: `#entity-keyframe-context-menu-two`, //Has suffix
+      entity_keyframe_change_date_button: `#change-date-button`, //Has prefix
+      entity_keyframe_date_input: `#date-input` //Has prefix
 };
 
 
