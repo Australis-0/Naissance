@@ -407,6 +407,16 @@
       closeKeyframeContextMenuTwo(entity_id);
     }
 
+    function closeKeyframeContextMenus (arg0_entity_id, arg1_instant) {
+      //Convert from parameters
+      var entity_id = arg0_entity_id;
+      var instant = arg1_instant;
+
+      //Close context menus
+      closeKeyframeContextMenu(entity_id, instant);
+      closeKeyframeContextMenuTwo(entity_id, instant);
+    }
+
     function closeKeyframeContextMenuTwo (arg0_entity_id, arg1_instant) {
       //Convert from parameters
       var entity_id = arg0_entity_id;

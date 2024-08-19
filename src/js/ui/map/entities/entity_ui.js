@@ -120,35 +120,6 @@ global.opened_popups = {};
     }
   }
 
-  function deleteKeyframe (arg0_entity_id, arg1_timestamp) { //[WIP] - Check whether deleting a keyframe actually updates the bio
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var timestamp = arg1_timestamp;
-
-    //Declare local instance variables
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-    var popup_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-
-    //Delete keyframe; update bio
-    deletePolityHistory(entity_id, timestamp);
-  }
-
-  function editKeyframe (arg0_entity_id, arg1_timestamp) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var timestamp = arg1_timestamp;
-
-    //Declare local instance variables
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-    var popup_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-
-    //Close entity UI, call editEntity()
-    closeEntityUI();
-    main.date = parseTimestamp(timestamp);
-    loadDate();
-    editEntity(entity_id);
-  }
-
   function hidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -230,7 +201,7 @@ global.opened_popups = {};
     }
   }
 
-  function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Finish rest of function
+  function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Refactor function
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var mode = arg1_mode;
