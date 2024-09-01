@@ -7,7 +7,7 @@
     var new_history_frame = (arg2_history_frame) ? arg2_history_frame : { coords: [], options: {} };
 
     //Declare local instance variables
-    var current_date = parseTimestamp(new_history_frame.id);
+    var current_date = convertTimestampToDate(new_history_frame.id);
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
     var founding_frame = false;
     var old_land_area = getPolityArea(entity_id, old_history_frame.id);

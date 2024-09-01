@@ -208,7 +208,7 @@ async function processGPT (arg0_input_text, arg1_options) { //[WIP] - Add ChatGP
         await sleep(randomNumber(1500, 3000));
 
         current_input_text = `${header_content}${footer_content}`;
-        response_text = await module.exports.sendFileToBrowserGPT(current_instance[1], text_file_name, current_input_text, {
+        response_text = await sendFileToBrowserGPT(current_instance[1], text_file_name, current_input_text, {
           type: current_type
         });
       } else {
@@ -221,7 +221,7 @@ async function processGPT (arg0_input_text, arg1_options) { //[WIP] - Add ChatGP
     //send_text handler - activated if text file is not used - Send current_input_text to GPT
     if (send_text) {
       current_input_text = `${header_content}${current_return_history.join("\n\n")}${footer_content}`;
-      response_text = await module.exports.sendTextToBrowserGPT(current_instance[1], current_input_text, {
+      response_text = await sendTextToBrowserGPT(current_instance[1], current_input_text, {
         type: current_type
       });
     }
@@ -342,7 +342,7 @@ async function sendFileToBrowserGPT (arg0_browser_instance, arg1_file_path, arg2
   await sleep(randomNumber(750, 1500));
 
   //2. Handle sendTextToBrowserGPT if necessary
-  var text_output = await module.exports.sendTextToBrowserGPT(chrome_browser, input_text, options);
+  var text_output = await sendTextToBrowserGPT(chrome_browser, input_text, options);
 
   //Return statement
   return text_output;
@@ -393,11 +393,11 @@ async function sendTextToBrowserGPT (arg0_browser_instance, arg1_input_text, arg
     await chrome_browser.click(`run-button`);
 
     //Log usage to rate limits tracker
-    var current_account = await module.exports.getCurrentGeminiAccount(chrome_browser);
+    var current_account = await getCurrentGeminiAccount(chrome_browser);
     gemini_rate_limits[current_account] = modifyValue(gemini_rate_limits, current_account, 1);
     console.log(gemini_rate_limits);
 
-    await module.exports.switchToAvailableAccount(chrome_browser, options.type, settings.gemini_accounts);
+    await switchToAvailableAccount(chrome_browser, options.type, settings.gemini_accounts);
 
     //Wait for response from Gemini
     await sleep(randomNumber(250, 500));
@@ -529,7 +529,7 @@ async function switchToAvailableAccount (arg0_browser_instance, arg1_type, arg2_
         var local_rate_usage = returnSafeNumber(rate_limits_obj[type][current_account]);
 
         if (local_rate_usage < ai_config[`${type}_rate_limit`])
-          await module.exports.switchAccount(chrome_browser, available_accounts[i]);
+          await switchAccount(chrome_browser, available_accounts[i]);
       }
   }
 }

@@ -12,27 +12,27 @@
     var entity_obj = getEntity(entity_id);
     var history_entry = getPolityHistory(entity_id, entry_date);
     var new_timestamp = getTimestamp(move_to_date);
-    var old_timestamp = getTimestamp(parseTimestamp(entry_date));
+    var old_timestamp = getTimestamp(convertTimestampToDate(entry_date));
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
     //Move history_entry to new timestamp
     if (entity_obj)
       if (history_entry) {
         //Only change date of keyframe if it does not conflict with the same keyframe
-        if (history_entry.id != timestampToInt(new_timestamp)) {
+        if (history_entry.id != convertTimestampToInt(new_timestamp)) {
           //Move to new_timestamp
           entity_obj.options.history[new_timestamp] = history_entry;
           var new_history_entry = entity_obj.options.history[new_timestamp];
 
           //Delete old timestamp; change ID
           delete entity_obj.options.history[old_timestamp];
-          new_history_entry.id = timestampToInt(new_timestamp);
+          new_history_entry.id = convertTimestampToInt(new_timestamp);
 
           entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
 
           if (context_menu_el) {
             //Repopulate bio; move it to new history entry
-            populateEntityBio(entity_id);
+            printEntityBio(entity_id);
 
             var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
 
@@ -81,7 +81,7 @@
       //Create new history object
       if (!entity_obj.options.history[date_string])
         entity_obj.options.history[date_string] = {
-          id: timestampToInt(date_string),
+          id: convertTimestampToInt(date_string),
 
           coords: actual_coords,
           options: {}
@@ -135,7 +135,7 @@
           popup_el.after(context_menu_el);
           closeKeyframeContextMenu(entity_id);
 
-          populateEntityBio(entity_id);
+          printEntityBio(entity_id);
         }
 
         //Delete entity if no history entries are left
@@ -244,13 +244,13 @@
       coords: [],
       options: {}
     };
-    var current_timestamp = timestampToInt(getTimestamp(date));
+    var current_timestamp = convertTimestampToInt(getTimestamp(date));
 
     var all_history_frames = Object.keys(entity_obj.options.history);
 
     //Iterate over all_history_frames
     for (var i = 0; i < all_history_frames.length; i++)
-      if (timestampToInt(all_history_frames[i]) <= current_timestamp) {
+      if (convertTimestampToInt(all_history_frames[i]) <= current_timestamp) {
         var local_history_frame = entity_obj.options.history[all_history_frames[i]];
 
         //is_founding handler
@@ -296,7 +296,7 @@
         var current_entry = undefined;
 
         for (var i = 0; i < all_entity_histories.length; i++)
-          if (timestampToInt(entry_timestamp) >= timestampToInt(all_entity_histories[i]))
+          if (convertTimestampToInt(entry_timestamp) >= convertTimestampToInt(all_entity_histories[i]))
             current_entry = (!options.return_key) ? entity_obj.options.history[all_entity_histories[i]] : all_entity_histories[i];
       }
 

@@ -519,7 +519,7 @@ function standardiseFraction (arg0_object) {
 
   //Declare local instance variables
   var all_object_keys = Object.keys(object);
-  var object_maximum = module.exports.getObjectMaximum(object);
+  var object_maximum = getObjectMaximum(object);
 
   //Iterate over all_object_keys
   for (var i = 0; i < all_object_keys.length; i++) {

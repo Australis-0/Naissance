@@ -18,7 +18,7 @@
         }
 
         //Repopulate entity bio; refresh UI
-        populateEntityBio(entity_id);
+        printEntityBio(entity_id);
         if (window[`${entity_id}_apply_path`])
           applyPath(entity_id);
       }
@@ -118,7 +118,7 @@
           for (var i = 0; i < all_history_entries.length; i++) {
             var local_history = entity_obj.options.history[all_history_entries[i]];
 
-            if (parseInt(local_history.id) <= timestampToInt(ending_timestamp))
+            if (parseInt(local_history.id) <= convertTimestampToInt(ending_timestamp))
               has_property = conditional_function(local_history);
           }
         }

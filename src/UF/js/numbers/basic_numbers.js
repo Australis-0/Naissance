@@ -163,13 +163,13 @@ function generateRandomID (arg0_object) {
 }
 
 /*
-  log() - Calculates log/natural log
-  arg0_x: (Number) - The x to calculate the log for.
-  arg1_y: (Number) - The y to calculate the log for.
+  logarithm() - Calculates logarithm/natural logarithm
+  arg0_x: (Number) - The x to calculate the logarithm for.
+  arg1_y: (Number) - The y to calculate the logarithm for.
 
   Returns: (Number)
 */
-function log (arg0_x, arg1_y) {
+function logarithm (arg0_x, arg1_y) {
   //Convert from parameters
   var x = arg0_x;
   var y = arg1_y;
@@ -510,7 +510,7 @@ function splitNumber (arg0_number, arg1_parts) {
   var parts = arg1_parts;
 
   //Return statement
-  return [...module.exports.splitNumberParts(number, parts)];
+  return [...splitNumberParts(number, parts)];
 }
 
 //splitNumberParts() - Internal helper function for splitNumber()

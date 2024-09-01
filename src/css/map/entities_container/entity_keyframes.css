@@ -1,0 +1,7 @@
+#entity-keyframe-context-menu {
+  position: absolute;
+  overflow: visible;
+}
+#entity-keyframe-context-menu .context-menu {
+  overflow: visible;
+}

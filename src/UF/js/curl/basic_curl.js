@@ -77,7 +77,7 @@ async function getBrowserInstance (arg0_options) {
 
   //Guard clause if already connected
   if (global.browser_instance)
-    if (await module.exports.isPageConnected(global.browser_instance)) {
+    if (await isPageConnected(global.browser_instance)) {
       return global.browser_instance;
     } else {
       console.log(`Page isn't connected. Restarting browser instance.`);
@@ -235,7 +235,7 @@ async function getWebsiteLinks (arg0_url, arg1_options) {
     options.attempts++;
 
     await sleep(random_delay);
-    return await module.exports.getWebsiteLinks(url, options);
+    return await getWebsiteLinks(url, options);
   }
 
   //Return statement
@@ -247,11 +247,11 @@ async function getWebsitePlaintext (arg0_url) {
   var url = arg0_url;
 
   //Declare local instance variables
-  var fetch_html = await module.exports.getWebsiteHTML(url);
+  var fetch_html = await getWebsiteHTML(url);
 
   //Return statement
   if (fetch_html)
-    return module.exports.stripHTML(fetch_html);
+    return stripHTML(fetch_html);
 }
 
 /*
@@ -291,14 +291,14 @@ async function generatePlaintext (arg0_options) {
 
   //Iterate over scrape_urls and parse websites
   for (var i = 0; i < scrape_urls.length; i++)
-    string += await module.exports.generatePlaintextRecursively(JSON.parse(JSON.stringify(scrape_urls[i])));
+    string += await generatePlaintextRecursively(JSON.parse(JSON.stringify(scrape_urls[i])));
 
   //Cache to /cache if options.cache is true
   if (options.cache) {
     var cache_file_name = `${options.cache_folder}${options.cache_prefix}${returnABRSDateString()}.txt`;
 
     //Write file
-    module.exports.writeTextFile(cache_file_name, string);
+    writeTextFile(cache_file_name, string);
   }
 
   //Return statement
@@ -338,7 +338,7 @@ async function generatePlaintextRecursively (arg0_options) {
   //Declare local instance variables
   var selectors = options.selectors[options.depth];
   var string = ``;
-  var website_html = await module.exports.getWebsiteHTML(options.url);
+  var website_html = await getWebsiteHTML(options.url);
 
   var dom = new JSDOM.JSDOM(website_html);
   var website_body = dom.window.document.body;
@@ -360,7 +360,7 @@ async function generatePlaintextRecursively (arg0_options) {
 
         if (local_href)
           //Replace iframe with inner HTML contents
-          all_iframe_els[i].outerHTML = await module.exports.getWebsiteHTML(local_href);
+          all_iframe_els[i].outerHTML = await getWebsiteHTML(local_href);
       } catch {}
   }
 
@@ -389,11 +389,11 @@ async function generatePlaintextRecursively (arg0_options) {
   }
 
   for (var i = 0; i < include_els_html.length; i++)
-    string += module.exports.stripHTML(include_els_html[i]) + "\n";
+    string += stripHTML(include_els_html[i]) + "\n";
 
   //5. Recursive depth handler
   if (options.depth < options.recursive_depth) {
-    var current_website_links = await module.exports.getWebsiteLinks(options.url, {
+    var current_website_links = await getWebsiteLinks(options.url, {
         allowed_domains: options.recursive_links,
         exclude_domains: options.recursive_exclude_links
     });
@@ -410,7 +410,7 @@ async function generatePlaintextRecursively (arg0_options) {
         new_options.url = current_website_links[i];
         new_options.depth++;
 
-        var local_page_plaintext = await module.exports.generatePlaintextRecursively(new_options);
+        var local_page_plaintext = await generatePlaintextRecursively(new_options);
 
         if (local_page_plaintext)
           string += local_page_plaintext;

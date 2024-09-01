@@ -17,7 +17,7 @@
   /*
     cleanKeyframes() - Removes duplicate keyframes.
     options: {
-      do_not_display: true/false - Whether to display in populateEntityBio() or not. False by default.
+      do_not_display: true/false - Whether to display in printEntityBio() or not. False by default.
     }
   */
   function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
@@ -67,7 +67,7 @@
         //Repopulate entity bio; refresh UI
         if (!options.do_not_display)
           try {
-            populateEntityBio(entity_id);
+            printEntityBio(entity_id);
           } catch {}
       }
 
@@ -88,7 +88,7 @@
         var all_history_entries = Object.keys(entity_obj.options.history);
 
         for (var i = 0; i < all_history_entries.length; i++) {
-          var local_date = parseTimestamp(all_history_entries[i]);
+          var local_date = convertTimestampToDate(all_history_entries[i]);
           var local_history_frame = entity_obj.options.history[all_history_entries[i]];
           var local_simplified_coords = convertToNaissance(simplify(local_history_frame, tolerance));
 

@@ -90,22 +90,6 @@
 .entity-ui-subcontainer {
   position: relative;
 }
-.entity-ui-subtitle {
-  color: white;
-
-  font-family: "Karla";
-  font-size: 1.1vw;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-.entity-ui-title, .entity-ui-title > input {
-  color: white;
-
-  font-family: "Karla";
-  font-weight: 900;
-  font-size: 1.75vw;
-  font-variant: small-caps;
-}
 
 /* -- Container styling: Animations -- */
 .entity-ui-container.hidden {
@@ -123,16 +107,6 @@
 .entity-ui-title {
   height: 100%;
   width: calc(100% - 8px);
-}
-#entity-ui-header input {
-  background: none;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-  margin-bottom: 4px;
-  max-width: calc(100% - (2.5vw + 6px)*var(--entity-ui-header-buttons));
-}
-#entity-ui-header-container span, #entity-ui-header input {
-  vertical-align: middle;
 }
 #entity-ui-header-container img {
   float: right;

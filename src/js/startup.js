@@ -1,13 +1,30 @@
 //Import modules
 window.fs = require("fs");
+window.path = require("path");
+
+//Load config
+{
+  global.load_order = {
+    load_directories: [
+      "config"
+    ],
+    load_files: [
+      ".config_backend.js"
+    ]
+  };
+  loadConfig();
+}
 
 //Init global
 {
   //Declare local initialisation constants
   var current_date = new Date();
 
+  //Initialise global.interfaces
+  global.interfaces = {};
+
   //Initialise global.main
-  window.main = {};
+  global.main = {};
 
   //Layer handling
   main.brush = {
@@ -101,8 +118,10 @@ if (!global.config) global.config = {};
   window.sidebar_selected_entities = [];
 }
 
-//Initialise map, other UI elements after everything else
+//Initialise optimisation; map, other UI elements after everything else
 {
+  initOptimisation();
+
   var map = L.map("map").setView({
     inertia: true,
     lon: 0,
@@ -138,7 +157,7 @@ if (!global.config) global.config = {};
 //Test scripts
 setTimeout(function(){
   var hierarchies_obj = main.hierarchies;
-  var hierarchy_el = document.querySelector(config.ui.hierarchy);
+  var hierarchy_el = getUISelector("hierarchy");
   loadSave("atlas");
 
   //Sync entities

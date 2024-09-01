@@ -10,28 +10,6 @@
 */
 //Statistics visualiser functions
 {
-  function closestPointInCircle (arg0_circle_x, arg1_circle_y, arg2_point_x, arg3_point_y, arg4_radius) {
-    //Convert from parameters
-    var cX = arg0_circle_x;
-    var cY = arg1_circle_y;
-    var pX = arg2_point_x;
-    var pY = arg3_point_y;
-    var r = arg4_radius;
-
-    //Declare local instance variables
-    var center_x = cX + r;
-    var center_y = cY + r;
-    var vX = pX - center_x;
-    var vY = pY - center_y;
-
-    var magV = Math.sqrt(vX*vX + vY*vY);
-    var aX = center_x + vX/magV*r;
-    var aY = center_y + vY/magV*r;
-
-    //Return statement
-    return [aX, aY];
-  }
-
   function createTimelineGraph (arg0_element, arg1_start_date, arg2_end_date, arg3_data, arg4_options) { //[WIP] - Finish function
     //Convert from parameters
     var element = arg0_element;
@@ -42,7 +20,7 @@
 
     //Declare local instance variables
     var begin_date = JSON.parse(JSON.stringify(start_date));
-    var canvas = document.getElementById(arg0_element);
+    var canvas = element;
     var dragging = false;
     var finish_date = JSON.parse(JSON.stringify(end_date));
     var last_x = 0;
@@ -104,7 +82,7 @@
 
   function drawTimelineGraph (arg0_element, arg1_start_date, arg2_end_date, arg3_data, arg4_options) { //[WIP] - Finish rest of function with labels
     //Convert from parameters
-    var canvas = document.getElementById(arg0_element);
+    var canvas = arg0_element;
     var start_date = arg1_start_date;
     var end_date = arg2_end_date;
     var data = arg3_data;
@@ -236,37 +214,21 @@
     y_axis_bottom_label.innerHTML = (options.type == "percentage") ? printPercentage(0) : 0;
   }
 
-  function onRangeChange (arg0_range_el, arg1_listener) {
-    //Convert from parameters
-    var range_el = arg0_range_el;
-    var listener = arg1_listener;
-
-    //Declare local instance variables
-    var n, c, m;
-
-    range_el.addEventListener("input", function (e) {
-      n = 1;
-      c = e.target.value;
-
-      if (c != m) listener(e);
-      m = c;
-    });
-    range_el.addEventListener("change", function (e) {
-      if (!n) listener(e);
-    });
-  }
-
   function populateTimelineGraph (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
     var local_entity = getEntity(entity_id);
 
     //Check to make sure history exists
     if (local_entity)
       if (local_entity.options)
         if (local_entity.options.history) {
+          var entity_graph_el = entity_el.querySelector(common_selectors.entity_timeline_graph_canvas);
+
           //Populate land area data
           {
             var all_entity_histories = Object.keys(local_entity.options.history);
@@ -278,7 +240,7 @@
             //Fetch maximum_land_area
             for (var i = 0; i < all_entity_histories.length; i++) {
               var local_history = local_entity.options.history[all_entity_histories[i]];
-              var local_history_date = parseTimestamp(local_history.id);
+              var local_history_date = convertTimestampToDate(local_history.id);
 
               var local_area = getPolityArea(entity_id, local_history_date);
 
@@ -293,7 +255,7 @@
             //Begin populating data
             for (var i = 0; i < all_entity_histories.length; i++) {
               var local_history = local_entity.options.history[all_entity_histories[i]];
-              var local_history_date = parseTimestamp(local_history.id);
+              var local_history_date = convertTimestampToDate(local_history.id);
 
               var local_area = getPolityArea(entity_id, local_history_date);
               var local_area_percentage = Math.round((local_area/maximum_land_area)*1000)/1000;
@@ -306,23 +268,7 @@
           }
 
           //Default graph is always land area
-          createTimelineGraph(`entity-ui-timeline-graph-${entity_id}`, land_area_start_date, land_area_end_date, land_area_data, { type: "percentage" });
+          createTimelineGraph(entity_graph_el, land_area_start_date, land_area_end_date, land_area_data, { type: "percentage" });
         }
-  }
-
-  function pointIsInCircle (arg0_circle_x, arg1_circle_y, arg2_point_x, arg3_point_y, arg4_radius) {
-    //Convert from parameters
-    var a = arg0_circle_x;
-    var b = arg1_circle_y;
-    var x = arg2_point_x;
-    var y = arg3_point_y;
-    var r = arg4_radius;
-
-    //Declare local instance variables
-    var dist_points = (a - x) * (a - x) + (b - y) * (b - y);
-    r *= r;
-
-    //Return statement
-    return (dist_points < r);
   }
 }

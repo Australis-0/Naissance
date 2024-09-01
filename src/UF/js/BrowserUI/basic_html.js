@@ -312,6 +312,26 @@
   }
 
   /*
+    getY() - Fetches the relative Y position of an element, accounting for scroll.
+    arg0_element: (HTMLElement) - HTML element to pass.
+    arg1_container_el: (HTMLElement) - Optional. The scrollable container element. document.body by default.
+
+    Returns: (Number)
+  */
+  function getY (arg0_element, arg1_container_el) {
+    //Convert from parameters
+    var element = arg0_element;
+    var container_el = (arg1_container_el) ? arg1_container_el : document.body;
+
+    //Declare local instance variables
+    var element_rect = element.getBoundingClientRect();
+    var container_rect = container_el.getBoundingClientRect();
+
+    //Return statement
+    return (element_rect.top - container_rect.top);
+  }
+
+  /*
     isDescendant() - Checks whether an element belongs to a specific parent.
     arg0_parent_el: (HTMLElement) - The HTML element of the parent to check.
     arg1_child_el: (HTMLElement) - The HTML element of the child to check.
@@ -334,6 +354,20 @@
 
     //Return statement; if failed
     return false;
+  }
+
+  /*
+    isElement() - Tests whether a given variable is an element.
+    arg0_element: (Variable) - The variable to test for the type HTMLElement.
+
+    Returns: (Boolean)
+  */
+  function isElement (arg0_element) {
+    //Convert from parameters
+    var element = arg0_element;
+
+    //Return statement
+    return (element instanceof Element || element instanceof HTMLDocument);
   }
 
   /*
@@ -499,4 +533,34 @@
       element.setAttribute("class", class_name.replace(/ hidden/gm, ""));
   }
 
+  /*
+    sortElements() - Sorts elements in a given order.
+    arg0_elements: (Array<HTMLElement>) - The array of elements to pass to the function.
+    arg1_options: (Object)
+      attribute: (String)
+      mode: (String) - Optional. Either 'ascending' or 'descending'. Ascending by default.
+
+    Returns: (Array<HTMLElement>)
+  */
+  function sortElements (arg0_elements, arg1_options) {
+    //Convert from parameters
+    var elements = arg0_elements;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Initialise options
+    if (!options.mode) options.mode = "ascending";
+
+    //Declare local instance variables
+    elements = Array.from(elements);
+    (options.mode == "ascending") ?
+      elements.sort((a, b) => {
+        return parseInt(a.getAttribute(options.attribute)) - parseInt(b.getAttribute(options.attribute));
+      }) :
+      elements.sort((a, b) => {
+        return parseInt(b.getAttribute(options.attribute)) - parseInt(a.getAttribute(options.attribute));
+      });
+
+    //Return statement
+    return elements;
+  }
 }

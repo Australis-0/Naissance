@@ -33,14 +33,14 @@ function switchTopbarTab (arg0_tab) {
 {
   function initTopbar () {
     //Declare listener events
-    getUISelector("file_button_el").onclick = function (e) {
+    getUISelector("file_button").onclick = function (e) {
       switchTopbarTab("file");
     };
-    getUISelector("map_button_el").onclick = function (e) {
+    getUISelector("map_button").onclick = function (e) {
       switchTopbarTab("map");
     };
   }
-  
+
   function initTopbarUI () {
     //Initialise topbar only after Topbar UI has first been loaded
     initTopbar();

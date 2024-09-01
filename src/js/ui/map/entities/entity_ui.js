@@ -1,476 +1,38 @@
-global.opened_interfaces = {};
-global.opened_popups = {};
-
-//Declare Entity UI functions - DEPRECATE AND REFERENCE.
+//Declare Entity UI functions
 {
-  function applyPath (arg0_entity_id) {
+  function closeEntityContextMenu (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
-    var entity_obj = getEntity(entity_id);
+    var entity_el = interfaces[entity_id];
+    console.log(entity_el)
 
-    //Make sure bio_container_el exists in the first place
-    if (bio_container_el) {
-      var bio_entries = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span`);
-      var bio_top_header_el = bio_container_el.querySelector(`.top-bio-header th:nth-child(2)`);
-
-      //Set select all field at top header
-      var select_all_el = document.createElement("span");
-
-      select_all_el.innerHTML = `Select All: <input type = "checkbox" id = "select-all-${entity_id}">`;
-      bio_top_header_el.prepend(select_all_el);
-
-      //Add select_all_el event listener
-      select_all_el.onclick = function (e) {
-        var all_checkboxes = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span input[type="checkbox"]`);
-
-        //Check all if select_all_el.checked is true, uncheck all if not
-        entity_obj.options.selected_keyframes = [];
-
-        for (var i = 0; i < all_checkboxes.length; i++)
-          all_checkboxes[i].checked = e.target.checked;
-
-        if (e.target.checked)
-          for (var i = 0; i < all_checkboxes.length; i++)
-            entity_obj.options.selected_keyframes.push(all_checkboxes[i].getAttribute("timestamp"));
-      };
-
-      //Iterate over each one and assign each a checkbox
-      for (var i = 0; i < bio_entries.length; i++) {
-        var local_checkbox_el = document.createElement("input");
-        var local_parent_el = bio_entries[i].parentElement.parentElement;
-        var local_timestamp = local_parent_el.getAttribute("timestamp");
-
-        local_checkbox_el.setAttribute("type", "checkbox");
-        local_checkbox_el.setAttribute("timestamp", local_timestamp);
-
-        if (entity_obj.options.selected_keyframes.includes(local_timestamp))
-          local_checkbox_el.checked = true;
-
-        bio_entries[i].prepend(local_checkbox_el);
-
-        //Add event listener
-        local_checkbox_el.onclick = function (e) {
-          var actual_timestamp = e.target.getAttribute("timestamp");
-
-          if (e.target.checked) {
-            if (!entity_obj.options.selected_keyframes.includes(actual_timestamp))
-              entity_obj.options.selected_keyframes.push(actual_timestamp);
-          } else {
-            for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++)
-              if (entity_obj.options.selected_keyframes[i] == actual_timestamp)
-                entity_obj.options.selected_keyframes.splice(i, 1);
-          }
-        };
-      }
-
-      //Set global flag
-      window[`${entity_id}_apply_path`] = true;
-      window[`${entity_id}_keyframes_open`] = true;
+    if (entity_el) {
+      entity_el._container.remove();
+      delete interfaces[entity_id];
     }
   }
 
-  function closeApplyPath (arg0_entity_id) {
+  /*
+    getEntityElement() - Fetches the current entity UI element.
+    arg0_entity_id: (String) - The entity ID for whose element to return.
+    arg1_options: (Object)
+      return_selector: (Boolean) - Optional. Whether to return the selector instead of the element. False by default.
+
+    Returns: (HTMLElement/String)
+  */
+  function getEntityElement (arg0_entity_id, arg1_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
+    var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
-    var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
-    var entity_obj = getEntity(entity_id);
-
-    //Make sure bio_container_el exists in the first place
-    if (bio_container_el) {
-      var bio_entries = bio_container_el.querySelectorAll(`table tbody tr td:not(:first-child) span`);
-      var bio_top_header_el = bio_container_el.querySelector(`.top-bio-header th:nth-child(2)`);
-
-      //Remove select all field at top header
-      try {
-        bio_top_header_el.querySelector(`span:first-child`).remove();
-      } catch {}
-
-      //Iterate over each one and remove the checkbox
-      for (var i = 0; i < bio_entries.length; i++) {
-        var local_checkbox_el = bio_entries[i].querySelector(`input[type="checkbox"]`);
-
-        if (local_checkbox_el)
-          local_checkbox_el.remove();
-      }
-
-      //Clear global flag
-      delete window[`${entity_id}_apply_path`];
-      delete window[`${entity_id}_keyframes_open`];
-    }
-  }
-
-  function closeEntityUI (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables
-    var popup = opened_interfaces[entity_id];
-
-    //Check to see if entity exists
-    if (popup) {
-      //Close popup
-      popup.close();
-      delete opened_interfaces[entity_id];
-      delete opened_popups[entity_id];
-    }
-  }
-
-  function hidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var date = arg1_date;
-    var do_not_reload = arg2_do_not_reload;
-
-    //Declare local instance variables
-    var entity_obj = getEntity(entity_id);
-
-    if (entity_obj) {
-      createHistoryFrame(entity_id, date, {
-        extinct: true
-      });
-
-      try { populateEntityBio(entity_id); } catch {}
-      try { populateTimelineGraph(entity_id); } catch {}
-
-      if (!do_not_reload)
-        loadDate();
-    }
-  }
-
-  function minimiseUI (arg0_element, arg1_tab) {
-    //Convert from parameters
-    var raw_element = arg0_element;
-    var tab = arg1_tab;
-
-    //Declare local instance variables
-    var element = document.getElementById(arg0_element);
-    var entity_id = raw_element.split("-");
-      entity_id = entity_id[entity_id.length - 1];
-
-    var actions_container = document.getElementById("entity-ui-actions-container");
-    var collapsed_flag =`${entity_id}_${tab}_collapsed`;
-    var customisation_container = document.getElementById(`customisation-top-parent-${entity_id}`);
-    var description_container = document.getElementById(`entity-ui-customisation-description-container-${entity_id}`);
-    var timeline_bio_container = document.getElementById(`entity-ui-timeline-bio-container-${entity_id}`);
-    var timeline_graph_container = document.getElementById(`entity-ui-timeline-graph-container-${entity_id}`);
-
-    //Collapse toggle
-    if (!element.getAttribute("class").includes("reverse-minimise-icon")) {
-      element.setAttribute("class", element.getAttribute("class").replace("minimise-icon", "reverse-minimise-icon"));
-
-      //Check tab to collapse
-      if (tab == "actions")
-        actions_container.setAttribute("class", actions_container.getAttribute("class") + " hidden");
-      if (tab == "customisation") {
-        customisation_container.setAttribute("class", customisation_container.getAttribute("class") + " hidden");
-
-        description_container.setAttribute("class", description_container.getAttribute("class") + " hidden");
-      }
-      if (tab == "timeline") {
-        timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class") + " hidden");
-
-        timeline_bio_container.setAttribute("class", timeline_bio_container.getAttribute("class") + " hidden");
-      }
-
-      //Set flag as tab collapsed
-      window[collapsed_flag] = true;
-    } else {
-      element.setAttribute("class", element.getAttribute("class").replace("reverse-minimise-icon", "minimise-icon"));
-
-      //Check tab to uncollapse
-      if (tab == "actions")
-        actions_container.setAttribute("class", actions_container.getAttribute("class").replace(/ hidden/g, ""));
-      if (tab == "customisation") {
-        customisation_container.setAttribute("class", customisation_container.getAttribute("class").replace(/ hidden/g, ""));
-
-        description_container.setAttribute("class", description_container.getAttribute("class").replace(/ hidden/g, ""));
-      }
-      if (tab == "timeline") {
-        timeline_graph_container.setAttribute("class", timeline_graph_container.getAttribute("class").replace(/ hidden/g, ""));
-
-        timeline_bio_container.setAttribute("class", timeline_bio_container.getAttribute("class").replace(/ hidden/g, ""));
-      }
-
-      //Remove tab collapsed flag
-      delete window[collapsed_flag];
-    }
-  }
-
-  function openActionContextMenu (arg0_entity_id, arg1_mode) { //[WIP] - Refactor function
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var mode = arg1_mode;
-
-    //Declare local instance variables
-    var actions_context_menu_el = document.querySelector(`${config.ui.entity_action_context_menu}-${entity_id}`);
-    var brush_obj = main.brush;
-    var entity_obj = getEntity(entity_id);
-
-    //Set actions_context_menu_el to be visible
-    removeClass(actions_context_menu_el, " instant-display-none");
-    removeClass(actions_context_menu_el, " display-none");
-
-    //Set actions_context_menu_el content according to mode
-    if (mode == "apply_path") {
-      actions_context_menu_el.innerHTML = `
-        <div class = "context-menu-subcontainer">
-          <b>Apply Path:</b>
-        </div>
-        <div id = "apply-path-${entity_id}" class = "context-menu-button confirm">
-          <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Apply Path to Selected Keyframes</span>
-        </div>
-      `;
-
-      //Declare local instance variables
-      var apply_path_el = document.getElementById(`apply-path-${entity_id}`);
-
-      //Set listener events
-      apply_path_el.onclick = function (e) {
-        applyPathToKeyframes(entity_id);
-      };
-
-      applyPath(entity_id);
-    } else if (mode == "clean_keyframes") {
-      actions_context_menu_el.innerHTML = `
-        <div class = "context-menu-subcontainer">
-          <b>Clean Keyframes:</b>
-        </div>
-        <div class = "context-menu-subcontainer">
-          Delete duplicate keyframes within following threshold range.<br>
-          <br>
-          <span id = "clean-keyframes-date-threshold-container-${entity_id}"></span>
-        </div>
-
-        <div id = "clean-keyframes-${entity_id}" class = "context-menu-button confirm">
-          <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Confirm</span>
-        </div>
-      `;
-
-      //Declare local instance variables
-      var clean_keyframes_el = document.getElementById(`clean-keyframes-${entity_id}`);
-      var prefix = `clean-keyframes-date-menu-${entity_id}`;
-      var years_input = document.getElementById(`clean-keyframes-date-menu-${entity_id}-years`);
-
-      //Populate only if not already defined in entity_obj.options
-      if (entity_obj.options.history) {
-        var all_history_entries = Object.keys(entity_obj.options.history);
-        var first_history_entry = entity_obj.options.history[all_history_entries[0]];
-
-        var time_difference = parseTimestamp(getTimestamp(main.date) - getTimestamp(first_history_entry.id));
-
-        generateDateRangeFields(`clean-keyframes-date-threshold-container-${entity_id}`, prefix, time_difference);
-      }
-
-      //Add event listeners
-      clean_keyframes_el.onclick = function (e) {
-        var date_range = returnDateRangeFromFields(prefix);
-
-        cleanKeyframes(entity_id, date_range);
-      };
-    } else if (mode == "hide") {
-      //Close other menus first
-      closeApplyPath(entity_id);
-
-      actions_context_menu_el.innerHTML = `
-        <div class = "context-menu-subcontainer">
-          <b>Hide/Unhide Polity:</b>
-        </div>
-        <div id = "hidden-date-menu-container-${entity_id}" class = "context-menu-subcontainer"></div>
-
-        <div id = "hidden-mark-polity-as-hidden-${entity_id}" class = "context-menu-button">
-          Mark Polity As Hidden
-        </div>
-        <div id = "hidden-mark-polity-as-visible-${entity_id}" class = "context-menu-button">
-          Mark Polity As Visible
-        </div>
-      `;
-
-      var prefix = `hidden-date-menu-${entity_id}`;
-
-      //Populate only if not already defined in entity_obj.options
-      (!entity_obj.options.ui_hide_polity_date) ?
-        generateDateFields(`hidden-date-menu-container-${entity_id}`, prefix) :
-        generateDateFields(`hidden-date-menu-container-${entity_id}`, prefix, parseTimestamp(entity_obj.options.ui_hide_polity_date));
-
-      //Declare local instance variables
-      var hide_polity_date_fields = [`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`];
-      var mark_polity_as_hidden_el = document.getElementById(`hidden-mark-polity-as-hidden-${entity_id}`);
-      var mark_polity_as_visible_el = document.getElementById(`hidden-mark-polity-as-visible-${entity_id}`);
-
-      //Set listener events
-      mark_polity_as_hidden_el.onclick = function (e) {
-        var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
-
-        hidePolity(entity_id, entered_date);
-      };
-      mark_polity_as_visible_el.onclick = function (e) {
-        var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
-
-        unhidePolity(entity_id, entered_date);
-      };
-
-      //Update entity_obj.options.ui_hide_polity_date
-      for (var i = 0; i < hide_polity_date_fields.length; i++) {
-        var local_el = document.getElementById(hide_polity_date_fields[i]);
-
-        local_el.onchange = function (e) {
-          var entered_date = getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
-
-          entity_obj.options.ui_hide_polity_date = getTimestamp(entered_date);
-          console.log(e);
-        };
-      }
-    } else if (mode == "simplify") {
-      //Close other menus first
-      closeApplyPath(entity_id);
-
-      actions_context_menu_el.innerHTML = `
-        <div class = "context-menu-subcontainer">
-          <b>Simplify Path:</b>
-        </div>
-        <div class = "context-menu-subcontainer">
-          <input type = "checkbox" id = "simplify-apply-to-all-keyframes-${entity_id}"> <span>Apply to All Keyframes</span>
-          <br>
-          <input type = "checkbox" id = "simplify-auto-simplify-when-editing-${entity_id}" checked> <span>Auto-Simplify When Editing</span>
-        </div>
-        <div class = "context-menu-subcontainer">
-          <span>Strength: </span> <input type = "range" id = "simplify-tolerance-${entity_id}" min = "0" max = "100" value = "10">
-        </div>
-        <div class = "context-menu-button confirm" id = "simplify-${entity_id}">
-          <img src = "gfx/interface/checkmark_icon.png" class = "icon medium negative" draggable = "false"> <span>Confirm</span>
-        </div>
-      `;
-
-      //Declare local instance variables
-      var auto_simplify_when_editing_el = document.getElementById(`simplify-auto-simplify-when-editing-${entity_id}`);
-      var simplify_all_keyframes_el = document.getElementById(`simplify-apply-to-all-keyframes-${entity_id}`);
-      var simplify_tolerance_el = document.getElementById(`simplify-tolerance-${entity_id}`);
-
-      //Set default if not already defined
-      if (!window.simplify_all_keyframes_el) window.simplify_all_keyframes_el = false;
-
-      //Auto-populate based on global settings
-      if (brush_obj.auto_simplify_when_editing)
-        auto_simplify_when_editing_el.checked = true;
-      if (window.simplify_all_keyframes_el)
-        simplify_all_keyframes_el.checked = true;
-      if (brush_obj.simplify_tolerance)
-        simplify_tolerance_el.value = parseInt(brush_obj.simplify_tolerance*Math.pow(10, 3));
-
-      //Set listener events
-      auto_simplify_when_editing_el.onclick = function (e) {
-        //Set global flag
-        brush_obj.auto_simplify_when_editing = e.target.checked;
-      };
-      simplify_all_keyframes_el.onclick = function (e) {
-        //Set global flag
-        brush.simplify_all_keyframes_el = e.target.checked;
-      };
-      document.getElementById(`simplify-${entity_id}`).onclick = function (e) {
-        var simplify_value = parseInt(simplify_tolerance_el.value);
-
-        //1 represents 0.001, 100 represents 0.1
-        var simplify_tolerance = simplify_value/Math.pow(10, 3);
-
-        (simplify_all_keyframes_el.checked) ?
-          simplifyAllEntityKeyframes(entity_id, simplify_tolerance) :
-          simplifyEntity(entity_id, simplify_tolerance);
-      };
-
-      onRangeChange(simplify_tolerance_el, function (e) {
-        //Set global flag
-        brush_obj.simplify_tolerance = getSimplifyTolerance(e.target.value);
-      });
-    }
-  }
-
-  function populateEntityBio (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables
-    var bio_container_el = document.querySelector(`#entity-ui-timeline-bio-container-${entity_id}`);
-    var bio_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id}`);
-    var bio_string = [];
-    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-    var entity_obj = getEntity(entity_id);
-    var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
-
-    if (entity_obj) {
-      var actual_timestamp;
-      var all_histories = Object.keys(entity_obj.options.history);
-
-      //Set actual_timestamp
-      if (context_menu_el)
-        if (context_menu_el.parentElement.getAttribute("timestamp"))
-          actual_timestamp = timestampToInt(context_menu_el.parentElement.getAttribute("timestamp"));
-
-      //Move context_menu_el back to popup_el; then repopulate bio
-      popup_el.after(context_menu_el);
-      popup_el.after(context_menu_date_el);
-      closeKeyframeContextMenu(entity_id, true); //Close context menu
-
-      //Format bio_string; populate header
-      bio_string.push(`<tr class = "no-select top-bio-header">
-        <th class = "uppercase">Date</th>
-        <th>
-          <img class = "bio-add-keyframe-icon plus-icon" draggable = "false" src = "./gfx/interface/plus_icon.png">
-        </th>
-      </tr>`);
-      bio_string.push(`<tr class = "no-select header-padding"><th></th><th></th></tr>`);
-
-      //Iterate over all_history_entries
-      for (var i = 0; i < all_histories.length; i++) {
-        var old_history_frame = getHistoryFrame(entity_obj, all_histories[i - 1]);
-        var new_history_frame = getHistoryFrame(entity_obj, all_histories[i]);
-
-        bio_string.push(getHistoryFrameLocalisation(entity_obj, old_history_frame, new_history_frame));
-      }
-
-      //Set bio_el to bio_string
-      bio_el.innerHTML = bio_string.join("");
-
-      //Append context menu button
-      var all_table_entries = document.querySelectorAll(`#entity-ui-timeline-bio-table-${entity_id}.timeline-bio-table tr:not(.no-select) > td:last-child`);
-
-      for (var i = 0; i < all_table_entries.length; i++) {
-        var local_timestamp = timestampToInt(all_table_entries[i].parentElement.getAttribute("timestamp"));
-
-        all_table_entries[i].innerHTML += `
-          <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/context_menu_icon.png">
-          <img class = "bio-jump-to-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/jump_to_icon.png">
-        `;
-      }
-
-      //Move context_menu_el back to relevant element if available
-      var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${actual_timestamp}"]`);
-
-      if (new_history_entry_el) {
-        new_history_entry_el.after(context_menu_el);
-        new_history_entry_el.after(context_menu_date_el);
-      }
-
-      //Add jump to functionality
-      var all_jump_to_btns = document.querySelectorAll(`img.bio-jump-to-icon`);
-
-      for (var i = 0; i < all_jump_to_btns.length; i++)
-        all_jump_to_btns[i].onclick = function (e) {
-          var local_timestamp = parseInt(this.getAttribute("timestamp"));
-
-          main.date = parseTimestamp(local_timestamp);
-          loadDate();
-        };
-    } else {
-      //Hide the Bio UI if entity_obj is not defined yet
-      if (!bio_container_el.getAttribute("class").includes("display-none"))
-        bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
-    }
+    var common_selectors = config.defines.common.selectors;
+    var entity_selector = `${common_selectors.entity_ui}[class~="${entity_id}"]`;
+
+    //Return statement
+    return (!options.return_selector) ? document.querySelector(entity_selector) : entity_selector;
   }
 
   function populateEntityColourWheel (arg0_entity_id) {
@@ -478,15 +40,18 @@ global.opened_popups = {};
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var b_el = document.querySelector(`[id="${entity_id}-b"]`);
-    var brightness_el = document.querySelector(`#colour-picker-brightness-range-${entity_id}`);
-    var colour_brightness_el = document.querySelector(`#colour-picker-brightness-${entity_id}`);
-    var colour_cursor_el = document.querySelector(`#colour-picker-cursor-${entity_id}`);
-    var colour_picker_el = document.querySelector(`#entity-ui-customisation-colour-picker-container-${entity_id}`);
-    var colour_wheel_el = document.querySelector(`#colour-picker-${entity_id}`);
-    var g_el = document.querySelector(`[id="${entity_id}-g"]`);
-    var opacity_el = document.querySelector(`#colour-picker-opacity-range-${entity_id}`);
-    var r_el = document.querySelector(`[id="${entity_id}-r"]`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var b_el = entity_el.querySelector(common_selectors.entity_b);
+    var brightness_el = entity_el.querySelector(common_selectors.brightness_range);
+    var colour_brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
+    var colour_cursor_el = entity_el.querySelector(common_selectors.colour_cursor);
+    var colour_picker_el = entity_el.querySelector(common_selectors.colour_picker);
+    var colour_wheel_el = entity_el.querySelector(common_selectors.colour_wheel);
+    var g_el = entity_el.querySelector(common_selectors.entity_g);
+    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
+    var r_el = entity_el.querySelector(common_selectors.entity_r);
 
     colour_wheel_el.onclick = function (e) {
       var bounding_rect = e.target.getBoundingClientRect();
@@ -547,9 +112,12 @@ global.opened_popups = {};
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var fill_el = document.getElementById(`${entity_id}-fill`);
-    var other_el = document.getElementById(`${entity_id}-other`);
-    var stroke_el = document.getElementById(`${entity_id}-stroke`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var fill_el = entity_el.querySelector(common_selectors.fill_tab);
+    var other_el = entity_el.querySelector(common_selectors.other_tab);
+    var stroke_el = entity_el.querySelector(common_selectors.stroke_tab);
 
     window[`${entity_id}_page`] = "fill"; //Set default page
 
@@ -606,7 +174,6 @@ global.opened_popups = {};
     });
   }
 
-  //Kept for initialising entity UIs
   function populateEntityUI (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -616,7 +183,7 @@ global.opened_popups = {};
     var tabs = ["actions", "customisation", "timeline"];
 
     //Begin populating entity UI
-    populateEntityBio(entity_id);
+    printEntityBio(entity_id);
     populateEntityColourWheel(entity_id);
     populateEntityOptions(entity_id);
     populateTimelineGraph(entity_id);
@@ -636,64 +203,357 @@ global.opened_popups = {};
         minimiseUI(`${tabs[i]}-minimise-btn-${entity_id}`, tabs[i]);
   }
 
-  function removeActiveFromEntityOptions (arg0_entity_id) {
+  function printEntityBio (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var fill_el = document.getElementById(`${entity_id}-fill`);
-    var other_el = document.getElementById(`${entity_id}-other`);
-    var stroke_el = document.getElementById(`${entity_id}-stroke`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
 
-    fill_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
-    other_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
-    stroke_el.setAttribute("class", fill_el.getAttribute("class").replace(" active", ""));
+    var bio_container_el = entity_el.querySelector(common_selectors.entity_bio_table);
+    var bio_el = entity_el.querySelector(common_selectors.entity_bio_table);
+    var bio_string = [];
+    var context_menu_el = entity_el.querySelector(common_selectors.entity_keyframe_context_menu_anchor);
+    var entity_obj = getEntity(entity_id);
+
+    if (entity_obj) {
+      var actual_timestamp;
+      var all_histories = Object.keys(entity_obj.options.history);
+
+      //Set actual_timestamp
+      if (context_menu_el)
+        if (context_menu_el.parentElement.getAttribute("timestamp"))
+          actual_timestamp = convertTimestampToInt(context_menu_el.parentElement.getAttribute("timestamp"));
+      closeEntityKeyframeContextMenus(entity_id); //Close previously open context menus
+
+      //Format bio_string; populate header
+      bio_string.push(`<tr class = "no-select top-bio-header">
+        <th class = "uppercase">Date</th>
+        <th>
+          <img class = "bio-add-keyframe-icon plus-icon" draggable = "false" src = "./gfx/interface/plus_icon.png">
+        </th>
+      </tr>`);
+      bio_string.push(`<tr class = "no-select header-padding"><th></th><th></th></tr>`);
+
+      //Iterate over all_history_entries
+      for (var i = 0; i < all_histories.length; i++) {
+        var old_history_frame = getHistoryFrame(entity_obj, all_histories[i - 1]);
+        var new_history_frame = getHistoryFrame(entity_obj, all_histories[i]);
+
+        bio_string.push(getHistoryFrameLocalisation(entity_obj, old_history_frame, new_history_frame));
+      }
+
+      //Set bio_el to bio_string
+      bio_el.innerHTML = bio_string.join("");
+
+      //Append context menu button
+      var all_table_entries = entity_el.querySelectorAll(`${common_selectors.entity_bio_table} tr:not(.no-select) > td:last-child`);
+
+      for (var i = 0; i < all_table_entries.length; i++) {
+        var local_timestamp = convertTimestampToInt(all_table_entries[i].parentElement.getAttribute("timestamp"));
+
+        all_table_entries[i].innerHTML += `
+          <img class = "bio-context-menu-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/context_menu_icon.png">
+          <img class = "bio-jump-to-icon" draggable = "false" timestamp = "${local_timestamp}" src = "./gfx/interface/jump_to_icon.png"">
+        `;
+      }
+
+      //Move context_menu_el back to relevant element if available
+      var new_history_entry_el = entity_el.querySelector(`${common_selectors.entity_bio_table} tr[timestamp="${actual_timestamp}"]`);
+
+      //Add keyframe context menul; jump to functionality
+      var all_context_menu_btns = entity_el.querySelectorAll(`img.bio-context-menu-icon`);
+      var all_jump_to_btns = entity_el.querySelectorAll(`img.bio-jump-to-icon`);
+
+      for (var i = 0; i < all_context_menu_btns.length; i++)
+        all_context_menu_btns[i].onclick = function (e) {
+          printEntityKeyframeNavigationMenu(entity_id, this.parentElement);
+        }
+      for (var i = 0; i < all_jump_to_btns.length; i++)
+        all_jump_to_btns[i].onclick = function (e) {
+          var local_timestamp = parseInt(this.getAttribute("timestamp"));
+
+          main.date = convertTimestampToDate(local_timestamp);
+          loadDate();
+        };
+    } else {
+      //Hide the Bio UI if entity_obj is not defined yet
+      if (!bio_container_el.getAttribute("class").includes("display-none"))
+        bio_container_el.setAttribute("class", bio_container_el.getAttribute("class") + " display-none");
+    }
   }
 
-  function setEntityColour (arg0_entity_id) {
+  /*
+  printEntityContextMenu() - Prints an Entity context menu on the current map.
+  arg0_entity_id: (String)
+  arg1_options: (Object)
+    coords: (Array<Number, Number>) - Optional. The coordinates to use for the popup instead of the default. Centroid of entity by default.
+    is_being_edited: (Boolean) - Optional. Whether the entity is currently being edited. False by default.
+    pin: (Boolean) - Optional. Whether the entity is currently pinned. False by default.
+  */
+  function printEntityContextMenu (arg0_entity_id, arg1_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+
+    var brush_obj = main.brush;
+    var coords_string;
+    var common_selectors = config.defines.common.selectors;
+    var entity_interface = interfaces[entity_id];
+    var entity_obj = getEntity(entity_id);
+    var is_being_edited = (options.is_being_edited);
+    var is_pinned = (options.pin);
+    var reload_popup = false;
+    var to_pin = (!is_pinned);
+
+    //Fetch is_being_edited; pin status, coords_string
+    if (brush_obj.editing_entity == entity_id) is_being_edited = true;
+    if (options.coords)
+      coords_string = (!Array.isArray(options.coords)) ?
+        [`${[options.coords.lng, options.coords.lat]}`] :
+        [`${options.coords.toString()}`];
+
+    //Check if reload_popup is true; only close existing UI and open a new popup if the popup is not already pinned
+    if (entity_interface) {
+      if (!entity_interface.options.is_pinned) reload_popup = true;
+
+      //Also reload popup if pin argument is different to is_pinned
+      if (is_pinned != entity_interface.options.is_pinned) reload_popup = true;
+    } else {
+      //Popup for entity doesn't exist, so create a new one
+      reload_popup = true;
+    }
+
+    //Reload leaflet popup if reload_popup is true
+    if (reload_popup) {
+      closeEntityContextMenu(entity_id);
+
+      //Bind popup
+      var popup_options = {
+        id: "entity-ui-popup",
+        class: entity_id,
+        className: entity_id
+      };
+
+      //Create entity options to serve as flags
+      if (entity_obj)
+      if (!entity_obj.options.selected_keyframes)
+        entity_obj.options.selected_keyframes = [];
+      if (!is_pinned) popup_options.is_pinned = is_pinned;
+      if (is_pinned) {
+        popup_options.autoClose = false;
+        popup_options.closeOnClick = false;
+        popup_options.is_pinned = true;
+      }
+
+      //Set popup
+      var last_history_coords = getEntityCoords(entity_id);
+      var leaflet_centre_coords;
+
+      //Fetch centroid for leaflet_centre_coords if options.coords is not available
+      if (!options.coords) {
+        var turf_polygon = getTurfObject(last_history_coords);
+        var turf_polygon_centre = turf.center(turf_polygon).geometry.coordinates;
+
+        leaflet_centre_coords = [turf_polygon_centre[1], turf_polygon_centre[0]]; //Convert from Turf LatLng to LngLat
+      } else {
+        leaflet_centre_coords = options.coords;
+      }
+
+      //Open popup
+      var popup = L.popup(popup_options).setLatLng(leaflet_centre_coords)
+        .setContent(`
+          <!-- 1. Entity UI Header -->
+          ${printEntityContextMenuHeaderSection(entity_id, options)}
+
+          <!-- 2. Timeline/Data Section -->
+          ${printEntityContextMenuHeader(entity_id, { id: "entity-timeline-data-header", name: "Timeline/Data"})}
+          ${printEntityContextMenuTimelineDataSection(entity_id)}
+          ${printEntityContextMenuBioSection(entity_id)}
+
+          <!-- 3. Customisation -->
+          ${printEntityContextMenuHeader(entity_id, { id: "entity-customisation-header", name: "Customisation"})}
+          ${printEntityContextMenuCustomisationSection(entity_id)}
+
+          <!-- 4. Actions UI -->
+          ${printEntityContextMenuHeader(entity_id, { id: "entity-actions-header", name: "Actions" })}
+
+          <!-- 5. Context Menu Anchors -->
+          <div id = "entity-actions-context-menu"></div>
+          <div id = "entity-keyframe-context-menu"></div>
+        `).openOn(map);
+      interfaces[entity_id] = popup;
+
+      //Call createContextMenu() after the popup content is set
+      setTimeout(function(){
+        var entity_actions_ui = printEntityActions(entity_id);
+      }, 1);
+    }
+  }
+
+  function printEntityContextMenuBioSection (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Return statement
+    return `<div id = "entity-ui-timeline-bio-container" class = "entity-ui-container bio">
+      <div id = "entity-ui-timeline-bio-subcontainer" class = "entity-ui-subcontainer">
+        <table id = "entity-ui-timeline-bio-table" class = "timeline-bio-table">
+          <tr>
+            <th>YEAR</th>
+            <th></th>
+          </tr>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  function printEntityContextMenuCustomisationSection (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Return statement
+    return `<div id = "customisation-top-parent" class = "entity-ui-container customisation-top-parent">
+      <div id = "entity-ui-customisation-colour-ui-container" class = "entity-ui-container colour-container">
+        <div id = "entity-ui-customisation-colour-picker-container" class = "colour-picker-container">
+          <img id = "colour-picker-hue" class = "colour-picker-hue" src = "gfx/interface/colour_wheel.png">
+          <div id = "colour-picker-brightness" class = "colour-picker-brightness"></div>
+
+          <div id = "colour-picker-cursor" class = "colour-picker-cursor"></div>
+
+          <div id = "colour-picker" class = "colour-picker-mask"></div>
+
+          <!-- RGB inputs -->
+          <div class = "rgb-inputs">
+            R: <input type = "number" id = "r" value = "255"><br>
+            G: <input type = "number" id = "g" value = "255"><br>
+            B: <input type = "number" id = "b" value = "255"><br>
+          </div>
+
+          <span class = "no-select">
+            <span class = "brightness-range-container">
+              <span id = "brightness-header" class = "small-header">Brightness</span>
+              <input type = "range" min = "0" max = "100" value = "100" id = "colour-picker-brightness-range" class = "colour-picker-brightness-range">
+            </span>
+
+            <span class = "opacity-range-container">
+              <span id = "opacity-header" class = "small-header">Opacity</span>
+              <input type = "range" min = "0" max = "100" value = "50" id = "colour-picker-opacity-range" class = "colour-picker-opacity-range">
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div id = "entity-ui-customisation-options-container" class = "entity-ui-container options-container">
+        <div class = "options-tab">
+          <span id = "fill" class = "options-tab-header active">Fill</span>
+          <span id = "stroke" class = "options-tab-header">Stroke</span>
+          <span id = "other" class = "options-tab-header">Other</span>
+          <hr>
+        </div>
+
+        <div id = "other-container" class = "options-body">
+          <b>Visibility Settings:</b><br><br>
+          Minimum Zoom: <input id = "minimum-zoom-level" class = "short-number-input" type = "number"><br>
+          Maximum Zoom: <input id = "maximum-zoom-level" class = "short-number-input" type = "number"><br>
+        </div>
+      </div>
+    </div>
+
+    <div id = "entity-ui-customisation-description-container" class = "entity-ui-container"></div>`;
+  }
+
+  /*
+    printEntityContextMenuHeader() - Returns an entity context menu header innerHTML string.
+    arg0_entity_id: (String) - The entity ID for which to print a header.
+    arg1_options: (Object)
+      id: (String) - The ID of the header.
+      name: (String) - The name of the header.
+  */
+  function printEntityContextMenuHeader (arg0_entity_id, arg1_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Initialise options
+    if (!options.id) options.id = "entity-header";
+    if (!options.name) options.name = "";
+
+    //Return statement
+    return `<div id = "${options.id}" class = "entity-ui-container small">${options.name}</div>`;
+  }
+
+  /*
+    printEntityContextMenuHeaderSection() - Returns innerHTML string for the entity context menu header section.
+    arg0_entity_id: (String) - The entity ID for which to print 1. Header.
+    arg1_options: (Object)
+      coords: (Array<Number, Number>) - Optional. The coordinates to use for the popup instead of the default. Centroid of entity by default.
+      is_being_edited: (Boolean) - Optional. Whether the entity is currently being edited. False by default.
+      pin: (Boolean) - Optional. Whether the entity is currently pinned. False by default.
+  */
+  function printEntityContextMenuHeaderSection (arg0_entity_id, arg1_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var brush_obj = main.brush;
+    var entity_el = getEntityElement(entity_id);
+    var entity_obj = getEntity(entity_id);
+    var entity_name = getEntityName(entity_obj);
+    var is_being_edited = (options.is_being_edited);
+    var is_pinned = (options.pin);
+    var coords_string;
+
+    //Fetch is_being_edited; pin status, coords_string
+    if (brush_obj.editing_entity == entity_id) is_being_edited = true;
+    if (options.coords)
+      coords_string = (!Array.isArray(options.coords)) ?
+        [`${[options.coords.lng, options.coords.lat]}`] :
+        [`${options.coords.toString()}`];
+
+    //Return statement
+    return `<div id = "entity-header" class = "entity-ui-container">
+      <input id = "polity-name" class = "${entity_id}" value = "${entity_name}"></input>
+
+      <img src = "gfx/interface/empty_icon.png" class = "button cross-icon" id = "close-popup" onclick = "closeEntityContextMenu('${entity_id}');" draggable = "false">
+      <img src = "gfx/interface/empty_icon.png" class = "button delete-icon" id = "delete-entity" onclick = "deleteEntity('${entity_id}');" draggable = "false">
+      <img src = "gfx/interface/empty_icon.png" class = "button ${(!is_pinned) ? "pin-icon" : "reverse-pin-icon"}" id = "pin-popup" onclick = "printEntityContextMenu(${entity_id}, { coords: ${coords_string}, is_being_edited: ${options.is_being_edited}, pin: ${!options.pin} });" draggable = "false">
+    </div>`;
+  }
+
+  function printEntityContextMenuTimelineDataSection (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var b_el = document.getElementById(`${entity_id}-b`);
-    var g_el = document.getElementById(`${entity_id}-g`);
-    var entity_obj = getEntity(entity_id);
-    var opacity_el = document.querySelector(`#colour-picker-opacity-range-${entity_id}`);
-    var r_el = document.getElementById(`${entity_id}-r`);
+    var data_graph_types = [{ id: "land_area", name: "Land Area" }];
+    var data_select_ui = [];
 
-    var b = parseInt(b_el.value);
-    var g = parseInt(g_el.value);
-    var r = parseInt(r_el.value);
+    //Format data_select_ui
+    for (var i = 0; i < data_graph_types.length; i++)
+      data_select_ui.push(`<option value = "${data_graph_types[i].id}">${data_graph_types[i].name}</option>`);
 
-    var current_colour = RGBToHex(r, g, b);
-    var current_history_entry = getPolityHistory(entity_id, main.date);
-    var current_tab = window[`${entity_id}_page`];
+    //Return statement
+    return `<div id = "entity-ui-timeline-graph-container" class = "entity-ui-container timeline">
+      <div id = "entity-ui-timeline-graph-subcontainer" class = "entity-ui-subcontainer">
+        <select id = "entity-ui-timeline-graph-type" class = "entity-select">${data_select_ui.join("\n")}</select>
+        <canvas id = "entity-ui-timeline-graph" class = "entity-ui-graph"></canvas>
 
-    //Set entity fill colour
-    if (current_tab == "fill") {
-      createHistoryFrame(entity_id, main.date, {
-        fillColor: current_colour,
-        fillOpacity: opacity_el.value/100
-      });
-      entity_obj.setStyle({
-        fillColor: current_colour,
-        fillOpacity: opacity_el.value/100
-      });
-    }
+        <span id = "entity-ui-timeline-graph-y-axis" class = "entity-ui-graph-y-axis"></span>
+        <span id = "entity-ui-timeline-graph-y-top-axis-label" class = "graph-label">100%</span>
+        <span id = "entity-ui-timeline-graph-y-bottom-axis-label" class = "graph-label">0%</span>
 
-    if (current_tab == "stroke") {
-      createHistoryFrame(entity_id, main.date, {
-        color: current_colour,
-        opacity: opacity_el.value/100
-      });
-      entity_obj.setStyle({
-        color: current_colour,
-        opacity: opacity_el.value/100
-      });
-    }
-
-    //Repopulate entity bio
-    populateEntityBio(entity_id);
+        <div id = "entity-ui-timeline-graph-x-axis" class = "entity-ui-graph-x-axis">
+          <span id = "entity-ui-timeline-graph-x-left-axis-label" class = "left-align graph-label">START</span>
+          <span id = "entity-ui-timeline-graph-x-right-axis-label" class = "right-align graph-label">END</span>
+        </div>
+      </div>
+    </div>`;
   }
 
   function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_change) {
@@ -703,12 +563,15 @@ global.opened_popups = {};
     var do_not_change = arg2_do_not_change;
 
     //Declare local instance variables
-    var brightness_el = document.querySelector(`#colour-picker-brightness-range-${entity_id}`);
-    var colour_brightness_el = document.querySelector(`#colour-picker-brightness-${entity_id}`);
-    var colour_cursor_el = document.querySelector(`#colour-picker-cursor-${entity_id}`);
-    var colour_picker_el = document.querySelector(`#entity-ui-customisation-colour-picker-container-${entity_id}`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var brightness_el = entity_el.querySelector(common_selectors.brightness_range);
+    var colour_brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
+    var colour_cursor_el = entity_el.querySelector(common_selectors.colour_cursor);
+    var colour_picker_el = entity_el.querySelector(common_selectors.colour_picker);
     var max_brightness = 255;
-    var options_el = document.querySelector(`#entity-ui-customisation-options-container-${entity_id}`);
+    var options_el = entity_el.querySelector(common_selectors.colour_options);
 
     //Get closest r,g,b value in colour wheel and teleport cursor there
     colour_cursor_el.style.visibility = "hidden";
@@ -778,16 +641,68 @@ global.opened_popups = {};
       setEntityColour(entity_id);
   }
 
+  function setEntityColour (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var b_el = entity_el.querySelector(common_selectors.entity_b);
+    var g_el = entity_el.querySelector(common_selectors.entity_g);
+    var entity_obj = getEntity(entity_id);
+    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
+    var r_el = entity_el.querySelector(common_selectors.entity_r);
+
+    var b = parseInt(b_el.value);
+    var g = parseInt(g_el.value);
+    var r = parseInt(r_el.value);
+
+    var current_colour = RGBToHex(r, g, b);
+    var current_history_entry = getPolityHistory(entity_id, main.date);
+    var current_tab = window[`${entity_id}_page`];
+
+    //Set entity fill colour
+    if (current_tab == "fill") {
+      createHistoryFrame(entity_id, main.date, {
+        fillColor: current_colour,
+        fillOpacity: opacity_el.value/100
+      });
+      entity_obj.setStyle({
+        fillColor: current_colour,
+        fillOpacity: opacity_el.value/100
+      });
+    }
+
+    if (current_tab == "stroke") {
+      createHistoryFrame(entity_id, main.date, {
+        color: current_colour,
+        opacity: opacity_el.value/100
+      });
+      entity_obj.setStyle({
+        color: current_colour,
+        opacity: opacity_el.value/100
+      });
+    }
+
+    //Repopulate entity bio
+    printEntityBio(entity_id);
+  }
+
   function switchEntityTab (arg0_entity_id, arg1_tab) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var tab = arg1_tab;
 
     //Declare local instance variables
-    var options_el = document.getElementById(`${entity_id}-other-container`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var options_el = entity_el.querySelector(common_selectors.other_container);
     var left_offset = 0.125; //In vw
     var tab_width = 3.25; //In vw
-    var underline_el = document.querySelector(`.options-tab[class~='${entity_id}'] > hr`);
+    var underline_el = entity_el.querySelector(common_selectors.underline_el);
 
     var entity_obj = getEntity(entity_id);
 
@@ -835,7 +750,7 @@ global.opened_popups = {};
           createHistoryFrame(entity_id, main.date, {
             maximum_zoom_level: local_value
           });
-          populateEntityBio(entity_id);
+          printEntityBio(entity_id);
 
           //Fix value
           if (local_value)
@@ -847,35 +762,13 @@ global.opened_popups = {};
           createHistoryFrame(entity_id, main.date, {
             minimum_zoom_level: local_value
           });
-          populateEntityBio(entity_id);
+          printEntityBio(entity_id);
 
           //Fix value
           if (local_value)
             minimum_zoom_level_el.value = local_value;
         };
       }
-    }
-  }
-
-  function unhidePolity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var date = arg1_date;
-    var do_not_reload = arg2_do_not_reload;
-
-    //Declare local instance variables
-    var entity_obj = getEntity(entity_id);
-
-    if (entity_obj) {
-      createHistoryFrame(entity_id, date, {
-        extinct: false
-      });
-
-      populateEntityBio(entity_id);
-      populateTimelineGraph(entity_id);
-
-      if (!do_not_reload)
-        loadDate();
     }
   }
 
@@ -886,10 +779,13 @@ global.opened_popups = {};
     var opacity = arg2_opacity;
 
     //Declare local instance variables
-    var b_el = document.getElementById(`${entity_id}-b`);
-    var opacity_el = document.querySelector(`#colour-picker-opacity-range-${entity_id}`);
-    var g_el = document.getElementById(`${entity_id}-g`);
-    var r_el = document.getElementById(`${entity_id}-r`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var b_el = entity_el.querySelector(common_selectors.entity_b);
+    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
+    var g_el = entity_el.querySelector(common_selectors.entity_g);
+    var r_el = entity_el.querySelector(common_selectors.entity_r);
 
     //Update values
     if (colour) {
@@ -914,10 +810,13 @@ global.opened_popups = {};
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var brightness_el = document.getElementById(`colour-picker-brightness-range-${entity_id}`);
-    var brightness_header_el = document.getElementById(`${entity_id}-brightness-header`);
-    var opacity_el = document.getElementById(`colour-picker-opacity-range-${entity_id}`);
-    var opacity_header_el = document.getElementById(`${entity_id}-opacity-header`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
+    var brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
+    var brightness_header_el = entity_el.querySelector(common_selectors.brightness_header);
+    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
+    var opacity_header_el = entity_el.querySelector(common_selectors.opacity_header);
 
     var brightness_value = parseInt(brightness_el.value);
     var opacity_value = parseInt(opacity_el.value);
@@ -929,36 +828,3 @@ global.opened_popups = {};
       opacity_header_el.innerHTML = `Opacity | ${opacity_value/100}`;
   }
 }
-
-//Field reaction
-document.body.addEventListener("keyup", (e) => {
-  //Declare local instance variables
-  var brush_obj = main.brush;
-  var entity_name = e.target.value;
-  var local_class = e.target.getAttribute("class");
-  var local_id = e.target.id;
-
-  var entity_obj = getEntity(local_class);
-
-  if (local_id == "polity-name") {
-    try {
-      if (getEntityName(entity_obj, date) != entity_name) {
-        renameEntity(entity_obj, entity_name, main.date);
-      } else {
-        var local_history = getPolityHistory(local_class, date);
-
-        if (local_history)
-          delete local_history.class_name;
-      }
-
-      //Repopulate bio
-      populateEntityBio(local_class);
-    } catch (e) {
-      console.error(e);
-    }
-
-    //Selection handler
-    if (brush_obj.current_selection)
-      selection.options.entity_name = entity_name;
-  }
-});

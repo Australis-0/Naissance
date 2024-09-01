@@ -37,7 +37,7 @@
     //Check if date is before first history frame
     var first_history_frame = getFirstHistoryFrame(entity_id);
 
-    if (first_history_frame.id > timestampToInt(getTimestamp(main.date)))
+    if (first_history_frame.id > convertTimestampToInt(getTimestamp(main.date)))
       return true;
 
     //Return statement

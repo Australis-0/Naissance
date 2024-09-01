@@ -6,8 +6,8 @@
 
   background-color: white;
   border-radius: 0.5rem;
+  min-width: var(--context-menu-width);
   overflow: hidden;
-  width: var(--context-menu-width);
 
   font-family: "Karla";
   font-size: 1rem;
@@ -45,4 +45,9 @@
 /* -- Select -- */
 .context-menu select {
   max-width: calc(var(--context-menu-width) - 2rem);
+}
+
+/* -- Text -- */
+.context-menu input {
+  color: black;
 }

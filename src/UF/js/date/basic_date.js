@@ -6,7 +6,7 @@
 */
 function daysInMonths (arg0_date_object) {
   //Convert from parameters
-  var date = parseTimestamp(arg0_date_object);
+  var date = convertTimestampToDate(arg0_date_object);
 
   //Declare local instance variables
   var days = 0;
@@ -29,6 +29,27 @@ function getDateString (arg0_date_object) { //[WIP] - Finish function body
 
 }
 
+function getMonth (arg0_string) {
+  //Convert from parameters
+  var string = arg0_string.toLowerCase();
+
+  //Declare local instance variables
+  var lowercase_months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+
+  var local_month = lowercase_months.indexOf(string) + 1;
+
+  if (!local_month)
+    for (var i = 0; i < lowercase_months.length; i++)
+      if (lowercase_months[i].includes(string)) {
+        local_month = i + 1;
+        break;
+      }
+  if (!local_month) local_month = 1;
+
+  //Return statement
+  return local_month;
+}
+
 /*
   getStandardYear() - Returns the standard numeric Gregorian year from a date object/timestamp.
   arg0_date_object: (Object, Date) - The date object/timestamp to pass to the function.
@@ -44,7 +65,7 @@ function getStandardYear (arg0_date_object) { //[WIP] - Finish function body
   Returns: (String)
 */
 function getTimestamp (arg0_date_object) {
-  var date = parseTimestamp(arg0_date_object);
+  var date = convertTimestampToDate(arg0_date_object);
 
   //Guard clause
   if (typeof date == "string") {
@@ -145,7 +166,7 @@ function leapYearsBetween (arg0_start_year, arg1_end_year) {
 */
 function monthsFromDays (arg0_date_object) {
   //Convert from parameters
-  var date = parseTimestamp(arg0_date_object);
+  var date = convertTimestampToDate(arg0_date_object);
 
   //Declare local variables
   var local_days_in_months = JSON.parse(JSON.stringify(days_in_months));
@@ -166,12 +187,12 @@ function monthsFromDays (arg0_date_object) {
 }
 
 /*
-  parseTimestamp() - Parses a timestamp into a date object.
+  convertTimestampToDate() - Parses a timestamp into a date object.
   arg0_timestamp: (String) - The timestamp to parse.
 
   Returns: (Object, Date)
 */
-function parseTimestamp (arg0_timestamp) {
+function convertTimestampToDate (arg0_timestamp) {
   //Convert from parameters
   var timestamp = arg0_timestamp;
 
@@ -194,7 +215,7 @@ function parseTimestamp (arg0_timestamp) {
 
 
   local_date.year = Math.floor(timestamp/(365.25*24*60));
-  timestamp -= timestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
+  timestamp -= convertTimestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
 
   var leap_years = leapYearsBefore(local_date.year);
 
@@ -282,12 +303,12 @@ function parseYears (arg0_number, arg1_current_year) {
 }
 
 /*
-  timestampToInt() - Converts a timestamp to its integer position [in minutes from AD1], assuming the Hanseceltican standard.
+  convertTimestampToInt() - Converts a timestamp to its integer position [in minutes from AD1], assuming the Hanseceltican standard.
   arg0_timestamp: (String) - The string of the timestamp to parse to an int.
 
   Returns: (Number)
 */
-function timestampToInt (arg0_timestamp) {
+function convertTimestampToInt (arg0_timestamp) {
   //Convert from parameters
   var timestamp = arg0_timestamp;
 

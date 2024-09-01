@@ -1,81 +1,104 @@
 //Date UI functions
 {
   function autoFillDate () {
-    //Declare local instance variables
-    var day_field = getUISelector(`day_el`);
-    var month_field = getUISelector(`month_el`);
-    var year_field = getUISelector(`year_el`);
-    var year_type_field = getUISelector(`year_type_el`);
-
-    var hour_field = getUISelector(`hour_el`);
-    var minute_field = getUISelector(`minute_el`);
-
-    //Update filled values to recent context
-    year_type_field.value = (main.date.year >= 0) ? "AD" : "BC";
-    year_field.value = Math.abs(main.date.year);
-    month_field.value = months[main.date.month - 1];
-    day_field.value = ordinalise(main.date.day);
-
-    hour_field.value = (main.date.hour < 10) ? "0" + main.date.hour : main.date.hour;
-    minute_field.value = (main.date.minute < 10) ? "0" + main.date.minute : main.date.minute;
+    populateDateFields(getUISelector("date_container"), main.date);
   }
 
-  function getDateFromFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element) {
+  function populateDateFields (arg0_date_container_el, arg1_date) {
     //Convert from parameters
-    var year_el = document.getElementById(arg0_year_element);
-    var month_el = document.getElementById(arg1_month_element);
-    var day_el = document.getElementById(arg2_day_element);
-    var hour_el = document.getElementById(arg3_hour_element);
-    var minute_el = document.getElementById(arg4_minute_element);
-    var year_type_el = document.getElementById(arg5_year_type_element);
+    var date_container_el = arg0_date_container_el;
+    var date = arg1_date;
 
     //Declare local instance variables
-    var new_date = JSON.parse(JSON.stringify(date));
+    var day_el = date_container_el.querySelector(`#day-input`);
+    var hour_el = date_container_el.querySelector(`#hour-input`);
+    var minute_el = date_container_el.querySelector(`#minute-input`);
+    var month_el = date_container_el.querySelector(`#month-input`);
+    var year_el = date_container_el.querySelector(`#year-input`);
+    var year_type_el = date_container_el.querySelector(`#year-type`);
 
-    //Check if year is valid
-    if (!isNaN(year_el.value))
-      if (year_el.value > 0) {
-        new_date.year = (year_type_el.value == "AD") ?
-          parseInt(year_el.value) :
-          parseInt(year_el.value)*-1;
-      } else if (year_field.value == 0) {
-        //Assume this means AD 1
-        year_el.value = 1;
-        year_field.value = 1;
-      } else {
-        new_date.year = year_el.value;
-        year_type_el.value = (year_type_el.value == "AD") ? "BC" : "AD";
-      }
+    var date = (arg1_date) ? arg1_date : main.date; //Feed in a custom date to populate with
+    var days_in_month = JSON.parse(JSON.stringify(global.days_in_months[date.month - 1]));
+    var is_leap_year = isLeapYear(date.year);
+    var lowercase_months = config.defines.common.months_lowercase;
+    var months_html = [];
 
-    //Set month; day; hour; minute
-    new_date.month = parseInt(month_el.value);
-    new_date.day = parseInt(day_el.value);
+    //Leap year check
+    if (is_leap_year && date.month == 2)
+      days_in_month++;
 
-    var hour_value = returnSafeNumber(parseInt(hour_el.value));
-    var minute_value = returnSafeNumber(parseInt(minute_el.value));
+    //Adjust days if year_el; month_el are changed. Add leading zeroes to hour_el; minute_el if changed
+    year_el.onchange = function () {
+      var local_day = parseInt(deordinalise(day_el.value));
+      var local_month = parseInt(month_el.value);
+      var local_year = parseInt(this.value);
 
-    //Set min, max bounds
-    if (hour_value < 0) hour_value = 0;
-    if (hour_value > 23) hour_value = 23;
-    if (minute_value < 0) minute_value = 0;
-    if (minute_value > 59) minute_value = 59;
+      //Max Leap year check
+      if (isLeapYear(local_year) && parseInt(month_el.value) == 2)
+        if (local_day > 29)
+          day_el.value = ordinalise(29);
+      //Max Month check
+      if (local_day > days_in_month)
+        day_el.value = ordinalise(days_in_month);
+      if (local_day < 1)
+        day_el.value = ordinalise(1);
+    };
+    month_el.onchange = function () {
+      var local_day = parseInt(deordinalise(day_el.value));
+      var local_month = getMonth(this.value);
+      var local_year = parseInt(year_el.value);
 
-    //New Year's exception (change to 00:01 if date is January 1)
-    if (new_date.month == 1 && new_date.day == 1)
-      if (hour_value == 0 && minute_value == 0)
-        minute_value = 1;
+      //Max Leap year check
+      days_in_month = JSON.parse(JSON.stringify(days_in_months[local_month - 1]));
+      if (isLeapYear(local_year) && local_month == 2) days_in_month++;
 
-    new_date.hour = hour_value;
-    new_date.minute = minute_value;
+      //Set month; day .value
+      month_el.value = config.defines.common.months_uppercase[local_month - 1];
+      day_el.value = (local_day <= days_in_month) ? ordinalise(local_day) : ordinalise(days_in_month);
+    };
+    day_el.onchange = function () {
+      var local_day = parseInt(deordinalise(this.value));
+      var local_month = parseInt(month_el.value);
+      var new_local_day = local_day;
 
-    month_el.value = new_date.month;
-    day_el.value = new_date.day;
-    hour_el.value = `${(new_date.hour < 10) ? "0" : ""}${new_date.hour}`;
-    minute_el.value = `${(new_date.minute < 10) ? "0" : ""}${new_date.minute}`;
+      //Make sure local_day is a valid number
+      if (isNaN(local_day) || local_day < 1)
+        new_local_day = ordinalise(1);
 
-    return new_date;
+      //Make sure local_day fits within bounds
+      if (local_day > days_in_month)
+        new_local_day = ordinalise(days_in_month);
+      day_el.value = new_local_day;
+
+      //Standardise day_el.value to ordinal
+      if (!isNaN(day_el.value) && !isNaN(parseFloat(day_el.value)))
+        day_el.value = ordinalise(day_el.value);
+    };
+
+    //Force leading zeroes for hours and minutes, make sure inputs are valid
+    hour_el.onchange = function () {
+      this.value = Math.max(Math.min(this.value, 23), 0);
+      if (this.value < 10)
+        this.value = `0${parseInt(this.value)}`;
+    };
+    minute_el.onchange = function () {
+      this.value = Math.max(Math.min(this.value, 59), 0);
+      if (this.value < 10)
+        this.value = `0${parseInt(this.value)}`;
+    };
+
+    //Set values according to current date
+    day_el.value = ordinalise(date.day);
+    hour_el.value = `${(date.hour < 10) ? "0" : ""}${date.hour}`;
+    minute_el.value = `${(date.minute < 10) ? "0" : ""}${date.minute}`;
+    month_el.value = months[date.month - 1];
+    year_el.value = Math.abs(date.year); //[WIP] - BC handling
+    year_type_el.value = (date.year >= 0) ? "AD" : "BC";
   }
+}
 
+//[WIP] - DEPRECATE - Date UI functions
+{
   function getDateRangeFromFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element) {
     //Convert from parameters
     var year_el = document.getElementById(arg0_year_element);
@@ -95,7 +118,7 @@
     };
 
     //Return statement
-    return parseTimestamp(getTimestamp(local_date)); //Flatten date
+    return convertTimestampToDate(getTimestamp(local_date)); //Flatten date
   }
 
   function generateDateFields (arg0_element, arg1_prefix, arg2_date) {
@@ -166,97 +189,6 @@
 
       populateDateRangeFields(`${prefix}-years`, `${prefix}-months`, `${prefix}-days`, `${prefix}-months`, `${prefix}-minute`, date);
     } catch {}
-  }
-
-  function populateDateFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_year_type_element, arg6_date) {
-    //Convert from parameters
-    var year_el = document.querySelector(arg0_year_element);
-    var month_el = document.querySelector(arg1_month_element);
-    var day_el = document.querySelector(arg2_day_element);
-    var hour_el = document.querySelector(arg3_hour_element);
-    var minute_el = document.querySelector(arg4_minute_element);
-    var year_type_el = document.querySelector(arg5_year_type_element);
-    var date = (arg6_date) ? arg6_date : main.date; //Feed in a custom date to populate with
-
-    //Declare local instance variables
-    var days_html = [];
-    var days_in_month = JSON.parse(JSON.stringify(days_in_months[date.month - 1]));
-    var hours_html = [];
-    var is_leap_year = isLeapYear(date.year);
-    var minutes_html = [];
-    var months_html = [];
-    var year_type_html = `<option value = "AD">AD</option><option value = "BC">BC</option>`;
-
-    //Populate fields
-    if (is_leap_year && date.month == 2)
-      days_in_month++;
-
-    for (var i = 0; i < days_in_month; i++)
-      days_html.push(`<option value = "${i + 1}">${ordinalise(i + 1)}</option>`);
-    for (var i = 0; i < months.length; i++)
-      months_html.push(`<option value = "${i + 1}">${months[i]}</option>`);
-
-    //Set all the innerHTMLs for month_el, day_el, hour_el, minute_el, year_el, year_type_el
-    month_el.innerHTML = months_html.join("");
-    day_el.innerHTML = days_html.join("");
-    year_type_el.innerHTML = year_type_html;
-
-    //Adjust days if year_el; month_el are changed. Add leading zeroes to hour_el; minute_el if changed
-    year_el.onchange = function () {
-      var local_year = parseInt(this.value);
-
-      if (isLeapYear(local_year) && parseInt(month_el.value) == 2) {
-        days_html = [];
-
-        for (var i = 0; i < 29; i++)
-          days_html.push(`<option value = "${i + 1}">${ordinalise(i + 1)}</option>`);
-      }
-
-      //Set innerHTML
-      day_el.innerHTML = days_html.join("");
-    };
-    month_el.onchange = function () {
-      var index = this.selectedIndex;
-      var local_month = parseInt(this.children[index].value);
-
-      days_in_month = JSON.parse(JSON.stringify(days_in_months[local_month - 1]));
-
-      //Leap year handling
-      if (isLeapYear(year_el.value) && local_month == 2) days_in_month++;
-
-      days_html = [];
-      for (var i = 0; i < days_in_month; i++)
-        days_html.push(`<option value = "${i + 1}">${ordinalise(i + 1)}</option>`);
-
-      //Set innerHTML
-      var current_day_value = JSON.parse(JSON.stringify(day_el.value));
-      day_el.innerHTML = days_html.join("");
-
-      //Make sure day field is valid but don't suddenly change it
-      day_el.value = (current_day_value <= days_in_month) ? current_day_value : days_in_month;
-    };
-
-    //Force leading zeroes for hours and minutes, make sure inputs are valid
-    hour_el.onchange = function () {
-      this.value = Math.max(Math.min(this.value, 23), 0);
-      if (this.value < 10)
-        this.value = "0" + parseInt(this.value);
-    };
-    minute_el.onchange = function () {
-      this.value = Math.max(Math.min(this.value, 59), 0);
-      if (this.value < 10)
-        this.value = "0" + parseInt(this.value);
-    };
-
-    //Set values according to current date
-    day_el.value = date.day;
-    hour_el.value = `${(date.hour < 10) ? "0" : ""}${date.hour}`;
-    minute_el.value = `${(date.minute < 10) ? "0" : ""}${date.minute}`;
-    month_el.value = date.month;
-    year_el.value = Math.abs(date.year); //[WIP] - BC handling
-    year_type_el.value = (date.year >= 0) ? "AD" : "BC";
-
-    console.log(`Year`, date.year);
   }
 
   function populateDateRangeFields (arg0_year_element, arg1_month_element, arg2_day_element, arg3_hour_element, arg4_minute_element, arg5_date) {
@@ -400,14 +332,6 @@
 
     autoFillDate();
     loadDate(old_date);
-  }
-
-  function returnDateFromFields (arg0_prefix) {
-    //Convert from parameters
-    var prefix = arg0_prefix;
-
-    //Return statement
-    return getDateFromFields(`${prefix}-year`, `${prefix}-month`, `${prefix}-day`, `${prefix}-hour`, `${prefix}-minute`, `${prefix}-year-type`);
   }
 
   function returnDateRangeFromFields (arg0_prefix) {

@@ -15,18 +15,18 @@ function adjustObjectHistory (arg0_object, arg1_date_object, arg2_date_object) {
   //Declare local instance variables
   var history_entry = getObjectHistory(local_object, entry_date);
   var new_timestamp = getTimestamp(move_to_date);
-  var old_timestamp = getTimestamp(parseTimestamp(entry_date));
+  var old_timestamp = getTimestamp(convertTimestampToDate(entry_date));
 
   //Move history_entry to new_timestamp
   if (history_entry)
-    if (history_entry.id != timestampToInt(new_timestamp)) {
+    if (history_entry.id != convertTimestampToInt(new_timestamp)) {
       //Move to new_timestamp
       local_object.options.history[new_timestamp] = history_entry;
       var new_history_entry = local_object.options.history[new_timestamp];
 
       //Delete old timestamp; change ID
       delete local_object.options.history[old_timestamp];
-      new_history_entry.id = timestampToInt(new_timestamp);
+      new_history_entry.id = convertTimestampToInt(new_timestamp);
 
       local_object.options.history = sortObject(local_object.options.history, "numeric_ascending");
     }
@@ -62,7 +62,7 @@ function checkObjectHistory (arg0_object, arg1_date_object, arg2_conditional_fun
       for (var i = 0; i < all_history_frames.length; i++) {
         var local_history = local_object.options.history[all_history_frames[i]];
 
-        if (parseInt(local_history.id) <= timestampToInt(ending_timestamp))
+        if (parseInt(local_history.id) <= convertTimestampToInt(ending_timestamp))
           has_property = conditional_function(local_history);
       }
     }
@@ -109,7 +109,7 @@ function createObjectHistory (arg0_object, arg1_date_object, arg2_options, arg3_
     //Create new history object
     if (!local_object.options.history[date_string])
       local_object.options.history[date_string] = {
-        id: timestampToInt(date_string),
+        id: convertTimestampToInt(date_string),
         coords: actual_coords,
         options: {}
       };
@@ -247,7 +247,7 @@ function getHistoryFrame (arg0_object, arg1_date_object) {
     coords: [],
     options: {}
   };
-  var current_timestamp = timestampToInt(getTimestamp(date));
+  var current_timestamp = convertTimestampToInt(getTimestamp(date));
 
   //Check if options.history exists
   if (local_object.options)
@@ -256,7 +256,7 @@ function getHistoryFrame (arg0_object, arg1_date_object) {
 
       //Iterate over all_history_frames
       for (var i = 0; i < all_history_frames.length; i++)
-        if (timestampToInt(all_history_frames[i]) <= current_timestamp) {
+        if (convertTimestampToInt(all_history_frames[i]) <= current_timestamp) {
           var local_history_frame = local_object.options.history[all_history_frames[i]];
 
           //is_founding handler
@@ -380,7 +380,7 @@ function getObjectHistory (arg0_object, arg1_date_object, arg2_options) {
 
       //Iterate over all_history_frames
       for (var i = 0; i < all_history_frames.length; i++)
-        if (timestampToInt(entry_timestamp) >= timestampToInt(all_history_frames[i]))
+        if (convertTimestampToInt(entry_timestamp) >= convertTimestampToInt(all_history_frames[i]))
           current_entry = (!options.return_key) ? local_object.options.history[all_history_frames[i]] : all_history_frames[i];
     }
 

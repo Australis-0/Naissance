@@ -40,6 +40,44 @@ function cleanObject (arg0_object, arg1_options) {
   return cleaned_object;
 }
 
+/*
+  dumbFlattenObject() - Non-recursively flattens the given input object, removing only 1 layer at a time.
+  arg0_object: (Object) - The input object to process.
+
+  Returns: (Object)
+*/
+function dumbFlattenObject (arg0_object) {
+  //Convert from parameters
+  var object = arg0_object;
+
+  //Declare local instance variables
+  var all_object_keys = Object.keys(object);
+  var new_obj = {};
+
+  //Iterate over all_object_keys and move their subobject values to new_obj
+  for (var i = 0; i < all_object_keys.length; i++) {
+    var local_value = object[all_object_keys[i]];
+
+    if (!Array.isArray(local_value) && typeof local_value == "object") {
+      var all_subkeys = Object.keys(local_value);
+
+      //Iterate over all all_subkeys
+      for (var x = 0; x < all_subkeys.length; x++)
+        new_obj[all_subkeys[x]] = local_value[all_subkeys[x]];
+    } else {
+      new_obj[all_object_keys[i]] = local_value;
+    }
+  }
+
+  //Return statement
+  return new_obj;
+}
+
+/*
+  dumbMergeObjects()- Merges two objects non-recursively. Overrides all values.
+  arg0_object: (Object) - The object to merge into.
+  arg1_object: (Object) - The object that takes precedence.
+*/
 function dumbMergeObjects (arg0_object, arg1_object) {
   //Convert from parameters
   var object = arg0_object;
@@ -100,7 +138,7 @@ function flattenObject (arg0_object) {
     var local_subobj = object[all_object_keys[i]];
 
     if (typeof local_subobj == "object") {
-      flattened_subobj = module.exports.flattenObject(local_subobj);
+      flattened_subobj = flattenObject(local_subobj);
 
       var all_flattened_keys = Object.keys(flattened_subobj);
 
@@ -147,7 +185,7 @@ function getDepth (arg0_object, arg1_depth) {
     if (!object.hasOwnProperty(key)) continue;
 
     if (typeof object[key] == "object") {
-      var level = module.exports.getDepth(object[key]) + 1;
+      var level = getDepth(object[key]) + 1;
       depth = Math.max(depth, level);
     }
   }
@@ -260,7 +298,7 @@ function getSubobject (arg0_object, arg1_key, arg2_restrict_search) {
 
       //Restrict search for certain arguments
       if (explore_object) {
-        var has_subobj = module.exports.getSubobject(local_subobj, new_key, restrict_search);
+        var has_subobj = getSubobject(local_subobj, new_key, restrict_search);
 
         if (has_subobj) {
           //Return statement
@@ -303,7 +341,7 @@ function getSubobjectKeys (arg0_object, arg1_options) {
       if (!options.exclude_keys.includes(all_object_keys[i]))
         all_keys.push(all_object_keys[i]);
 
-      var all_subkeys = module.exports.getSubobjectKeys(local_subobj, options);
+      var all_subkeys = getSubobjectKeys(local_subobj, options);
 
       if (options.include_objects || options.only_objects)
         if (!options.exclude_keys.includes(all_object_keys[i]))
@@ -395,7 +433,7 @@ function removeZeroes (arg0_object) {
       if (local_subobj == 0)
         delete object[all_object_keys[i]];
     if (typeof local_subobj == "object")
-      object[all_object_keys[i]] = module.exports.removeZeroes(local_subobj);
+      object[all_object_keys[i]] = removeZeroes(local_subobj);
   }
 
   //Return statement
