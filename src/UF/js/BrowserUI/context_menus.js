@@ -615,7 +615,7 @@
     var year_type_el = date_container_el.querySelector(`#year-type`);
 
     //Declare local instance variables
-    var new_date = JSON.parse(JSON.stringify(date));
+    var new_date = {};
 
     //Check if year is valid
     if (!isNaN(year_el.value))
@@ -633,7 +633,7 @@
       }
 
     //Set month; day; hour; minute
-    new_date.month = parseInt(month_el.value);
+    new_date.month = getMonth(month_el.value); //[WIP] - This is flawed
     new_date.day = parseInt(day_el.value);
 
     var hour_value = returnSafeNumber(parseInt(hour_el.value));
@@ -653,7 +653,7 @@
     new_date.hour = hour_value;
     new_date.minute = minute_value;
 
-    month_el.value = new_date.month;
+    month_el.value = (!isNaN(new_date.month)) ? months[new_date.month - 1] : "January";
     day_el.value = new_date.day;
     hour_el.value = `${(new_date.hour < 10) ? "0" : ""}${new_date.hour}`;
     minute_el.value = `${(new_date.minute < 10) ? "0" : ""}${new_date.minute}`;
@@ -714,6 +714,7 @@
 
     //Iterate over all_inputs and set values in return_obj by referring to the ID
     for (var i = 0; i < all_inputs.length; i++) {
+      var has_output = true;
       var local_id = all_inputs[i].getAttribute("id");
       var local_output;
       var local_type = all_inputs[i].getAttribute("type");
@@ -721,7 +722,7 @@
       //Fetch .id based on type
       if (local_type == "biuf") {
         local_output = all_inputs[i].querySelector("biuf-input").innerHTML;
-      } else if (["rich_text", "wysiwyg"].includes(local_type) {
+      } else if (["rich_text", "wysiwyg"].includes(local_type)) {
         local_output = getWysiwygFromFields(all_inputs[i]);
       } else if (local_type == "checkbox") {
         var all_checkboxes = all_inputs[i].querySelectorAll("[type='checkbox']");
@@ -782,14 +783,17 @@
         }
       } else if (local_type == "url") {
         local_output = all_inputs[i].querySelector("input[type='url']").value;
+      } else {
+        has_output = false;
       }
 
       //Set return_obj[local_id]
-      return_obj[local_id] = local_output;
+      if (has_output)
+        return_obj[local_id] = local_output;
     }
 
     //Return statement
-    return local_output;
+    return return_obj;
   }
 
   function getWysiwygFromFields (arg0_wysiwyg_el) {
