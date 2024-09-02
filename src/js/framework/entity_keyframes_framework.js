@@ -1,4 +1,4 @@
-//Initialise functions
+//Initialise Entity Keyframes actiosn
 {
   function deleteKeyframe (arg0_entity_id, arg1_timestamp) { //[WIP] - Deleting a keyframe should update the bio and close the keyframe context menus. It currently does not
     //Convert from parameters
@@ -28,6 +28,56 @@
     editEntity(entity_id);
   }
 
+  function moveKeyframe (arg0_entity_id, arg1_timestamp, arg2_timestamp) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entry_date = arg1_date;
+    var move_to_date = arg2_date;
+
+    //Declare local instance variables
+    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
+    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
+    var entity_obj = getEntity(entity_id);
+    var history_entry = getPolityHistory(entity_id, entry_date);
+    var new_timestamp = getTimestamp(move_to_date);
+    var old_timestamp = getTimestamp(convertTimestampToDate(entry_date));
+    var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
+
+    //Move history_entry to new timestamp
+    if (entity_obj)
+      if (history_entry) {
+        //Only change date of keyframe if it does not conflict with the same keyframe
+        if (history_entry.id != convertTimestampToInt(new_timestamp)) {
+          //Move to new_timestamp
+          entity_obj.options.history[new_timestamp] = history_entry;
+          var new_history_entry = entity_obj.options.history[new_timestamp];
+
+          //Delete old timestamp; change ID
+          delete entity_obj.options.history[old_timestamp];
+          new_history_entry.id = convertTimestampToInt(new_timestamp);
+
+          entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
+
+          if (context_menu_el) {
+            //Repopulate bio; move it to new history entry
+            printEntityBio(entity_id);
+
+            var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
+
+            if (new_history_entry_el) {
+              new_history_entry_el.after(context_menu_el);
+              new_history_entry_el.after(context_menu_date_el);
+            }
+          }
+        }
+      } else {
+        console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);
+      }
+  }
+}
+
+//Initialise Entity Keyframes framework
+{
   /*
     getAllEntityKeyframes() - Fetches all entity keyframes as either an array of keys or objects.
     arg0_options: (Object)
@@ -251,6 +301,8 @@
     arg0_entity_id: (String) - The entity ID to which this effect applies.
     arg1_scope: (Object) - The effect scope to apply.
     arg2_options: (Object)
+      options: (Object) - The actual options of various inputs and the data given, treated as global variables.
+
       depth: (Number) - The current recursive depth. Starts at 1.
       scope_type: (Array<String>) - Optional. What the current scope_type currently refers to (e.g. 'polities', 'markers'). All if undefined. Undefined by default.
       timestamp: (String) - Optional. The current timestamp of the keyframe being referenced, if any.
@@ -272,6 +324,20 @@
     var entity_obj = getEntity(entity_id);
 
     //[WIP] - .interface parser; load inputs into .options
+    if (options.depth == 1) {
+      var common_selectors = config.defines.common.selectors;
+      var entity_el = getEntityElement(entity_id);
+
+      var actions_container_el = entity_el.querySelector(`${common_selectors.entity_actions_context_menu_anchor}`);
+      var actions_input_obj = getInputsAsObject(actions_container_el);
+      var keyframe_container_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+      var keyframe_input_obj = getInputsAsObject(keyframe_container_el);
+
+      //Set options.options to be passed down
+      options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
+      options.options.timestamp = options.timestamp;
+    }
+    var suboptions = options.options;
 
     //.effect parser
     //Iterate over all_scope_keys, recursively parsing the scope whenever 'effect_<key>' is encountered.
@@ -286,6 +352,15 @@
 
       //Same-scope effects
       {
+        //History effects
+        if (all_scope_keys[i] == "delete_keyframe")
+          deleteKeyframe(entity_id, suboptions[local_value]);
+        if (all_scope_keys[i] == "edit_keyframe")
+          editKeyframe(entity_id, suboptions[local_value]);
+        if (all_scope_keys[i] == "move_keyframe") {
+          moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
+
+        //UI interface effects
         if (all_scope_keys[i] == "close_ui")
           //Parse the entity_effect being referenced
           for (var x = 0; x < local_value.length; x++) {
@@ -317,25 +392,4 @@
       }
     }
   }
-
-  /*
-    populateEntityKeyframesUI() - Populates the UI for entity keyframes as specified in config.entity_keyframes
-    arg0_entity_id: (String) - The ID of a given entity.
-  */
-  /*function populateEntityKeyframesUI (arg0_entity_id) { //[WIP] - Finish function body.
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables; fetch entity from known selector
-    var common_defines = config.defines.common;
-    var common_selectors = common_defines.selectors;
-    var entity_obj = getEntity(entity_id);
-
-    var entity_el = document.querySelector(`${common_selectors.entity_ui}.${entity_id}`);
-
-    //Check to make sure entity_el exists
-    if (entity_el) {
-
-    }
-  }*/
 }

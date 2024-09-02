@@ -1,52 +1,5 @@
 //Marked for review functions
 {
-  function adjustPolityHistory (arg0_entity_id, arg1_date, arg2_date) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var entry_date = arg1_date;
-    var move_to_date = arg2_date;
-
-    //Declare local instance variables
-    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
-    var entity_obj = getEntity(entity_id);
-    var history_entry = getPolityHistory(entity_id, entry_date);
-    var new_timestamp = getTimestamp(move_to_date);
-    var old_timestamp = getTimestamp(convertTimestampToDate(entry_date));
-    var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
-
-    //Move history_entry to new timestamp
-    if (entity_obj)
-      if (history_entry) {
-        //Only change date of keyframe if it does not conflict with the same keyframe
-        if (history_entry.id != convertTimestampToInt(new_timestamp)) {
-          //Move to new_timestamp
-          entity_obj.options.history[new_timestamp] = history_entry;
-          var new_history_entry = entity_obj.options.history[new_timestamp];
-
-          //Delete old timestamp; change ID
-          delete entity_obj.options.history[old_timestamp];
-          new_history_entry.id = convertTimestampToInt(new_timestamp);
-
-          entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
-
-          if (context_menu_el) {
-            //Repopulate bio; move it to new history entry
-            printEntityBio(entity_id);
-
-            var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
-
-            if (new_history_entry_el) {
-              new_history_entry_el.after(context_menu_el);
-              new_history_entry_el.after(context_menu_date_el);
-            }
-          }
-        }
-      } else {
-        console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);
-      }
-  }
-
   function createHistoryFrame (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
