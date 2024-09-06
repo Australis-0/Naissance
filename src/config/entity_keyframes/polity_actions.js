@@ -16,7 +16,7 @@ config.entity_keyframes.polity_actions = {
         y: 0,
 
         multiple_rows: true,
-        placeholder: "timestamp"
+        placeholder: "timestamp" //[WIP] - This means the interface defaults to the timestamp the keyframe is tied to.
       },
       change_date_button: {
         id: "change_date_button",

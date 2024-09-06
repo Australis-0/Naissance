@@ -698,6 +698,7 @@
     arg0_context_menu_el: (HTMLElement) - The context menu element.
     arg1_options: (Object)
       do_not_include_submenus: (Boolean) - Optional. Whether to not include context submenus. False by default.
+      entity_id: (String) - Optional. Whether the context menu is related to an entity. Undefined by default.
       custom_file_function: (Function) - Optional. The function to run to fetch input values for 'file' types. Fetches all paths by default.
       custom_html_function: (Function) - Optional. The function to run to fetch input values for custom 'html' types. Fetches nothing by default.
 
@@ -712,6 +713,7 @@
     var all_inputs = context_menu_el.querySelectorAll(`.context-menu-cell`);
     var return_obj = {};
 
+    //1. General input handling
     //Iterate over all_inputs and set values in return_obj by referring to the ID
     for (var i = 0; i < all_inputs.length; i++) {
       var has_output = true;
@@ -790,6 +792,16 @@
       //Set return_obj[local_id]
       if (has_output)
         return_obj[local_id] = local_output;
+    }
+
+    //2. Speciaised input handling
+    if (options.entity_id) {
+      var common_selectors = config.defines.common.selectors;
+      var entity_obj = getEntity(options.entity_id);
+
+      //Multiple keyframes handling
+      if (entity_obj.options.selected_keyframes_key)
+        return_obj[entity_obj.options.selected_keyframes_key] = entity_obj.options.selected_keyframes;
     }
 
     //Return statement

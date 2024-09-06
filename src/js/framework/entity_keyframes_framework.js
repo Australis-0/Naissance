@@ -28,7 +28,7 @@
     editEntity(entity_id);
   }
 
-  function moveKeyframe (arg0_entity_id, arg1_timestamp, arg2_timestamp) {
+  function moveKeyframe (arg0_entity_id, arg1_date, arg2_date) { //[WIP] - This should update the bio and adjust any open context menus tied to a keyframe. ('placeholder: "timestamp"') It does not.
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var entry_date = arg1_date;
@@ -167,6 +167,40 @@
   }
 
   /*
+    getEntityKeyframesAtOrder() - Fetches all entity keyframe actions belonging to a given .order.
+    arg0_options: (Object)
+      order: (Number) - Optional. The current order ot fetch all relevant keyframes at. 1 by default.
+      return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
+
+    Returns: (Array<Object>/Array<String>)
+  */
+  function getEntityKeyframesAtOrder (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Declare local instance variables
+    var flattened_entity_keyframes = config.flattened_entity_keyframes;
+    var order = (options.order != undefined) ? options.order : 1;
+    var return_keyframes = [];
+    var return_keys = [];
+
+    //Iterate over all_flattened_entity_keyframes
+    var all_flattened_entity_keyframes = Object.keys(flattened_entity_keyframes);
+
+    for (var i = 0; i < all_flattened_entity_keyframes.length; i++) {
+      var local_keyframe = flattened_entity_keyframes[all_flattened_entity_keyframes[i]];
+
+      if (local_keyframe.order == options.order) {
+        return_keyframes.push(local_keyframe);
+        return_keys.push(all_flattened_entity_keyframes[i]);
+      }
+    }
+
+    //Return statement
+    return (!options.return_key) ? return_keyframes : return_keys;
+  }
+
+  /*
     getEntityKeyframesCategory() - Fetches an entity keynames category object/key.
     arg0_name: (String) - The name/ID of the entity keyframe category.
     arg1_options: (Object)
@@ -222,37 +256,36 @@
   }
 
   /*
-    getEntityKeyframesAtOrder() - Fetches all entity keyframe actions belonging to a given .order.
-    arg0_options: (Object)
-      order: (Number) - Optional. The current order ot fetch all relevant keyframes at. 1 by default.
-      return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
-
-    Returns: (Array<Object>/Array<String>)
+    getEntityKeyframesInput() - Fetches the input object of a given entity keyframe.
+    arg0_keyframe_id: (String) - The keyframe ID to search for.
+    arg1_input_id: (String) - The input ID to search for in terms of .id or input key.
   */
-  function getEntityKeyframesAtOrder (arg0_options) {
+  function getEntityKeyframesInput (arg0_keyframe_id, arg1_input_id) {
     //Convert from parameters
-    var options = (arg0_options) ? arg0_options : {};
+    var keyframe_id = arg0_keyframe_id;
+    var input_id = arg1_input_id;
 
     //Declare local instance variables
-    var flattened_entity_keyframes = config.flattened_entity_keyframes;
-    var order = (options.order != undefined) ? options.order : 1;
-    var return_keyframes = [];
-    var return_keys = [];
+    var entity_keyframe = getEntityKeyframe(keyframe_id);
 
-    //Iterate over all_flattened_entity_keyframes
-    var all_flattened_entity_keyframes = Object.keys(flattened_entity_keyframes);
+    if (entity_keyframe)
+    //Iterate over .interface if it exists
+      if (entity_keyframe.interface) {
+        //Guard clause if citing direct key
+        if (entity_keyframe.interface[input_id]) return entity_keyframe.interface[input_id];
 
-    for (var i = 0; i < all_flattened_entity_keyframes.length; i++) {
-      var local_keyframe = flattened_entity_keyframes[all_flattened_entity_keyframes[i]];
+        //Iterate over all_inputs
+        var all_inputs = Object.keys(entity_keyframe.interface);
 
-      if (local_keyframe.order == options.order) {
-        return_keyframes.push(local_keyframe);
-        return_keys.push(all_flattened_entity_keyframes[i]);
+        for (var i = 0; i < all_inputs.length; i++) {
+          var local_input = entity_keyframe.interface[all_inputs[i]];
+
+          if (!Array.isArray(local_input) && typeof local_input == "object")
+            if (local_input.id == input_id)
+              //Return statement
+              return local_input;
+        }
       }
-    }
-
-    //Return statement
-    return (!options.return_key) ? return_keyframes : return_keys;
   }
 
   /*
@@ -294,102 +327,5 @@
 
     //Return statement
     return getEntityKeyframesAtOrder({ order: lowest_order })[0];
-  }
-
-  /*
-    parseEntityEffect() - Applies an entity effect from a given .effect scope.
-    arg0_entity_id: (String) - The entity ID to which this effect applies.
-    arg1_scope: (Object) - The effect scope to apply.
-    arg2_options: (Object)
-      options: (Object) - The actual options of various inputs and the data given, treated as global variables.
-
-      depth: (Number) - The current recursive depth. Starts at 1.
-      scope_type: (Array<String>) - Optional. What the current scope_type currently refers to (e.g. 'polities', 'markers'). All if undefined. Undefined by default.
-      timestamp: (String) - Optional. The current timestamp of the keyframe being referenced, if any.
-      ui_type: (String) - Optional. Whether the ui_type is 'entity_keyframes'/'entity_actions'. 'entity_keyframes' by default.
-  */
-  function parseEntityEffect (arg0_entity_id, arg1_scope, arg2_options) { //[WIP] - Finish function body.
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var scope = (arg1_scope) ? arg1_scope : {};
-    var options = (arg2_options) ? arg2_options : {};
-
-    //Initialise options
-    if (!options.depth) options.depth = 0;
-      options.depth++;
-    if (!options.ui_type) options.ui_type = "entity_keyframes";
-
-    //Declare local instance variables
-    var all_scope_keys = Object.keys(scope);
-    var entity_obj = getEntity(entity_id);
-
-    //[WIP] - .interface parser; load inputs into .options
-    if (options.depth == 1) {
-      var common_selectors = config.defines.common.selectors;
-      var entity_el = getEntityElement(entity_id);
-
-      var actions_container_el = entity_el.querySelector(`${common_selectors.entity_actions_context_menu_anchor}`);
-      var actions_input_obj = getInputsAsObject(actions_container_el);
-      var keyframe_container_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
-      var keyframe_input_obj = getInputsAsObject(keyframe_container_el);
-
-      //Set options.options to be passed down
-      options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
-      options.options.timestamp = options.timestamp;
-    }
-    var suboptions = options.options;
-
-    //.effect parser
-    //Iterate over all_scope_keys, recursively parsing the scope whenever 'effect_<key>' is encountered.
-    for (var i = 0; i < all_scope_keys.length; i++) {
-      var local_value = getList(scope[all_scope_keys[i]]);
-
-      //Recursive parsers
-      if (all_scope_keys[i].startsWith("effect_")) {
-        var new_options = JSON.parse(JSON.stringify(options));
-        var parsed_effect = parseEntityEffect(entity_id, local_value[0], new_options);
-      }
-
-      //Same-scope effects
-      {
-        //History effects
-        if (all_scope_keys[i] == "delete_keyframe")
-          deleteKeyframe(entity_id, suboptions[local_value]);
-        if (all_scope_keys[i] == "edit_keyframe")
-          editKeyframe(entity_id, suboptions[local_value]);
-        if (all_scope_keys[i] == "move_keyframe") {
-          moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
-
-        //UI interface effects
-        if (all_scope_keys[i] == "close_ui")
-          //Parse the entity_effect being referenced
-          for (var x = 0; x < local_value.length; x++) {
-            var local_entity_keyframe = getEntityKeyframe(local_value[x]);
-            var local_entity_order = (local_entity_keyframe.order != undefined) ?
-              local_entity_keyframe.order : 1;
-
-            closeEntityKeyframeContextMenu(entity_id, local_entity_order);
-          }
-        if (all_scope_keys[i] == "close_menus")
-          if (local_value[0]) closeEntityKeyframeContextMenus(entity_id);
-        if (all_scope_keys[i] == "interface")
-          printEntityKeyframeContextMenu(entity_id, scope);
-        if (["open_ui", "trigger"].includes(all_scope_keys[i]))
-          if (options.ui_type == "entity_keyframes") {
-            //Parse the entity_effect being referenced
-            for (var x = 0; x < local_value.length; x++) {
-              var local_entity_keyframe = getEntityKeyframe(local_value[x]);
-              console.log(local_value[x]);
-
-              if (local_entity_keyframe.effect) {
-                var new_options = JSON.parse(JSON.stringify(options));
-                var parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
-              }
-              if (local_entity_keyframe)
-                printEntityKeyframeContextMenu(entity_id, local_entity_keyframe);
-            }
-          }
-      }
-    }
   }
 }

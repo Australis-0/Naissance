@@ -219,7 +219,6 @@
 
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
-
     var entity_el = getEntityElement(entity_id);
     var entity_header_el = entity_el.querySelector(common_selectors.entity_ui_header);
     var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
@@ -235,7 +234,23 @@
       entity_keyframe_context_width += entity_keyframe_context_menus[i].offsetWidth + 8;
     }
 
+    //Update context menu inputs
+    refreshEntityKeyframeContextMenuInputs(entity_id);
+
     //Return statement
     return entity_keyframe_context_width;
+  }
+
+  function refreshEntityKeyframeContextMenuInputs (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var common_selectors = entity_el = getEntityElement(entity_id);
+    var entity_el = getEntityElement(entity_id);
+    var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+    var entity_keyframe_context_menus = entity_keyframe_anchor_el.querySelectorAll(`${common_selectors.entity_keyframe_context_menu_anchor} > .context-menu`);
+
+    //Iterate over all entity_keyframe_context_menus; fetch their IDs and update their inputs based on .placeholders
   }
 }
