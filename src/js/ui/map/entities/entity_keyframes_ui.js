@@ -246,11 +246,36 @@
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var common_selectors = entity_el = getEntityElement(entity_id);
+    var common_selectors = config.defines.common.selectors;
     var entity_el = getEntityElement(entity_id);
     var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
     var entity_keyframe_context_menus = entity_keyframe_anchor_el.querySelectorAll(`${common_selectors.entity_keyframe_context_menu_anchor} > .context-menu`);
+    var entity_timestamp = entity_keyframe_anchor_el.getAttribute("timestamp");
 
+    //Placeholder handlers
     //Iterate over all entity_keyframe_context_menus; fetch their IDs and update their inputs based on .placeholders
+    for (var i = 0; i < entity_keyframe_context_menus.length; i++) {
+      var entity_keyframe_obj = config.flattened_entity_keyframes[entity_keyframe_context_menus[i].id];
+      var input_obj = getInputsAsObject(entity_keyframe_context_menus[i], { entity_id: entity_id });
+
+      if (entity_keyframe_obj)
+        if (entity_keyframe_obj.interface) {
+          var all_interface_keys = Object.keys(entity_keyframe_obj.interface);
+
+          //Iterate over all_interface_keys to fill out inputs if placeholder exists
+          for (var x = 0; x < all_interface_keys.length; x++) {
+            var local_value = entity_keyframe_obj.interface[all_interface_keys[x]];
+
+            //Make sure local_value.placeholder is a valid field before filling it in
+            var local_input_el = entity_keyframe_context_menus[i].querySelector(`#${local_value.id}`);
+            if (local_value.placeholder)
+              fillInput({
+                element: local_input_el,
+                type: local_input_el.getAttribute("type"),
+                placeholder: input_obj[local_value.placeholder]
+              });
+          }
+        }
+    }
   }
 }

@@ -623,10 +623,9 @@
         new_date.year = (year_type_el.value == "AD") ?
           parseInt(year_el.value) :
           parseInt(year_el.value)*-1;
-      } else if (year_field.value == 0) {
+      } else if (year_el.value == 0) {
         //Assume this means AD 1
         year_el.value = 1;
-        year_field.value = 1;
       } else {
         new_date.year = year_el.value;
         year_type_el.value = (year_type_el.value == "AD") ? "BC" : "AD";
@@ -723,7 +722,7 @@
 
       //Fetch .id based on type
       if (local_type == "biuf") {
-        local_output = all_inputs[i].querySelector("biuf-input").innerHTML;
+        local_output = all_inputs[i].querySelector("#biuf-input").innerHTML;
       } else if (["rich_text", "wysiwyg"].includes(local_type)) {
         local_output = getWysiwygFromFields(all_inputs[i]);
       } else if (local_type == "checkbox") {
@@ -797,11 +796,20 @@
     //2. Speciaised input handling
     if (options.entity_id) {
       var common_selectors = config.defines.common.selectors;
+      var entity_el = getEntityElement(options.entity_id);
       var entity_obj = getEntity(options.entity_id);
 
       //Multiple keyframes handling
       if (entity_obj.options.selected_keyframes_key)
         return_obj[entity_obj.options.selected_keyframes_key] = entity_obj.options.selected_keyframes;
+      //Timestamp handling
+      if (entity_el) {
+        var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+        var entity_timestamp = entity_keyframe_anchor_el.getAttribute("timestamp");
+
+        if (entity_timestamp)
+          return_obj.timestamp = entity_timestamp;
+      }
     }
 
     //Return statement
@@ -820,6 +828,124 @@
     return (html_content_el.innerHTML.length > visual_content_el.innerHTML.length) ?
       html_content_el.innerHTML : visual_content_el.innerHTML;
   }
+}
+
+//Initialise write functions
+{
+  /*
+    fillInput() - Fills in a context menu input with its corresponding type.
+    arg0_options: (Object)
+      element: (HTMLElement) - The direct element object for which to fill in an input for.
+      type: (String) - The type of input the element represents.
+      placeholder: (Variable) - The variable to use as the placeholder.
+  */
+  function fillInput (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Initialise options
+    if (!options.type) options.type = "text";
+
+    //Make sure element is declared; look over options.type and fill in the input with variable
+    if (options.element)
+      if (options.type == "biuf") {
+        options.element.querySelector(`#biuf-input`).innerHTML = options.placeholder;
+      } else if (["rich_text", "wysiwyg"].includes(options.type)) {
+        options.element.querySelector(`.html-view`).value = options.placeholder;
+        options.element.querySelector(`.visual-view`).innerHTML = options.placeholder;
+      } else if (["color", "colour"].includes(options.type)) {
+        var b_el = options.element.querySelector(`input#b`);
+        var g_el = options.element.querySelector(`input#g`);
+        var r_el = options.element.querySelector(`input#r`);
+
+        //Set numbers and update colour wheel
+        r_el.value = options.placeholder[0];
+        g_el.value = options.placeholder[1];
+        b_el.value = options.placeholder[2];
+        setColourWheelCursor(options.element, options.placeholder);
+      } else if (options.type == "datalist") {
+        options.element.querySelector("datalist").value = options.placeholder;
+      } else if (options.type == "date") {
+        var day_el = options.element.querySelector(`#day-input`);
+        var hour_el = options.element.querySelector(`#hour-input`);
+        var minute_el = options.element.querySelector(`#minute-input`);
+        var month_el = options.element.querySelector(`#month-input`);
+        var year_el = options.element.querySelector(`#year-input`);
+        var year_type_el = options.element.querySelector(`#year-type`);
+
+        //Set local values from options.placeholder
+        options.placeholder = convertTimestampToDate(options.placeholder);
+
+        if (options.placeholder.year < 0) {
+          year_el.value = options.placeholder.year*-1;
+          year_type_el.value = "BC";
+        } else {
+          year_el.value = options.placeholder.year;
+          year_type_el.value = "AD";
+        }
+        month_el.value = (!isNaN(options.placeholder.month)) ? months[options.placeholder.month - 1] : "January";
+        day_el.value = options.placeholder.day;
+        hour_el.value = `${(options.placeholder.hour < 10) ? "0" : ""}${options.placeholder.hour}`;
+        minute_el.value = `${(options.placeholder.minute < 10) ? "0" : ""}${options.placeholder.minute}`;
+      } else if (options.type == "date_length") {
+        var days_el = options.element.querySelector(`#days-input`);
+        var hours_el = options.element.querySelector(`#hours-input`);
+        var minutes_el = options.element.querySelector(`#minutes-input`);
+        var months_el = options.element.querySelector(`#months-input`);
+        var years_el = options.element.querySelector(`#years-input`);
+
+        //Set local values from options.placeholder
+        options.placeholder = convertTimestampToDate(options.placeholder);
+
+        years_el.value = options.placeholder.year;
+        months_el.value = options.placeholder.month;
+        days_el.value = options.placeholder.day;
+        hours_el.value = options.placeholder.hour;
+        minutes_el.value = options.placeholder.minute;
+      } else if (options.type == "email") {
+        options.element.querySelector(`input[type="email"]`).value = options.placeholder;
+      } else if (options.type == "file") {
+        //[WIP] - No current file input of this kind
+      } else if (options.type == "html") {
+        options.element = options.placeholder;
+      } else if (options.type == "image") {
+        //[WIP] - No current file input of this kind
+      } else if (options.type == "number") {
+        options.element.querySelector(`input[type="number"]`).value = options.placeholder;
+      } else if (options.type == "password") {
+        options.element.querySelector(`input[type="password"]`).value = options.placeholder;
+      } else if (options.type == "radio") {
+        var all_radio_els = options.element.querySelectorAll(`[type="radio"]`);
+        options.placeholder = getList(options.placeholder);
+
+        //Iterate over all_radios
+        for (var i = 0; i < all_radio_els; i++)
+          if (options.placeholder[i] != undefined)
+            all_radio_els[i].checked = options.placeholder[i];
+      } else if (options.type == "range") {
+        options.element.querySelector(`input[type="range"]`).value = options.placeholder;
+      } else if (options.type == "search_select") {
+        //[WIP] - No search select input of this kind
+      } else if (options.type == "select") {
+        options.element.querySelector(`select`).value = options.placeholder;
+      } else if (["tel", "telephone"].includes(options.type)) {
+        options.element.querySelector(`input[type="tel"]`).value = options.placeholder;
+      } else if (options.type == "text") {
+        options.element.querySelector(`input[type="text"]`).value = options.placeholder;
+      } else if (options.type == "time") {
+        var time_el = options.element.querySelector(`input[type="time"]`);
+
+        if (!Array.isArray(options.placeholder) && typeof options.placeholder == "object") {
+          time_el.value = `${(options.placeholder.hour < 10) ? `0` : ""}${options.placeholder.hour}:${(options.placeholder.minute < 10) ? `0` : ""}${options.placeholder.minute}`;
+        } else if (Array.isArray(options.placeholder)) {
+          time_el.value = `${(options.placeholder[0] < 10) ? `0` : ""}${options.placeholder[0]}:${(options.placeholder[1] < 10) ? `0` : ""}${options.placeholder[1]}`;
+        } else {
+          time_el.value = options.placeholder;
+        }
+      } else if (options.type == "url") {
+        options.element.querySelector(`input[type="url"]`).value = options.placeholder;
+      }
+   }
 }
 
 //Internal UI helper functions
