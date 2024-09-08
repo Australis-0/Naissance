@@ -35,8 +35,9 @@
     var move_to_date = arg2_date;
 
     //Declare local instance variables
-    var context_menu_date_el = document.getElementById(`context-date-menu-${entity_id}`);
-    var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+
     var entity_obj = getEntity(entity_id);
     var history_entry = getPolityHistory(entity_id, entry_date);
     var new_timestamp = getTimestamp(move_to_date);
@@ -55,20 +56,12 @@
           //Delete old timestamp; change ID
           delete entity_obj.options.history[old_timestamp];
           new_history_entry.id = convertTimestampToInt(new_timestamp);
+          entity_obj.options.history = sortObjectByKey(entity_obj.options.history, { key: "id", mode: "ascending" });
 
-          entity_obj.options.history = sortObject(entity_obj.options.history, "numeric_ascending");
+          //Repopulate bio; move it to new history entry
+          printEntityBio(entity_id);
 
-          if (context_menu_el) {
-            //Repopulate bio; move it to new history entry
-            printEntityBio(entity_id);
-
-            var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
-
-            if (new_history_entry_el) {
-              new_history_entry_el.after(context_menu_el);
-              new_history_entry_el.after(context_menu_date_el);
-            }
-          }
+          var new_history_entry_el = document.querySelector(`#entity-ui-timeline-bio-table-${entity_id} tr[timestamp="${new_history_entry.id}"]`);
         }
       } else {
         console.warn(`Could not find history entry for ${entity_id} at timestamp ${entry_date}!`);

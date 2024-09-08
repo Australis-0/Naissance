@@ -467,3 +467,42 @@ function sortObject (arg0_object, arg1_options) {
     })
   );
 }
+
+/*
+  sortObjectByKey() - Sorts an object by an immediate key.
+  arg0_object: (Object) - The object to sort.
+  arg1_options: (Object)
+    key: (String) - The sub-key to sort by. Non-recursive.
+    type: (String) - Optional. The order to sort the object in. 'ascending'/'descending'. 'descending' by default.
+*/
+function sortObjectByKey (arg0_object, arg1_options) {
+  //Convert from parameters
+  var object = arg0_object;
+  var options = (arg1_options) ? arg1_options : {};
+
+  //Initialise options
+  if (!options.mode) options.mode = "descending";
+
+  //Declare local instance variables
+  var object_keys = Object.keys(object);
+  var object_array = objectToArray(object);
+  var return_obj = {};
+
+  //Iterate over object_array; assign .RESERVED_KEY to keep track of sorting
+  for (var i = 0; i < object_array.length; i++)
+    object_array[i].RESERVED_KEY = object_keys[i];
+
+  //Sort by key
+  object_array.sort(function(a, b) {
+    return (options.mode == "descending") ? b[options.key] - a[options.key] : a[options.key] - b[options.key];
+  });
+
+  //Format return_obj
+  for (var i = 0; i < object_array.length; i++) {
+    return_obj[object_array[i].RESERVED_KEY] = object_array[i];
+    delete return_obj[object_array[i].RESERVED_KEY].RESERVED_KEY;
+  }
+
+  //Return statement
+  return return_obj;
+}

@@ -69,6 +69,10 @@
           history_string.push(`${entity_name} gained ${printPercentage(Math.abs(land_percentage_change), { display_float: true })} more land.`);
       }
 
+    //Blank handler
+    if (history_string.length == 0)
+      history_string.push(`No detectable changes were made.`);
+
     //Return statement
     return (history_string.length > 0) ? `<tr timestamp = ${new_history_frame.id}>
       <td>${printDate(current_date)}</td>

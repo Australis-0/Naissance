@@ -6,8 +6,8 @@
 
     //Declare local instance variables
     var entity_el = interfaces[entity_id];
-    console.log(entity_el)
 
+    //Close entity_el
     if (entity_el) {
       entity_el._container.remove();
       delete interfaces[entity_id];
@@ -523,6 +523,8 @@
       <img src = "gfx/interface/empty_icon.png" class = "button cross-icon" id = "close-popup" onclick = "closeEntityContextMenu('${entity_id}');" draggable = "false">
       <img src = "gfx/interface/empty_icon.png" class = "button delete-icon" id = "delete-entity" onclick = "deleteEntity('${entity_id}');" draggable = "false">
       <img src = "gfx/interface/empty_icon.png" class = "button ${(!is_pinned) ? "pin-icon" : "reverse-pin-icon"}" id = "pin-popup" onclick = "printEntityContextMenu(${entity_id}, { coords: ${coords_string}, is_being_edited: ${options.is_being_edited}, pin: ${!options.pin} });" draggable = "false">
+
+      <div id = "polity-id">ID: ${entity_id}</div>
     </div>`;
   }
 
