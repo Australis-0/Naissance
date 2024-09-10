@@ -136,7 +136,7 @@
     var current_entity_class;
 
     //Close popups relating to entity first
-    closeEntityUI(entity_id);
+    closeEntityContextMenu(entity_id);
 
     //Delete entity now
     try {
@@ -176,7 +176,7 @@
     var entity_obj = getEntity(entity_id);
 
     //Close popups relating to entity first
-    closeEntityUI(entity_id);
+    closeEntityContextMenu(entity_id);
 
     //finishEntity() if brush_obj.current_path has something in it
     try {

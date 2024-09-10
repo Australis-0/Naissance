@@ -96,17 +96,8 @@
     //Declare local instance variables
     var common_defines = config.defines.common;
     var common_selectors = common_defines.selectors;
-    var entity_obj = getEntity(entity_id);
-
-    var entity_el = getEntityElement(entity_id);
-    var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
     var entity_keyframe_obj = getEntityKeyframe(entity_keyframe);
-    var entity_keyframe_order = (entity_keyframe_obj.order != undefined) ? entity_keyframe_obj.order : 1;
-    var entity_selector = getEntityElement(entity_id, { return_selector: true });
-    var lowest_order = config.entity_keyframes_lowest_order;
-
-    //Initialise options
-    if (!options.timestamp) options.timestamp = entity_keyframe_anchor_el.getAttribute("timestamp");
+    var entity_obj = getEntity(entity_id);
 
     //Initialise interfaces[entity_id] if it doesn't exist
     if (!global.interfaces[entity_id]) global.interfaces[entity_id] = {
@@ -117,12 +108,21 @@
     //Refresh entity keyframe context menus first; then append the current context menu
     var context_menu_ui = {};
 
-    //Check to see if given entity_keyframe_obj is of the lowest order. If so, set "timestamp" attribute
-    if (entity_keyframe_order == config.entity_keyframes_lowest_order)
-      entity_keyframe_anchor_el.setAttribute("timestamp", options.timestamp);
-
     //Parse given .interface from entity_keyframe_obj if applicable
     if (entity_keyframe_obj.interface) {
+      var entity_el = getEntityElement(entity_id);
+      var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
+      var entity_keyframe_order = (entity_keyframe_obj.order != undefined) ? entity_keyframe_obj.order : 1;
+      var entity_selector = getEntityElement(entity_id, { return_selector: true });
+      var lowest_order = config.entity_keyframes_lowest_order;
+
+      //Initialise options
+      if (!options.timestamp) options.timestamp = entity_keyframe_anchor_el.getAttribute("timestamp");
+
+      //Check to see if given entity_keyframe_obj is of the lowest order. If so, set "timestamp" attribute
+      if (entity_keyframe_order == config.entity_keyframes_lowest_order)
+        entity_keyframe_anchor_el.setAttribute("timestamp", options.timestamp);
+
       //Delete given order if already extant
       if (entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor} [order="${entity_keyframe_order}"]`))
         closeEntityKeyframeContextMenu(entity_id, entity_keyframe_order);

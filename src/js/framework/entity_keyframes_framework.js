@@ -22,7 +22,7 @@
     var timestamp = arg1_timestamp;
 
     //Close entity UI, call editEntity()
-    closeEntityUI();
+    closeEntityContextMenu();
     main.date = convertTimestampToDate(timestamp);
     loadDate();
     editEntity(entity_id);
