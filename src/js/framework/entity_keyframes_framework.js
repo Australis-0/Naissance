@@ -5,12 +5,8 @@
     var entity_id = arg0_entity_id;
     var timestamp = arg1_timestamp;
 
-    //Declare local instance variables
-    var entity_keyframe_context_menu_el = document.querySelector(`${config.ui.entity_keyframe_context_menu}-${entity_id}`);
-    var entity_keyframe_context_menu_two_el = document.querySelector(`${config.ui.entity_keyframe_context_menu_two}-${entity_id}`);
-
     //Delete keyframe; update bio [WIP] - Make sure to update bio
-    closeKeyframeContextMenus(entity_id);
+    closeEntityKeyframeContextMenus(entity_id);
     deletePolityHistory(entity_id, timestamp);
 
     printEntityBio(entity_id);
