@@ -4,9 +4,13 @@
 /* -- General Context Menu Styling -- */
 .context-menu td {
   /*border: 1px solid black;*/
+  vertical-align: top;
 }
 .context-menu td > div {
   padding: 0.5rem;
+}
+.context-menu tr {
+  display: table-row;
 }
 
 .context-menu-cell {
@@ -64,6 +68,13 @@
 
     margin-right: 0.4rem;
   }
+}
+.button > img {
+  max-height: 2rem;
+  max-width: 2rem;
+  margin-right: 0.5rem;
+
+  vertical-align: middle;
 }
 
 /* -- BIUF Inputs -- */

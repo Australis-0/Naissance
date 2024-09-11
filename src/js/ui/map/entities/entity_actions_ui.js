@@ -18,13 +18,13 @@
     //Set local context menu and functionality
     var entity_actions_ui = createContextMenu({
       anchor: `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor}`,
-      class: "entity-context-menu",
+      class: "entity-context-menu actions-menu",
 
       edit_entity_button: {
         id: "edit-entity-button",
         name: "Edit Polity",
         type: "button",
-        icon: "gfx/interface/empty_icon.png",
+        icon: "gfx/interface/pencil_filled_icon.png",
         onclick: `editEntity('${entity_id}');`,
         x: 0,
         y: 0,

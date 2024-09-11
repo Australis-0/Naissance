@@ -11,10 +11,6 @@ input {
 option {
   color: black;
 }
-td {
-  display: flex;
-  align-items: center;
-}
 
 /* -- Global display classes -- */
 .display-none, .instant-display-none {

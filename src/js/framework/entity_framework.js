@@ -27,7 +27,7 @@
     var all_scope_keys = Object.keys(scope);
     var entity_obj = getEntity(entity_id);
 
-    //[WIP] - .interface parser; load inputs into .options
+    //.interface parser; load inputs into .options
     if (options.depth == 1) {
       var common_selectors = config.defines.common.selectors;
       var entity_el = getEntityElement(entity_id);
