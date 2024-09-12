@@ -1,4 +1,4 @@
-//Initialise Entity Keyframes actiosn
+//Initialise Entity Keyframes actions
 {
   function deleteKeyframe (arg0_entity_id, arg1_timestamp) { //[WIP] - Deleting a keyframe should update the bio and close the keyframe context menus. It currently does not
     //Convert from parameters
@@ -71,6 +71,8 @@
     getAllEntityKeyframes() - Fetches all entity keyframes as either an array of keys or objects.
     arg0_options: (Object)
       return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
+
+    Returns: (Array<Object>/Array<String>)
   */
   function getAllEntityKeyframes (arg0_options) {
     //Convert from parameters
@@ -100,6 +102,8 @@
     arg0_name: (String) - The name/ID of the entity keyframe category.
     arg1_options: (Object)
       return_key: (Boolean) - Optional. Whether or not to return the key. False by default.
+
+    Returns: (Object/String)
   */
   function getEntityKeyframe (arg0_name, arg1_options) {
     //Convert from parameters
@@ -190,10 +194,12 @@
   }
 
   /*
-    getEntityKeyframesCategory() - Fetches an entity keynames category object/key.
+    getEntityKeyframesCategory() - Fetches an entity keyframes category object/key.
     arg0_name: (String) - The name/ID of the entity keyframe category.
     arg1_options: (Object)
       return_key: (Boolean) - Optional. Whether or not to return the key. False by default.
+
+    Returns: (Object/String)
   */
   function getEntityKeyframesCategory (arg0_name, arg1_options) {
     //Convert from parameters
@@ -245,9 +251,11 @@
   }
 
   /*
-    getEntityKeyframesInput() - Fetches the input object of a given entity keyframe.
+    getEntityKeyframesInput() - Fetches the input object of a given entity keyframe within config .interface.
     arg0_keyframe_id: (String) - The keyframe ID to search for.
     arg1_input_id: (String) - The input ID to search for in terms of .id or input key.
+
+    Returns: (Object)
   */
   function getEntityKeyframesInput (arg0_keyframe_id, arg1_input_id) {
     //Convert from parameters
@@ -258,7 +266,7 @@
     var entity_keyframe = getEntityKeyframe(keyframe_id);
 
     if (entity_keyframe)
-    //Iterate over .interface if it exists
+      //Iterate over .interface if it exists
       if (entity_keyframe.interface) {
         //Guard clause if citing direct key
         if (entity_keyframe.interface[input_id]) return entity_keyframe.interface[input_id];

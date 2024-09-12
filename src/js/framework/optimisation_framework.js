@@ -1,7 +1,16 @@
 //Declare function
 {
   function initOptimisation () {
-    //Set .all_entity_keyframes; .all_entity_keyframe_objects
+    //ENTITY ACTIONS
+    //Set .flattened_entity_actions
+    config.flattened_entity_actions = dumbFlattenObject(config.entity_actions);
+
+    config.all_entity_actions = getAllEntityActions();
+    config.all_entity_actions_keys = getAllEntityActions({ return_key: true });
+    config.entity_actions_lowest_order = getEntityActionsLowestOrder();
+
+    //ENTITY KEYFRAMES
+    //Set /.all_entity_keyframes; .all_entity_keyframe_objects
     config.flattened_entity_keyframes = dumbFlattenObject(config.entity_keyframes);
 
     config.all_entity_keyframes = getAllEntityKeyframes();

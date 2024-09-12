@@ -1,5 +1,5 @@
-config.entity_keyframes.polity_actions = {
-  name: "Polity Actions",
+config.entity_keyframes.keyframe_actions = {
+  name: "Keyframe Actions",
   scope_type: ["polities"],
 
   adjust_time: {

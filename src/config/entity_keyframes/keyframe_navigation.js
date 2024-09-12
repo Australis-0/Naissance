@@ -1,5 +1,5 @@
-config.entity_keyframes.polity_navigation = {
-  name: "Polity Navigation",
+config.entity_keyframes.keyframe_navigation = {
+  name: "Keyframe Navigation",
   scope_type: ["polities"],
 
   navigation_ui: {

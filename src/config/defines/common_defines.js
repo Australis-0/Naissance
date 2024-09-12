@@ -1,4 +1,5 @@
 config.defines.common = {
+  reserved_entity_actions: ["name", "scope_type"], //The types of keys that are reserved for config.entity_actions categories
   reserved_entity_keyframes: ["name", "scope_type"], //The types of keys that are reserved for config.entity_keyframes categories
 
   months_lowercase: ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"],
