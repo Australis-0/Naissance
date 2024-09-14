@@ -96,8 +96,8 @@
     var canvas_height = canvas.getBoundingClientRect().height;
     var canvas_width = canvas.getBoundingClientRect().width;
     var ctx = canvas.getContext("2d");
-    var end_timestamp = getTimestamp(start_date);
-    var start_timestamp = getTimestamp(end_date);
+    var end_timestamp = convertTimestampToInt(getTimestamp(start_date));
+    var start_timestamp = convertTimestampToInt(getTimestamp(end_date));
     var stroke_width = (options.stroke_width) ? options.stroke_width : 2;
     var x_coords = [];
     var x_offset = parseInt(canvas.getAttribute("x"));
@@ -124,7 +124,7 @@
 
     for (var i = 0; i < data.length; i++) {
       //X coords are reversed for some reason, use 1 - to correct it
-      var x_percentage = 1 - ((getTimestamp(data[i].date) - start_timestamp)/timespan);
+      var x_percentage = 1 - ((convertTimestampToInt(getTimestamp(data[i].date)) - start_timestamp)/timespan);
       var x_coord = canvas_width*x_percentage + x_offset;
 
       //Calculate minmax values, and minmax visible values
@@ -157,7 +157,7 @@
       var closest_right_entry = [undefined, {}]; //[timestamp, data];
 
       for (var i = 0; i < data.length; i++) {
-        var local_timestamp = getTimestamp(data[i].date);
+        var local_timestamp = convertTimestampToInt(getTimestamp(data[i].date));
         var begin_distance = local_timestamp - start_timestamp;
         var end_distance = local_timestamp - end_timestamp;
 

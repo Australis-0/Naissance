@@ -50,7 +50,7 @@ function checkObjectHistory (arg0_object, arg1_date_object, arg2_conditional_fun
   var conditional_function = arg2_conditional_function;
 
   //Declare local instance variables
-  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(window.date);
+  var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
   var has_property;
 
   //Check if object has history

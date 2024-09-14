@@ -243,7 +243,7 @@
   function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var tolerance = (arg1_tolerance) ? getTimestamp(arg1_tolerance) : Infinity;
+    var tolerance = (arg1_tolerance) ? convertTimestampToInt(getTimestamp(arg1_tolerance)) : Infinity;
     var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
@@ -254,7 +254,7 @@
         var all_history_entries = Object.keys(entity_obj.options.history);
 
         for (var i = 0; i < all_history_entries.length; i++)
-          if (parseInt(all_history_entries[i]) >= (getTimestamp(main.date) - tolerance)) {
+          if (parseInt(all_history_entries[i]) >= (convertTimestampToInt(getTimestamp(main.date)) - tolerance)) {
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
 
@@ -469,11 +469,11 @@
     return has_property;
   }
 
+  //finishEntity() - Finishes an entity's editing process.
   function finishEntity () {
     //Declare local instance variables
     var brush_obj = main.brush;
     var coords = convertToNaissance(brush_obj.current_path);
-    var date_string = getTimestamp(main.date);
     var entity_id;
     var entity_name;
     var new_entity = {
@@ -528,6 +528,11 @@
     return entity_id;
   }
 
+  /*
+    generateEntityID() - Generates a random entity ID for use.
+
+    Returns: (String)
+  */
   function generateEntityID () {
     //While loop to find ID, just in-case of conflicting random ID's:
     while (true) {
