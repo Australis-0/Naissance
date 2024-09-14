@@ -89,7 +89,7 @@
                   //Set new ._latlngs to coords of current history frame
                   createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
                 } else {
-                  hidePolity(local_value.options.className, main.date);
+                  hideEntity(local_value.options.className, main.date);
                 }
               }
           }
@@ -136,7 +136,7 @@
                     //Set new ._latlngs to coords of current history frame
                     createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
                   } else {
-                    hidePolity(local_value.options.className, main.date);
+                    hideEntity(local_value.options.className, main.date);
                   }
                 }
             }

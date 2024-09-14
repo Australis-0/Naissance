@@ -201,6 +201,7 @@
 
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
+    var current_timestamp = getTimestamp(main.date);
     var entity_el = getEntityElement(entity_id);
     var entity_selector = getEntityElement(entity_id, { return_selector: true });
     var reserved_entity_actions = config.defines.common.reserved_entity_actions;
@@ -227,7 +228,7 @@
         if (local_action.limit)
           limit_fulfilled = parseEntityLimit(entity_id, local_action.limit, {
             //[WIP] - Make sure to add .options for inputs
-            timestamp: getTimestamp(main.date),
+            timestamp: current_timestamp,
             ui_type: "entity_actions"
           });
 
@@ -258,10 +259,14 @@
 
       //Make sure limits are fulfilled first before parsing effect onclick
       if (limits_fulfilled[all_entity_actions[i]])
-        if (local_value.effect)
-          all_entity_actions[i].onclick = function (e) {
-            parseEntityEffect(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_actions" });
+        if (local_value.effect) {
+          let button_el = context_menu_el.querySelector(`div[type="button"][id="${all_entity_actions[i]}"]`);
+
+          button_el.onclick = function (e) {
+            parseEntityEffect(entity_id, local_value.effect, { timestamp: current_timestamp, ui_type: "entity_actions" });
+            console.log(`Parse entity effect:`, entity_id, local_value.effect, { timestamp: current_timestamp, ui_type: "entity_actions" });
           };
+        }
     }
 
     //Return statement

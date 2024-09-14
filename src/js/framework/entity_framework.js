@@ -22,9 +22,13 @@
     if (options.depth == undefined) options.depth = 0;
       options.depth++;
     if (!options.ui_type) options.ui_type = "entity_keyframes";
+      //Metadata - Reserved variables
+      if (!options.ENTITY_ABSOLUTE_AGE) options.ENTITY_ABSOLUTE_AGE = getEntityAbsoluteAge(entity_id);
+      if (!options.ENTITY_RELATIVE_AGE) options.ENTITY_RELATIVE_AGE = getEntityRelativeAge(entity_id);
 
     //Declare local instance variables
     var all_scope_keys = Object.keys(scope);
+    var brush_obj = main.brush;
     var entity_obj = getEntity(entity_id);
     var limit_fulfilled = true;
 
@@ -64,6 +68,20 @@
 
       //Same-scope effects
       {
+        //Action effects - [WIP] - Finish adding action effects
+        if (all_scope_keys[i] == "clean_keyframes")
+          cleanKeyframes(entity_id, local_value[0]);
+        if (all_scope_keys[i] == "edit_entity")
+          editEntity(entity_id);
+        if (all_scope_keys[i] == "hide_entity")
+          if (local_value[0]) {
+            hideEntity(entity_id);
+          } else {
+            showEntity(entity_id);
+          }
+        if (all_scope_keys[i] == "simplify_all_keyframes")
+          simplifyAllEntityKeyframes(entity_id, brush_obj.simplify_tolerance);
+
         //History effects
         if (all_scope_keys[i] == "delete_keyframe")
           deleteKeyframe(entity_id, suboptions[local_value]);
@@ -190,7 +208,7 @@
   }
 }
 
-//Entity handling functions - Functions similar to class methods
+//Entity actions
 {
   function applyPathToKeyframes (arg0_entity_id) {
     //Convert from parameters
@@ -214,6 +232,67 @@
         if (window[`${entity_id}_apply_path`])
           applyPath(entity_id);
       }
+  }
+
+  /*
+    cleanKeyframes() - Removes duplicate keyframes.
+    options: {
+      do_not_display: true/false - Whether to display in printEntityBio() or not. False by default.
+    }
+  */
+  function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var tolerance = (arg1_tolerance) ? getTimestamp(arg1_tolerance) : Infinity;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj)
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++)
+          if (parseInt(all_history_entries[i]) >= (getTimestamp(main.date) - tolerance)) {
+            var empty_options = false;
+            var local_history_entry = entity_obj.options.history[all_history_entries[i]];
+
+            //Process .coords
+            {
+              //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
+              if (getLastIdenticalCoords(entity_obj, local_history_entry))
+                delete local_history_entry.coords;
+
+              //Convert to Naissance format if applicable
+              if (local_history_entry.coords)
+                local_history_entry.coords = convertToNaissance(local_history_entry.coords);
+            }
+
+            //Remove frame if same .coords and options is empty
+            if (local_history_entry.options) {
+              if (Object.keys(local_history_entry.options).length == 0) {
+                empty_options = true;
+                delete local_history_entry.options;
+              }
+            } else {
+              empty_options = true;
+            }
+
+            //Remove frame if needed
+            if (!local_history_entry.coords && empty_options)
+              delete entity_obj.options.history[all_history_entries[i]];
+          }
+
+        //Repopulate entity bio; refresh UI
+        if (!options.do_not_display)
+          try {
+            printEntityBio(entity_id);
+          } catch {}
+      }
+
+    //Return statement
+    return entity_obj;
   }
 
   function deleteEntity (arg0_entity_id) {
@@ -290,6 +369,77 @@
     }
   }
 
+  function renameEntity (arg0_entity_id, arg1_entity_name, arg2_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
+    var date = (arg2_date) ? getTimestamp(arg2_date) : main.date;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj)
+      createHistoryFrame(entity_obj, date, { entity_name: entity_name });
+
+    //Return statement
+    return entity_name;
+  }
+
+  function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var tolerance = arg1_tolerance;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+
+    if (entity_obj) {
+      if (entity_obj.options.history) {
+        var all_history_entries = Object.keys(entity_obj.options.history);
+
+        for (var i = 0; i < all_history_entries.length; i++) {
+          var local_date = convertTimestampToDate(all_history_entries[i]);
+          var local_history_frame = entity_obj.options.history[all_history_entries[i]];
+          var local_simplified_coords = convertToNaissance(simplify(local_history_frame, tolerance));
+
+          //Extract coords from local_simplified_coords
+          local_history_frame.coords = local_simplified_coords;
+        }
+      }
+
+      //Simplify current entity to update coords on map
+      simplifyEntity(entity_id, tolerance);
+    }
+  }
+
+  function simplifyEntity (arg0_entity_id, arg1_tolerance) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var tolerance = arg1_tolerance;
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id
+
+    if (entity_obj) {
+      var simplified_coords = simplify(entity_obj._latlngs, tolerance);
+      entity_obj._latlngs = simplified_coords;
+
+      //Set history entry to reflect actual_coords
+      if (entity_obj.options.history) {
+        var current_history_entry = getPolityHistory(entity_obj, main.date);
+
+        current_history_entry.coords = convertToNaissance(simplified_coords);
+      }
+
+      //Refresh entity_obj
+      entity_obj.remove();
+      entity_obj.addTo(map);
+    }
+  }
+}
+
+//Entity handling functions - Functions similar to class methods
+{
   //[WIP] - Make function more general-purpose
   function entityHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function) {
     //Convert from parameters
@@ -431,6 +581,61 @@
     return entity_obj;
   }
 
+  /*
+    getEntityAbsoluteAge() - Fetches the absolute age of an entity; the distance between its first and last frames.
+    arg0_entity_id: (String) - The entity ID for which to fetch the absolute age for.
+
+    Returns: (Object, Date)
+  */
+  function getEntityAbsoluteAge (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+
+    //Attempt to fetch distance between first and last keyframe to fetch its absolute age
+    if (entity_obj)
+      if (entity_obj.options)
+        if (entity_obj.options.history) {
+          var all_history_frames = Object.keys(entity_obj.options.history);
+          var first_history_frame = entity_obj.options.history[all_history_frames[0]];
+          var last_history_frame = entity_obj.options.history[all_history_frames[all_history_frames.length - 1]];
+
+          var age_timestamp = last_history_frame.id - first_history_frame.id;
+
+          //Return statement
+          return convertTimestampToDate(age_timestamp);
+        }
+
+    //Return statement if entity has no history
+    return getBlankDate();
+  }
+
+  function getEntityRelativeAge (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+
+    //Attempt to fetch distance between first keyframe and main.date to fetch its relative age
+    if (entity_obj)
+      if (entity_obj.options)
+        if (entity_obj.options.history) {
+          var all_history_frames = Object.keys(entity_obj.options.history);
+          var first_history_frame = entity_obj.options.history[all_history_frames[0]];
+
+          var age_timestamp = convertTimestampToInt(getTimestamp(main.date)) - first_history_frame.id;
+
+          //Return statement
+          return convertTimestampToDate(age_timestamp);
+        }
+
+    //Return statement if entity has no history
+    return getBlankDate();
+  }
+
   function getEntityName (arg0_entity_id, arg1_date) {
     //Convert from parmateers
     var entity_id = arg0_entity_id;
@@ -520,22 +725,6 @@
 
     //Return statement
     return array;
-  }
-
-  function renameEntity (arg0_entity_id, arg1_entity_name, arg2_date) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var entity_name = (arg1_entity_name) ? arg1_entity_name : `Unnamed Polity`;
-    var date = (arg2_date) ? getTimestamp(arg2_date) : main.date;
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-
-    if (entity_obj)
-      createHistoryFrame(entity_obj, date, { entity_name: entity_name });
-
-    //Return statement
-    return entity_name;
   }
 
   /*
