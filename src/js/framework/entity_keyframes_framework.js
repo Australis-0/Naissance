@@ -164,6 +164,7 @@
     arg0_options: (Object)
       order: (Number) - Optional. The current order ot fetch all relevant keyframes at. 1 by default.
       return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
+      return_object: (Boolean) - Optional. Whether to return the array as an object or not. False by default.
 
     Returns: (Array<Object>/Array<String>)
   */
@@ -176,6 +177,7 @@
     var order = (options.order != undefined) ? options.order : 1;
     var return_keyframes = [];
     var return_keys = [];
+    var return_obj = {};
 
     //Iterate over all_flattened_entity_keyframes
     var all_flattened_entity_keyframes = Object.keys(flattened_entity_keyframes);
@@ -187,6 +189,14 @@
         return_keyframes.push(local_keyframe);
         return_keys.push(all_flattened_entity_keyframes[i]);
       }
+    }
+
+    //options.return_object handler
+    if (options.return_object) {
+      for (var i = 0; i < return_keyframes.length; i++)
+        return_obj[return_keyframes[i]] = return_keyframes[i];
+      //Return statement
+      return return_obj;
     }
 
     //Return statement

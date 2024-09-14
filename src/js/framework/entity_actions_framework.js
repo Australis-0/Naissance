@@ -122,8 +122,9 @@
     arg0_options: (Object)
       order: (Number) - Optional. The current order to fetch all relevant actions at. 1 by default.
       return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
+      return_object: (Boolean) - Optional. Whether to return the array as an object or not. False by default.
 
-    Returns: (Array<Object>/Array<String>)
+    Returns: (Array<Object>/Array<String>/Object)
   */
   function getEntityActionsAtOrder (arg0_options) {
     //Convert from parameters
@@ -133,18 +134,27 @@
     var flattened_entity_actions = config.flattened_entity_actions;
     var order = (options.order != undefined) ? options.order : 1;
     var return_actions = [];
+    var return_obj = {};
     var return_keys = [];
 
     //Iterate over all_flattened_entity_actions
     var all_flattened_entity_actions = Object.keys(flattened_entity_actions);
 
     for (var i = 0; i < all_flattened_entity_actions.length; i++) {
-      var local_keyframe = flattened_entity_actions[all_flattened_entity_actions[u]];
+      var local_action = flattened_entity_actions[all_flattened_entity_actions[i]];
 
-      if (local_keyframe.order == options.order) {
-        return_actions.push(local_keyframe);
-        return_keys.push(all_flattened_entity_keyframes[i]);
+      if (local_action.order == options.order) {
+        return_actions.push(local_action);
+        return_keys.push(all_flattened_entity_actions[i]);
       }
+    }
+
+    //options.return_object handler
+    if (options.return_object) {
+      for (var i = 0; i < return_actions.length; i++)
+        return_obj[return_keys[i]] = return_actions[i];
+      //Return statement
+      return return_obj;
     }
 
     //Return statement
@@ -281,6 +291,6 @@
     var lowest_order = getEntityActionsLowestOrder(flattened_entity_actions);
 
     //Return statement
-    return getEntityActionsAtOrder({ order: lowest_order })[0];
+    return getEntityActionsAtOrder({ order: lowest_order, return_object: true });
   }
 }

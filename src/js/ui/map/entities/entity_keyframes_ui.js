@@ -139,6 +139,8 @@
     arg2_options: (Object)
       <key>: (Variable) - The placeholder value to assign to the given context menu.
       timestamp: (Object, Date/Number) - The timestamp the keyframe is referencing.
+
+    Returns: (HTMLElement)
   */
   function printEntityKeyframeContextMenu (arg0_entity_id, arg1_entity_keyframe, arg2_options) {
     //Convert from parameters

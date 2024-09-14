@@ -390,7 +390,8 @@
 
       //Call createContextMenu() after the popup content is set
       setTimeout(function(){
-        var entity_actions_ui = printEntityActions(entity_id);
+        var entity_actions_el = getEntityActionsAnchorElement(entity_id)
+        var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
       }, 1);
     }
   }

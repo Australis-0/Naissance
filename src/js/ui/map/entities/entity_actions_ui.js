@@ -191,6 +191,8 @@
     printEntityActionsNavigationMenu() - Prints the entity actions navigation menu - in this case, visible by default.
     arg0_entity_id: (String) - The entity ID for which to display the navigation menu for.
     arg1_parent_el: (HTMLElement) - The HTMLElement to assign the navigation menu to.
+
+    Returns: (HTMLElement)
   */
   function printEntityActionsNavigationMenu (arg0_entity_id, arg1_parent_el) { //[WIP] - Finish function body.
     //Convert from parameters
@@ -212,6 +214,7 @@
       anchor: `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor}`,
       class: "entity-context-menu actions-menu"
     };
+    var limits_fulfilled = {};
 
     //Iterate over all_entity_actions
     for (var i = 0; i < all_entity_actions.length; i++) {
@@ -220,10 +223,6 @@
 
       //Make sure that local_action is actually a valid UI element
       if (!Array.isArray(local_action) && !reserved_entity_actions.includes(all_entity_actions[i])) {
-        formatted_navigation_obj[all_entity_actions[i]] = {
-          id: all_entity_actions[i]
-        };
-
         //Check if .limit is fulfilled
         if (local_action.limit)
           limit_fulfilled = parseEntityLimit(entity_id, local_action.limit, {
@@ -232,9 +231,41 @@
             ui_type: "entity_actions"
           });
 
-        //onclick function should be parseEntityEffect()
+
+        if (limit_fulfilled) {
+          //Define default parameters for element
+          formatted_navigation_obj[all_entity_actions[i]] = {
+            id: all_entity_actions[i],
+            type: "button"
+          };
+          var local_context_obj = formatted_navigation_obj[all_entity_actions[i]];
+
+          //Add element if limit_fulfilled
+          local_context_obj = dumbMergeObjects(local_context_obj, local_action);
+          limits_fulfilled[all_entity_actions[i]] = limit_fulfilled;
+        }
       }
     }
+
+    //formatted_navigation_obj now contains the correct createContextMenu() options; assign to #entity-actions-context-menu
+    formatted_navigation_obj.anchor = `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor}`;
+    formatted_navigation_obj.class = "entity-context-menu actions-menu";
+    var context_menu_el = createContextMenu(formatted_navigation_obj);
+
+    //Iterate over all_entity_actions
+    for (var i = 0; i < all_entity_actions.length; i++) {
+      let local_value = entity_actions_navigation_obj[all_entity_actions[i]];
+
+      //Make sure limits are fulfilled first before parsing effect onclick
+      if (limits_fulfilled[all_entity_actions[i]])
+        if (local_value.effect)
+          all_entity_actions[i].onclick = function (e) {
+            parseEntityEffect(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_actions" });
+          };
+    }
+
+    //Return statement
+    return (context_menu_el) ? context_menu_el : undefined;
   }
 
   /*

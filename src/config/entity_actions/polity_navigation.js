@@ -22,7 +22,7 @@ config.entity_actions.polity_navigation = {
     y: 0,
 
     limit: {
-      entity_is_hidden: true
+      entity_is_hidden: false
     },
     effect: {
       hide_entity: true
@@ -36,7 +36,7 @@ config.entity_actions.polity_navigation = {
     y: 0,
 
     limit: {
-      entity_is_hidden: false
+      entity_is_hidden: true
     },
     effect: {
       hide_entity: false

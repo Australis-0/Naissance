@@ -168,19 +168,24 @@
       //Same-scope conditions
       {
         if (all_scope_keys[i] == "entity_is_hidden")
-          if (isEntityHidden(entity_id, main.date))
-            local_checks++;
+          if (local_value[0] == true) {
+            if (isEntityHidden(entity_id, main.date))
+              local_checks++;
+          } else {
+            if (!isEntityHidden(entity_id, main.date))
+              local_checks++;
+          }
       }
     }
 
     //Return statement; AND/NOT/OR/XOR handler
-    if (options.scope == "and")
+    if (options.operator == "and")
       if (local_checks >= all_scope_keys.length) return true;
-    if (options.scope == "not")
+    if (options.operator == "not")
       if (local_checks == 0) return true;
-    if (options.scope == "or")
+    if (options.operator == "or")
       if (local_checks > 0) return true;
-    if (options.scope == "xor")
+    if (options.operator == "xor")
       if (local_checks == 1) return true;
   }
 }

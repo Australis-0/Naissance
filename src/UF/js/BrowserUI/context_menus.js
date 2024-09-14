@@ -61,6 +61,8 @@
 
         x: (Number) - Optional. The X position of the element in a grid. 0 by default.
         y: (Number) - Optional. The Y position of the element in a grid. n + 1 by default, where n = last row.
+
+    Returns: (HTMLElement)
   */
   function createContextMenu (arg0_options) { //[WIP] - Finish function body.
     //Convert from parameters
