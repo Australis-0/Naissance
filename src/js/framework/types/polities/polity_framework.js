@@ -11,7 +11,7 @@
 
     //Check to make sure entity_obj exists
     if (entity_obj) {
-      var is_extinct = isPolityHidden(entity_id, date);
+      var is_extinct = isEntityHidden(entity_id, date);
       var last_coords = getEntityCoords(entity_id, date);
 
       if (last_coords)
@@ -27,31 +27,5 @@
 
     //Return statement
     return entity_area;
-  }
-
-  function isPolityHidden (arg0_entity_id, arg1_date) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var date = arg1_date;
-
-    //Check if date is before first history frame
-    var first_history_frame = getFirstHistoryFrame(entity_id);
-
-    if (first_history_frame.id > convertTimestampToInt(getTimestamp(main.date)))
-      return true;
-
-    //Return statement
-    return entityHasProperty(entity_id, date, function (local_history) {
-      var is_extinct;
-
-      if (local_history.options)
-        if (local_history.options.extinct) {
-          is_extinct = local_history.options.extinct;
-        } else if (local_history.options.extinct == false) {
-          is_extinct = false;
-        }
-
-      return is_extinct;
-    });
   }
 }

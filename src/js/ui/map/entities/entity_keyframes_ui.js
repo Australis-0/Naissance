@@ -1,12 +1,17 @@
 //Initialise functions
 {
+  /*
+    closeEntityKeyframeContextMenu() - Closes entity keyframe context menus for a specific order.
+    arg0_entity_id: (String) - The entity ID for which to close a menu.
+    arg1_order: (Number) - The order which to target to remove.
+  */
   function closeEntityKeyframeContextMenu (arg0_entity_id, arg1_order) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var order = (arg1_order) ? arg1_order : 1;
 
     //Declare local instance variables
-    var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
+    var entity_keyframe_anchor_el = getEntityKeyframesAnchorElement(entity_id);
 
     //Fetch local entity keyframe context menu and close it
     var entity_keyframe_el = entity_keyframe_anchor_el.querySelector(`[order="${order}"]`);
@@ -14,12 +19,16 @@
     refreshEntityKeyframeContextMenus(entity_id);
   }
 
+  /*
+    closeEntityKeyframeContextMenus() - Closes all entity keyframe context menus.
+    arg0_entity_id: (String) - The entity ID for which to close all menus.
+  */
   function closeEntityKeyframeContextMenus (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var entity_keyframe_anchor_selector = getEntityKeyframeAnchorElement(entity_id, { return_selector: true });
+    var entity_keyframe_anchor_selector = getEntityKeyframesAnchorElement(entity_id, { return_selector: true });
 
     //Fetch local entity keyframe context menus and close all of them
     var entity_keyframe_els = document.querySelectorAll(`${entity_keyframe_anchor_selector} > .context-menu`);
@@ -29,24 +38,57 @@
       entity_keyframe_els[i].remove();
   }
 
+  /*
+    closeEntityKeyframeLastContextMenu() - Closes the last opened keyframe context menu for an entity.
+    arg0_entity_id: (String) - The entity ID for which to close the last opened menu.
+  */
   function closeEntityKeyframeLastContextMenu (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
+    var entity_keyframe_anchor_el = getEntityKeyframesAnchorElement(entity_id);
     var entity_open_orders = getEntityKeyframeOpenOrders(entity_id);
 
     //Close last keyframe context menu
     closeEntityKeyframeContextMenu(entity_id, entity_open_orders[entity_open_orders.length - 1]);
   }
 
+  /*
+    getEntityKeyframesAnchorElement() - Fetches the keyframe HTMLElement or selector of a given entity's entity keyframe anchor element.
+    arg0_entity_id: (String) - The entity ID for which to fetch the selector for.
+    arg1_options: (Object)
+      return_selector: (Boolean) - Optional. Whether or not to return the selector instead of the HTMLElement. False by default.
+  */
+  function getEntityKeyframesAnchorElement (arg0_entity_id, arg1_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+    var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+    var entity_selector = `${common_selectors.entity_ui}[class*=" ${entity_id}"]`;
+
+    //Return statement
+    return (!options.return_selector) ?
+      entity_keyframe_anchor_el :
+      `${entity_selector} ${common_selectors.entity_keyframe_context_menu_anchor}`;
+  }
+
+  /*
+    getEntityKeyframeOpenOrders() - Fetches all currently opened orders for entity keyframe context menus as an array.
+    arg0_entity_id: (String) - The entity ID for which to fetch currently opened orders.
+
+    Returns: (Array<Number>)
+  */
   function getEntityKeyframeOpenOrders (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var entity_keyframe_anchor_selector = getEntityKeyframeAnchorElement(entity_id, { return_selector: true });
+    var entity_keyframe_anchor_selector = getEntityKeyframesAnchorElement(entity_id, { return_selector: true });
     var entity_keyframe_els = document.querySelectorAll(`${entity_keyframe_anchor_selector} .context-menu`);
     var unique_orders = [];
 
@@ -64,29 +106,40 @@
   }
 
   /*
-    getEntityKeyframeAnchorElement() - Fetches the keyframe HTMLElement or selector of a given entity's entity keyframe anchor element.
-    arg0_entity_id: (String) - The entity ID for which to fetch the selector for.
-    arg1_options: (Object)
-      return_selector: (Boolean) - Optional. Whether or not to return the selector instead of the HTMLElement. False by default.
+    getEntityKeyframesInputObject() - Fetches the merged input object for a given Entity UI's keyframes menu.
+    arg0_entity_id: (String) - The entity ID for which to return the input object for.
+
+    Returns: (Object)
   */
-  function getEntityKeyframeAnchorElement (arg0_entity_id, arg1_options) {
+  function getEntityKeyframesInputObject (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_selector = `${common_selectors.entity_ui}[class*=" ${entity_id}"]`;
-
     var entity_el = getEntityElement(entity_id);
-    var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+    var entity_keyframes_anchor_el = getEntityKeyframesAnchorElement(entity_id);
+    var inputs_obj = {};
+
+    //Iterate over all_context_menu_els
+    var all_context_menu_els = entity_keyframes_anchor_el.querySelectorAll(".context-menu");
+
+    for (var i = 0; i < all_context_menu_els.length; i++)
+      inputs_obj = dumbMergeObjects(inputs_obj, getInputsAsObject(all_context_menu_els[i], {
+        entity_id: entity_id
+      }));
 
     //Return statement
-    return (!options.return_selector) ?
-      entity_keyframe_anchor_el :
-      `${entity_selector} ${common_selectors.entity_keyframe_context_menu_anchor}`;
+    return inputs_obj;
   }
 
+  /*
+    printEntityKeyframeContextMenu() - Prints an entity keyframe context menu based on an EntityKeyframe object.
+    arg0_entity_id: (String) - The entity ID for which to print the context menu for.
+    arg1_entity_keyframe: (Object, Date/Number) - The timestamp the keyframe is contextualised in.
+    arg2_options: (Object)
+      <key>: (Variable) - The placeholder value to assign to the given context menu.
+      timestamp: (Object, Date/Number) - The timestamp the keyframe is referencing.
+  */
   function printEntityKeyframeContextMenu (arg0_entity_id, arg1_entity_keyframe, arg2_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -111,7 +164,7 @@
     //Parse given .interface from entity_keyframe_obj if applicable
     if (entity_keyframe_obj.interface) {
       var entity_el = getEntityElement(entity_id);
-      var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
+      var entity_keyframe_anchor_el = getEntityKeyframesAnchorElement(entity_id);
       var entity_keyframe_order = (entity_keyframe_obj.order != undefined) ? entity_keyframe_obj.order : 1;
       var entity_selector = getEntityElement(entity_id, { return_selector: true });
       var lowest_order = config.entity_keyframes_lowest_order;
@@ -182,6 +235,11 @@
     return (context_menu_el) ? context_menu_el : undefined;
   }
 
+  /*
+    printEntityKeyframeNavigationMenu() - Prints the base navigation menu for entity keyframes based upon its lowest order.
+    arg0_entity_id: (String) - The entity ID for which to print the base navigation menu.
+    arg1_parent_el: (HTMLElement) - The parent element in which to print the navigation menu.
+  */
   function printEntityKeyframeNavigationMenu (arg0_entity_id, arg1_parent_el) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -199,7 +257,7 @@
     var top_string = `calc(${bio_container_el.offsetTop}px + ${parent_offset}px)`;
 
     //Create local context menu
-    var entity_keyframe_anchor_el = getEntityKeyframeAnchorElement(entity_id);
+    var entity_keyframe_anchor_el = getEntityKeyframesAnchorElement(entity_id);
     var entity_keyframe_navigation_obj = getEntityKeyframesNavigationObject();
 
     entity_keyframe_anchor_el.style.top = top_string;
@@ -241,6 +299,10 @@
     return entity_keyframe_context_width;
   }
 
+  /*
+    refreshEntityKeyframeContextMenuInputs() - Refreshes all entity keyframe context menu inputs.
+    arg0_entity_id: (String) - The entity ID which to refresh entity keyframe context menus for.
+  */
   function refreshEntityKeyframeContextMenuInputs (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;

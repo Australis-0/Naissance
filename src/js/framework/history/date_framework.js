@@ -136,7 +136,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
         //Run through each options type
         if (local_entity.options.type == "polity") {
           //Make sure polity is not extinct
-          if (!isPolityHidden(local_entity_id, main.date)) {
+          if (!isEntityHidden(local_entity_id, main.date)) {
             var local_history_frame = getHistoryFrame(local_entity, main.date);
             var local_options = JSON.parse(JSON.stringify(local_entity.options));
 

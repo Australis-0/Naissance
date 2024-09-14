@@ -19,13 +19,14 @@
     var options = (arg2_options) ? arg2_options : {};
 
     //Initialise options
-    if (!options.depth) options.depth = 0;
+    if (options.depth == undefined) options.depth = 0;
       options.depth++;
     if (!options.ui_type) options.ui_type = "entity_keyframes";
 
     //Declare local instance variables
     var all_scope_keys = Object.keys(scope);
     var entity_obj = getEntity(entity_id);
+    var limit_fulfilled = true;
 
     //.interface parser; load inputs into .options
     if (options.depth == 1) {
@@ -43,12 +44,19 @@
     }
     var suboptions = options.options;
 
+    //.limit parser
+    if (scope.limit) {
+      var new_options = JSON.parse(JSON.stringify(options));
+      limit_fulfilled = parseEntityLimit(entity_id, scope.limit, new_options);
+    }
+
     //.effect parser
     //Iterate over all_scope_keys, recursively parsing the scope whenever 'effect_<key>' is encountered.
-    for (var i = 0; i < all_scope_keys.length; i++) {
+    if (limit_fulfilled)
+      for (var i = 0; i < all_scope_keys.length; i++) {
       var local_value = getList(scope[all_scope_keys[i]]);
 
-      //Recursive parsers
+      //Recursive parsers/scoping
       if (all_scope_keys[i].startsWith("effect_")) {
         var new_options = JSON.parse(JSON.stringify(options));
         var parsed_effect = parseEntityEffect(entity_id, local_value[0], new_options);
@@ -96,9 +104,84 @@
             }
           }
         if (all_scope_keys[i] == "select_multiple_keyframes")
-          selectMultipleKeyframes(entity_id, { assign_key: local_value[0] })
+          selectMultipleKeyframes(entity_id, { assign_key: local_value[0] });
       }
     }
+  }
+
+  /*
+    parseEntityLimit() - Recursively returns a boolean for an entity given its .limit scope.
+    arg0_entity_id: (String) - The entity ID for which this limit checks.
+    arg1_scope: (Object) - The effect limit scope to apply.
+    arg2_options: (Object)
+      operator: (String) - Optional. The current operator. Either 'and', 'not', 'or', or 'xor'. 'and' by default.
+      options: (Object) - The actual options of various inputs and the data given, treated as global variables.
+
+      depth: (Number) - The current recursive depth. Starts at 1.
+      scope_type: (Array<String>) - Optional. What the current scope_type currently refers to. (e.g. 'polities', 'markers'). All if undefined. Undefined by default.
+      timestamp: (String) - Optional. The current timestamp of the keyframe being referenced, if any.
+      ui_type: (String) - Optional. Whether the ui_type is 'entity_keyframes'/'entity_actions'. 'entity_keyframes' by default.
+
+    Returns: (Boolean)
+  */
+  function parseEntityLimit (arg0_entity_id, arg1_scope, arg2_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var scope = arg1_scope;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Initialise options
+    if (options.depth == undefined) options.depth = 0;
+      options.depth++;
+    if (!options.operator) options.operator = "and";
+    if (!options.ui_type) options.ui_type = "entity_keyframes";
+
+    //Declare local instance variables
+    var all_scope_keys = Object.keys(scope);
+    var entity_obj = getEntity(entity_id);
+    var local_checks = 0;
+
+    //Current .limit parser
+    //Iterate over all_scope_keys, recursively parsing the scope whenever a subscope is encountered.
+    for (var i = 0; i < all_scope_keys.length; i++) {
+      var local_value = getList(scope[all_scope_keys[i]]);
+
+      //Recursive parsers/scoping
+      {
+        if (all_scope_keys[i].startsWith("limit_") || all_scope_keys[i] == "limit") {
+          var new_options = JSON.parse(JSON.stringify(options));
+          var parsed_limit = parseEntityLimit(entity_id, local_value[0], new_options);
+
+          if (parsed_limit) local_checks++;
+        }
+        //And/Not/Or/Xor parser
+        var local_boolean_type = getBooleanOperatorFromString(all_scope_keys[i]);
+        if (local_boolean_type) {
+          var new_options = JSON.parse(JSON.stringify(options));
+            new_options.scope = local_boolean_type;
+          var parsed_limit = parseEntityLimit(entity_id, local_value[0], new_options);
+
+          if (parsed_limit) local_checks++;
+        }
+      }
+
+      //Same-scope conditions
+      {
+        if (all_scope_keys[i] == "entity_is_hidden")
+          if (isEntityHidden(entity_id, main.date))
+            local_checks++;
+      }
+    }
+
+    //Return statement; AND/NOT/OR/XOR handler
+    if (options.scope == "and")
+      if (local_checks >= all_scope_keys.length) return true;
+    if (options.scope == "not")
+      if (local_checks == 0) return true;
+    if (options.scope == "or")
+      if (local_checks > 0) return true;
+    if (options.scope == "xor")
+      if (local_checks == 1) return true;
   }
 }
 
@@ -377,6 +460,32 @@
     return (entity_name) ? entity_name : "Unnamed Polity";
   }
 
+  function isEntityHidden (arg0_entity_id, arg1_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = arg1_date;
+
+    //Check if date is before first history frame
+    var first_history_frame = getFirstHistoryFrame(entity_id);
+
+    if (first_history_frame.id > convertTimestampToInt(getTimestamp(main.date)))
+      return true;
+
+    //Return statement
+    return entityHasProperty(entity_id, date, function (local_history) {
+      var is_extinct;
+
+      if (local_history.options)
+        if (local_history.options.extinct) {
+          is_extinct = local_history.options.extinct;
+        } else if (local_history.options.extinct == false) {
+          is_extinct = false;
+        }
+
+      return is_extinct;
+    });
+  }
+
   function reloadEntityInArray (arg0_array, arg1_entity_id) {
     //Convert from parameters
     var array = getList(arg0_array);
@@ -538,5 +647,19 @@
 
     //Return statement
     return entity_name;
+  }
+}
+
+//Entity parser helper functions
+{
+  function getBooleanOperatorFromString (arg0_string) {
+    //Convert from parameters
+    var string = arg0_string;
+
+    //Return statement
+    if (string.startsWith("and_") || string == "and") return "and";
+    if (string.startsWith("not_") || string == "not") return "not";
+    if (string.startsWith("or_") || string == "or") return "or";
+    if (string.startsWith("xor_") || string == "xor") return "xor";
   }
 }

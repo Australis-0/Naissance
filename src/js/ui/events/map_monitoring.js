@@ -29,7 +29,7 @@ map.on("zoom", function (e) {
           var entity_id = local_entity.options.className;
 
           if (entity_id != brush_obj.editing_entity) {
-            var is_hidden = isPolityHidden(entity_id, main.date);
+            var is_hidden = isEntityHidden(entity_id, main.date);
 
             if (!is_hidden)
               local_entity.addTo(map);
