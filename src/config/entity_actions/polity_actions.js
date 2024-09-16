@@ -62,6 +62,7 @@ config.entity_actions.polity_actions = {
       simplify_check_options: {
         id: "simplify_check_options",
         name: "Simplify Options:",
+        type: "checkbox",
         options: {
           simplify_apply_to_all_keyframes: "Apply to All Keyframes",
           simplify_auto_simplify_when_editing: "Auto-Simplify When Editing"
@@ -72,6 +73,7 @@ config.entity_actions.polity_actions = {
       simplify_range: {
         id: "simplify_range",
         name: "Strength:",
+        type: "range",
         x: 0,
         y: 1,
 
@@ -89,6 +91,7 @@ config.entity_actions.polity_actions = {
       confirm_button: {
         id: "confirm_button",
         name: "Confirm",
+        type: "button",
         x: 0,
         y: 2,
 

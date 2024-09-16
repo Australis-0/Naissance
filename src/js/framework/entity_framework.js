@@ -22,9 +22,6 @@
     if (options.depth == undefined) options.depth = 0;
       options.depth++;
     if (!options.ui_type) options.ui_type = "entity_keyframes";
-      //Metadata - Reserved variables
-      if (!options.ENTITY_ABSOLUTE_AGE) options.ENTITY_ABSOLUTE_AGE = getEntityAbsoluteAge(entity_id);
-      if (!options.ENTITY_RELATIVE_AGE) options.ENTITY_RELATIVE_AGE = getEntityRelativeAge(entity_id);
 
     //Declare local instance variables
     var all_scope_keys = Object.keys(scope);
@@ -113,7 +110,6 @@
             //Parse the entity_effect being referenced
             for (var x = 0; x < local_value.length; x++) {
               var local_entity_action = getEntityAction(local_value[x]);
-              console.log(`Parse entity action:`, local_entity_action);
 
               if (local_entity_action.effect) {
                 var new_options = JSON.parse(JSON.stringify(options));

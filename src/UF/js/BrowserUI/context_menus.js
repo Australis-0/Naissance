@@ -801,6 +801,11 @@
       var entity_el = getEntityElement(options.entity_id);
       var entity_obj = getEntity(options.entity_id);
 
+      //Metadata handling
+      //Metadata - Reserved variables
+      if (!return_obj.ENTITY_ABSOLUTE_AGE) return_obj.ENTITY_ABSOLUTE_AGE = getEntityAbsoluteAge(options.entity_id);
+      if (!return_obj.ENTITY_RELATIVE_AGE) return_obj.ENTITY_RELATIVE_AGE = getEntityRelativeAge(options.entity_id);
+
       //Multiple keyframes handling
       if (entity_obj.options.selected_keyframes_key)
         return_obj[entity_obj.options.selected_keyframes_key] = entity_obj.options.selected_keyframes;
@@ -904,6 +909,8 @@
         days_el.value = options.placeholder.day;
         hours_el.value = options.placeholder.hour;
         minutes_el.value = options.placeholder.minute;
+
+        console.log(true, options.placeholder, days_el)
       } else if (options.type == "email") {
         options.element.querySelector(`input[type="email"]`).value = options.placeholder;
       } else if (options.type == "file") {

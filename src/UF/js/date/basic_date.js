@@ -1,3 +1,4 @@
+//Initialise basic date functions
 {
   /*
     daysInMonths() - Fetches the number of days already passed since the beginning of the year.
@@ -219,12 +220,9 @@
     var local_date = {};
 
     //Guard clause
-    if (typeof timestamp == "object")
-      return timestamp;
+    if (typeof timestamp == "object") return timestamp;
 
     //Calculate years
-
-
     local_date.year = Math.floor(timestamp/(365.25*24*60));
     timestamp -= convertTimestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
 

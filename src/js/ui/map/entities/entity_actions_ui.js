@@ -241,6 +241,7 @@
           if (entity_action_obj.interface) {
             var new_interface = JSON.parse(JSON.stringify(entity_action_obj.interface));
             new_interface.anchor = context_menu_ui.anchor;
+            console.log(new_interface);
 
             var action_context_menu_ui = createContextMenu(new_interface);
             refreshEntityActionsContextMenus(entity_id);
@@ -266,7 +267,7 @@
               //Parse .effect to .onclick event handlers
               if (local_value.effect)
                 local_element.onclick = function (e) {
-                  parseEntityEffect(entity_id, local_value.effect, { timestamp: getTimestamp(main.date), ui_type: "entity_actions" });
+                  parseEntityEffect(entity_id, local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "entity_actions" });
                   console.log(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_actions" });
                 };
             }

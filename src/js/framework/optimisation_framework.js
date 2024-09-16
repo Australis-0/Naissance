@@ -10,7 +10,7 @@
     config.entity_actions_lowest_order = getEntityActionsLowestOrder();
 
     //ENTITY KEYFRAMES
-    //Set /.all_entity_keyframes; .all_entity_keyframe_objects
+    //Set .all_entity_keyframes; .all_entity_keyframe_objects
     config.flattened_entity_keyframes = dumbFlattenObject(config.entity_keyframes);
 
     config.all_entity_keyframes = getAllEntityKeyframes();
