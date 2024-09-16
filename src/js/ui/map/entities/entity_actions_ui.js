@@ -180,11 +180,99 @@
   /*
     printEntityActionsContextMenu() - Prints an entity actions context menu based on an EntityActions object.
     arg0_entity_id: (String) - The entity ID for which to print the context menu for.
-    arg1_options: (Object)
+    arg1_entity_action: (Object) - The entity action to be referenced from config.entity_actions.
+    arg2_options: (Object)
       <key>: (Variable) - The placeholder value to assign to the given context menu.
   */
-  function printEntityActionsContextMenu (arg0_entity_id, arg1_options) {
+  function printEntityActionsContextMenu (arg0_entity_id, arg1_entity_action, arg2_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entity_action = arg1_entity_action;
+    var options = (arg2_options) ? arg2_options : {};
 
+    //Declare local instance variables
+    var common_defines = config.defines.common;
+    var common_selectors = config.defines.common.selectors;
+    var entity_action_obj = getEntityAction(entity_action);
+    var entity_obj = getEntity(entity_id);
+
+    //Initialise interfaces[entity_id] if it doesn't exist
+    if (!global.interfaces[entity_id]) global.interfaces[entity_id] = {
+      id: entity_id,
+      entity_obj: entity_obj
+    };
+
+    //Refresh entity action context menus first; then append the current context menu
+    var context_menu_ui = {};
+
+    //Parse given .interface from entity_action_obj if applicable
+    if (entity_action_obj.interface) {
+      var entity_el = getEntityElement(entity_id);
+
+      //Check to make sure given entity_action_obj is not of the lowest order
+      if (entity_action_obj.order != lowest_order)
+        if (entity_action_obj.interface) {
+          var entity_action_anchor_el = getEntityActionsAnchorElement(entity_id);
+          var entity_action_order = (entity_action_obj.order != undefined) ? entity_action_obj.order : 1;
+          var entity_el = getEntityElement(entity_id);
+          var entity_selector = getEntityElement(entity_id, { return_selector: true });
+          var lowest_order = config.entity_actions_lowest_order;
+
+          //Delete given order if already extant
+          if (entity_el.querySelector(`${common_selectors.entity_actions_context_menu_anchor} [order="${entity_action_order}"]`))
+            closeEntityActionContextMenu(entity_id, entity_action_order);
+
+          //Append dummy context menu div first for context_menu_ui to appended to
+          var context_menu_el = document.createElement("div");
+
+          context_menu_el.setAttribute("class", "context-menu");
+          context_menu_el.id = entity_action_obj.id;
+          context_menu_el.setAttribute("order", entity_action_order);
+          entity_action_anchor_el.appendChild(context_menu_el);
+
+          //Initialise context_menu_ui options
+          context_menu_ui.anchor = `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor} .context-menu#${entity_action_obj.id}`;
+          if (entity_action_obj.class) context_menu_ui.class = entity_action_obj.class;
+          if (entity_action_obj.name) context_menu_ui.name = entity_action_obj.name;
+          if (entity_action_obj.maximum_height) context_menu_ui.maximum_height = entity_action_obj.maximum_height;
+          if (entity_action_obj.maximum_width) context_menu_ui.maximum_width = entity_action_obj.maximum_width;
+
+          //Initialise preliminary context menu first
+          if (entity_action_obj.interface) {
+            var new_interface = JSON.parse(JSON.stringify(entity_action_obj.interface));
+            new_interface.anchor = context_menu_ui.anchor;
+
+            var action_context_menu_ui = createContextMenu(new_interface);
+            refreshEntityActionsContextMenus(entity_id);
+          }
+
+          //Iterate over all_interface_keys and parse them correctly
+          var all_interface_keys = Object.keys(entity_action_obj.interface);
+
+          for (let i = 0; i < all_interface_keys.length; i++) {
+            let local_value = entity_action_obj.interface[all_interface_keys[i]];
+
+            if (!Array.isArray(local_value) && typeof local_value == "object") {
+              let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
+              if (!local_value.id) local_value.id = all_interface_keys[i];
+
+              //Type handlers: set placeholders where applicable
+              {
+                //Date
+                if (local_value.type == "date")
+                  populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+              }
+
+              //Parse .effect to .onclick event handlers
+              if (local_value.effect)
+                local_element.onclick = function (e) {
+                  parseEntityEffect(entity_id, local_value.effect, { timestamp: getTimestamp(main.date), ui_type: "entity_actions" });
+                  console.log(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_actions" });
+                };
+            }
+          }
+        }
+    }
   }
 
   /*
@@ -286,7 +374,7 @@
     var common_selectors = config.defines.common.selectors;
     var entity_actions_anchor_el = getEntityActionsAnchorElement(entity_id);
     var entity_actions_context_menus = entity_actions_anchor_el.querySelectorAll(`${common_selectors.entity_actions_context_menu_anchor} > .context-menu`);
-    var entity_actions_context_width = entity_actions_anchor_el.offsetWidth + 8; //Measured in px
+    var entity_actions_context_width = 0; //Measured in px
     var entity_el = getEntityElement(entity_id);
     var entity_header_el = entity_el.querySelector(common_selectors.entity_ui_header);
     var timestamp = getTimestamp(main.date);
@@ -295,12 +383,13 @@
     entity_actions_context_menus = sortElements(entity_actions_context_menus, { attribute: "order" });
     for (var i = 0; i < entity_actions_context_menus.length; i++) {
       //Set current position; track entity_actions_context_width
-      entity_actions_context_menus[i].style.left = `${entity_actions_context_width}px`;
+      if (!entity_actions_context_menus[i].getAttribute("class").includes("actions-menu"))
+        entity_actions_context_menus[i].style.left = `${entity_actions_context_width}px`;
       entity_actions_context_width += entity_actions_context_menus[i].offsetWidth + 8;
     }
 
     //Update context menu inputs
-    refreshEntityActionsContextMenus(entity_id);
+    refreshEntityActionsContextMenuInputs(entity_id);
 
     //Return statement
     return entity_actions_context_width;

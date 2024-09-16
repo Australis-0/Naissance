@@ -1,0 +1,7 @@
+#entity-actions-context-menu {
+  position: absolute;
+  overflow: visible;
+}
+#entity-actions-context-menu .context-menu {
+  overflow: visible;
+}

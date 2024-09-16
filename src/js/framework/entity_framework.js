@@ -109,7 +109,20 @@
         if (all_scope_keys[i] == "interface")
           printEntityKeyframeContextMenu(entity_id, scope);
         if (["open_ui", "trigger"].includes(all_scope_keys[i]))
-          if (options.ui_type == "entity_keyframes") {
+          if (options.ui_type == "entity_actions") {
+            //Parse the entity_effect being referenced
+            for (var x = 0; x < local_value.length; x++) {
+              var local_entity_action = getEntityAction(local_value[x]);
+              console.log(`Parse entity action:`, local_entity_action);
+
+              if (local_entity_action.effect) {
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect = parseEntityEffect(entity_id, local_entity_action.effect, new_options);
+              }
+              if (local_entity_action)
+                printEntityActionsContextMenu(entity_id, local_entity_action);
+            }
+          } else if (options.ui_type == "entity_keyframes") {
             //Parse the entity_effect being referenced
             for (var x = 0; x < local_value.length; x++) {
               var local_entity_keyframe = getEntityKeyframe(local_value[x]);

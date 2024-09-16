@@ -2,8 +2,8 @@ config.entity_actions.polity_actions = {
   name: "Polity Actions",
   scope_type: ["polities"],
 
-  apply_path: {
-    id: "apply_path",
+  apply_path_two: {
+    id: "apply_path_two",
     name: "Apply Path",
     order: 2,
 
@@ -24,8 +24,8 @@ config.entity_actions.polity_actions = {
       }
     }
   },
-  clean_keyframes: {
-    id: "clean_keyframes",
+  clean_keyframes_two: {
+    id: "clean_keyframes_two",
     name: "Clean Keyframes",
     order: 2,
 
@@ -53,8 +53,8 @@ config.entity_actions.polity_actions = {
       }
     }
   },
-  simplify_path: {
-    id: "simplify_path",
+  simplify_path_two: {
+    id: "simplify_path_two",
     name: "Simplify Path",
     order: 2,
 

@@ -280,10 +280,7 @@
 
     Returns: (Number)
   */
-  function getEntityActionsLowestOrder (arg0_options) {
-    //Convert from parameters
-    var options = (arg0_options) ? arg0_options : {};
-
+  function getEntityActionsLowestOrder () {
     //Declare local instance variables
     var flattened_entity_actions = config.flattened_entity_actions;
     var min_order = Infinity;

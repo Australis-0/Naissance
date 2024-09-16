@@ -135,7 +135,7 @@
   /*
     printEntityKeyframeContextMenu() - Prints an entity keyframe context menu based on an EntityKeyframe object.
     arg0_entity_id: (String) - The entity ID for which to print the context menu for.
-    arg1_entity_keyframe: (Object, Date/Number) - The timestamp the keyframe is contextualised in.
+    arg1_entity_keyframe: (Object) - The entity keyframe action to be referenced from config.entity_keyframes.
     arg2_options: (Object)
       <key>: (Variable) - The placeholder value to assign to the given context menu.
       timestamp: (Object, Date/Number) - The timestamp the keyframe is referencing.

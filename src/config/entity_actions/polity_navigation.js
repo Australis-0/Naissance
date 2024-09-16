@@ -1,7 +1,7 @@
 config.entity_actions.polity_navigation = {
   name: "Polity Navigation",
   scope_type: ["polities"],
-  //This is the 1st-order navigation menu, which is displayed by default in the Entity UI.
+  base_navigation: true, //This is the 1st-order navigation menu, which is displayed by default in the Entity UI.
 
   edit_polity: {
     icon: "gfx/interface/pencil_filled_icon.png",
@@ -71,7 +71,7 @@ config.entity_actions.polity_navigation = {
     y: 1,
 
     effect: {
-      trigger: "apply_path"
+      trigger: "apply_path_two"
     }
   },
   clean_keyframes: {
@@ -82,7 +82,7 @@ config.entity_actions.polity_navigation = {
     y: 1,
 
     effect: {
-      trigger: "clean_keyframes"
+      trigger: "clean_keyframes_two"
     }
   },
   simplify_path: {
@@ -93,7 +93,7 @@ config.entity_actions.polity_navigation = {
     y: 1,
 
     effect: {
-      trigger: "simplify_path"
+      trigger: "simplify_path_two"
     }
   }
 };
