@@ -73,6 +73,8 @@
           cleanKeyframes(entity_id, local_value[0]);
         if (all_scope_keys[i] == "edit_entity")
           editEntity(entity_id);
+        if (all_scope_keys[i] == "finish_entity")
+          finishEntity();
         if (all_scope_keys[i] == "hide_entity")
           if (local_value[0]) {
             hideEntity(entity_id);
@@ -111,7 +113,6 @@
             //Parse the entity_effect being referenced
             for (var x = 0; x < local_value.length; x++) {
               var local_entity_keyframe = getEntityKeyframe(local_value[x]);
-              console.log(local_value[x]);
 
               if (local_entity_keyframe.effect) {
                 var new_options = JSON.parse(JSON.stringify(options));
@@ -121,6 +122,8 @@
                 printEntityKeyframeContextMenu(entity_id, local_entity_keyframe);
             }
           }
+        if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
+          refreshEntityActions(entity_id);
         if (all_scope_keys[i] == "select_multiple_keyframes")
           selectMultipleKeyframes(entity_id, { assign_key: local_value[0] });
       }
@@ -185,6 +188,14 @@
 
       //Same-scope conditions
       {
+        if (all_scope_keys[i] == "entity_is_being_edited")
+          if (local_value[0] == true) {
+            if (isEntityBeingEdited(entity_id, local_value[0]))
+              local_checks++;
+          } else {
+            if (!isEntityBeingEdited(entity_id, local_value[0]))
+              local_checks++;
+          }
         if (all_scope_keys[i] == "entity_is_hidden")
           if (local_value[0] == true) {
             if (isEntityHidden(entity_id, main.date))
@@ -675,6 +686,20 @@
     return (entity_name) ? entity_name : "Unnamed Polity";
   }
 
+  /*
+    isEntityBeingEdited() - Checks whether the entity is currently being edited.
+    arg0_entity_id: (String) - The Entity ID to check for.
+
+    Returns: (Boolean)
+  */
+  function isEntityBeingEdited (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Return statement
+    if (main.brush.editing_entity == entity_id) return true;
+  }
+
   function isEntityHidden (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -699,6 +724,26 @@
 
       return is_extinct;
     });
+  }
+
+  function refreshEntityActions (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+    var entity_el = getEntityElement(entity_id);
+
+    //Check if entity_el exists
+    if (!entity_el)
+      printEntityContextMenu(entity_id, {
+        coords: entity_obj.getBounds().getCenter(),
+        is_being_edited: isEntityBeingEdited(entity_id)
+      });
+    setTimeout(function(){
+      var entity_actions_el = getEntityActionsAnchorElement(entity_id);
+      var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
+    }, 1);
   }
 
   function reloadEntityInArray (arg0_array, arg1_entity_id) {

@@ -232,7 +232,6 @@
             ui_type: "entity_actions"
           });
 
-
         if (limit_fulfilled) {
           //Define default parameters for element
           formatted_navigation_obj[all_entity_actions[i]] = {

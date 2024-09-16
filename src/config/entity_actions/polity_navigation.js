@@ -10,8 +10,26 @@ config.entity_actions.polity_navigation = {
     x: 0,
     y: 0,
 
+    limit: {
+      entity_is_being_edited: false
+    },
     effect: {
       edit_entity: true
+    }
+  },
+  finish_polity: {
+    icon: "gfx/interface/checkmark_icon.png",
+    name: "Finish Polity",
+    order: 1,
+    x: 0,
+    y: 0,
+
+    limit: {
+      entity_is_being_edited: true
+    },
+    effect: {
+      finish_entity: true,
+      refresh_entity_actions: true
     }
   },
   hide_polity: {
@@ -22,6 +40,7 @@ config.entity_actions.polity_navigation = {
     y: 0,
 
     limit: {
+      entity_is_being_edited: false,
       entity_is_hidden: false
     },
     effect: {
@@ -36,6 +55,7 @@ config.entity_actions.polity_navigation = {
     y: 0,
 
     limit: {
+      entity_is_being_edited: false,
       entity_is_hidden: true
     },
     effect: {
