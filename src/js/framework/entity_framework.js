@@ -51,9 +51,15 @@
 
         //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
         if (local_value.length == 1)
-          if (typeof local_value[0] == "string")
+          if (typeof local_value[0] == "string") {
+            //Direct variable substitution if detected as valid
             if (options.options[local_value[0]] != undefined)
               scope[all_scope_keys[i]] = options.options[local_value[0]];
+            //If the string is more complex; attempt to use parseVariableString() on it
+            try {
+              scope[all_scope_keys[i]] = parseVariableString(local_value[0], options.options);
+            } catch (e) {}
+          }
       }
     }
     var suboptions = options.options;
@@ -260,6 +266,43 @@
     if (options.operator == "xor")
       if (local_checks == 1) return true;
   }
+
+  /*
+    parseVariableString() - Parses a variable string and returns its resolved value.
+    arg0_string: (String) - The string which to resolve.
+    arg1_options: (Object)
+      <key>: (Variable) - The value to substitute all mentions of this key with.
+
+    Returns: (Variable)
+  */
+  function parseVariableString (arg0_string, arg1_options) {
+    //Convert from parameters
+    var string = JSON.parse(JSON.string(arg0_string));
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Initialise options
+    if (!options.BRUSH_OBJ) options.BRUSH_OBJ = "main.brush";
+    if (!options.MAIN_OBJ) options.MAIN_OBJ = "global.main";
+
+    //Declare local instance variables
+    var all_option_keys = Object.keys(options);
+
+    //Iterate over all_option_keys and construct RegExp to replace it
+    for (var i = 0; i < all_option_keys.length; i++) {
+      var local_value = options[all_option_keys[i]];
+
+      var local_regexp = new RegExp(all_option_keys[i], "g");
+      string = string.replace(local_regexp, local_value);
+    }
+
+    //Destructure all keys in options such that they are locally available for eval to use
+    Object.entries(options).forEach(([key, value]) => {
+      eval(`var ${key} = value;`);
+    });
+
+    //Return statement; run string as eval
+    return eval(string);
+  }
 }
 
 //Entity actions
@@ -311,9 +354,10 @@
         var all_history_entries = Object.keys(entity_obj.options.history);
 
         for (var i = 0; i < all_history_entries.length; i++)
-          if (parseInt(all_history_entries[i]) >= (convertTimestampToInt(getTimestamp(main.date)) - tolerance)) {
+          if (convertTimestampToInt(all_history_entries[i]) >= (convertTimestampToInt(getTimestamp(main.date)) - tolerance)) {
             var empty_options = false;
             var local_history_entry = entity_obj.options.history[all_history_entries[i]];
+            console.log(`Processing:`, local_history_entry)
 
             //Process .coords
             {
@@ -855,75 +899,81 @@
     var entity_obj = getEntity(entity_id);
 
     var bio_container_el = entity_el.querySelector(common_selectors.entity_bio_container);
-    console.log(bio_container_el);
+    var is_select_multiple_keyframes_open = false;
+    var select_all_checkbox_el = entity_el.querySelector(`[id="select-all-${entity_id}"]`);
 
     //Check if selection should be closed or not first
     if (bio_container_el && !options.close_selection) {
-      //Make sure bio_container_el exists in the first place before appending a checkbox to each keyframe; create a 'Select All' button at top.
-      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
-      var bio_top_header_el = bio_container_el.querySelector(common_selectors.entity_bio_header);
-      var select_all_el = document.createElement("span");
+      //Make sure selecting multiple keyframes isn't already open
+      if (!select_all_checkbox_el) {
+        //Make sure bio_container_el exists in the first place before appending a checkbox to each keyframe; create a 'Select All' button at top.
+        var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
+        var bio_top_header_el = bio_container_el.querySelector(common_selectors.entity_bio_header);
+        var select_all_el = document.createElement("span");
 
-      select_all_el.innerHTML = `Select All: <input type = "checkbox" id = "select-all-${entity_id}">`;
-      bio_top_header_el.prepend(select_all_el);
-      entity_obj.options.selected_keyframes_key = options.assign_key;
+        select_all_el.innerHTML = `Select All: <input type = "checkbox" id = "select-all-${entity_id}">`;
+        bio_top_header_el.prepend(select_all_el);
+        entity_obj.options.selected_keyframes_key = options.assign_key;
 
-      //Add select_all_el onclick event listener
-      select_all_el.onclick = function (e) {
-        var all_checkbox_els = bio_container_el.querySelectorAll(`${common_selectors.entity_bio_entries_dates} input[type="checkbox"]`);
+        //Add select_all_el onclick event listener
+        select_all_el.onclick = function (e) {
+          var all_checkbox_els = bio_container_el.querySelectorAll(`${common_selectors.entity_bio_entries_dates} input[type="checkbox"]`);
 
-        //Check if select_all_el.checked is true; uncheck all if not
-        entity_obj.options.selected_keyframes = [];
+          //Check if select_all_el.checked is true; uncheck all if not
+          entity_obj.options.selected_keyframes = [];
 
-        //Iterate over all_checkbox_els and set them to the select_all_el .checked value; update selected timestamps
-        for (var i = 0; i < all_checkbox_els.length; i++)
-          all_checkbox_els[i].checked = e.target.checked;
-        if (e.target.checked)
+          //Iterate over all_checkbox_els and set them to the select_all_el .checked value; update selected timestamps
           for (var i = 0; i < all_checkbox_els.length; i++)
-            entity_obj.options.selected_keyframes.push(all_checkbox_els[i].getAttribute("timestamp"));
-      };
-
-      //Iterate over each bio entry and assign each a checkbox
-      for (var i = 0; i < bio_entries.length; i++) {
-        var local_checkbox_el = document.createElement("input");
-        var local_parent_el = bio_entries[i].parentElement;
-        var local_timestamp = local_parent_el.getAttribute("timestamp");
-
-        //Create local_checkbox_el and prepend it to the current bio_entries[i]
-        local_checkbox_el.setAttribute("type", "checkbox");
-        local_checkbox_el.setAttribute("timestamp", local_timestamp);
-
-        if (entity_obj.options.selected_keyframes.includes(local_timestamp))
-          local_checkbox_el.checked = true;
-        bio_entries[i].prepend(local_checkbox_el);
-
-        //Add local_checkbox_el onclick event istener
-        local_checkbox_el.onclick = function (e) {
-          var actual_timestamp = e.target.getAttribute("timestamp");
-
-          if (e.target.checked) {
-            if (!entity_obj.options.selected_keyframes.includes(actual_timestamp))
-              entity_obj.options.selected_keyframes.push(actual_timestamp);
-          } else {
-            for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++)
-              if (entity_obj.options.selected_keyframes[i] == actual_timestamp)
-                entity_obj.options.selected_keyframes.splice(i, 1);
-          }
+            all_checkbox_els[i].checked = e.target.checked;
+          if (e.target.checked)
+            for (var i = 0; i < all_checkbox_els.length; i++)
+              entity_obj.options.selected_keyframes.push(all_checkbox_els[i].getAttribute("timestamp"));
         };
+
+        //Iterate over each bio entry and assign each a checkbox
+        for (var i = 0; i < bio_entries.length; i++) {
+          var local_checkbox_el = document.createElement("input");
+          var local_parent_el = bio_entries[i].parentElement;
+          var local_timestamp = local_parent_el.getAttribute("timestamp");
+
+          //Create local_checkbox_el and prepend it to the current bio_entries[i]
+          local_checkbox_el.setAttribute("type", "checkbox");
+          local_checkbox_el.setAttribute("timestamp", local_timestamp);
+
+          if (entity_obj.options.selected_keyframes.includes(local_timestamp))
+            local_checkbox_el.checked = true;
+          bio_entries[i].prepend(local_checkbox_el);
+
+          //Add local_checkbox_el onclick event istener
+          local_checkbox_el.onclick = function (e) {
+            var actual_timestamp = e.target.getAttribute("timestamp");
+
+            if (e.target.checked) {
+              if (!entity_obj.options.selected_keyframes.includes(actual_timestamp))
+                entity_obj.options.selected_keyframes.push(actual_timestamp);
+            } else {
+              for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++)
+                if (entity_obj.options.selected_keyframes[i] == actual_timestamp)
+                  entity_obj.options.selected_keyframes.splice(i, 1);
+            }
+          };
+        }
       }
     } else {
-      //Close multi-keyframe selection
-      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
-      var bio_top_header_el = bio_container_el.querySelectorAll(common_selectors.entity_bio_header);
+      if (select_all_checkbox_el) {
+        //Close multi-keyframe selection
+        var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
+        var bio_top_header_el = bio_container_el.querySelectorAll(common_selectors.entity_bio_header);
 
-      //Remove select_all_el at top header; entity_obj.options.selected_keyframes_key
-      try { bio_top_header_el.querySelector(`span:first-child`).remove(); } catch {}
-      delete entity_obj.options.selected_keyframes;
+        //Remove select_all_el at top header; entity_obj.options.selected_keyframes_key
+        try { bio_top_header_el.querySelector(`span:first-child`).remove(); } catch {}
+        delete entity_obj.options.selected_keyframes;
 
-      //Iterate over all bio_entries and remove the local_checkbox_el
-      for (var i = 0; i < bio_entries.length; i++) {
-        var local_checkbox_el = bio_entries[i].querySelector(`input[type="checkbox"]`);
-        if (local_checkbox_el) local_checkbox_el.remove();
+        //Iterate over all bio_entries and remove the local_checkbox_el
+        for (var i = 0; i < bio_entries.length; i++) {
+          var local_checkbox_el = bio_entries[i].querySelector(`input[type="checkbox"]`);
+          if (local_checkbox_el) local_checkbox_el.remove();
+        }
       }
     }
   }

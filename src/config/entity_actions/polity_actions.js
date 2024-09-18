@@ -67,6 +67,9 @@ config.entity_actions.polity_actions = {
           simplify_apply_to_all_keyframes: "Apply to All Keyframes",
           simplify_auto_simplify_when_editing: "Auto-Simplify When Editing"
         },
+        placeholder: {
+          simplify_auto_simplify_when_editing: `BRUSH_OBJ.auto_simplify_when_editing`,
+        },
         x: 0,
         y: 0
       },
