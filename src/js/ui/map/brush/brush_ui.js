@@ -25,12 +25,18 @@
       if (main.events.mouse_pressed) {
         if (main.events.left_mouse) {
           //Initialise brush_obj.current_path if not defined
-          if (!brush_obj.current_path)
+          if (!brush_obj.current_path) {
             brush_obj.current_path = brush_obj.cursor;
-
-           brush_obj.current_path = union( brush_obj.current_path, brush_obj.cursor);
+            if (!brush_obj.entity_options)
+              brush_obj.entity_options = {};
+              if (!brush_obj.entity_options.className)
+                brush_obj.entity_options.className = generateEntityID();
+              if (!brush_obj.entity_options.history)
+                brush_obj.entity_options.history = {};
+          }
 
           brush_obj.brush_change = true;
+          brush_obj.current_path = union(brush_obj.current_path, brush_obj.cursor);
         } else if (main.events.right_mouse) {
           //Only delete if  brush_obj.current_path exists
           if (brush_obj.current_path)
@@ -211,11 +217,11 @@
         delete brush_obj.current_selection; //current_selection has to actually be deleted to avoid refresh errors
       }
       if (brush_obj.current_path)
-        brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
+        brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.entity_options).addTo(map);
 
       //Bind tooltip to selection
       if (brush_obj.current_selection) {
-        L.setOptions(brush_obj.current_selection, brush_obj.polity_options);
+        L.setOptions(brush_obj.current_selection, brush_obj.entity_options);
         brush_obj.current_selection.on("click", function (e) {
           printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: true });
         });

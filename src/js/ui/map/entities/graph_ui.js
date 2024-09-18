@@ -226,49 +226,50 @@
     //Check to make sure history exists
     if (local_entity)
       if (local_entity.options)
-        if (local_entity.options.history) {
-          var entity_graph_el = entity_el.querySelector(common_selectors.entity_timeline_graph_canvas);
+        if (local_entity.options.history)
+          if (Object.keys(local_entity.options.history).length > 0) {
+            var entity_graph_el = entity_el.querySelector(common_selectors.entity_timeline_graph_canvas);
 
-          //Populate land area data
-          {
-            var all_entity_histories = Object.keys(local_entity.options.history);
-            var land_area_data = [];
-            var land_area_end_date;
-            var land_area_start_date;
-            var maximum_land_area = 0;
+            //Populate land area data
+            {
+              var all_entity_histories = Object.keys(local_entity.options.history);
+              var land_area_data = [];
+              var land_area_end_date;
+              var land_area_start_date;
+              var maximum_land_area = 0;
 
-            //Fetch maximum_land_area
-            for (var i = 0; i < all_entity_histories.length; i++) {
-              var local_history = local_entity.options.history[all_entity_histories[i]];
-              var local_history_date = convertTimestampToDate(local_history.id);
+              //Fetch maximum_land_area
+              for (var i = 0; i < all_entity_histories.length; i++) {
+                var local_history = local_entity.options.history[all_entity_histories[i]];
+                var local_history_date = convertTimestampToDate(local_history.id);
 
-              var local_area = getPolityArea(entity_id, local_history_date);
+                var local_area = getPolityArea(entity_id, local_history_date);
 
-              if (local_area > maximum_land_area)
-                maximum_land_area = local_area;
+                if (local_area > maximum_land_area)
+                  maximum_land_area = local_area;
 
-              //Set land_area_start_date, land_area_end_date'
-              if (i == 0) land_area_start_date = local_history_date;
-              if (i == all_entity_histories.length - 1) land_area_end_date = local_history_date;
+                //Set land_area_start_date, land_area_end_date'
+                if (i == 0) land_area_start_date = local_history_date;
+                if (i == all_entity_histories.length - 1) land_area_end_date = local_history_date;
+              }
+
+              //Begin populating data
+              for (var i = 0; i < all_entity_histories.length; i++) {
+                var local_history = local_entity.options.history[all_entity_histories[i]];
+                var local_history_date = convertTimestampToDate(local_history.id);
+
+                var local_area = getPolityArea(entity_id, local_history_date);
+                var local_area_percentage = Math.round((local_area/maximum_land_area)*1000)/1000;
+
+                //Push element with value
+                land_area_data.push({
+                  date: local_history_date, value: Math.abs(local_area_percentage)
+                });
+              }
             }
 
-            //Begin populating data
-            for (var i = 0; i < all_entity_histories.length; i++) {
-              var local_history = local_entity.options.history[all_entity_histories[i]];
-              var local_history_date = convertTimestampToDate(local_history.id);
-
-              var local_area = getPolityArea(entity_id, local_history_date);
-              var local_area_percentage = Math.round((local_area/maximum_land_area)*1000)/1000;
-
-              //Push element with value
-              land_area_data.push({
-                date: local_history_date, value: Math.abs(local_area_percentage)
-              });
-            }
+            //Default graph is always land area
+            createTimelineGraph(entity_graph_el, land_area_start_date, land_area_end_date, land_area_data, { type: "percentage" });
           }
-
-          //Default graph is always land area
-          createTimelineGraph(entity_graph_el, land_area_start_date, land_area_end_date, land_area_data, { type: "percentage" });
-        }
   }
 }

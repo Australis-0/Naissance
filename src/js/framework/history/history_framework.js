@@ -157,6 +157,7 @@
         if (entity_obj.options.history) {
           var all_history_frames = Object.keys(entity_obj.options.history);
           var history_frame = {
+            id: convertTimestampToInt(getTimestamp(main.date)),
             coords: [],
             options: {}
           };
@@ -170,10 +171,10 @@
               history_frame.coords = first_history_frame.coords;
             if (first_history_frame.options)
               history_frame.options = mergeObjects(history_frame.options, first_history_frame.options, "override");
-
-            //Return statement
-            return history_frame;
           }
+
+          //Return statement
+          return history_frame;
         }
   }
 

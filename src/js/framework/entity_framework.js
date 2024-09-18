@@ -52,10 +52,8 @@
         //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
         if (local_value.length == 1)
           if (typeof local_value[0] == "string")
-            if (options.options[local_value[0]] != undefined) {
+            if (options.options[local_value[0]] != undefined)
               scope[all_scope_keys[i]] = options.options[local_value[0]];
-              console.log(`Set ${all_scope_keys[i]}`, options.options[local_value[0]]);
-            }
       }
     }
     var suboptions = options.options;
@@ -203,10 +201,8 @@
         //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
         if (local_value.length == 1)
           if (typeof local_value[0] == "string")
-            if (options.options[local_value[0]] != undefined) {
+            if (options.options[local_value[0]] != undefined)
               scope[all_scope_keys[i]] = options.options[local_value[0]];
-              console.log(`Set ${all_scope_keys[i]}`, options.options[local_value[0]]);
-            }
       }
 
     //Current .limit parser
@@ -414,14 +410,14 @@
 
     if (entity_obj) {
       brush_obj.editing_entity = entity_id;
-      brush_obj.polity_options = entity_obj.options;
+      brush_obj.entity_options = entity_obj.options;
 
       //Remove old entity_obj from map
       entity_obj.remove();
 
       //Set brush to this
       brush_obj.current_path = entity_obj._latlngs;
-      brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.polity_options).addTo(map);
+      brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.entity_options).addTo(map);
 
       //Set entityUI for current selected entity
       brush_obj.current_selection.on("click", function (e) {
@@ -548,25 +544,17 @@
     createHistoryFrame(new_entity, main.date, {}, coords);
     new_entity.options.history = sortObject(new_entity.options.history, "numeric_ascending");
 
-    //Edit options; append ID and HTML
+    //Edit options; append name and metadata
     {
-      if (!new_entity.options.has_id) {
-        entity_id = generateEntityID();
-
-        new_entity.options.className = (new_entity.options.className) ?
-          new_entity.options.className + ` ${entity_id}` :
-          entity_id.toString();
-        if (brush_obj.current_selection.options.entity_name)
-          entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
-        new_entity.options.has_id = true;
-      }
+      if (brush_obj.current_selection.options.entity_name)
+        entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
     }
 
     //Add new entity to relevant layer
     if (new_entity.options.className) {
-      var entity_exists = getEntity(new_entity.options.className);
+      var is_new_entity = getEntity(new_entity.options.className, { return_is_new_entity: true });
 
-      if (!entity_exists) {
+      if (is_new_entity) {
         var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
 
         main.entities.push(new_entity_obj);
@@ -577,7 +565,7 @@
     //Set selection.options
     {
       delete brush_obj.editing_entity;
-      delete brush_obj.polity_options;
+      delete brush_obj.entity_options;
 
       clearBrush();
     }
@@ -621,7 +609,8 @@
     getEntity() - Returns an entity object or [layer_key, index];
     arg0_entity_id: (String)
     arg1_options: (Object)
-      return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default
+      return_is_new_entity: (Boolean) - Optional. Returns whether the current entity is a new entity or not. False by default.
+      return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default.
   */
   function getEntity (arg0_entity_id, arg1_options) {
     //Convert from parameters
@@ -629,7 +618,9 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Declare local isntance variables
+    var brush_obj = main.brush;
     var entity_obj;
+    var is_new_entity;
 
     //Guard clause
     if (typeof entity_id == "object") return entity_id;
@@ -643,8 +634,16 @@
           entity_obj = (!options.return_key) ? main.entities[i] : i;
     }
 
+    //If entity_obj is undefined; check to make sure entity_id being fetched isn't just the current main.brush.current_selection
+    if (brush_obj.current_selection)
+      if (brush_obj.current_selection.options)
+        if (brush_obj.current_selection.options.className == entity_id) {
+          entity_obj = brush_obj.current_selection;
+          is_new_entity = true;
+        }
+
     //Return statement
-    return entity_obj;
+    return (!options.return_is_new_entity) ? entity_obj : is_new_entity;
   }
 
   /*
@@ -663,16 +662,17 @@
     //Attempt to fetch distance between first and last keyframe to fetch its absolute age
     if (entity_obj)
       if (entity_obj.options)
-        if (entity_obj.options.history) {
-          var all_history_frames = Object.keys(entity_obj.options.history);
-          var first_history_frame = entity_obj.options.history[all_history_frames[0]];
-          var last_history_frame = entity_obj.options.history[all_history_frames[all_history_frames.length - 1]];
+        if (entity_obj.options.history)
+          if (Object.keys(entity_obj.options.history).length > 0) {
+            var all_history_frames = Object.keys(entity_obj.options.history);
+            var first_history_frame = entity_obj.options.history[all_history_frames[0]];
+            var last_history_frame = entity_obj.options.history[all_history_frames[all_history_frames.length - 1]];
 
-          var age_timestamp = last_history_frame.id - first_history_frame.id;
+            var age_timestamp = last_history_frame.id - first_history_frame.id;
 
-          //Return statement
-          return convertTimestampToDate(age_timestamp);
-        }
+            //Return statement
+            return convertTimestampToDate(age_timestamp);
+          }
 
     //Return statement if entity has no history
     return getBlankDate();
@@ -688,15 +688,16 @@
     //Attempt to fetch distance between first keyframe and main.date to fetch its relative age
     if (entity_obj)
       if (entity_obj.options)
-        if (entity_obj.options.history) {
-          var all_history_frames = Object.keys(entity_obj.options.history);
-          var first_history_frame = entity_obj.options.history[all_history_frames[0]];
+        if (entity_obj.options.history)
+          if (Object.keys(entity_obj.options.history).length > 0) {
+            var all_history_frames = Object.keys(entity_obj.options.history);
+            var first_history_frame = entity_obj.options.history[all_history_frames[0]];
 
-          var age_timestamp = convertTimestampToInt(getTimestamp(main.date)) - first_history_frame.id;
+            var age_timestamp = convertTimestampToInt(getTimestamp(main.date)) - first_history_frame.id;
 
-          //Return statement
-          return convertTimestampToDate(age_timestamp);
-        }
+            //Return statement
+            return convertTimestampToDate(age_timestamp);
+          }
 
     //Return statement if entity has no history
     return getBlankDate();
@@ -728,8 +729,8 @@
 
       if (!entity_name)
         if (brush_obj.current_path)
-          if (selection.options.className == entity_id)
-            entity_name = selection.options.entity_name;
+          if (entity_obj.options.className == entity_id)
+            entity_name = entity_obj.options.entity_name;
     }
 
     //Return statement
@@ -746,8 +747,13 @@
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
     //Return statement
-    if (main.brush.editing_entity == entity_id) return true;
+    if (brush_obj.editing_entity == entity_id) return true;
+    if (brush_obj.entity_options)
+      if (brush_obj.entity_options.className == entity_id) return true;
   }
 
   function isEntityHidden (arg0_entity_id, arg1_date) {
@@ -758,8 +764,9 @@
     //Check if date is before first history frame
     var first_history_frame = getFirstHistoryFrame(entity_id);
 
-    if (first_history_frame.id > convertTimestampToInt(getTimestamp(main.date)))
-      return true;
+    if (first_history_frame)
+      if (first_history_frame.id > convertTimestampToInt(getTimestamp(main.date)))
+        return true;
 
     //Return statement
     return entityHasProperty(entity_id, date, function (local_history) {
