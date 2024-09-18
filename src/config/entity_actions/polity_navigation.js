@@ -44,7 +44,8 @@ config.entity_actions.polity_navigation = {
       entity_is_hidden: false
     },
     effect: {
-      hide_entity: true
+      hide_entity: true,
+      refresh_entity_actions: true
     }
   },
   show_polity: {
@@ -59,7 +60,8 @@ config.entity_actions.polity_navigation = {
       entity_is_hidden: true
     },
     effect: {
-      hide_entity: false
+      hide_entity: false,
+      refresh_entity_actions: true
     }
   },
 

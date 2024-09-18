@@ -22,12 +22,14 @@
     if (options.depth == undefined) options.depth = 0;
       options.depth++;
     if (!options.ui_type) options.ui_type = "entity_keyframes";
+    console.log(`parseEntityEffect():`, entity_id, scope, options);
 
     //Declare local instance variables
     var all_scope_keys = Object.keys(scope);
     var brush_obj = main.brush;
     var entity_obj = getEntity(entity_id);
     var limit_fulfilled = true;
+    scope = JSON.parse(JSON.stringify(scope)); //Deep-copy scope
 
     //.interface parser; load inputs into .options
     if (options.depth == 1) {
@@ -42,6 +44,19 @@
       //Set options.options to be passed down
       options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
       options.options.timestamp = options.timestamp;
+
+      //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
+      for (var i = 0; i < all_scope_keys.length; i++) {
+        var local_value = getList(scope[all_scope_keys[i]]);
+
+        //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
+        if (local_value.length == 1)
+          if (typeof local_value[0] == "string")
+            if (options.options[local_value[0]] != undefined) {
+              scope[all_scope_keys[i]] = options.options[local_value[0]];
+              console.log(`Set ${all_scope_keys[i]}`, options.options[local_value[0]]);
+            }
+      }
     }
     var suboptions = options.options;
 
@@ -55,88 +70,96 @@
     //Iterate over all_scope_keys, recursively parsing the scope whenever 'effect_<key>' is encountered.
     if (limit_fulfilled)
       for (var i = 0; i < all_scope_keys.length; i++) {
-      var local_value = getList(scope[all_scope_keys[i]]);
+        var local_value = getList(scope[all_scope_keys[i]]);
 
-      //Recursive parsers/scoping
-      if (all_scope_keys[i].startsWith("effect_")) {
-        var new_options = JSON.parse(JSON.stringify(options));
-        var parsed_effect = parseEntityEffect(entity_id, local_value[0], new_options);
-      }
+        //Recursive parsers/scoping
+        if (all_scope_keys[i].startsWith("effect_")) {
+          var new_options = JSON.parse(JSON.stringify(options));
+          var parsed_effect = parseEntityEffect(entity_id, local_value[0], new_options);
+        }
 
-      //Same-scope effects
-      {
-        //Action effects - [WIP] - Finish adding action effects
-        if (all_scope_keys[i] == "clean_keyframes")
-          cleanKeyframes(entity_id, local_value[0]);
-        if (all_scope_keys[i] == "edit_entity")
-          editEntity(entity_id);
-        if (all_scope_keys[i] == "finish_entity")
-          finishEntity();
-        if (all_scope_keys[i] == "hide_entity")
-          if (local_value[0]) {
-            hideEntity(entity_id);
-          } else {
-            showEntity(entity_id);
-          }
-        if (all_scope_keys[i] == "simplify_all_keyframes")
-          simplifyAllEntityKeyframes(entity_id, brush_obj.simplify_tolerance);
-
-        //History effects
-        if (all_scope_keys[i] == "delete_keyframe")
-          deleteKeyframe(entity_id, suboptions[local_value]);
-        if (all_scope_keys[i] == "edit_keyframe")
-          editKeyframe(entity_id, suboptions[local_value]);
-        if (all_scope_keys[i] == "move_keyframe")
-          moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
-
-        //UI interface effects
-        if (all_scope_keys[i] == "close_ui")
-          //Parse the entity_effect being referenced
-          for (var x = 0; x < local_value.length; x++) {
-            var local_entity_keyframe = getEntityKeyframe(local_value[x]);
-            var local_entity_order = (local_entity_keyframe.order != undefined) ?
-              local_entity_keyframe.order : 1;
-
-            closeEntityKeyframeContextMenu(entity_id, local_entity_order);
-          }
-        if (all_scope_keys[i] == "close_menus")
-          if (local_value[0]) closeEntityKeyframeContextMenus(entity_id);
-        if (all_scope_keys[i] == "close_select_multiple_keyframes")
-          selectMultipleKeyframes(entity_id, { close_selection: true });
-        if (all_scope_keys[i] == "interface")
-          printEntityKeyframeContextMenu(entity_id, scope);
-        if (["open_ui", "trigger"].includes(all_scope_keys[i]))
-          if (options.ui_type == "entity_actions") {
-            //Parse the entity_effect being referenced
-            for (var x = 0; x < local_value.length; x++) {
-              var local_entity_action = getEntityAction(local_value[x]);
-
-              if (local_entity_action.effect) {
-                var new_options = JSON.parse(JSON.stringify(options));
-                var parsed_effect = parseEntityEffect(entity_id, local_entity_action.effect, new_options);
-              }
-              if (local_entity_action)
-                printEntityActionsContextMenu(entity_id, local_entity_action);
+        //Same-scope effects
+        {
+          //Action effects - [WIP] - Finish adding action effects
+          if (all_scope_keys[i] == "apply_path")
+            applyPathToKeyframes(entity_id, local_value);
+          if (all_scope_keys[i] == "clean_all_keyframes")
+            cleanKeyframes(entity_id, options.ENTITY_ABSOLUTE_AGE);
+          if (all_scope_keys[i] == "clean_keyframes")
+            cleanKeyframes(entity_id, local_value[0]);
+          if (all_scope_keys[i] == "edit_entity")
+            editEntity(entity_id);
+          if (all_scope_keys[i] == "finish_entity")
+            finishEntity();
+          if (all_scope_keys[i] == "hide_entity")
+            if (local_value[0]) {
+              hideEntity(entity_id);
+            } else {
+              showEntity(entity_id);
             }
-          } else if (options.ui_type == "entity_keyframes") {
+          if (all_scope_keys[i] == "simplify_all_keyframes")
+            simplifyAllEntityKeyframes(entity_id, brush_obj.simplify_tolerance);
+
+          //History effects
+          if (all_scope_keys[i] == "delete_keyframe")
+            deleteKeyframe(entity_id, suboptions[local_value]);
+          if (all_scope_keys[i] == "edit_keyframe")
+            editKeyframe(entity_id, suboptions[local_value]);
+          if (all_scope_keys[i] == "move_keyframe")
+            moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
+
+          //UI interface effects
+          if (all_scope_keys[i] == "close_ui")
             //Parse the entity_effect being referenced
             for (var x = 0; x < local_value.length; x++) {
               var local_entity_keyframe = getEntityKeyframe(local_value[x]);
+              var local_entity_order = (local_entity_keyframe.order != undefined) ?
+                local_entity_keyframe.order : 1;
 
-              if (local_entity_keyframe.effect) {
-                var new_options = JSON.parse(JSON.stringify(options));
-                var parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
-              }
-              if (local_entity_keyframe)
-                printEntityKeyframeContextMenu(entity_id, local_entity_keyframe);
+              closeEntityKeyframeContextMenu(entity_id, local_entity_order);
             }
-          }
-        if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
-          refreshEntityActions(entity_id);
-        if (all_scope_keys[i] == "select_multiple_keyframes")
-          selectMultipleKeyframes(entity_id, { assign_key: local_value[0] });
+          if (all_scope_keys[i] == "close_menus")
+            if (local_value[0]) closeEntityKeyframeContextMenus(entity_id);
+          if (all_scope_keys[i] == "close_select_multiple_keyframes")
+            selectMultipleKeyframes(entity_id, { close_selection: true });
+          if (all_scope_keys[i] == "interface")
+            printEntityKeyframeContextMenu(entity_id, scope);
+          if (["open_ui", "trigger"].includes(all_scope_keys[i]))
+            if (options.ui_type == "entity_actions") {
+              //Parse the entity_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_entity_action = getEntityAction(local_value[x]);
+
+                if (local_entity_action.immediate) {
+                  var new_options = JSON.parse(JSON.stringify(options));
+                  var parsed_effect = parseEntityEffect(entity_id, local_entity_action.immediate, new_options);
+                }
+                if (local_entity_action.effect) {
+                  var new_options = JSON.parse(JSON.stringify(options));
+                  var parsed_effect = parseEntityEffect(entity_id, local_entity_action.effect, new_options);
+                }
+                if (local_entity_action)
+                  printEntityActionsContextMenu(entity_id, local_entity_action);
+              }
+            } else if (options.ui_type == "entity_keyframes") {
+              //Parse the entity_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_entity_keyframe = getEntityKeyframe(local_value[x]);
+
+                if (local_entity_keyframe.effect) {
+                  var new_options = JSON.parse(JSON.stringify(options));
+                  var parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
+                }
+                if (local_entity_keyframe)
+                  printEntityKeyframeContextMenu(entity_id, local_entity_keyframe);
+              }
+            }
+          if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
+            refreshEntityActions(entity_id);
+          if (all_scope_keys[i] == "select_multiple_keyframes")
+            selectMultipleKeyframes(entity_id, { assign_key: local_value[0] });
+        }
       }
-    }
   }
 
   /*
@@ -170,6 +193,21 @@
     var all_scope_keys = Object.keys(scope);
     var entity_obj = getEntity(entity_id);
     var local_checks = 0;
+
+    //Add in scope variables if options.options demands; but only on the first depth layer
+    if (options.depth == 1)
+      //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
+      for (var i = 0; i < all_scope_keys.length; i++) {
+        var local_value = getList(scope[all_scope_keys[i]]);
+
+        //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
+        if (local_value.length == 1)
+          if (typeof local_value[0] == "string")
+            if (options.options[local_value[0]] != undefined) {
+              scope[all_scope_keys[i]] = options.options[local_value[0]];
+              console.log(`Set ${all_scope_keys[i]}`, options.options[local_value[0]]);
+            }
+      }
 
     //Current .limit parser
     //Iterate over all_scope_keys, recursively parsing the scope whenever a subscope is encountered.
@@ -230,28 +268,31 @@
 
 //Entity actions
 {
-  function applyPathToKeyframes (arg0_entity_id) {
+  function applyPathToKeyframes (arg0_entity_id, arg1_keyframes) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
+    var keyframes = getList(arg1_keyframes);
 
     //Declare local instance variables
     var entity_obj = getEntity(entity_id);
 
-    if (entity_obj)
-      if (entity_obj.options.selected_keyframes) {
-        var current_history_entry = getPolityHistory(entity_id, main.date);
+    if (entity_obj) {
+      var current_history_entry = getPolityHistory(entity_id, main.date);
 
-        for (var i = 0; i < entity_obj.options.selected_keyframes.length; i++) {
-          var local_history_entry = entity_obj.options.history[entity_obj.options.selected_keyframes[i]];
+      //Make sure keyframes is defined
+      if (!keyframes)
+        keyframes = (entity_obj.options.selected_keyframes) ? entity_obj.options.selected_keyframes : [];
+      //Iterate over all keyframes
+      for (var i = 0; i < keyframes.length; i++) {
+        var local_timestamp = getTimestamp(keyframes[i]);
 
-          local_history_entry.coords = current_history_entry.coords;
-        }
-
-        //Repopulate entity bio; refresh UI
-        printEntityBio(entity_id);
-        if (window[`${entity_id}_apply_path`])
-          applyPath(entity_id);
+        var local_history_entry = entity_obj.options.history[local_timestamp];
+        local_history_entry.coords = current_history_entry.coords;
       }
+    }
+
+    //Repopulate entity bio; refresh UI
+    printEntityBio(entity_id);
   }
 
   /*
@@ -807,12 +848,13 @@
     var entity_obj = getEntity(entity_id);
 
     var bio_container_el = entity_el.querySelector(common_selectors.entity_bio_container);
+    console.log(bio_container_el);
 
     //Check if selection should be closed or not first
     if (bio_container_el && !options.close_selection) {
       //Make sure bio_container_el exists in the first place before appending a checkbox to each keyframe; create a 'Select All' button at top.
-      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries);
-      var bio_top_header_el = bio_container_el.querySelectorAll(common_selectors.entity_bio_header);
+      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
+      var bio_top_header_el = bio_container_el.querySelector(common_selectors.entity_bio_header);
       var select_all_el = document.createElement("span");
 
       select_all_el.innerHTML = `Select All: <input type = "checkbox" id = "select-all-${entity_id}">`;
@@ -821,7 +863,7 @@
 
       //Add select_all_el onclick event listener
       select_all_el.onclick = function (e) {
-        var all_checkbox_els = bio_container_el.querySelectorAll(`${common_selectors.entity_bio_entries} input[type="checkbox"]`);
+        var all_checkbox_els = bio_container_el.querySelectorAll(`${common_selectors.entity_bio_entries_dates} input[type="checkbox"]`);
 
         //Check if select_all_el.checked is true; uncheck all if not
         entity_obj.options.selected_keyframes = [];
@@ -837,7 +879,7 @@
       //Iterate over each bio entry and assign each a checkbox
       for (var i = 0; i < bio_entries.length; i++) {
         var local_checkbox_el = document.createElement("input");
-        var local_parent_el = bio_entries[i].parentElement.parentElement;
+        var local_parent_el = bio_entries[i].parentElement;
         var local_timestamp = local_parent_el.getAttribute("timestamp");
 
         //Create local_checkbox_el and prepend it to the current bio_entries[i]
@@ -864,7 +906,7 @@
       }
     } else {
       //Close multi-keyframe selection
-      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries);
+      var bio_entries = bio_container_el.querySelectorAll(common_selectors.entity_bio_entries_dates);
       var bio_top_header_el = bio_container_el.querySelectorAll(common_selectors.entity_bio_header);
 
       //Remove select_all_el at top header; entity_obj.options.selected_keyframes_key

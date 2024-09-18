@@ -40,6 +40,7 @@ config.defines.common = {
       entity_bio_container: `#entity-ui-timeline-bio-container`, //The query selector containing the Entity Bio container.
       entity_bio_header: `.top-bio-header`, //The query selector for tyhe Entity Bio header.
       entity_bio_table: `#entity-ui-timeline-bio-table`, //The query selector containing the Entity Bio table with history frames.
+        entity_bio_entries_dates: `table tbody tr td:first-child`, //The query selector containing all entity bio entry dates.
         entity_bio_entries: `table tbody tr td:not(:first-child) span`, //The query selector for all entity bio entries generated.
 
       entity_keyframe_context_menu_anchor: `#entity-keyframe-context-menu`,

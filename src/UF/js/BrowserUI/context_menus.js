@@ -374,7 +374,7 @@
           if (all_suboptions[i] == options.default)
             checked_string = " checked";
           html_string.push(`<input id = "${all_suboptions[i]}" type = "checkbox" ${objectToAttributes(options.attributes)}${checked_string}>`);
-          html_string.push(`<label for = "${all_suboptions[i]}">${local_option}</label>`);
+          html_string.push(`<label for = "${all_suboptions[i]}">${local_option}</label><br>`);
         }
       }
     } else if (["color", "colour"].includes(options.type)) {
