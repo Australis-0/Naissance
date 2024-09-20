@@ -1,4 +1,4 @@
-//Entity framework handling
+//Entity parser handling
 {
   /*
     parseEntityEffect() - Applies an entity effect from a given .effect scope.
@@ -317,97 +317,22 @@
   }
 }
 
-//Entity actions
+//Entity parser helper functions
 {
-  function applyPathToKeyframes (arg0_entity_id, arg1_keyframes) {
+  function getBooleanOperatorFromString (arg0_string) {
     //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var keyframes = getList(arg1_keyframes);
-
-    //Declare local instance variables
-    var entity_obj = getEntity(entity_id);
-
-    if (entity_obj) {
-      var current_history_entry = getPolityHistory(entity_id, main.date);
-
-      //Make sure keyframes is defined
-      if (!keyframes)
-        keyframes = (entity_obj.options.selected_keyframes) ? entity_obj.options.selected_keyframes : [];
-      //Iterate over all keyframes
-      for (var i = 0; i < keyframes.length; i++) {
-        var local_timestamp = getTimestamp(keyframes[i]);
-
-        var local_history_entry = entity_obj.options.history[local_timestamp];
-        local_history_entry.coords = current_history_entry.coords;
-      }
-    }
-
-    //Repopulate entity bio; refresh UI
-    printEntityBio(entity_id);
-  }
-
-  /*
-    cleanKeyframes() - Removes duplicate keyframes.
-    options: {
-      do_not_display: true/false - Whether to display in printEntityBio() or not. False by default.
-    }
-  */
-  function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var tolerance = (arg1_tolerance) ? convertTimestampToInt(getTimestamp(arg1_tolerance)) : Infinity;
-    var options = (arg2_options) ? arg2_options : {};
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-
-    if (entity_obj)
-      if (entity_obj.options.history) {
-        var all_history_entries = Object.keys(entity_obj.options.history);
-
-        for (var i = 0; i < all_history_entries.length; i++)
-          if (convertTimestampToInt(all_history_entries[i]) >= (convertTimestampToInt(getTimestamp(main.date)) - tolerance)) {
-            var empty_options = false;
-            var local_history_entry = entity_obj.options.history[all_history_entries[i]];
-            console.log(`Processing:`, local_history_entry)
-
-            //Process .coords
-            {
-              //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
-              if (getLastIdenticalCoords(entity_obj, local_history_entry))
-                delete local_history_entry.coords;
-
-              //Convert to Naissance format if applicable
-              if (local_history_entry.coords)
-                local_history_entry.coords = convertToNaissance(local_history_entry.coords);
-            }
-
-            //Remove frame if same .coords and options is empty
-            if (local_history_entry.options) {
-              if (Object.keys(local_history_entry.options).length == 0) {
-                empty_options = true;
-                delete local_history_entry.options;
-              }
-            } else {
-              empty_options = true;
-            }
-
-            //Remove frame if needed
-            if (!local_history_entry.coords && empty_options)
-              delete entity_obj.options.history[all_history_entries[i]];
-          }
-
-        //Repopulate entity bio; refresh UI
-        if (!options.do_not_display)
-          try {
-            printEntityBio(entity_id);
-          } catch {}
-      }
+    var string = arg0_string;
 
     //Return statement
-    return entity_obj;
+    if (string.startsWith("and_") || string == "and") return "and";
+    if (string.startsWith("not_") || string == "not") return "not";
+    if (string.startsWith("or_") || string == "or") return "or";
+    if (string.startsWith("xor_") || string == "xor") return "xor";
   }
+}
 
+//Entity core actions
+{
   function deleteEntity (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -482,6 +407,28 @@
     }
   }
 
+  function hideEntity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : main.date;
+    var do_not_reload = arg2_do_not_reload;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+
+    if (entity_obj) {
+      createHistoryFrame(entity_id, date, {
+        extinct: true
+      });
+
+      try { printEntityBio(entity_id); } catch {}
+      try { populateTimelineGraph(entity_id); } catch {}
+
+      if (!do_not_reload)
+        loadDate();
+    }
+  }
+
   function renameEntity (arg0_entity_id, arg1_entity_name, arg2_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -498,60 +445,30 @@
     return entity_name;
   }
 
-  function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
+  function showEntity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var tolerance = arg1_tolerance;
+    var date = (arg1_date) ? arg1_date : main.date;
+    var do_not_reload = arg2_do_not_reload;
 
     //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+    var entity_obj = getEntity(entity_id);
 
     if (entity_obj) {
-      if (entity_obj.options.history) {
-        var all_history_entries = Object.keys(entity_obj.options.history);
+      createHistoryFrame(entity_id, date, {
+        extinct: false
+      });
 
-        for (var i = 0; i < all_history_entries.length; i++) {
-          var local_date = convertTimestampToDate(all_history_entries[i]);
-          var local_history_frame = entity_obj.options.history[all_history_entries[i]];
-          var local_simplified_coords = convertToNaissance(simplify(local_history_frame, tolerance));
+      try { printEntityBio(entity_id); } catch {}
+      try { populateTimelineGraph(entity_id); } catch {}
 
-          //Extract coords from local_simplified_coords
-          local_history_frame.coords = local_simplified_coords;
-        }
-      }
-
-      //Simplify current entity to update coords on map
-      simplifyEntity(entity_id, tolerance);
-    }
-  }
-
-  function simplifyEntity (arg0_entity_id, arg1_tolerance) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var tolerance = arg1_tolerance;
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id
-
-    if (entity_obj) {
-      var simplified_coords = simplify(entity_obj._latlngs, tolerance);
-      entity_obj._latlngs = simplified_coords;
-
-      //Set history entry to reflect actual_coords
-      if (entity_obj.options.history) {
-        var current_history_entry = getPolityHistory(entity_obj, main.date);
-
-        current_history_entry.coords = convertToNaissance(simplified_coords);
-      }
-
-      //Refresh entity_obj
-      entity_obj.remove();
-      entity_obj.addTo(map);
+      if (!do_not_reload)
+        loadDate();
     }
   }
 }
 
-//Entity handling functions - Functions similar to class methods
+//Entity functions - General-purpose, regardless of entity type
 {
   //[WIP] - Make function more general-purpose
   function entityHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function) {
@@ -603,7 +520,7 @@
     //Edit options; append name and metadata
     {
       if (brush_obj.current_selection.options.entity_name)
-        entity_name = JSON.parse(JSON.stringify(selection.options.entity_name));
+        entity_name = JSON.parse(JSON.stringify(brush_obj.current_selection.options.entity_name));
     }
 
     //Add new entity to relevant layer
@@ -695,7 +612,13 @@
       if (brush_obj.current_selection.options)
         if (brush_obj.current_selection.options.className == entity_id) {
           entity_obj = brush_obj.current_selection;
-          is_new_entity = true;
+
+          //Check to see if entity_obj has a history
+          is_new_entity = true; //Assume that this is true by default
+          if (entity_obj.options)
+            if (entity_obj.options.history)
+              if (Object.keys(entity_obj.options.history).length > 0)
+                is_new_entity = false;
         }
 
     //Return statement
@@ -837,6 +760,17 @@
 
       return is_extinct;
     });
+  }
+
+  function isSameFrame (arg0_history_frame, arg1_history_frame) {
+    //Convert from parameters
+    var history_frame = arg0_history_frame;
+    var ot_history_frame = arg1_history_frame;
+
+    //Return statement
+    return (
+      JSON.stringify(history_frame.coords) == JSON.stringify(ot_history_frame.coords) &&
+      JSON.stringify(history_frame.options) && JSON.stringify(ot_history_frame.options));
   }
 
   function refreshEntityActions (arg0_entity_id) {
@@ -1014,16 +948,34 @@
   }
 }
 
-//Entity parser helper functions
+//Polity functions - For polygons only
 {
-  function getBooleanOperatorFromString (arg0_string) {
+  function getPolityArea (arg0_entity_id, arg1_date) {
     //Convert from parameters
-    var string = arg0_string;
+    var entity_id = arg0_entity_id;
+    var date = arg1_date;
+
+    //Declare local instance variables
+    var entity_area = 0;
+    var entity_obj = getEntity(entity_id);
+
+    //Check to make sure entity_obj exists
+    if (entity_obj) {
+      var is_extinct = isEntityHidden(entity_id, date);
+      var last_coords = getEntityCoords(entity_id, date);
+
+      if (last_coords)
+        try {
+          var local_coordinates = getTurfObject(last_coords);
+
+          entity_area = (!is_extinct) ? turf.area(local_coordinates) : 0;
+        } catch (e) {
+          console.log(e);
+          entity_area = 0;
+        }
+    }
 
     //Return statement
-    if (string.startsWith("and_") || string == "and") return "and";
-    if (string.startsWith("not_") || string == "not") return "not";
-    if (string.startsWith("or_") || string == "or") return "or";
-    if (string.startsWith("xor_") || string == "xor") return "xor";
+    return entity_area;
   }
 }

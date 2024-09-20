@@ -37,7 +37,7 @@ window.path = require("path");
     polity_options: {}, //Used to store the options of the entity selected.
 
     selected_layer: "polities", //The current selected layer.
-    simplify_tolerance: getSimplifyTolerance(10), //The current simplify tolerance for brushes.
+    simplify_tolerance: 0.05, //The current simplify tolerance for brushes.
 
     //Brush settings
     auto_simplify_when_editing: true,

@@ -31,7 +31,7 @@
 
   /*
     getHierarchyRenderingOrder() - Renders polities within a hierarchy.
-    arg0_options (Object):
+    arg0_options: (Object)
       exclude_selection: (Boolean), - Whether to exclude the selected ID. False by default.
       return_objects: (Boolean) - Whether to return entity objects instead. False by default.
   */
