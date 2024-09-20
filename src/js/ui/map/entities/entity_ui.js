@@ -663,7 +663,7 @@
     var r = parseInt(r_el.value);
 
     var current_colour = RGBToHex(r, g, b);
-    var current_history_entry = getPolityHistory(entity_id, main.date);
+    var current_history_entry = getLastHistoryFrame(entity_id, main.date);
     var current_tab = window[`${entity_id}_page`];
 
     //Set entity fill colour
@@ -738,8 +738,8 @@
         underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
 
         //Populate default values
-        var current_maximum_zoom_value = getEntityProperty(entity_obj, "maximum_zoom_level", main.date);
-        var current_minimum_zoom_value = getEntityProperty(entity_obj, "minimum_zoom_level", main.date);
+        var current_maximum_zoom_value = getEntityProperty(entity_obj, main.date, "maximum_zoom_level");
+        var current_minimum_zoom_value = getEntityProperty(entity_obj, main.date, "minimum_zoom_level");
 
         if (current_maximum_zoom_value)
           maximum_zoom_level_el.value = current_maximum_zoom_value;

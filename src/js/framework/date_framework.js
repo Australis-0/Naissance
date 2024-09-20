@@ -27,7 +27,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     for (var i = 0; i < main.entities.length; i++) {
       var local_entity = main.entities[i];
       var local_entity_id = local_entity.options.className;
-      var local_history = getPolityHistory(local_entity_id, main.date);
+      var local_history = getLastHistoryFrame(local_entity_id, main.date);
 
       //Reload object; add to map
       if (local_history) {

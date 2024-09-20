@@ -319,6 +319,12 @@
 
 //Entity parser helper functions
 {
+  /*
+    getBooleanOperatorFromString() - Helper function. Fetches a boolean operator (e.g. 'xor') from a given scripting string. Returns either 'and', 'not', 'or', or 'xor'.
+    arg0_string: (String) - The scripting string.
+
+    Returns: (String)
+  */
   function getBooleanOperatorFromString (arg0_string) {
     //Convert from parameters
     var string = arg0_string;
@@ -333,6 +339,10 @@
 
 //Entity core actions
 {
+  /*
+    deleteEntity() - Deletes an entity.
+    arg0_entity_id: (String) - The entity ID for the entity to delete.
+  */
   function deleteEntity (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -372,6 +382,10 @@
     refreshHierarchy();
   }
 
+  /*
+    editEntity() - Edits an entity clientside.
+    arg0_entity_id: (String) - The entity ID to edit.
+  */
   function editEntity (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -407,6 +421,12 @@
     }
   }
 
+  /*
+    hideEntity() - Hides an entity.
+    arg0_entity_id: (String) - The entity ID to hide.
+    arg1_date: (Object, Date) - Optional. The date at which to hide the entity. main.date by default.
+    arg2_do_not_reload: (Boolean) - Optional. Whether to reload the entity interface. False by default.
+  */
   function hideEntity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -429,6 +449,12 @@
     }
   }
 
+  /*
+    renameEntity() - Renames an entity.
+    arg0_entity_id: (String) - The entity ID for the entity which to rename.
+    arg1_entity_name: (String) - What to rename the entity to.
+    arg2_date: (Object, Date) - Optional. The date at which to rename the entity. main.date by default.
+  */
   function renameEntity (arg0_entity_id, arg1_entity_name, arg2_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -445,6 +471,12 @@
     return entity_name;
   }
 
+  /*
+    showEntity() - Shows an entity.
+    arg0_entity_id: (String) - The entity ID to show.
+    arg1_date: (Object, Date) - Optional. The date at which to hide the entity. main.date by default.
+    arg2_do_not_reload: (Boolean) - Optional. Whether to reload the entity interface. False by default.
+  */
   function showEntity (arg0_entity_id, arg1_date, arg2_do_not_reload) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -470,35 +502,6 @@
 
 //Entity functions - General-purpose, regardless of entity type
 {
-  //[WIP] - Make function more general-purpose
-  function entityHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var date = arg1_date;
-    var conditional_function = arg2_conditional_function;
-
-    //Declare local instance variables
-    var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-    var has_property;
-
-    if (entity_obj)
-      if (entity_obj.options)
-        if (entity_obj.options.history) {
-          var all_history_entries = Object.keys(entity_obj.options.history);
-
-          for (var i = 0; i < all_history_entries.length; i++) {
-            var local_history = entity_obj.options.history[all_history_entries[i]];
-
-            if (parseInt(local_history.id) <= convertTimestampToInt(ending_timestamp))
-              has_property = conditional_function(local_history);
-          }
-        }
-
-    //Return statement
-    return has_property;
-  }
-
   //finishEntity() - Finishes an entity's editing process.
   function finishEntity () {
     //Declare local instance variables
@@ -584,6 +587,8 @@
     arg1_options: (Object)
       return_is_new_entity: (Boolean) - Optional. Returns whether the current entity is a new entity or not. False by default.
       return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default.
+
+    Returns: (Object, Date/String)
   */
   function getEntity (arg0_entity_id, arg1_options) {
     //Convert from parameters
@@ -657,6 +662,12 @@
     return getBlankDate();
   }
 
+  /*
+    getEntityRelativeAge() - Fetches the relative age of an entity; the distance between its first frame and the current main.date.
+    arg0_entity_id: (String) - The entity ID for which to fetch the relative age for.
+
+    Returns: (Object, Date)
+  */
   function getEntityRelativeAge (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -682,6 +693,13 @@
     return getBlankDate();
   }
 
+  /*
+    getEntityName() - Fetches an entity name relative to the current date.
+    arg0_entity_id: (String) - The entity ID for which to fetch the entity name for.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch the name for. main.date by default.
+
+    Returns: (String)
+  */
   function getEntityName (arg0_entity_id, arg1_date) {
     //Convert from parmateers
     var entity_id = arg0_entity_id;
@@ -718,7 +736,7 @@
 
   /*
     isEntityBeingEdited() - Checks whether the entity is currently being edited.
-    arg0_entity_id: (String) - The Entity ID to check for.
+    arg0_entity_id: (String) - The entity ID to check for.
 
     Returns: (Boolean)
   */
@@ -735,6 +753,13 @@
       if (brush_obj.entity_options.className == entity_id) return true;
   }
 
+  /*
+    isEntityHidden() - Checks whether an entity is currently hidden.
+    arg0_entity_id: (String) - The entity ID to check for.
+    arg1_date: (Object, Date) - Optional. The date at which to check if an entity is hidden.
+
+    Returns: (Boolean)
+  */
   function isEntityHidden (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -748,7 +773,7 @@
         return true;
 
     //Return statement
-    return entityHasProperty(entity_id, date, function (local_history) {
+    return entityHistoryHasProperty(entity_id, date, function (local_history) {
       var is_extinct;
 
       if (local_history.options)
@@ -762,17 +787,10 @@
     });
   }
 
-  function isSameFrame (arg0_history_frame, arg1_history_frame) {
-    //Convert from parameters
-    var history_frame = arg0_history_frame;
-    var ot_history_frame = arg1_history_frame;
-
-    //Return statement
-    return (
-      JSON.stringify(history_frame.coords) == JSON.stringify(ot_history_frame.coords) &&
-      JSON.stringify(history_frame.options) && JSON.stringify(ot_history_frame.options));
-  }
-
+  /*
+    refreshEntityActions() - Refreshes the visible Entity Action navigation menu.
+    arg0_entity_id: (String) - The entity ID to refresh Entity Actions for.
+  */
   function refreshEntityActions (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -793,6 +811,13 @@
     }, 1);
   }
 
+  /*
+    reloadEntityInArray() - Reloads a given entity in an array when rendering. Returns the source array.
+    arg0_array: (Array<Object>) - The array containing the entity objects to reload.
+    arg1_entity_id: (String) - The entity ID which to reload.
+
+    Returns: (Array<Object>)
+  */
   function reloadEntityInArray (arg0_array, arg1_entity_id) {
     //Convert from parameters
     var array = getList(arg0_array);
@@ -924,6 +949,13 @@
     }
   }
 
+  /*
+    setEntityNameFromInput() - Sets the current entity name from a given input element.
+    arg0_entity_id: (String) - The entity ID which to set the entity name for.
+    arg1_element: (HTMLElement) - The HTML element representing the input for the given name.
+
+    Returns: (String)
+  */
   function setEntityNameFromInput (arg0_entity_id, arg1_element) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -950,6 +982,13 @@
 
 //Polity functions - For polygons only
 {
+  /*
+    getPolityArea() - Fetches the total area of a given polity in square metres.
+    arg0_entity_id: (String) - The entity ID for which to fetch the total area.
+    arg1_date: (Object, Date) - The date for which to fetch the entity area.
+
+    Returns: (Number)
+  */
   function getPolityArea (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;

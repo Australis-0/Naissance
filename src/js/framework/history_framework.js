@@ -1,4 +1,4 @@
-//Marked for review functions
+//Initialise history frame functions
 {
   function createHistoryFrame (arg0_entity_id, arg1_date, arg2_options, arg3_coords) {
     //Convert from parameters
@@ -11,7 +11,7 @@
     var date_string = getTimestamp(date);
     var entity_key = getEntity(entity_id, { return_key: true });
     var hierarchy_obj = main.hierarchies.hierarchy;
-    var old_history_entry = getPolityHistory(entity_id, date);
+    var old_history_entry = getLastHistoryFrame(entity_id, date);
 
     var entity_obj = (typeof entity_id != "object") ?
       main.entities[entity_key] : entity_id;
@@ -68,7 +68,7 @@
     }
   }
 
-  function deletePolityHistory (arg0_entity_id, arg1_date) {
+  function deleteHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var entry_date = arg1_date;
@@ -76,7 +76,7 @@
     //Declare local instance variables
     var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
     var entity_obj = getEntity(entity_id);
-    var history_key = getPolityHistory(entity_id, entry_date, { return_key: true });
+    var history_key = getLastHistoryFrame(entity_id, entry_date, { return_key: true });
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
     //Delete polity history if it exists
@@ -97,7 +97,7 @@
       }
   }
 
-  function editPolityHistory (arg0_entity_id, arg1_date) {
+  function editHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var entry_date = arg1_date;
@@ -109,15 +109,58 @@
     editEntity(entity_id);
   }
 
-  function getEntityProperty (arg0_entity_id, arg1_property, arg2_date, arg3_previous_property) {
+  /*
+    entityHistoryHasProperty() - Checks whether an entity's history matches a given conditional function.
+    arg0_entity_id: (String) - The entity ID for which to check if entity history matches.
+    arg1_date: (Object, Date) - Optional. The ending timestamp prior to which to check the conditional_function for. main.date by default.
+    arg2_conditional_function: (Function) - The conditional function which to run a check on every keyframe in an entity object for. Must return a Boolean.
+
+    Returns: (Boolean)
+  */
+  function entityHistoryHasProperty (arg0_entity_id, arg1_date, arg2_conditional_function) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
-    var property = arg1_property;
-    var date = arg2_date;
-    var previous_property = arg3_previous_property;
+    var date = arg1_date;
+    var conditional_function = arg2_conditional_function;
 
     //Declare local instance variables
     var ending_timestamp = (date) ? getTimestamp(date) : getTimestamp(main.date);
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+    var has_property;
+
+    if (entity_obj)
+      if (entity_obj.options)
+        if (entity_obj.options.history) {
+          var all_history_entries = Object.keys(entity_obj.options.history);
+
+          for (var i = 0; i < all_history_entries.length; i++) {
+            var local_history = entity_obj.options.history[all_history_entries[i]];
+
+            if (parseInt(local_history.id) <= convertTimestampToInt(ending_timestamp))
+              has_property = conditional_function(local_history);
+          }
+        }
+
+    //Return statement
+    return has_property;
+  }
+
+  /*
+    getEntityProperty() - Fetches the current value of an entity property (or key value) relative to the current date. For example, this can be used to fetch the last .entity_name.
+    arg0_entity_id: (String) - The entity ID for which to return the relevant key value for.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch the last keyframed property entry for. main.date by default.
+    arg2_property: (String) - The key string which to return the property for.
+
+    Returns: (Variable)
+  */
+  function getEntityProperty (arg0_entity_id, arg1_date, arg2_property) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : main.date;
+    var property = arg2_property;
+
+    //Declare local instance variables
+    var ending_timestamp = convertTimestampToInt(getTimestamp(date));
     var entity_value;
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
@@ -144,6 +187,12 @@
     }
   }
 
+  /*
+    getFirstHistoryFrame() - Returns the first history frame of a given entity object.
+    arg0_entity_id: (String) - The entity ID for which to return the first history frame.
+
+    Returns: (Object)
+  */
   function getFirstHistoryFrame (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -179,13 +228,16 @@
   }
 
   /*
-    getHistoryFrame() - Returns the history frame of an entity.
+    getHistoryFrame() - Returns the most recent relative history frame for an entity.
+    arg0_entity_id: (String) - The entity ID for which to fetch the relevant history frame.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch all last keyframed property entries for. main.date by default.
+
     Returns: (Object)
       is_founding: (Boolean), - Whether this frame is the founding frame
 
       id: (String), - The current history timestamp
       coords: (Array<Array<Number, Number>>), - An array of Naissance coords representing the poly
-      options: {} - A list of customisation options
+      options: (Object) - A list of customisation options
   */
   function getHistoryFrame (arg0_entity_id, arg1_date) {
     //Convert from parameters
@@ -229,11 +281,14 @@
   }
 
   /*
-    getPolityHistory() - Returns a polity history entry for the specified date
-    options: (Object)
+    getLastHistoryFrame() - Returns the most recent absolute history frame for an entity.
+
+    arg0_entity_id: (String) - The enity ID for which to fetch the last history frame.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch the last history frame.
+    arg2_options: (Object)
       return_key: (Boolean) - Whether to return the key instead of the object. False by default
   */
-  function getPolityHistory (arg0_entity_id, arg1_date, arg2_options) {
+  function getLastHistoryFrame (arg0_entity_id, arg1_date, arg2_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var entry_date = arg1_date;
@@ -257,10 +312,35 @@
     //Return statement
     return current_entry;
   }
+
+  /*
+    isSameHistoryFrame() - Checks whether two entity history frames are identical.
+    arg0_history_frame: (Object) - The 1st history frame to compare.
+    arg1_history_frame: (Object) - The 2nd history frame to compare.
+
+    Returns: (Boolean)
+  */
+  function isSameHistoryFrame (arg0_history_frame, arg1_history_frame) {
+    //Convert from parameters
+    var history_frame = arg0_history_frame;
+    var ot_history_frame = arg1_history_frame;
+
+    //Return statement
+    return (
+      JSON.stringify(history_frame.coords) == JSON.stringify(ot_history_frame.coords) &&
+      JSON.stringify(history_frame.options) && JSON.stringify(ot_history_frame.options));
+  }
 }
 
-//Entity keyframe handling
+//Entity history frame property handling
 {
+  /*
+    getEntityCoords() - Fetches an entity's current coordinates.
+    arg0_entity_id: (String) - The entity ID for which to fetch the coordinates for.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch current .coords.
+
+    Returns: (Array<Array<Number, Number>>)
+  */
   function getEntityCoords (arg0_entity_id, arg1_date) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -270,71 +350,9 @@
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
 
     //Return statement
-    return entityHasProperty(entity_obj, date, function (local_history) {
+    return entityHistoryHasProperty(entity_obj, date, function (local_history) {
       if (local_history.coords)
         return local_history.coords;
-    })
-  }
-
-  /*
-    getLastCoords() - Fetches the last valid .coords field from a Naissance entity.
-    arg2_options: (Object)
-      different_coords: (Boolean) - Optional. Whether the coords are required to be different. False by default.
-  */
-  function getLastCoords (arg0_entity_id, arg1_history_frame, arg2_options) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var history_frame = arg1_history_frame;
-    var options = (arg2_options) ? arg2_options : {};
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-    var last_history_coords = [];
-
-    if (entity_obj)
-      if (entity_obj.options.history) {
-        var all_history_frames = Object.keys(entity_obj.options.history);
-        var current_index = all_history_frames.indexOf(history_frame.id.toString());
-
-        //Iterate backwards from current_index
-        for (var i = current_index; i >= 0; i--) {
-          var local_history_entry = entity_obj.options.history[all_history_frames[i]];
-
-          //Return statement
-          if (local_history_entry.coords)
-            if (options.different_coords) {
-              if (JSON.stringify(local_history_entry.coords) != JSON.stringify(history_frame.coords))
-                return local_history_entry.coords;
-            } else {
-              if (local_history_entry.coords.length > 0)
-                return local_history_entry.coords;
-            }
-        }
-      }
-  }
-
-  function getLastIdenticalCoords (arg0_entity_id, arg1_history_frame) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var history_frame = arg1_history_frame;
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-
-    if (entity_obj)
-      if (entity_obj.options.history) {
-        var all_history_frames = Object.keys(entity_obj.options.history);
-        var current_index = all_history_frames.indexOf(history_frame.id.toString());
-
-        //Iterate backwards from current_index
-        for (var i = current_index; i >= 0; i--)
-          if (i != current_index) {
-            var local_history_entry = entity_obj.options.history[all_history_frames[i]];
-
-            if (JSON.stringify(local_history_entry.coords) == JSON.stringify(history_frame.coords))
-              //Return statement
-              return local_history_entry.coords;
-          }
-      }
+    });
   }
 }

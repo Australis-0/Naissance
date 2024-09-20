@@ -14,7 +14,7 @@
 
       //Set history entry to reflect actual_coords
       if (entity_obj.options.history) {
-        var current_history_entry = getPolityHistory(entity_obj, main.date);
+        var current_history_entry = getLastHistoryFrame(entity_obj, main.date);
 
         current_history_entry.coords = convertToNaissance(simplified_coords);
       }

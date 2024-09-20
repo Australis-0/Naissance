@@ -327,13 +327,13 @@
   }
 
   /*
-    getLastIdenticalCoords() - Fetches the last identical coords prior to the current frame.
+    getEntityLastIdenticalCoords() - Fetches the last identical coords prior to the current frame.
     arg0_object: (Object) - The object being referenced.
     arg1_history_frame: (Object) - The history frame object being referenced.
 
     Returns: (Array<Array<Number, Number>, ...>)
   */
-  function getLastIdenticalCoords (arg0_object, arg1_history_frame) {
+  function getEntityLastIdenticalCoords (arg0_object, arg1_history_frame) {
     //Convert from parameters
     var local_object = arg0_object;
     var history_frame = arg1_history_frame;

@@ -14,8 +14,8 @@ map.on("zoom", function (e) {
     var local_entity = getEntity(local_render_order[i]);
 
     if (local_entity) {
-      var local_entity_maximum_zoom = getEntityProperty(local_entity, "maximum_zoom_level", main.date);
-      var local_entity_minimum_zoom = getEntityProperty(local_entity, "minimum_zoom_level", main.date);
+      var local_entity_maximum_zoom = getEntityProperty(local_entity, main.date, "maximum_zoom_level");
+      var local_entity_minimum_zoom = getEntityProperty(local_entity, main.date, "minimum_zoom_level");
 
       var entity_meets_requirements = false;
 

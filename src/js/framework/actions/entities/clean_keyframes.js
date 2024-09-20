@@ -27,8 +27,8 @@
 
             //Process .coords
             {
-              //Remove .coords if last coords are the same getLastIdenticalCoords(entity_obj, local_history_entry));
-              if (getLastIdenticalCoords(entity_obj, local_history_entry))
+              //Remove .coords if last coords are the same getEntityLastIdenticalCoords(entity_obj, local_history_entry));
+              if (getEntityLastIdenticalCoords(entity_obj, local_history_entry))
                 delete local_history_entry.coords;
 
               //Convert to Naissance format if applicable

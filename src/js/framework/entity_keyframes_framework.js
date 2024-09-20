@@ -7,7 +7,7 @@
 
     //Delete keyframe; update bio [WIP] - Make sure to update bio
     closeEntityKeyframeContextMenus(entity_id);
-    deletePolityHistory(entity_id, timestamp);
+    deleteHistoryFrame(entity_id, timestamp);
 
     printEntityBio(entity_id);
   }
@@ -35,7 +35,7 @@
     var entity_el = getEntityElement(entity_id);
 
     var entity_obj = getEntity(entity_id);
-    var history_entry = getPolityHistory(entity_id, entry_date);
+    var history_entry = getLastHistoryFrame(entity_id, entry_date);
     var new_timestamp = getTimestamp(move_to_date);
     var old_timestamp = getTimestamp(convertTimestampToDate(entry_date));
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
