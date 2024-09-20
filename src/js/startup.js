@@ -34,7 +34,7 @@ window.path = require("path");
     current_selection: undefined, //Renamed selection. The selection entity currently being edited.
     current_path: undefined, //The raw path currently being edited.
     editing_entity: undefined, //The entity ID currently being edited
-    polity_options: {}, //Used to store the options of the entity selected.
+    entity_options: {}, //Used to store the options of the entity selected.
 
     selected_layer: "polities", //The current selected layer.
     simplify_tolerance: 0.05, //The current simplify tolerance for brushes.

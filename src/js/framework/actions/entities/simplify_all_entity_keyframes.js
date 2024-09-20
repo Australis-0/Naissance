@@ -1,5 +1,12 @@
 //Initialise functions
 {
+  /*
+    simplifyAllEntityKeyframes() - Simplifies all entity keyframe paths to a given tolerance.
+    arg0_entity_id: (String) - The entity ID to simplify all keyframes for.
+    arg1_tolerance: (Number) - The tolerance to simplify the keyframes to.
+
+    Returns: (Number)
+  */
   function simplifyAllEntityKeyframes (arg0_entity_id, arg1_tolerance) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -25,5 +32,8 @@
       //Simplify current entity to update coords on map
       simplifyEntity(entity_id, tolerance);
     }
+
+    //Return statement
+    return entity_obj;
   }
 }

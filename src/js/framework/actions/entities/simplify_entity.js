@@ -1,5 +1,12 @@
 //Initialise functions
 {
+  /*
+    simplifyEntity() - Simplifies an entity to a given tolerance.
+    arg0_entity_id: (String) - The entity ID to simplify.
+    arg1_tolerance: (Number) - The tolerance to simplify this entity to.
+
+    Returns: (Object)
+  */
   function simplifyEntity (arg0_entity_id, arg1_tolerance) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -23,5 +30,8 @@
       entity_obj.remove();
       entity_obj.addTo(map);
     }
+
+    //Return statement
+    return entity_obj;
   }
 }

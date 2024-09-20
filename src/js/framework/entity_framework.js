@@ -509,6 +509,7 @@
     var coords = convertToNaissance(brush_obj.current_path);
     var entity_id;
     var entity_name;
+    var is_new_entity;
     var new_entity = {
       options: brush_obj.current_selection.options
     };
@@ -524,11 +525,14 @@
     {
       if (brush_obj.current_selection.options.entity_name)
         entity_name = JSON.parse(JSON.stringify(brush_obj.current_selection.options.entity_name));
+      if (brush_obj.entity_options)
+        if (brush_obj.entity_options.className)
+          if (getEntity(brush_obj.entity_options.className, { return_is_new_entity: true }))
+            is_new_entity = true;
     }
 
     //Add new entity to relevant layer
     if (new_entity.options.className) {
-      var is_new_entity = getEntity(new_entity.options.className, { return_is_new_entity: true });
 
       if (is_new_entity) {
         var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
@@ -613,17 +617,11 @@
     }
 
     //If entity_obj is undefined; check to make sure entity_id being fetched isn't just the current main.brush.current_selection
-    if (brush_obj.current_selection)
-      if (brush_obj.current_selection.options)
-        if (brush_obj.current_selection.options.className == entity_id) {
+    if (brush_obj.entity_options)
+      if (brush_obj.entity_options.className)
+        if (!entity_obj) {
+          is_new_entity = true;
           entity_obj = brush_obj.current_selection;
-
-          //Check to see if entity_obj has a history
-          is_new_entity = true; //Assume that this is true by default
-          if (entity_obj.options)
-            if (entity_obj.options.history)
-              if (Object.keys(entity_obj.options.history).length > 0)
-                is_new_entity = false;
         }
 
     //Return statement

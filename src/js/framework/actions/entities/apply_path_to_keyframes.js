@@ -1,5 +1,10 @@
 //Initialise functions
 {
+  /*
+    applyPathToKeyframes() - Retroactively applies the current path to multiple keyframes.
+    arg0_entity_id: (String) - The entity ID for which to apply the path to multiple keyframes for.
+    arg1_keyframes: (Array<String>) - The keyframes which to apply paths for.
+  */
   function applyPathToKeyframes (arg0_entity_id, arg1_keyframes) {
     //Convert from parameters
     var entity_id = arg0_entity_id;

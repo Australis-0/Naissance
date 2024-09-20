@@ -6,6 +6,8 @@
     arg1_tolerance: (Object, Date) - The date range from the current main.date for which duplicate keyframes should be removed.
     arg2_options: (Object)
       do_not_display: (Boolean) - Optional. Whether to not refresh the entity bio. False by default.
+
+    Returns: (Object)
   */
   function cleanKeyframes (arg0_entity_id, arg1_tolerance, arg2_options) {
     //Convert from parameters
