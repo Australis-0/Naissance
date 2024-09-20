@@ -210,7 +210,6 @@
           if (entity_action_obj.interface) {
             var new_interface = JSON.parse(JSON.stringify(entity_action_obj.interface));
             new_interface.anchor = context_menu_ui.anchor;
-            console.log(new_interface);
 
             var action_context_menu_ui = createContextMenu(new_interface);
             refreshEntityActionsContextMenus(entity_id);
@@ -226,18 +225,45 @@
               let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
               if (!local_value.id) local_value.id = all_interface_keys[i];
 
-              //Type handlers: set placeholders where applicable
+              //Type handlers: set placeholders and user_value where applicable
               {
                 //Date
                 if (local_value.type == "date")
                   populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+                if (local_value.type == "range") {
+                  var actual_number_in_range = calculateNumberInRange(
+                    [returnSafeNumber(local_value.attributes.min, 0), returnSafeNumber(local_value.attributes.max, 100)],
+                    local_value.placeholder,
+                    local_value.value_equation
+                  );
+                  var range_el = local_element.querySelector(`input[type="range"]`);
+
+                  range_el.value = actual_number_in_range;
+                }
               }
 
               //Parse .effect to .onclick event handlers
               if (local_value.effect)
                 local_element.onclick = function (e) {
+                  var local_input = getInput(this, { entity_id: entity_id });
+
+                  //Fetch local_actual_value based on local_value.value_equation
+                  var local_actual_value = (local_value.value_equation) ?
+                    parseVariableString(local_value.value_equation, { VALUE: parseFloat(local_input) }) : parseFloat(local_input);
+
+                  if (local_value.value_equation)
+                    fillInput({
+                      element: this,
+                      type: local_value.type,
+                      placeholder: local_actual_value
+                    });
                   parseEntityEffect(entity_id, local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "entity_actions" });
-                  console.log(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_actions" });
+
+                  //Range post-handler
+                  if (local_value.type == "range") {
+                    var range_el = this.querySelector(`input[type="range"]`);
+                    range_el.value = parseFloat(local_input);
+                  }
                 };
             }
           }
@@ -400,7 +426,7 @@
               fillInput({
                 element: local_input_el,
                 type: local_input_el.getAttribute("type"),
-                placeholder: input_obj[local_value.placeholder]
+                placeholder: (input_obj[local_value.placeholder]) ? input_obj[local_value.placeholder] : local_value.placeholder
               });
           }
         }

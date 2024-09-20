@@ -101,8 +101,10 @@
             } else {
               showEntity(entity_id);
             }
+          if (all_scope_keys[i] == "set_brush_simplify_tolerance")
+            setBrushSimplifyTolerance(local_value[0]);
           if (all_scope_keys[i] == "simplify_all_keyframes")
-            simplifyAllEntityKeyframes(entity_id, brush_obj.simplify_tolerance);
+            simplifyAllEntityKeyframes(entity_id, returnSafeNumber(local_value[0]));
 
           //History effects
           if (all_scope_keys[i] == "delete_keyframe")
@@ -133,29 +135,39 @@
               //Parse the entity_effect being referenced
               for (var x = 0; x < local_value.length; x++) {
                 var local_entity_action = getEntityAction(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
 
-                if (local_entity_action.immediate) {
-                  var new_options = JSON.parse(JSON.stringify(options));
-                  var parsed_effect = parseEntityEffect(entity_id, local_entity_action.immediate, new_options);
-                }
-                if (local_entity_action.effect) {
-                  var new_options = JSON.parse(JSON.stringify(options));
-                  var parsed_effect = parseEntityEffect(entity_id, local_entity_action.effect, new_options);
-                }
+                //Initialise options
+                if (!new_options.ENTITY_ACTION)
+                  new_options.ENTITY_ACTION = local_value[x];
+
+                //Parse scope
+                if (local_entity_action.effect)
+                  parsed_effect = parseEntityEffect(entity_id, local_entity_action.effect, new_options);
+                if (local_entity_action.immediate)
+                  parsed_immediate = parseEntityEffect(entity_id, local_entity_action.immediate, new_options);
                 if (local_entity_action)
-                  printEntityActionsContextMenu(entity_id, local_entity_action);
+                  printEntityActionsContextMenu(entity_id, local_entity_action, new_options);
               }
             } else if (options.ui_type == "entity_keyframes") {
               //Parse the entity_effect being referenced
               for (var x = 0; x < local_value.length; x++) {
                 var local_entity_keyframe = getEntityKeyframe(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
 
-                if (local_entity_keyframe.effect) {
-                  var new_options = JSON.parse(JSON.stringify(options));
-                  var parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
-                }
+                //Initialise options
+                if (!new_options.ENTITY_KEYFRAME)
+                  new_options.ENTITY_KEYFRAME = local_value[x];
+
+                //Parse scope
+                if (local_entity_keyframe.effect)
+                  parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
+                if (local_entity_action.immediate)
+                  parsed_immediate = parseEntityEffect(entity_id, local_entity_action.immediate, new_options);
                 if (local_entity_keyframe)
-                  printEntityKeyframeContextMenu(entity_id, local_entity_keyframe);
+                  printEntityKeyframeContextMenu(entity_id, local_entity_keyframe, new_options);
               }
             }
           if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
@@ -277,7 +289,7 @@
   */
   function parseVariableString (arg0_string, arg1_options) {
     //Convert from parameters
-    var string = JSON.parse(JSON.string(arg0_string));
+    var string = JSON.parse(JSON.stringify(arg0_string));
     var options = (arg1_options) ? arg1_options : {};
 
     //Initialise options

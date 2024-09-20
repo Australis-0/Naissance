@@ -67,6 +67,7 @@
   function createContextMenu (arg0_options) { //[WIP] - Finish function body.
     //Convert from parameters
     var options = (arg0_options) ? arg0_options : {};
+    console.log(`createContextMenu()`, options);
 
     //Initialise options
     if (!options.class) options.class = "";
@@ -213,6 +214,14 @@
     //Intiialise options
     if (!options.attributes) options.attributes = {};
     if (!options.options) options.options = {};
+      if (!options.options.VALUE) {
+        if (options.attributes.value)
+          options.options.VALUE = options.attributes.value;
+        if (options.placeholder)
+          options.options.VALUE = options.placeholder;
+      }
+    if (options.name)
+      options.name = `<span id = "name-label">${parseLocalisation(options.name, { is_html: true, scopes: options.options })}</span>`;
 
     //Declare local instance variables
     var html_string = [];
@@ -355,6 +364,7 @@
           html_string.push(options.name);
       html_string.push(`</span>`);
     } else if (options.type == "checkbox") {
+      delete options.options.VALUE;
       if (!options.options) {
         if (options.icon)
           html_string.push(`<img src = "${options.icon}">`);
@@ -414,6 +424,7 @@
         html_string.push(`</span>`);
       html_string.push(`</div>`);
     } else if (options.type == "datalist") {
+      delete options.options.VALUE;
       if (options.name)
         html_string.push(`<div class = "header">${options.name}</div>`);
       html_string.push(`<datalist class = "datalist">`);
@@ -507,7 +518,8 @@
       if (options.name)
         html_string.push(options.name);
       html_string.push(`<input type = "password" id = "password-input" ${objectToAttributes(options.attributes)}>`);
-    } else if (options.type == "radio") { //[WIP] - This needs a way for radio buttons to be grouped
+    } else if (options.type == "radio") {
+      delete options.options.VALUE;
       if (!options.options) {
         if (options.name)
           html_string.push(options.name);
@@ -528,9 +540,10 @@
         }
       }
     } else if (options.type == "range") {
-      var name_string = (options.name) ? ` ${options.name}` : "";
+      var actual_number_in_range = calculateNumberInRange([options.attributes.min, options.attributes.max], options.options.VALUE, options.value_equation);
+      var name_string = (options.name) ? `${options.name} ` : "";
 
-      html_string.push(`<input type = "range" id = "range-input"${name_string} ${objectToAttributes(options.attributes)}`);
+      html_string.push(`${name_string}<input type = "range" id = "range-input"${objectToAttributes(options.attributes)} value = "${actual_number_in_range}">`);
     } else if (options.type == "reset") {
       if (options.name)
         html_string.push(`<div class = "header">${options.name}</div>`);
@@ -695,6 +708,90 @@
   }
 
   /*
+    getInput() - Returns the input of a specific input HTMLElement within a context menu as a variable.
+    arg0_input_el: (HTMLElement) - The individual .context-menu-cell being referenced.
+
+    Returns: (Variable)
+  */
+  function getInput (arg0_input_el) { //[WIP] - Complete function body
+    //Convert from parameters
+    var input_el = arg0_input_el;
+
+    //Declare local instance variables
+    var id = input_el.getAttribute("id");
+    var output;
+    var type = input_el.getAttribute("type");
+
+    if (type == "biuf") {
+      output = input_el.querySelector(`#biuf-input`).innerHTML;
+    } else if (["rich_text", "wysiwyg"].includes(type)) {
+      output = getWysiwygFromFields(input_el);
+    } else if (type == "checkbox") {
+      var all_checkboxes = input_el.querySelectorAll(`[type="checkbox"]`);
+      output = [];
+
+      //Iterate over all_checkboxes
+      for (var i = 0; i < all_checkboxes.length; i++)
+        if (all_checkboxes[i].checked)
+          output.push(all_checkboxes[i].id);
+    } else if (["color", "colour"].includes(type)) {
+      output = getColourFromFields(input_el);
+    } else if (type == "datalist") {
+      output = input_el.querySelector("datalist").value;
+    } else if (type == "date") {
+      output = getDateFromFields(input_el);
+    } else if (type == "date_length") {
+      output = getDateLengthFromFields(input_el);
+    } else if (type == "email") {
+      output = input_el.querySelector("input[type='email']").value;
+    } else if (type == "file") {
+      //[WIP] - No current file input of this kind
+    } else if (type == "html") {
+      if (options.custom_html_function)
+        output = options.custom_html_function(input_el);
+    } else if (type == "image") {
+      //[WIP] - No current file input of this kind
+    } else if (type == "number") {
+      output = input_el.querySelector(`input[type="number"]`).value;
+    } else if (type == "password") {
+      output = input_el.querySelector(`input[type="password"]`).value;
+    } else if (type == "radio") {
+      var all_radio_els = input_el.querySelectorAll(`[type="radio"]`);
+
+      //Iterate over all_radio_els
+      for (var i = 0; i < all_radio_els.length; i++)
+        if (all_radio_els[i].checked) {
+          output = all_radio_els[i].id;
+          break;
+        }
+    } else if (type == "range") {
+      output = input_el.querySelector(`input[type="range"]`).value;
+    } else if (type == "search_select") {
+      //[WIP] - No search select input of this kind
+    } else if (type == "select") {
+      output = input_el.querySelector("select").value;
+    } else if (["tel", "telephone"].includes(type)) {
+      output = input_el.querySelector(`input[type="tel"]`).value;
+    } else if (type == "text") {
+      output = input_el.querySelector(`input[type="text"]`).value;
+    } else if (type == "time") {
+      output = input_el.querySelector(`input[type="time"]`).value;
+      if (output && output != "n/a") {
+        output = output.split(":");
+        output = {
+          hour: parseInt(output[0]),
+          minute: parseInt(output[1])
+        };
+      }
+    } else if (type == "url") {
+      output = input_el.querySelector(`input[type="url"]`).value;
+    }
+
+    //Return statement
+    return output;
+  }
+
+  /*
     getInputsAsObject() - Returns inputs as an object.
     arg0_context_menu_el: (HTMLElement) - The context menu element.
     arg1_options: (Object)
@@ -720,75 +817,10 @@
       var has_output = true;
       var local_id = all_inputs[i].getAttribute("id");
       var local_output;
-      var local_type = all_inputs[i].getAttribute("type");
 
-      //Fetch .id based on type
-      if (local_type == "biuf") {
-        local_output = all_inputs[i].querySelector("#biuf-input").innerHTML;
-      } else if (["rich_text", "wysiwyg"].includes(local_type)) {
-        local_output = getWysiwygFromFields(all_inputs[i]);
-      } else if (local_type == "checkbox") {
-        var all_checkboxes = all_inputs[i].querySelectorAll("[type='checkbox']");
-        local_output = [];
-
-        //Iterate over all_checkboxes
-        for (var x = 0; x < all_checkboxes.length; x++)
-          if (all_checkboxes[x].checked)
-            local_output.push(all_checkboxes[x].id);
-      } else if (["color", "colour"].includes(local_type)) {
-        local_output = getColourFromFields(all_inputs[i]);
-      } else if (local_type == "datalist") {
-        local_output = all_inputs[i].querySelector("datalist").value;
-      } else if (local_type == "date") {
-        local_output = getDateFromFields(all_inputs[i]);
-      } else if (local_type == "date_length") {
-        local_output = getDateLengthFromFields(all_inputs[i]);
-      } else if (local_type == "email") {
-        local_output = all_inputs[i].querySelector("input[type='email']").value;
-      } else if (local_type == "file") {
-        //[WIP] - No current file input of this kind
-      } else if (local_type == "html") {
-        if (options.custom_html_function)
-          local_output = options.custom_html_function(all_inputs[i]);
-      } else if (local_type == "image") {
-        //[WIP] - No current file input of this kind
-      } else if (local_type == "number") {
-        local_output = all_inputs[i].querySelector("input[type='number']").value;
-      } else if (local_type == "password") {
-        local_output = all_inputs[i].querySelector("input[type='password']").value;
-      } else if (local_type == "radio") {
-        var all_radios = all_inputs[i].querySelectorAll("[type='radio']");
-
-        //Iterate over all_radios
-        for (var i = 0; i < all_radios.length; i++)
-          if (all_radios[i].checked) {
-            local_output = all_radios[i].id;
-            break;
-          }
-      } else if (local_type == "range") {
-        local_output = all_inputs[i].querySelector("input[type='range']").value;
-      } else if (local_type == "search_select") {
-        //[WIP] - No search select input of this kind
-      } else if (local_type == "select") {
-        local_output = all_inputs[i].querySelector("select").value;
-      } else if (["tel", "telephone"].includes(local_type)) {
-        local_output = all_inputs[i].querySelector("input[type='tel']").value;
-      } else if (local_type == "text") {
-        local_output = all_inputs[i].querySelector("input[type='text']").value;
-      } else if (local_type == "time") {
-        local_output = all_inputs[i].querySelector("input[type='time']").value;
-        if (local_output && local_output != "n/a") {
-          local_output = local_output.split(":");
-          local_output = {
-            hour: parseInt(local_output[0]),
-            minute: parseInt(local_output[1])
-          };
-        }
-      } else if (local_type == "url") {
-        local_output = all_inputs[i].querySelector("input[type='url']").value;
-      } else {
-        has_output = false;
-      }
+      //Fetch local_output
+      local_output = getInput(all_inputs[i]);
+      if (local_output) has_output = true;
 
       //Set return_obj[local_id]
       if (has_output)
@@ -870,6 +902,13 @@
         g_el.value = options.placeholder[1];
         b_el.value = options.placeholder[2];
         setColourWheelCursor(options.element, options.placeholder);
+      } else if (options.type == "checkbox") {
+        var all_checkbox_els = options.element.querySelectorAll(`[type="checkbox"]`);
+
+        //Iterate over all_checkbox_els
+        for (var i = 0; i < all_checkbox_els.length; i++)
+          if (options.placeholder[all_checkbox_els[i].id])
+            all_checkbox_els[i].checked = options.placeholder;
       } else if (options.type == "datalist") {
         options.element.querySelector("datalist").value = options.placeholder;
       } else if (options.type == "date") {
@@ -925,12 +964,11 @@
         options.element.querySelector(`input[type="password"]`).value = options.placeholder;
       } else if (options.type == "radio") {
         var all_radio_els = options.element.querySelectorAll(`[type="radio"]`);
-        options.placeholder = getList(options.placeholder);
 
-        //Iterate over all_radios
+        //Iterate over all_radio_els
         for (var i = 0; i < all_radio_els; i++)
-          if (options.placeholder[i] != undefined)
-            all_radio_els[i].checked = options.placeholder[i];
+          if (options.placeholder == all_radio_els[i].id)
+            all_radio_els[i].checked = true;
       } else if (options.type == "range") {
         options.element.querySelector(`input[type="range"]`).value = options.placeholder;
       } else if (options.type == "search_select") {

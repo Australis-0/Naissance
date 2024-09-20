@@ -4,6 +4,7 @@
     parseLocalisation() - Parses a localisation into given sounds.
     arg0_string: (String) - The string to parse into a given localisation, with {} representing scope variables.
     arg1_options: (Object)
+      is_html: (Boolean) - Optional. Whether the localisation to be parsed is HTML. False by default.
       scopes: (Object)
         <variable_key>: (Variable) - The value to replace {<variable>} string keys with.
 
@@ -22,7 +23,11 @@
         var local_regex = new RegExp(`{${all_scopes[i]}}`, "gm");
         var local_value = options.scopes[all_scopes[i]];
 
-        string = string.replace(local_regex, local_value);
+        if (!options.is_html) {
+          string = string.replace(local_regex, local_value);
+        } else {
+          string = string.replace(local_regex, `<span data-key = "${all_scopes[i]}">${local_value}</span>`);
+        }
       }
     }
 

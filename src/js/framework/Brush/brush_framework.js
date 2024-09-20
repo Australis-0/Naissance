@@ -22,4 +22,28 @@
     delete brush_obj.current_path;
     delete brush_obj.editing_entity;
   }
+
+  function setBrushSimplifyTolerance (arg0_tolerance) {
+    //Convert from parameters
+    var tolerance = arg0_tolerance;
+
+    //Declare local instance variables
+    var all_simplify_tolerance_range_els = document.querySelectorAll(`*:has(> [global_key="BRUSH_OBJ.simplify_tolerance"]`);
+    var brush_obj = main.brush;
+
+    //Iterate over all_simplify_tolerance_range_els
+    for (var i = 0; i < all_simplify_tolerance_range_els.length; i++) {
+      //Change range_el value first
+      var local_range_el = all_simplify_tolerance_range_els[i].querySelector(`input[type="range"]`);
+      local_range_el.value = tolerance;
+
+      //Iterate over all_local_value_els and substitute them with the correct value
+      var all_local_value_els = all_simplify_tolerance_range_els[i].querySelectorAll(`span[data-key="VALUE"]`);
+      for (var x = 0; x < all_local_value_els.length; x++)
+        all_local_value_els[x].innerHTML = tolerance;
+    }
+
+    //Set actual brush_obj.simplify_tolerance
+    brush_obj.simplify_tolerance = tolerance;
+  }
 }
