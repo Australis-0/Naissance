@@ -15,10 +15,14 @@
     main.groups = {};
 
     //Push new entities
-    for (var i = 0; i < save_data.entities.length; i++)
-      main.entities.push(
-        L.polygon(save_data.entities[i].coords, save_data.entities[i].options)
-      );
+    for (var i = 0; i < save_data.entities.length; i++) {
+      var local_options = JSON.parse(JSON.stringify(save_data.entities[i].options));
+
+      //Make sure entity when pushed is not displayed
+      local_options.do_not_display = true;
+      var local_polygon = createPolygon(save_data.entities[i].coords, local_options);
+      main.entities.push(local_polygon);
+    }
 
     //Load groups
     if (save_data.groups)

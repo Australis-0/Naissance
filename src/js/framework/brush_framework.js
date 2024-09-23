@@ -21,6 +21,7 @@
 
     delete brush_obj.current_path;
     delete brush_obj.editing_entity;
+    delete brush_obj.entity_options;
   }
 
   function setBrushSimplifyTolerance (arg0_tolerance) {

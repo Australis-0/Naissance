@@ -4,6 +4,8 @@
     //Declare local instance variables
     var brush_obj = main.brush;
 
+    main.cursor_layer = new maptalks.VectorLayer("cursor_layer").addTo(map);
+
     //On mousemove event for map
     map.on("mousemove", function (e) {
       //Set cursor
@@ -13,12 +15,15 @@
           brush_obj.cursor.remove();
 
         //Set new cursor
-        brush_obj.cursor = LGeo.circle(e.latlng, brush_obj.radius, {
-          color: RGBToHex(0, 0, 0),
-          dashArray: 4,
-          fill: false,
-          weight: 2
-        }).addTo(map);
+        brush_obj.cursor = new maptalks.Circle(e.coordinate, brush_obj.radius, {
+          symbol: {
+            lineColor: RGBToHex(0, 0, 0),
+            lineDasharray: [4, 4],
+            polygonFill: "transparent",
+            lineWidth: 2
+          }
+        });
+        main.cursor_layer.addGeometry(brush_obj.cursor);
       }
 
       //Left click to paint
@@ -38,7 +43,7 @@
           brush_obj.brush_change = true;
           brush_obj.current_path = union(brush_obj.current_path, brush_obj.cursor);
         } else if (main.events.right_mouse) {
-          //Only delete if  brush_obj.current_path exists
+          //Only delete if brush_obj.current_path exists
           if (brush_obj.current_path)
             try {
               brush_obj.current_path = difference(brush_obj.current_path, brush_obj.cursor);
@@ -58,11 +63,16 @@
     });
 
     //Brush cursor outline
-    L.DomEvent.on(L.DomUtil.get("map"), "mousewheel", function (e) {
-      if (e.wheelDeltaY < 0)
-        brush_obj.radius = brush_obj.radius*1.1;
-      if (e.wheelDeltaY > 0)
-        brush_obj.radius = brush_obj.radius*0.9;
+    map.getContainer().addEventListener("wheel", function (e) {
+      //Normalise the wheel delta across different browsers
+      var delta_y = e.deltaY*-1;
+
+      if (window.ctrl_pressed) {
+        if (delta_y < 0)
+          brush_obj.radius = brush_obj.radius*1.1;
+        if (delta_y > 0)
+          brush_obj.radius = brush_obj.radius*0.9;
+      }
     });
   }
 
@@ -71,7 +81,7 @@
     var brush_obj = main.brush;
     var selected_id = "";
 
-    if (brush_obj.brush_change) {
+    if (brush_obj.brush_change) { //brush_obj.brush_change here refers to discrete changes; not continuous changes
       if (brush_obj.current_path) {
         if (brush_obj.current_selection)
           selected_id = brush_obj.current_selection.options.className;
@@ -216,12 +226,15 @@
         brush_obj.current_selection.remove();
         delete brush_obj.current_selection; //current_selection has to actually be deleted to avoid refresh errors
       }
-      if (brush_obj.current_path)
-        brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.entity_options).addTo(map);
+      if (brush_obj.current_path) {
+        brush_obj.current_selection = createPolygon(brush_obj.current_path, brush_obj.entity_options);
+        brush_obj.current_selection.remove();
+        brush_obj.current_selection.addTo(main.cursor_layer);
+      }
 
       //Bind tooltip to selection
       if (brush_obj.current_selection) {
-        L.setOptions(brush_obj.current_selection, brush_obj.entity_options);
+        brush_obj.current_selection.setSymbol(brush_obj.entity_options);
         brush_obj.current_selection.on("click", function (e) {
           printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: true });
         });

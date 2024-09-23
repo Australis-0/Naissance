@@ -122,16 +122,31 @@ if (!global.config) global.config = {};
 {
   initOptimisation();
 
-  var map = L.map("map").setView({
-    inertia: true,
-    lon: 0,
-    lat: 0,
-    minZoom: 3,
-    maxZoom: 10,
-    worldCopyJump: true //Makes sure the world map wraps around
-  }).setView([51.505, -0.09], 5);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+  /*
+  var map = new maptalks.Map('map', {
+   center: [0, 0],
+   zoom: 2,
+   baseLayer: new maptalks.TileLayer('base', {
+     'urlTemplate' : 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+     'subdomains'  : ['a','b','c','d'],
+     'attribution'  : '&copy; <a href="http://www.osm.org/copyright">OSM</a> contributors, '+
+     '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+   })
+ });
+  */
+  var map = new maptalks.Map("map", {
+    center: [51.505, -0.09],
+    zoom: 5,
+    spatialReference: {
+      projection: 'EPSG:3857' // Ensure that both Maptalks and Leaflet use the same projection
+    },
+    baseLayer: new maptalks.TileLayer("base", {
+      urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      subdomains: ["a"],
+      repeatWorld: false
+    })
+  });
+  main.entity_layer = new maptalks.VectorLayer("entity_layer").addTo(map);
 
   //Initialise Brush UI
   initBrush();
@@ -159,7 +174,7 @@ setTimeout(function(){
   var hierarchies_obj = main.hierarchies;
   var hierarchy_el = getUISelector("hierarchy");
   loadSave("atlas");
-
+  
   //Sync entities
   main.equate_entities_interval = equateObject(hierarchies_obj.hierarchy, "entities", global.main, "entities");
   main.previous_hierarchy_html = hierarchy_el.innerHTML;

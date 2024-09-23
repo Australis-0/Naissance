@@ -11,7 +11,7 @@
     var date_string = getTimestamp(date);
     var entity_key = getEntity(entity_id, { return_key: true });
     var hierarchy_obj = main.hierarchies.hierarchy;
-    var old_history_entry = getLastHistoryFrame(entity_id, date);
+    var old_history_entry = getAbsoluteHistoryFrame(entity_id, date);
 
     var entity_obj = (typeof entity_id != "object") ?
       main.entities[entity_key] : entity_id;
@@ -76,7 +76,7 @@
     //Declare local instance variables
     var context_menu_el = document.getElementById(`entity-ui-context-menu-${entity_id}`);
     var entity_obj = getEntity(entity_id);
-    var history_key = getLastHistoryFrame(entity_id, entry_date, { return_key: true });
+    var history_key = getAbsoluteHistoryFrame(entity_id, entry_date, { return_key: true });
     var popup_el = document.querySelector(`.leaflet-popup[class~='${entity_id}']`);
 
     //Delete polity history if it exists
@@ -228,6 +228,39 @@
   }
 
   /*
+    getAbsoluteHistoryFrame() - Returns the most recent absolute history frame for an entity.
+
+    arg0_entity_id: (String) - The enity ID for which to fetch the last history frame.
+    arg1_date: (Object, Date) - Optional. The date relative to which to fetch the last history frame.
+    arg2_options: (Object)
+      return_key: (Boolean) - Whether to return the key instead of the object. False by default
+  */
+  function getAbsoluteHistoryFrame (arg0_entity_id, arg1_date, arg2_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var entry_date = arg1_date;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Declare local instance variables
+    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
+    var entry_timestamp = getTimestamp(arg1_date);
+
+    //Check that entity_obj actually exists
+    if (entity_obj)
+      if (entity_obj.options.history) {
+        var all_entity_histories = Object.keys(entity_obj.options.history);
+        var current_entry = undefined;
+
+        for (var i = 0; i < all_entity_histories.length; i++)
+          if (convertTimestampToInt(entry_timestamp) >= convertTimestampToInt(all_entity_histories[i]))
+            current_entry = (!options.return_key) ? entity_obj.options.history[all_entity_histories[i]] : all_entity_histories[i];
+      }
+
+    //Return statement
+    return current_entry;
+  }
+
+  /*
     getHistoryFrame() - Returns the most recent relative history frame for an entity.
     arg0_entity_id: (String) - The entity ID for which to fetch the relevant history frame.
     arg1_date: (Object, Date) - Optional. The date relative to which to fetch all last keyframed property entries for. main.date by default.
@@ -278,39 +311,6 @@
 
     //Return statement
     return history_frame;
-  }
-
-  /*
-    getLastHistoryFrame() - Returns the most recent absolute history frame for an entity.
-
-    arg0_entity_id: (String) - The enity ID for which to fetch the last history frame.
-    arg1_date: (Object, Date) - Optional. The date relative to which to fetch the last history frame.
-    arg2_options: (Object)
-      return_key: (Boolean) - Whether to return the key instead of the object. False by default
-  */
-  function getLastHistoryFrame (arg0_entity_id, arg1_date, arg2_options) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var entry_date = arg1_date;
-    var options = (arg2_options) ? arg2_options : {};
-
-    //Declare local instance variables
-    var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
-    var entry_timestamp = getTimestamp(arg1_date);
-
-    //Check that entity_obj actually exists
-    if (entity_obj)
-      if (entity_obj.options.history) {
-        var all_entity_histories = Object.keys(entity_obj.options.history);
-        var current_entry = undefined;
-
-        for (var i = 0; i < all_entity_histories.length; i++)
-          if (convertTimestampToInt(entry_timestamp) >= convertTimestampToInt(all_entity_histories[i]))
-            current_entry = (!options.return_key) ? entity_obj.options.history[all_entity_histories[i]] : all_entity_histories[i];
-      }
-
-    //Return statement
-    return current_entry;
   }
 
   /*

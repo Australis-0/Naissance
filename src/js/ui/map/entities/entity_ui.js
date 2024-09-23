@@ -6,12 +6,38 @@
 
     //Declare local instance variables
     var entity_el = interfaces[entity_id];
+    console.log(`Entity el:`, entity_el);
 
-    //Close entity_el
-    if (entity_el) {
-      entity_el._container.remove();
-      delete interfaces[entity_id];
-    }
+    if (entity_el)
+      if (!entity_el.isMap) {
+        //Close entity_el
+        entity_el.remove();
+        delete interfaces[entity_id];
+      }
+  }
+
+  function createPopup (arg0_coords, arg1_content, arg2_options) {
+    //Convert from parameters
+    var coords = arg0_coords;
+    var content = (arg1_content) ? arg1_content : "";
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Initialise options
+    if (!options.className) options.className = "default";
+
+    //Declare local instance variables
+    content = `<div class = "leaflet-popup${(options.className) ? ` ${options.className}` : ""}">${content}</div>`;
+    var popup = new maptalks.ui.UIMarker(coords, {
+      draggable: true,
+      single: false,
+      content: content
+    });
+    popup.addTo(map).show();
+
+    interfaces[options.className] = document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`);
+
+    //Return statement
+    return interfaces[options.className];
   }
 
   /*
@@ -365,27 +391,27 @@
       }
 
       //Open popup
-      var popup = L.popup(popup_options).setLatLng(leaflet_centre_coords)
-        .setContent(`
-          <!-- 1. Entity UI Header -->
-          ${printEntityContextMenuHeaderSection(entity_id, options)}
+      var html_content = `
+        <!-- 1. Entity UI Header -->
+        ${printEntityContextMenuHeaderSection(entity_id, options)}
 
-          <!-- 2. Timeline/Data Section -->
-          ${printEntityContextMenuHeader(entity_id, { id: "entity-timeline-data-header", name: "Timeline/Data"})}
-          ${printEntityContextMenuTimelineDataSection(entity_id)}
-          ${printEntityContextMenuBioSection(entity_id)}
+        <!-- 2. Timeline/Data Section -->
+        ${printEntityContextMenuHeader(entity_id, { id: "entity-timeline-data-header", name: "Timeline/Data"})}
+        ${printEntityContextMenuTimelineDataSection(entity_id)}
+        ${printEntityContextMenuBioSection(entity_id)}
 
-          <!-- 3. Customisation -->
-          ${printEntityContextMenuHeader(entity_id, { id: "entity-customisation-header", name: "Customisation"})}
-          ${printEntityContextMenuCustomisationSection(entity_id)}
+        <!-- 3. Customisation -->
+        ${printEntityContextMenuHeader(entity_id, { id: "entity-customisation-header", name: "Customisation"})}
+        ${printEntityContextMenuCustomisationSection(entity_id)}
 
-          <!-- 4. Actions UI -->
-          ${printEntityContextMenuHeader(entity_id, { id: "entity-actions-header", name: "Actions" })}
+        <!-- 4. Actions UI -->
+        ${printEntityContextMenuHeader(entity_id, { id: "entity-actions-header", name: "Actions" })}
 
-          <!-- 5. Context Menu Anchors -->
-          <div id = "entity-actions-context-menu"></div>
-          <div id = "entity-keyframe-context-menu"></div>
-        `).openOn(map);
+        <!-- 5. Context Menu Anchors -->
+        <div id = "entity-actions-context-menu"></div>
+        <div id = "entity-keyframe-context-menu"></div>
+      `;
+      var popup = createPopup(leaflet_centre_coords, html_content, popup_options);
       interfaces[entity_id] = popup;
 
       //Call createContextMenu() after the popup content is set
@@ -663,7 +689,7 @@
     var r = parseInt(r_el.value);
 
     var current_colour = RGBToHex(r, g, b);
-    var current_history_entry = getLastHistoryFrame(entity_id, main.date);
+    var current_history_entry = getAbsoluteHistoryFrame(entity_id, main.date);
     var current_tab = window[`${entity_id}_page`];
 
     //Set entity fill colour

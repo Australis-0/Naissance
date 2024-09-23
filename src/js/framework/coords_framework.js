@@ -68,6 +68,12 @@
   }
 
   //convertToTurf() - Returns [coordinates, type];
+  /*
+    convertToTurf() - Converts any format to Turf.
+    arg0_format: (Variable) - The coords format to input.
+
+    Returns: (Array<Array<Number, Number>>) - Turf coordinates.
+  */
   function convertToTurf (arg0_format) {
     //Convert from parameters
     var format = arg0_format;
@@ -85,11 +91,13 @@
       if (format_type == "geojson") {
         var geojson_coords = getGeoJSONCoords(format);
 
-        turf_coords = convertLeafletToTurf(geojson_coords);
+        turf_coords = convertLeafletCoordsToTurf(geojson_coords);
       } else if (["leaflet", "naissance"].includes(format_type)) {
-        turf_coords = convertLeafletToTurf(format);
+        turf_coords = convertLeafletCoordsToTurf(format);
       } else if (format_type == "leaflet_non_poly") {
-        turf_coords = convertLeafletToTurf(format._latlngs);
+        turf_coords = convertLeafletCoordsToTurf(format._latlngs);
+      } else if (format_type == "maptalks") {
+        turf_coords = convertMaptalksCoordsToTurf(format);
       } else if (format_type == "naissance_history") {
         var no_coords = false;
 
@@ -106,16 +114,21 @@
             return [format.coords, "polygon"];
         }
 
-        turf_coords = convertLeafletToTurf(format.coords);
+        turf_coords = convertLeafletCoordsToTurf(format.coords);
       } else if (format_type == "turf_object") {
-        turf_coords = convertLeafletToTurf(format);
+        turf_coords = convertLeafletCoordsToTurf(format);
       }
 
     //Return statement
     return turf_coords;
   }
+  
+  /*
+    getCoordsType() - Returns the coords format the variable represents.
+    arg0_format: (Variable) - The coords format to input.
 
-  //getCoordsType() - Returns either 'geojson', 'leaflet', 'leaflet_non_poly', 'naissance', 'naissance_history', 'turf', or 'turf_object'
+    Returns: (String) - Either 'geojson', 'leaflet', 'leaflet_non_poly', 'maptalks', 'naissance', 'naissance_history', 'turf', or 'turf_object'
+  */
   function getCoordsType (arg0_format) {
     //Convert from parameters
     var format = arg0_format;
@@ -127,7 +140,7 @@
       console.error(`getCoordsType() was fed an undefined format!`, format);
 
     //Check if type is GeoJSON
-    if (format._initHooksCalled && !format._latlngs)
+    if (format._initHooksCalled && !format._latlngs && !format._symbolUpdated)
       return "geojson";
 
     //Check if type is Leaflet
@@ -140,6 +153,10 @@
         if (flattened_array[0].lat && flattened_array[1].lng)
           return "leaflet";
     }
+
+    //Check if type is maptalks
+    if (format._symbolUpdated)
+      return "maptalks";
 
     //Check if type is naissance_history
     if (typeof format == "object")
@@ -167,7 +184,31 @@
 
 //Internals functions - Should not actually be used by end dev
 {
-  function convertLeafletToTurf (arg0_geojson) {
+  function convertLeafletCoordsToMaptalks (arg0_coords) {
+      //Convert from parameters
+      var coords = arg0_coords;
+
+      //Return statement
+      return maptalks.GeoJSON.toGeometry(new L.Polygon(coords).toGeoJSON()).getCoordinates();
+  }
+
+  function convertLeafletCoordsToNaissance (arg0_coords) {
+  //Convert from parameters
+  var coords = arg0_coords;
+
+  //Iterate over coords
+  for (var i = 0; i < coords.length; i++)
+    if (Array.isArray(coords[i])) {
+      coords[i] = convertLeafletCoordsToNaissance(coords[i]);
+    } else {
+      coords[i] = [coords[i].lat, coords[i].lng];
+    }
+
+  //Return statement
+  return coords;
+}
+
+  function convertLeafletCoordsToTurf (arg0_geojson) {
     //Convert from parameters
     var geojson = arg0_geojson;
 
@@ -180,20 +221,44 @@
     ];
   }
 
-  function convertLeafletToNaissance (arg0_coords) {
+  function convertMaptalksCoordsToTurf (arg0_coords) {
     //Convert from parameters
     var coords = arg0_coords;
 
-    //Iterate over coords
-    for (var i = 0; i < coords.length; i++)
-      if (Array.isArray(coords[i])) {
-        coords[i] = convertLeafletToNaissance(coords[i]);
-      } else {
-        coords[i] = [coords[i].lat, coords[i].lng];
-      }
+    //Declare local instance variables
+    var geojson = coords.toGeoJSON();
 
     //Return statement
-    return coords;
+    return [
+      geojson.geometry.coordinates,
+      (geojson.geometry.type == "Polygon") ? "polygon" : "multiPolygon"
+    ];
+  }
+
+  function convertCoordsToGeoJSON (arg0_coords) {
+    //Convert from parameters
+    var coords = arg0_coords;
+
+    //Declare local instance variables
+    var leaflet_polygon = new L.Polygon(coords).toGeoJSON();
+
+    //Return statement
+    return leaflet_polygon.geometry.coordinates;
+  }
+
+  function flipCoordinates (arg0_coords)  {
+    //Convert from parameters
+    var coords = arg0_coords;
+
+    //Return statement
+    return coords.map((coordinate) => {
+      // If the element is an array (nested array structure), recurse
+      if (Array.isArray(coordinate[0])) {
+        return flipCoordinates(coordinate); // Recurse into inner arrays
+      } else {
+        return [coordinate[1], coordinate[0]]; // Flip latitude and longitude
+      }
+    });
   }
 
   function getGeoJSONCoords (arg0_geoJSON) {
@@ -213,5 +278,26 @@
 
     //Return statement
     return coords;
+  }
+
+  function isValidCoordinate(coords) {
+    // Check if it's a valid array of [longitude, latitude]
+    return Array.isArray(coords) && coords.length === 2 &&
+           typeof coords[0] === 'number' && typeof coords[1] === 'number' &&
+           coords[0] >= -180 && coords[0] <= 180 && // Valid longitude
+           coords[1] >= -90 && coords[1] <= 90;    // Valid latitude
+  }
+
+  function validateCoordinates(coordsArray) {
+    // Recursively validate coordinates
+    return coordsArray.every(coords => {
+      if (Array.isArray(coords[0])) {
+        // If it's a nested array, recurse
+        return validateCoordinates(coords);
+      } else {
+        // Otherwise, validate the coordinate pair
+        return isValidCoordinate(coords);
+      }
+    });
   }
 }

@@ -14,7 +14,7 @@
     var entity_obj = getEntity(entity_id);
 
     if (entity_obj) {
-      var current_history_entry = getLastHistoryFrame(entity_id, main.date);
+      var current_history_entry = getAbsoluteHistoryFrame(entity_id, main.date);
 
       //Make sure keyframes is defined
       if (!keyframes)

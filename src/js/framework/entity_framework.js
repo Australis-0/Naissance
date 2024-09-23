@@ -502,6 +502,20 @@
 
 //Entity functions - General-purpose, regardless of entity type
 {
+  function convertLeafletOptionsToMaptalks (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Return statement
+    return replaceKeys(options, {
+      color: "lineColor",
+      fillColor: "polygonFill",
+      lineOpacity: "opacity",
+      polygonOpacity: "fillOpacity",
+      weight: "lineWidth"
+    });
+  }
+
   //finishEntity() - Finishes an entity's editing process.
   function finishEntity () {
     //Declare local instance variables
@@ -532,25 +546,15 @@
     }
 
     //Add new entity to relevant layer
-    if (new_entity.options.className) {
+    if (is_new_entity) {
+      var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
 
-      if (is_new_entity) {
-        var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
-
-        main.entities.push(new_entity_obj);
-        renameEntity(entity_id, entity_name, main.date);
-      }
+      main.entities.push(new_entity_obj);
+      renameEntity(entity_id, entity_name, main.date);
     }
 
-    //Set selection.options
-    {
-      delete brush_obj.editing_entity;
-      delete brush_obj.entity_options;
-
-      clearBrush();
-    }
-
-    //Reload date
+    //Clear brush and reload date
+    clearBrush();
     loadDate();
 
     //Return statement
@@ -591,6 +595,7 @@
     arg1_options: (Object)
       return_is_new_entity: (Boolean) - Optional. Returns whether the current entity is a new entity or not. False by default.
       return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default.
+      return_map_entity: (Boolean) - Optional. Whether to return the map entity instead of the backend Entity object. False by default.
 
     Returns: (Object, Date/String)
   */

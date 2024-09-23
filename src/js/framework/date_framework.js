@@ -24,18 +24,18 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
     clearMap();
 
     //Iterate over all entities and render them
-    for (var i = 0; i < main.entities.length; i++) {
-      var local_entity = main.entities[i];
-      var local_entity_id = local_entity.options.className;
-      var local_history = getLastHistoryFrame(local_entity_id, main.date);
+    for (let i = 0; i < main.entities.length; i++) {
+      let local_entity = main.entities[i];
+      let local_entity_id = local_entity.options.className;
+      let local_history = getAbsoluteHistoryFrame(local_entity_id, main.date);
 
       //Reload object; add to map
       if (local_history) {
         //Update UIs for each open popup
-        var local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
+        let local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
 
         if (local_popup) {
-          var name_field = local_popup.querySelector(`input#polity-name`);
+          let name_field = local_popup.querySelector(`input#polity-name`);
 
           name_field.value = getEntityName(local_entity_id);
         }
@@ -44,19 +44,28 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
         if (local_entity.options.type == "polity") {
           //Make sure polity is not extinct
           if (!isEntityHidden(local_entity_id, main.date)) {
-            var local_history_frame = getHistoryFrame(local_entity, main.date);
-            var local_options = JSON.parse(JSON.stringify(local_entity.options));
+            let local_history_frame = getHistoryFrame(local_entity, main.date);
+            let local_options = JSON.parse(JSON.stringify(local_entity.options));
 
             //Overwrite local_options with local_history_options
-            var all_local_history_options = Object.keys(local_history_frame.options);
+            let all_local_history_options = Object.keys(local_history_frame.options);
 
-            for (var x = 0; x < all_local_history_options.length; x++)
+            for (let x = 0; x < all_local_history_options.length; x++)
               local_options[all_local_history_options[x]] = local_history_frame.options[all_local_history_options[x]];
 
-            main.entities[i] = L.polygon(local_history_frame.coords, local_options).addTo(map);
-            main.entities[i].on("click", function (e) {
-              printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: false, pin: true });
-            });
+            //Refresh main.entities[i]; add to current main.entity_layer
+            local_options.do_not_display = true;
+            main.entities[i] = createPolygon(local_history_frame.coords, local_options);
+
+            try {
+              delete local_options.do_not_display;
+              main.entities[i].addTo(main.entity_layer);
+              main.entities[i].on("click", function (e) {
+                printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: false, pin: true });
+              });
+            } catch (e) {
+              console.error(`Ran into error!`, e, JSON.stringify(local_history_frame.coords));
+            }
 
             //If this is the current selected polity, re-add cursor
             if (brush_obj.editing_entity == local_entity_id)

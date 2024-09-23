@@ -27,7 +27,7 @@
 
     if (!(e.which == 2 || e.button == 4) && !sidebar_container_el) {
       main.events.mouse_pressed = true;
-      map.dragging.disable();
+      map.config("draggable", false);
     }
 
     if (e.button == 2)
@@ -39,7 +39,7 @@
     main.events.mouse_pressed = false;
     main.events.right_mouse = false;
 
-    map.dragging.enable();
+    map.config("draggable", true);
 
     //Process brush
     processBrush();

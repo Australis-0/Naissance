@@ -11,3 +11,6 @@
 div.leaflet-control-zoom {
   display: none;
 }
+.leaflet-popup {
+  text-align: inherit !important;
+}
