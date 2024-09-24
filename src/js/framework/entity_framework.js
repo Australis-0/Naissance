@@ -407,12 +407,9 @@
       brush_obj.editing_entity = entity_id;
       brush_obj.entity_options = entity_obj.options;
 
-      //Remove old entity_obj from map
-      entity_obj.remove();
-
       //Set brush to this
-      brush_obj.current_path = entity_obj._latlngs;
-      brush_obj.current_selection = L.polygon(brush_obj.current_path, brush_obj.entity_options).addTo(map);
+      brush_obj.current_path = convertEntityCoordsToMaptalks(entity_obj);
+      brush_obj.current_selection = entity_obj;
 
       //Set entityUI for current selected entity
       brush_obj.current_selection.on("click", function (e) {

@@ -122,7 +122,7 @@
     //Return statement
     return turf_coords;
   }
-  
+
   /*
     getCoordsType() - Returns the coords format the variable represents.
     arg0_format: (Variable) - The coords format to input.
@@ -184,12 +184,23 @@
 
 //Internals functions - Should not actually be used by end dev
 {
-  function convertLeafletCoordsToMaptalks (arg0_coords) {
-      //Convert from parameters
-      var coords = arg0_coords;
+  function convertEntityCoordsToMaptalks (arg0_entity_id) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
 
-      //Return statement
-      return maptalks.GeoJSON.toGeometry(new L.Polygon(coords).toGeoJSON()).getCoordinates();
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+
+    //Return statement
+    return flipCoordinates(convertMaptalksCoordsToTurf(entity_obj)[0]);
+  }
+
+  function convertLeafletCoordsToMaptalks (arg0_coords) {
+    //Convert from parameters
+    var coords = arg0_coords;
+
+    //Return statement
+    return maptalks.GeoJSON.toGeometry(new L.Polygon(coords).toGeoJSON()).getCoordinates();
   }
 
   function convertLeafletCoordsToNaissance (arg0_coords) {
