@@ -37,7 +37,7 @@ window.path = require("path");
     entity_options: {}, //Used to store the options of the entity selected.
 
     selected_layer: "polities", //The current selected layer.
-    simplify_tolerance: 0.05, //The current simplify tolerance for brushes.
+    simplify_tolerance: 0.005, //The current simplify tolerance for brushes.
 
     //Brush settings
     auto_simplify_when_editing: true,
@@ -174,7 +174,7 @@ setTimeout(function(){
   var hierarchies_obj = main.hierarchies;
   var hierarchy_el = getUISelector("hierarchy");
   loadSave("atlas");
-  
+
   //Sync entities
   main.equate_entities_interval = equateObject(hierarchies_obj.hierarchy, "entities", global.main, "entities");
   main.previous_hierarchy_html = hierarchy_el.innerHTML;

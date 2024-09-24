@@ -595,7 +595,6 @@
     arg1_options: (Object)
       return_is_new_entity: (Boolean) - Optional. Returns whether the current entity is a new entity or not. False by default.
       return_key: (Boolean) - Optional. Whether to return a [layer_key, index] instead of an object. False by default.
-      return_map_entity: (Boolean) - Optional. Whether to return the map entity instead of the backend Entity object. False by default.
 
     Returns: (Object, Date/String)
   */

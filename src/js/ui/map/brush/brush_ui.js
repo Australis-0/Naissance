@@ -236,7 +236,7 @@
       if (brush_obj.current_selection) {
         brush_obj.current_selection.setSymbol(brush_obj.entity_options);
         brush_obj.current_selection.on("click", function (e) {
-          printEntityContextMenu(e.target.options.className, { coords: e.latlng, is_being_edited: true });
+          printEntityContextMenu(e.target.options.className, { coords: e.coordinate, is_being_edited: true });
         });
       }
     }

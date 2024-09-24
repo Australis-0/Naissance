@@ -1,12 +1,15 @@
 //Declare Entity UI functions
 {
+  /*
+    closeEntityContextMenu() - Closes an entity context menu and removes it from interfaces.
+    arg0_entity_id: (String) - The entity ID to close the context menu for.
+  */
   function closeEntityContextMenu (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var entity_el = interfaces[entity_id];
-    console.log(`Entity el:`, entity_el);
+    var entity_el = getEntityElement(entity_id);
 
     if (entity_el)
       if (!entity_el.isMap) {
@@ -14,8 +17,27 @@
         entity_el.remove();
         delete interfaces[entity_id];
       }
+    cleanEntityContextMenus();
   }
 
+  //cleanEntityContextMenus() - Cleans up any empty context menus leftover.
+  function cleanEntityContextMenus () {
+    var all_ui_els = document.querySelectorAll(`.maptalks-front .maptalks-ui > div`);
+
+    for (var i = 0; i < all_ui_els.length; i++)
+      if (all_ui_els[i].innerHTML.length == 0)
+        all_ui_els[i].remove();
+  }
+
+  /*
+    createPopup() - Creates an on-map popup at a given set of coordinates.
+    arg0_coords: (Array<Number, Number>) - The coords at which to place the new popup.
+    arg1_content: (String) - The innerHTML value which to print on the popup.
+    arg2_options: (Object)
+      className: (String) - The class name of the given popup.
+
+    Returns: (Object)
+  */
   function createPopup (arg0_coords, arg1_content, arg2_options) {
     //Convert from parameters
     var coords = arg0_coords;
@@ -34,7 +56,10 @@
     });
     popup.addTo(map).show();
 
-    interfaces[options.className] = document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`);
+    interfaces[options.className] = {
+      content: document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`),
+      options: {}
+    };
 
     //Return statement
     return interfaces[options.className];
@@ -339,9 +364,10 @@
     //Fetch is_being_edited; pin status, coords_string
     if (brush_obj.editing_entity == entity_id) is_being_edited = true;
     if (options.coords)
-      coords_string = (!Array.isArray(options.coords)) ?
-        [`${[options.coords.lng, options.coords.lat]}`] :
-        [`${options.coords.toString()}`];
+      coords_string = (typeof options.coords == "object" && !Array.isArray(options.coords)) ?
+        `[${[options.coords.x, options.coords.y]}]` :
+        `[${options.coords.toString()}]`;
+
 
     //Check if reload_popup is true; only close existing UI and open a new popup if the popup is not already pinned
     if (entity_interface) {
@@ -389,6 +415,7 @@
       } else {
         leaflet_centre_coords = options.coords;
       }
+      options.coords = leaflet_centre_coords;
 
       //Open popup
       var html_content = `
@@ -418,6 +445,9 @@
       setTimeout(function(){
         var entity_actions_el = getEntityActionsAnchorElement(entity_id)
         var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
+
+        //Populate entity UI
+        populateEntityUI(entity_id);
       }, 1);
     }
   }
@@ -539,9 +569,9 @@
     //Fetch is_being_edited; pin status, coords_string
     if (brush_obj.editing_entity == entity_id) is_being_edited = true;
     if (options.coords)
-      coords_string = (!Array.isArray(options.coords)) ?
-        [`${[options.coords.lng, options.coords.lat]}`] :
-        [`${options.coords.toString()}`];
+      coords_string = (typeof options.coords == "object" && !Array.isArray(options.coords)) ?
+        `[${[options.coords.x, options.coords.y]}]` :
+        `[${options.coords.toString()}]`;
 
     //Return statement
     return `<div id = "entity-header" class = "entity-ui-container">
