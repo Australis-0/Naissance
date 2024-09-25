@@ -21,6 +21,7 @@
       //Make sure entity when pushed is not displayed
       local_options.do_not_display = true;
       var local_polygon = createPolygon(save_data.entities[i].coords, local_options);
+      delete local_options.do_not_display;
       main.entities.push(local_polygon);
     }
 

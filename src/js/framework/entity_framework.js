@@ -542,12 +542,17 @@
             is_new_entity = true;
     }
 
-    //Add new entity to relevant layer
-    if (is_new_entity) {
-      var new_entity_obj = L.polygon(brush_obj.current_path, new_entity.options);
-
+    //new_entity, old entity handling
+    if (is_new_entity) { //If is_new_entity, create a new polygon and push it to main.entities
+      var new_entity_obj = createPolygon(brush_obj.current_path, new_entity.options);
       main.entities.push(new_entity_obj);
       renameEntity(entity_id, entity_name, main.date);
+    } else {
+      if (brush_obj.entity_options) //If is old entity, edit the extant polygon and reload date
+        if (brush_obj.entity_options.className) {
+          var entity_obj = getEntity(brush_obj.entity_options.className);
+          entity_obj.options = new_entity.options;
+        }
     }
 
     //Clear brush and reload date
