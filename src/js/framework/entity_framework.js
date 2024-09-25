@@ -164,8 +164,8 @@
                 //Parse scope
                 if (local_entity_keyframe.effect)
                   parsed_effect = parseEntityEffect(entity_id, local_entity_keyframe.effect, new_options);
-                if (local_entity_action.immediate)
-                  parsed_immediate = parseEntityEffect(entity_id, local_entity_action.immediate, new_options);
+                if (local_entity_keyframe.immediate)
+                  parsed_immediate = parseEntityEffect(entity_id, local_entity_keyframe.immediate, new_options);
                 if (local_entity_keyframe)
                   printEntityKeyframeContextMenu(entity_id, local_entity_keyframe, new_options);
               }

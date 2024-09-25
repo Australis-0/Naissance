@@ -157,7 +157,8 @@
     //Initialise interfaces[entity_id] if it doesn't exist
     if (!global.interfaces[entity_id]) global.interfaces[entity_id] = {
       id: entity_id,
-      entity_obj: entity_obj
+      entity_obj: entity_obj,
+      options: {}
     };
 
     //Refresh entity keyframe context menus first; then append the current context menu

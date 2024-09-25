@@ -56,10 +56,27 @@
     });
     popup.addTo(map).show();
 
-    interfaces[options.className] = {
-      content: document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`),
-      options: {}
-    };
+    //interfaces[options.className]
+    var popup_window_el = document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`);
+    
+    if (!interfaces[options.className]) {
+      interfaces[options.className] = {
+        content: popup_window_el,
+        options: {}
+      };
+    } else {
+      var local_interface = interfaces[options.className];
+      if (!local_interface.content) local_interface.content = popup_window_el;
+      if (!local_interface.options) local_interface.options = {};
+    }
+
+
+    //Enforce proper pointer events
+    ["click", "mousedown", "mouseup", "mousemove", "touchstart", "touchend", "wheel"].forEach((event) => {
+      popup_window_el.addEventListener(event, function (e) {
+        e.stopPropagation();
+      });
+    });
 
     //Return statement
     return interfaces[options.className];
