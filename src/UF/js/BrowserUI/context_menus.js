@@ -15,7 +15,7 @@
     createContextMenu() - Creates a context menu within the DOM.
 
     arg0_options: (Object)
-      anchor: (String) - The query selector to pin a context menu to.
+      anchor: (String/Element) - The query selector to pin a context menu to.
       class: (String) - The class prefix to prepend.
       id: (String) - The ID of the context menu.
       name: (String) - Optional. Title of the context menu. Undefined; will not display by default.
@@ -62,12 +62,13 @@
         x: (Number) - Optional. The X position of the element in a grid. 0 by default.
         y: (Number) - Optional. The Y position of the element in a grid. n + 1 by default, where n = last row.
 
+        return_html: (Boolean) - Optional. Whether to return the html_string instead of modifying the anchor element. False by default.
+
     Returns: (HTMLElement)
   */
   function createContextMenu (arg0_options) { //[WIP] - Finish function body.
     //Convert from parameters
     var options = (arg0_options) ? arg0_options : {};
-    console.log(`createContextMenu()`, options);
 
     //Initialise options
     if (!options.class) options.class = "";
@@ -172,13 +173,18 @@
     html_string.push(`</div>`);
 
     //Fetch query_selector_el and set .innerHTML to html_string.join("");
-    if (options.anchor) {
-      query_selector_el = (isElement(options.anchor)) ? options.anchor : document.querySelector(options.anchor);
-      query_selector_el.innerHTML = html_string.join("");
-    }
+    if (!options.return_html) {
+      if (options.anchor) {
+        query_selector_el = (isElement(options.anchor)) ? options.anchor : document.querySelector(options.anchor);
+        query_selector_el.innerHTML = html_string.join("");
+      }
 
-    //Return statement
-    return query_selector_el;
+      //Return statement
+      return query_selector_el;
+    } else {
+      //Return statement
+      return html_string.join("");
+    }
   }
 
   /*
@@ -593,6 +599,85 @@
 
     //Return statement
     return html_string.join("");
+  }
+
+  /*
+    createPageMenu() - Creates a page menu for a set of HTML elements.
+    arg0_options: (Object)
+      anchor: (String) - The query selector anchor in which the page menu is created. If options.tab_anchor is specified, this is just where page content is displayed instead.
+      tab_anchor: (String) - Optional. Defaults to creating two elements in anchor if not available.
+
+      pages: (Object)
+        <page_key>: (Object) - createContextMenu() options is placed here.
+          name: (String)
+          special_function: (Function) - The function to execute upon clicking this tab.
+      special_function: (Function) - The function to execute upon clicking any tab.
+
+    Returns: (HTMLElement)
+  */
+  function createPageMenu (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Initialise options
+    if (!options.pages) options.pages = {};
+
+    //Declare local instance variables
+    var all_pages = Object.keys(options.pages);
+    var content_el;
+    var tabs_el;
+
+    //Define content_el; tabs_el
+    if (!options.tab_anchor) {
+      content_el = document.querySelector(options.anchor);
+      tabs_el = document.querySelector(options.tab_anchor);
+    } else {
+      content_el = document.createElement("div");
+      tabs_el = document.createElement("div");
+    }
+
+    //Set tabs_el.innerHTML according to page_key
+    var tabs_html = [];
+
+    //Set tabs_html to tabs_el.innerHTML
+    tabs_html.push(`<div class = "tabs-container">`);
+      for (var i = 0; i < all_pages.length; i++) {
+        var local_value = options.pages[all_pages[i]];
+
+        var local_page_name = (local_value.name) ? local_value.name : all_pages[i];
+        tabs_html.push(`<span id = "${all_pages[i]}">${local_page_name}</span>`);
+      }
+    tabs_html.push(`<hr>`);
+    tabs_html.push(`</div>`);
+
+    tabs_el.innerHTML = tabs_html.join("");
+
+    //Add .onclick events for all_pages
+    for (let i = 0; i < all_pages.length; i++) {
+      let local_tab_button_el = tabs_el.querySelector(`span[id="${all_pages[i]}"]`);
+      let local_value = options.pages[all_pages[i]];
+
+      //Initialise local_value options
+      if (!local_value.anchor) local_value.anchor = content_el;
+
+      //Set .onclick function; check for all_pages[i]
+      local_tab_button_el.onclick = function (e) {
+        if (options.special_function) options.special_function(e);
+        if (local_value.special_function) local_value.special_function(e);
+
+        //Remove "active" class from all_pages; and set the current tab to active
+        for (var x = 0; x < all_pages.length; x++)
+          removeClass(tabs_el.querySelector(`span[id="${all_pages[x]}"]`), "active");
+        addClass(local_tab_button_el, "active");
+
+        //Set "page" attribute for content_el; replace content
+        content_el.setAttribute("page", all_pages[i]);
+        content_el.innerHTML = createContextMenu(local_value);
+      };
+    }
+
+    //Return statement
+    return [tabs_el, content_el];
   }
 }
 

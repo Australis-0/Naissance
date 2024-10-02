@@ -58,7 +58,7 @@
 
     //interfaces[options.className]
     var popup_window_el = document.querySelector(`.leaflet-popup${(options.className) ? `[class~="${options.className}"]` : ""}`);
-    
+
     if (!interfaces[options.className]) {
       interfaces[options.className] = {
         content: popup_window_el,
@@ -446,7 +446,10 @@
 
         <!-- 3. Customisation -->
         ${printEntityContextMenuHeader(entity_id, { id: "entity-customisation-header", name: "Customisation"})}
-        ${printEntityContextMenuCustomisationSection(entity_id)}
+        <div id = "customisation-top-parent" class = "entity-ui-container customisation-top-parent">
+          <div id = "entity-ui-customisation-colour-ui-container"></div>
+          <div id = "entity-ui-customisation-options-container"></div>
+        </div>
 
         <!-- 4. Actions UI -->
         ${printEntityContextMenuHeader(entity_id, { id: "entity-actions-header", name: "Actions" })}
@@ -462,6 +465,8 @@
       setTimeout(function(){
         var entity_actions_el = getEntityActionsAnchorElement(entity_id)
         var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
+
+        var entity_colour_ui = printEntityContextMenuCustomisationSection(entity_id);
 
         //Populate entity UI
         populateEntityUI(entity_id);
@@ -490,55 +495,24 @@
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
-    //Return statement
-    return `<div id = "customisation-top-parent" class = "entity-ui-container customisation-top-parent">
-      <div id = "entity-ui-customisation-colour-ui-container" class = "entity-ui-container colour-container">
-        <div id = "entity-ui-customisation-colour-picker-container" class = "colour-picker-container">
-          <img id = "colour-picker-hue" class = "colour-picker-hue" src = "gfx/interface/colour_wheel.png">
-          <div id = "colour-picker-brightness" class = "colour-picker-brightness"></div>
+    //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+    var entity_el = getEntityElement(entity_id);
+    var entity_customisation_fill_tab_el = createContextMenu({
+      anchor: common_selectors.colour_options,
+      class: `colour-picker-container`,
+      id: "entity-ui-customisation-colour-picker-container",
+      name: "Colour Picker:",
 
-          <div id = "colour-picker-cursor" class = "colour-picker-cursor"></div>
+      colour_input: {
+        id: "colour_input",
+        name: "Colour",
+        type: "colour",
 
-          <div id = "colour-picker" class = "colour-picker-mask"></div>
-
-          <!-- RGB inputs -->
-          <div class = "rgb-inputs">
-            R: <input type = "number" id = "r" value = "255"><br>
-            G: <input type = "number" id = "g" value = "255"><br>
-            B: <input type = "number" id = "b" value = "255"><br>
-          </div>
-
-          <span class = "no-select">
-            <span class = "brightness-range-container">
-              <span id = "brightness-header" class = "small-header">Brightness</span>
-              <input type = "range" min = "0" max = "100" value = "100" id = "colour-picker-brightness-range" class = "colour-picker-brightness-range">
-            </span>
-
-            <span class = "opacity-range-container">
-              <span id = "opacity-header" class = "small-header">Opacity</span>
-              <input type = "range" min = "0" max = "100" value = "50" id = "colour-picker-opacity-range" class = "colour-picker-opacity-range">
-            </span>
-          </span>
-        </div>
-      </div>
-
-      <div id = "entity-ui-customisation-options-container" class = "entity-ui-container options-container">
-        <div class = "options-tab">
-          <span id = "fill" class = "options-tab-header active">Fill</span>
-          <span id = "stroke" class = "options-tab-header">Stroke</span>
-          <span id = "other" class = "options-tab-header">Other</span>
-          <hr>
-        </div>
-
-        <div id = "other-container" class = "options-body">
-          <b>Visibility Settings:</b><br><br>
-          Minimum Zoom: <input id = "minimum-zoom-level" class = "short-number-input" type = "number"><br>
-          Maximum Zoom: <input id = "maximum-zoom-level" class = "short-number-input" type = "number"><br>
-        </div>
-      </div>
-    </div>
-
-    <div id = "entity-ui-customisation-description-container" class = "entity-ui-container"></div>`;
+        x: 0,
+        y: 0
+      }
+    });
   }
 
   /*
