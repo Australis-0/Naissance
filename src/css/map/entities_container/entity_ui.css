@@ -332,6 +332,33 @@
 }
 
 /* -- Container styling: Customisation -- */
+.leaflet-popup {
+  #customisation-top-parent {
+    display: flex;
+
+    #entity-ui-customisation-colour {
+      flex: 1;
+
+      background-color: rgba(0, 0, 0, 0.85);
+      height: 7vw;
+      max-width: 7vw;
+      min-width: 7vw !important;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      padding: 12px;
+    }
+    #entity-ui-customisation-other {
+      flex: 1;
+
+      background-color: rgba(0, 0, 0, 0.85);
+      height: 7vw;
+      margin-left: 6px;
+      min-width: calc(13vw - 30px - 12px) !important;
+      padding: 12px;
+    }
+  }
+
+}
 
 .customisation-top-parent {
   display: flex;
@@ -375,132 +402,18 @@
   color: black;
 }
 
-/* -- Container styling: Customisation Colour Wheel -- */
-.colour-picker-brightness {
-  position: absolute;
-
-  border-radius: 50%;
-  background: rgb(0, 0, 0);
-  height: 3.25vw;
-  width: 3.25vw;
-
-  opacity: 0;
-}
-.colour-picker-container {
-  background: none;
-  border-radius: 50%;
-  height: 3.25vw;
-  width: 3.25vw;
-
-  opacity: 1;
-}
-.colour-picker-container img {
-  opacity: 1;
-}
-.colour-picker-hue {
-  position: absolute;
-
-  border-radius: 50%;
-  background: conic-gradient(red, magenta, blue, aqua, lime, yellow, red);
-  height: 3.25vw;
-  width: 3.25vw;
-}
-.colour-picker-mask {
-  position: relative;
-  bottom: 14px;
-
-  border-radius: 50%;
-  background: none;
-  height: 3.25vw;
-  width: 3.25vw;
-}
-.colour-picker-cursor {
-  position: relative;
-
-  border-radius: 50%;
-  height: 12px;
-  width: 12px;
-
-  border: 1px solid black;
-  box-shadow: 0px 0px 1px 1px white;
-  left: calc((3.25vw/2) - 6px);
-  top: calc((3.25vw/2) - 6px);
-
-  transition: left 0.25s ease, top 0.25s ease, background 0.25s ease;
-}
-
-.brightness-range-container {
-  display: inline-block;
-  position: relative;
-  width: 200%;
-
-  bottom: calc(3.5vw);
-}
-.opacity-range-container {
-  position: relative;
-  bottom: calc(3.5vw + 12px);
-}
-.rgb-inputs {
-  position: relative;
-
-  bottom: 3.6vw;
-  left: 3.75vw;
-
-  height: 3.25vw;
-
-  font-size: 0.65vw;
-}
-.rgb-inputs > input {
-  width: 2vw;
-
-  color: black;
-  font-size: 0.65vw;
-}
-.rgb-inputs > input::-webkit-outer-spin-button, .rgb-inputs > input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.colour-picker-brightness-range {
-  position: relative;
-  bottom: 6px;
-  margin: 0px;
-}
-.colour-picker-opacity-range {
-  position: relative;
-  bottom: 6px;
-  margin: 0px;
-}
-
 /* -- Container styling: Customisation Options -- */
-.options-tab-header {
+#customisation-tab-container {
   display: inline-block;
-  width: 3.25vw;
+  width: 100%;
 
   color: white;
   font-family: "Barlow";
   font-size: 0.75vw;
   font-weight: 300;
-  text-align: center;
   text-transform: uppercase;
 
   padding-bottom: 0.2vw;
-}
-.options-tab > hr {
-  position: relative;
-
-  border: none;
-  border-bottom: 3px solid rgb(140, 200, 240);
-  left: 0.125vw;
-  width: 3vw;
-  margin: 0;
-
-  transition: left 1s ease;
-}
-
-/* -- Container styling: Customisation Options Animations -- */
-.options-tab-header:hover {
-  cursor: pointer;
 }
 
 /* -- Container styling: Actions -- */

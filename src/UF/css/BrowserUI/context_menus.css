@@ -1,7 +1,30 @@
 /* -- Font imports -- */
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Jersey+10&family=Karla:ital,wght@0,200..800;1,200..800&display=swap');
 
-/* -- General Context Menu Styling -- */
+/* -- 1. GENERAL TABS STYLING -- */
+.tabs-container > hr {
+  position: relative;
+
+  border: none;
+  border-bottom: 3px solid rgb(140, 200, 240);
+  left: 0.5rem;
+  width: 6rem;
+  margin: 0;
+
+  transition: left 1s ease;
+}
+.tabs-container > span {
+  display: inline-block;
+  overflow: hidden;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  width: 6rem;
+}
+.tabs-container:hover {
+  cursor: pointer;
+}
+/* -- 2. GENERAL CONTEXT MENU STYLING -- */
 .context-menu td {
   /*border: 1px solid black;*/
   vertical-align: top;
@@ -42,7 +65,6 @@
     border: 1px solid black;
     margin-top: 0.2rem;
   }
-
   /* -- Button formatting -- */
   .button {
     border: 1px solid black;
@@ -60,7 +82,6 @@
 
     cursor: pointer;
   }
-
   /* -- Checkbox formatting -- */
   input[type="checkbox"] {
     position: relative;
@@ -77,6 +98,7 @@
   vertical-align: middle;
 }
 
+/* -- 3. ACTUAL INPUTS -- */
 /* -- BIUF Inputs -- */
 .biuf-input {
   position: relative;
@@ -95,6 +117,105 @@
   display: none;
   background-color: rgb(0, 0, 0, 0.7);
   padding: 5px;
+}
+
+/* -- Colour picker -- */
+.context-menu-cell[type="colour"] .header {
+  position: absolute;
+}
+.colour-picker-brightness {
+  display: inline;
+  position: absolute;
+
+  border-radius: 50%;
+  background: rgb(0, 0, 0);
+  height: 8.25rem;
+  width: 8.25rem;
+
+  opacity: 0;
+}
+.colour-picker-container {
+  background: none;
+  border-radius: 50%;
+  height: 12rem;
+  width: 15rem;
+
+  opacity: 1;
+}
+.colour-picker-container img {
+  opacity: 1;
+}
+.colour-picker-hue {
+  position: absolute;
+
+  border-radius: 50%;
+  background: black;
+  height: 8.25rem;
+  width: 8.25rem;
+}
+.colour-picker-mask {
+  position: relative;
+  bottom: 2rem;
+
+  border-radius: 50%;
+  background: none;
+  height: 8.25rem;
+  width: 8.25rem;
+}
+.colour-picker-cursor {
+  position: relative;
+
+  border-radius: 50%;
+  height: 12px;
+  width: 12px;
+
+  border: 1px solid black;
+  box-shadow: 0px 0px 1px 1px white;
+  left: calc((8.25rem/2) - 6px);
+  top: calc((8.25rem/2) - 6px - 1.15rem);
+
+  transition: left 0.25s ease, top 0.25s ease, background 0.25s ease;
+}
+
+.brightness-range-container {
+  display: inline-block;
+  position: relative;
+  width: 200%;
+
+  bottom: calc(3.5rem);
+}
+.opacity-range-container {
+  position: relative;
+  bottom: calc(3.5rem + 12px);
+}
+.rgb-inputs {
+  position: relative;
+
+  bottom: 10rem;
+  left: 9rem;
+  height: 3.25rem;
+
+  font-size: 1rem;
+}
+.rgb-inputs > input {
+  width: 2rem;
+
+  color: black;
+  font-size: 1rem;
+}
+.rgb-inputs > input::-webkit-outer-spin-button, .rgb-inputs > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.opacity-range-container, .brightness-range-container {
+  position: relative;
+  bottom: 4.5rem;
+  margin: 0px;
+
+  .small-header {
+    margin-left: 0.5rem;
+  }
 }
 
 /* -- WYSIWYG Editor -- */
@@ -282,101 +403,5 @@
     left: 0;
 
     background-color: rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* -- Colour picker -- */
-.colour-picker-brightness {
-  display: inline;
-  position: absolute;
-
-  border-radius: 50%;
-  background: rgb(0, 0, 0);
-  height: 8.25rem;
-  width: 8.25rem;
-
-  opacity: 0;
-}
-.colour-picker-container {
-  background: none;
-  border-radius: 50%;
-  height: 12rem;
-  width: 15rem;
-
-  opacity: 1;
-}
-.colour-picker-container img {
-  opacity: 1;
-}
-.colour-picker-hue {
-  position: absolute;
-
-  border-radius: 50%;
-  background: black;
-  height: 8.25rem;
-  width: 8.25rem;
-}
-.colour-picker-mask {
-  position: relative;
-  bottom: 2rem;
-
-  border-radius: 50%;
-  background: none;
-  height: 8.25rem;
-  width: 8.25rem;
-}
-.colour-picker-cursor {
-  position: relative;
-
-  border-radius: 50%;
-  height: 12px;
-  width: 12px;
-
-  border: 1px solid black;
-  box-shadow: 0px 0px 1px 1px white;
-  left: calc((8.25rem/2) - 6px);
-  top: calc((8.25rem/2) - 6px - 1.15rem);
-
-  transition: left 0.25s ease, top 0.25s ease, background 0.25s ease;
-}
-
-.brightness-range-container {
-  display: inline-block;
-  position: relative;
-  width: 200%;
-
-  bottom: calc(3.5rem);
-}
-.opacity-range-container {
-  position: relative;
-  bottom: calc(3.5rem + 12px);
-}
-.rgb-inputs {
-  position: relative;
-
-  bottom: 10rem;
-  left: 9rem;
-  height: 3.25rem;
-
-  font-size: 1rem;
-}
-.rgb-inputs > input {
-  width: 2rem;
-
-  color: black;
-  font-size: 1rem;
-}
-.rgb-inputs > input::-webkit-outer-spin-button, .rgb-inputs > input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.opacity-range-container, .brightness-range-container {
-  position: relative;
-  bottom: 4.5rem;
-  margin: 0px;
-
-  .small-header {
-    margin-left: 0.5rem;
   }
 }

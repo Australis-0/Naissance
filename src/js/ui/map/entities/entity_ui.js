@@ -447,8 +447,11 @@
         <!-- 3. Customisation -->
         ${printEntityContextMenuHeader(entity_id, { id: "entity-customisation-header", name: "Customisation"})}
         <div id = "customisation-top-parent" class = "entity-ui-container customisation-top-parent">
-          <div id = "entity-ui-customisation-colour-ui-container"></div>
-          <div id = "entity-ui-customisation-options-container"></div>
+          <div id = "entity-ui-customisation-colour"></div>
+          <div id = "entity-ui-customisation-other">
+            <div id = "customisation-tab-container"></div>
+            <div id = "customisation-options"></div>
+          </div>
         </div>
 
         <!-- 4. Actions UI -->
@@ -498,19 +501,43 @@
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
     var entity_el = getEntityElement(entity_id);
+
+    //Define colour picker
     var entity_customisation_fill_tab_el = createContextMenu({
-      anchor: common_selectors.colour_options,
-      class: `colour-picker-container`,
-      id: "entity-ui-customisation-colour-picker-container",
+      anchor: common_selectors.entity_colour_picker,
+      class: `colour-picker-container unique`,
+      id: "entity-colour-picker",
       name: "Colour Picker:",
 
       colour_input: {
         id: "colour_input",
-        name: "Colour",
         type: "colour",
 
         x: 0,
         y: 0
+      }
+    });
+
+    //Define tab options in #entity-ui-customisation-options-container
+    var entity_customisation_content_el = createPageMenu({
+      anchor: common_selectors.entity_customisation_options,
+      tab_anchor: common_selectors.entity_customisation_tab_container,
+      default: "fill",
+
+      class: `customisation-options-container`,
+      id: "entity-customisation-options",
+      name: "Customisation OptionsL:",
+
+      pages: {
+        fill: {
+          name: "Fill"
+        },
+        stroke: {
+          name: "Stroke"
+        },
+        other: {
+          name: "Other"
+        }
       }
     });
   }

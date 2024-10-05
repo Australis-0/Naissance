@@ -52,28 +52,9 @@ config.defines.common = {
       entity_keyframe_context_menu_anchor: `#entity-keyframe-context-menu`,
 
       //Entity UI - 3rd Row - Customisation
-      //Tabs
-      fill_tab: `#fill`,
-      other_tab: `#other`,
-      stroke_tab: `#stroke`,
-      underline_el: `.options-tab > hr`,
-
-      other_container: `#other-container`,
-
-        //Fill/Stroke
-        //Colour wheel
-        brightness_header: `#brightness-header`,
-        brightness_range: `#colour-picker-brightness-range`,
-        colour_brightness: `#colour-picker-brightness`,
-        colour_cursor: `#colour-picker-cursor`,
-        colour_options: `#entity-ui-customisation-options-container`,
-        colour_picker: `#entity-ui-customisation-colour-picker-container`,
-        colour_wheel: `#colour-picker`,
-        entity_b: "#b",
-        entity_g: "#g",
-        entity_r: "#r",
-        opacity_header: `#opacity-header`,
-        opacity_range: `#colour-picker-opacity-range`,
+      entity_colour_picker: `#entity-ui-customisation-colour`,
+      entity_customisation_tab_container: `#entity-ui-customisation-other #customisation-tab-container`,
+      entity_customisation_options: `#entity-ui-customisation-other #customisation-options`,
 
       //Entity UI - 4th Row - Actions
       entity_actions_context_menu_anchor: `#entity-actions-context-menu`

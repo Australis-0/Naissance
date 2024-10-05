@@ -607,15 +607,18 @@
       anchor: (String) - The query selector anchor in which the page menu is created. If options.tab_anchor is specified, this is just where page content is displayed instead.
       tab_anchor: (String) - Optional. Defaults to creating two elements in anchor if not available.
 
+      default: (String) - Optional. The default context menu to apply to content and active tabs. The first key by default.
       pages: (Object)
         <page_key>: (Object) - createContextMenu() options is placed here.
           name: (String)
+          html: (Array<String>/String) - Optional. Any custom HTML to load into the page instead of context menu options.
+          <key>: (Variable) - Optional. The same as most context menus. Does not apply if local .html is true.
           special_function: (Function) - The function to execute upon clicking this tab.
       special_function: (Function) - The function to execute upon clicking any tab.
 
     Returns: (HTMLElement)
   */
-  function createPageMenu (arg0_options) {
+  function createPageMenu (arg0_options) { //[WIP] - Implement options.default
     //Convert from parameters
     var options = (arg0_options) ? arg0_options : {};
 
@@ -628,7 +631,7 @@
     var tabs_el;
 
     //Define content_el; tabs_el
-    if (!options.tab_anchor) {
+    if (options.tab_anchor) {
       content_el = document.querySelector(options.anchor);
       tabs_el = document.querySelector(options.tab_anchor);
     } else {
@@ -649,32 +652,57 @@
       }
     tabs_html.push(`<hr>`);
     tabs_html.push(`</div>`);
-
     tabs_el.innerHTML = tabs_html.join("");
 
-    //Add .onclick events for all_pages
-    for (let i = 0; i < all_pages.length; i++) {
-      let local_tab_button_el = tabs_el.querySelector(`span[id="${all_pages[i]}"]`);
-      let local_value = options.pages[all_pages[i]];
+    //Declare local helper function for switching pages
+    function localSwitchPage (arg0_page, arg1_event) {
+      //Convert from parameters
+      var page = arg0_page;
+      var e = (arg1_event) ? arg1_event : {};
+
+      //Declare local instance variables
+      var hr_el = tabs_el.querySelector("hr");
+      var left_offset = 0.5; //In rem
+      var left_offset_multiplier = all_pages.indexOf(page);
+      var local_tab_button_el = tabs_el.querySelector(`span[id="${page}"]`);
+      var local_value = options.pages[page];
+      var tab_width = 7; //In rem
 
       //Initialise local_value options
       if (!local_value.anchor) local_value.anchor = content_el;
 
-      //Set .onclick function; check for all_pages[i]
+      //Parse .onclick handler
+      if (options.special_function) options.special_function(e);
+      if (local_value.special_function) local_value.special_function(e);
+
+      //Remove 'active' class from all pages; and set the current tab to active in terms of highlighting
+      for (var x = 0; x < all_pages.length; x++)
+        removeClass(tabs_el.querySelector(`span[id="${all_pages[x]}"]`), "active");
+      addClass(local_tab_button_el, "active");
+      hr_el.style.left = `${left_offset + tab_width*left_offset_multiplier}rem`;
+
+      //Set "page" attribute for content_el; replace content
+      content_el.setAttribute("page", all_pages[i]);
+
+      if (!local_value.html) {
+        if (!local_value.class) local_value.class = "unique";
+        createContextMenu(local_value);
+      } else {
+        content_el.innerHTML = (Array.isArray(local_value.html)) ?
+          local_value.html.join("") : local_value.html;
+      }
+    }
+
+    //Add .onclick events for all_pages
+    for (let i = 0; i < all_pages.length; i++) {
+      let local_tab_button_el = tabs_el.querySelector(`span[id="${all_pages[i]}"]`);
       local_tab_button_el.onclick = function (e) {
-        if (options.special_function) options.special_function(e);
-        if (local_value.special_function) local_value.special_function(e);
-
-        //Remove "active" class from all_pages; and set the current tab to active
-        for (var x = 0; x < all_pages.length; x++)
-          removeClass(tabs_el.querySelector(`span[id="${all_pages[x]}"]`), "active");
-        addClass(local_tab_button_el, "active");
-
-        //Set "page" attribute for content_el; replace content
-        content_el.setAttribute("page", all_pages[i]);
-        content_el.innerHTML = createContextMenu(local_value);
+        localSwitchPage(all_pages[i], e);
       };
     }
+
+    //Parse options.default
+    if (options.default) localSwitchPage(options.default);
 
     //Return statement
     return [tabs_el, content_el];
