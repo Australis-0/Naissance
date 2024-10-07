@@ -346,6 +346,15 @@
       overflow-x: hidden;
       overflow-y: hidden;
       padding: 12px;
+
+      :is(.brightness-range-container, .opacity-range-container) .small-header {
+        font-size: 0.85rem;
+        line-height: 1rem;
+        margin-bottom: 0.1rem;
+        margin-left: 0.5rem;
+        margin-right: 0rem;
+        vertical-align: middle;
+      }
     }
     #entity-ui-customisation-other {
       flex: 1;
@@ -357,7 +366,6 @@
       padding: 12px;
     }
   }
-
 }
 
 .customisation-top-parent {
@@ -365,7 +373,6 @@
 }
 .entity-ui-container.colour-container {
   flex: 1;
-
   height: 7vw;
   max-width: 7vw;
   min-width: 7vw !important;

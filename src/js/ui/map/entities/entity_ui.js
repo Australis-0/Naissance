@@ -103,107 +103,23 @@
     return (!options.return_selector) ? document.querySelector(entity_selector) : entity_selector;
   }
 
-  function populateEntityColourWheel (arg0_entity_id) {
+  function populateEntityColour (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
+    var current_history = getHistoryFrame(entity_id);
+    var entity_obj = getEntity(entity_id);
+    var entity_selector = getEntityElement(entity_id, { return_selector: true });
+    var entity_ui_obj = global.interfaces[entity_id];
+    var page = entity_ui_obj.page;
 
-    var b_el = entity_el.querySelector(common_selectors.entity_b);
-    var brightness_el = entity_el.querySelector(common_selectors.brightness_range);
-    var colour_brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
-    var colour_cursor_el = entity_el.querySelector(common_selectors.colour_cursor);
-    var colour_picker_el = entity_el.querySelector(common_selectors.colour_picker);
-    var colour_wheel_el = entity_el.querySelector(common_selectors.colour_wheel);
-    var g_el = entity_el.querySelector(common_selectors.entity_g);
-    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
-    var r_el = entity_el.querySelector(common_selectors.entity_r);
-
-    colour_wheel_el.onclick = function (e) {
-      var bounding_rect = e.target.getBoundingClientRect();
-      var coord_x = e.clientX - bounding_rect.left;
-      var coord_y = e.clientY - bounding_rect.top;
-
-      colour_cursor_el.style.left = `calc(${coord_x}px - 6px)`;
-      colour_cursor_el.style.top = `calc(${coord_y}px - 6px)`;
-
-      //Get r,g,b value of pixel
-      html2canvas(colour_picker_el).then((canvas) => {
-        var ctx = canvas.getContext("2d");
-
-        var canvas_height = ctx.canvas.height;
-        var canvas_width = ctx.canvas.width;
-
-        var pixel = ctx.getImageData(coord_x, coord_y, 1, 1).data;
-
-        colour_cursor_el.style.background = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
-        r_el.value = pixel[0];
-        g_el.value = pixel[1];
-        b_el.value = pixel[2];
-
-        setEntityColour(entity_id);
-      });
-    };
-
-    //Range change listeners
-    onRangeChange(brightness_el, function (e) {
-      var brightness_value = parseInt(brightness_el.value);
-
-      //Set brightness opacity
-      colour_brightness_el.style.opacity = `${1 - brightness_value*0.01}`;
-      updateBrightnessOpacityHeaders(entity_id);
-    });
-    onRangeChange(opacity_el, function (e) {
-      setEntityColour(entity_id);
-      updateBrightnessOpacityHeaders(entity_id);
-    });
-
-    //RGB listeners
-    r_el.onchange = function () {
-      this.value = Math.max(Math.min(this.value, 255), 0);
-      setEntityColourWheelCursor(entity_id, [r_el.value, g_el.value, b_el.value]);
-    };
-    g_el.onchange = function () {
-      this.value = Math.max(Math.min(this.value, 255), 0);
-      setEntityColourWheelCursor(entity_id, [r_el.value, g_el.value, b_el.value]);
-    };
-    b_el.onchange = function () {
-      this.value = Math.max(Math.min(this.value, 255), 0);
-      setEntityColourWheelCursor(entity_id, [r_el.value, g_el.value, b_el.value]);
-    };
-  }
-
-  function populateEntityOptions (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var fill_el = entity_el.querySelector(common_selectors.fill_tab);
-    var other_el = entity_el.querySelector(common_selectors.other_tab);
-    var stroke_el = entity_el.querySelector(common_selectors.stroke_tab);
-
-    window[`${entity_id}_page`] = "fill"; //Set default page
-
-    fill_el.onclick = function () {
-      removeActiveFromEntityOptions(entity_id);
-      fill_el.setAttribute("class", fill_el.getAttribute("class") + " active");
-      switchEntityTab(entity_id, "fill");
-    };
-    stroke_el.onclick = function () {
-      removeActiveFromEntityOptions(entity_id);
-      stroke_el.setAttribute("class", stroke_el.getAttribute("class") + " active");
-      switchEntityTab(entity_id, "stroke");
-    };
-    other_el.onclick = function () {
-      removeActiveFromEntityOptions(entity_id);
-      other_el.setAttribute("class", other_el.getAttribute("class") + " active");
-      switchEntityTab(entity_id, "other");
-    };
+    //Initialise setColourWheelCursor()
+    if (page == "fill") {
+      setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.fillColor));
+    } else if (page == "stroke") {
+      setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.color));
+    }
   }
 
   function populateEntityTooltips (arg0_entity_id) {
@@ -247,13 +163,13 @@
     var entity_id = arg0_entity_id;
 
     //Declare local instance variable
-    var page = window[`${entity_id}_page`];
+    var entity_ui_obj = global.interfaces[entity_id];
+    var page = entity_ui_obj.page;
     var tabs = ["actions", "customisation", "timeline"];
 
     //Begin populating entity UI
     printEntityBio(entity_id);
-    populateEntityColourWheel(entity_id);
-    populateEntityOptions(entity_id);
+    populateEntityColour(entity_id);
     populateTimelineGraph(entity_id);
 
     //Initialise tooltips
@@ -261,13 +177,9 @@
       populateEntityTooltips(entity_id);
     }, 100);
 
-    //Initialise page and colour
-    if (entity_id)
-      switchEntityTab(entity_id, (page) ? page : "fill");
-
     //Keep collapsed tabs
     for (var i = 0; i < tabs.length; i++)
-      if (window[`${entity_id}_${tabs[i]}_collapsed`])
+      if (entity_ui_obj[`${tabs[i]}_collapsed`])
         minimiseUI(`${tabs[i]}-minimise-btn-${entity_id}`, tabs[i]);
   }
 
@@ -514,19 +426,21 @@
         type: "colour",
 
         x: 0,
-        y: 0
+        y: 0,
+
       }
     });
 
     //Define tab options in #entity-ui-customisation-options-container
     var entity_customisation_content_el = createPageMenu({
+      id: entity_id,
+
       anchor: common_selectors.entity_customisation_options,
       tab_anchor: common_selectors.entity_customisation_tab_container,
       default: "fill",
 
       class: `customisation-options-container`,
-      id: "entity-customisation-options",
-      name: "Customisation OptionsL:",
+      name: "Customisation Options:",
 
       pages: {
         fill: {
@@ -631,222 +545,6 @@
         </div>
       </div>
     </div>`;
-  }
-
-  function setEntityColourWheelCursor (arg0_entity_id, arg1_colour, arg2_do_not_change) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var colour = arg1_colour;
-    var do_not_change = arg2_do_not_change;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var brightness_el = entity_el.querySelector(common_selectors.brightness_range);
-    var colour_brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
-    var colour_cursor_el = entity_el.querySelector(common_selectors.colour_cursor);
-    var colour_picker_el = entity_el.querySelector(common_selectors.colour_picker);
-    var max_brightness = 255;
-    var options_el = entity_el.querySelector(common_selectors.colour_options);
-
-    //Get closest r,g,b value in colour wheel and teleport cursor there
-    colour_cursor_el.style.visibility = "hidden";
-
-    //Adjust brightness_el to new maximum brightness
-    max_brightness = Math.max(Math.max(colour[0], colour[1]), colour[2])/255;
-
-    colour_brightness_el.style.opacity = `${1 - max_brightness}`;
-    brightness_el.value = max_brightness*100;
-
-    //Move colour_cursor_el
-    html2canvas(colour_picker_el).then((canvas) => {
-      var ctx = canvas.getContext("2d");
-
-      var canvas_height = ctx.canvas.height;
-      var canvas_width = ctx.canvas.width;
-
-      var circle_radius = canvas_width/2;
-      var image_data = ctx.getImageData(0, 0, canvas_width, canvas_height).data;
-
-      //Iterate over all image_data; each pixel has 4 elements
-      var closest_pixel = [10000000, 0, 0]; //[colour_distance, x, y];
-
-      for (var i = 0; i < image_data.length; i+= 4) {
-        var local_colour = [image_data[i], image_data[i + 1], image_data[i + 2]];
-
-        if (local_colour.join(", ") != "255, 255, 255") {
-          var distance_from_colour = deltaE(colour, local_colour);
-
-          if (distance_from_colour < closest_pixel[0]) {
-            //Calculate local_x, local_y
-            var local_x = (i/4) % canvas_width;
-            var local_y = Math.floor((i/4)/canvas_width);
-
-            closest_pixel = [distance_from_colour, local_x, local_y, i];
-          }
-        }
-      }
-
-      colour_cursor_el.style.background = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
-
-      //Check if closest_pixel[1], closest_pixel[2] are inside circle
-      if (
-        pointIsInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius)
-      ) {
-        colour_cursor_el.style.left = `calc(${closest_pixel[1]}px - 6px)`;
-        colour_cursor_el.style.top = `calc(${closest_pixel[2]}px - 6px)`;
-      } else {
-        //If not, use closest point to edge of circle instead
-        var bounding_rect = colour_picker_el.getBoundingClientRect();
-        var cursor_coords = closestPointInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius);
-
-        var actual_x = (cursor_coords[0])*(bounding_rect.width/canvas_width);
-        var actual_y = (cursor_coords[1])*(bounding_rect.height/canvas_height);
-
-        colour_cursor_el.style.left = `calc(${actual_x}px - 6px)`;
-        colour_cursor_el.style.top = `calc(${actual_y}px - 6px)`;
-      }
-
-      colour_cursor_el.style.visibility = "visible";
-    });
-
-    //Set entity colour
-    updateBrightnessOpacityHeaders(entity_id);
-
-    if (!do_not_change)
-      setEntityColour(entity_id);
-  }
-
-  function setEntityColour (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var b_el = entity_el.querySelector(common_selectors.entity_b);
-    var g_el = entity_el.querySelector(common_selectors.entity_g);
-    var entity_obj = getEntity(entity_id);
-    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
-    var r_el = entity_el.querySelector(common_selectors.entity_r);
-
-    var b = parseInt(b_el.value);
-    var g = parseInt(g_el.value);
-    var r = parseInt(r_el.value);
-
-    var current_colour = RGBToHex(r, g, b);
-    var current_history_entry = getAbsoluteHistoryFrame(entity_id, main.date);
-    var current_tab = window[`${entity_id}_page`];
-
-    //Set entity fill colour
-    if (current_tab == "fill") {
-      createHistoryFrame(entity_id, main.date, {
-        fillColor: current_colour,
-        fillOpacity: opacity_el.value/100
-      });
-      entity_obj.setStyle({
-        fillColor: current_colour,
-        fillOpacity: opacity_el.value/100
-      });
-    }
-
-    if (current_tab == "stroke") {
-      createHistoryFrame(entity_id, main.date, {
-        color: current_colour,
-        opacity: opacity_el.value/100
-      });
-      entity_obj.setStyle({
-        color: current_colour,
-        opacity: opacity_el.value/100
-      });
-    }
-
-    //Repopulate entity bio
-    printEntityBio(entity_id);
-  }
-
-  function switchEntityTab (arg0_entity_id, arg1_tab) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var tab = arg1_tab;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var options_el = entity_el.querySelector(common_selectors.other_container);
-    var left_offset = 0.125; //In vw
-    var tab_width = 3.25; //In vw
-    var underline_el = entity_el.querySelector(common_selectors.underline_el);
-
-    var entity_obj = getEntity(entity_id);
-
-    window[`${entity_id}_page`] = tab; //Set new page
-
-    if (tab) {
-      if (tab == "fill") {
-        //Switch tabs first
-        options_el.setAttribute("class", "options-body hidden");
-        underline_el.style.left = `${left_offset}vw`;
-
-        var fill_colour = hexToRGB(entity_obj.options.fillColor);
-        updateEntityColour(entity_id, fill_colour, entity_obj.options.fillOpacity);
-      }
-      if (tab == "stroke") {
-        //Switch tabs first
-        options_el.setAttribute("class", "options-body hidden");
-        underline_el.style.left = `${left_offset*2 + tab_width*1}vw`;
-
-        var stroke_colour = hexToRGB(entity_obj.options.color);
-        updateEntityColour(entity_id, stroke_colour, entity_obj.options.opacity);
-      }
-      if (tab == "other") {
-        //Declare local instance variables
-        var maximum_zoom_level_el = document.getElementById(`maximum-zoom-level-${entity_id}`);
-        var minimum_zoom_level_el = document.getElementById(`minimum-zoom-level-${entity_id}`);
-
-        //Switch tabs first
-        options_el.setAttribute("class", "options-body");
-        underline_el.style.left = `${left_offset*3.5 + tab_width*2}vw`;
-
-        //Populate default values
-        var current_maximum_zoom_value = getEntityProperty(entity_obj, main.date, "maximum_zoom_level");
-        var current_minimum_zoom_value = getEntityProperty(entity_obj, main.date, "minimum_zoom_level");
-
-        if (current_maximum_zoom_value)
-          maximum_zoom_level_el.value = current_maximum_zoom_value;
-        if (current_minimum_zoom_value)
-          minimum_zoom_level_el.value = current_minimum_zoom_value;
-
-        //Add event listeners
-        maximum_zoom_level_el.onchange = function (e) {
-          var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
-
-          createHistoryFrame(entity_id, main.date, {
-            maximum_zoom_level: local_value
-          });
-          printEntityBio(entity_id);
-
-          //Fix value
-          if (local_value)
-            maximum_zoom_level_el.value = local_value;
-        };
-        minimum_zoom_level_el.onchange = function (e) {
-          var local_value = (e.target.value.length > 0) ? parseInt(e.target.value) : undefined;
-
-          createHistoryFrame(entity_id, main.date, {
-            minimum_zoom_level: local_value
-          });
-          printEntityBio(entity_id);
-
-          //Fix value
-          if (local_value)
-            minimum_zoom_level_el.value = local_value;
-        };
-      }
-    }
   }
 
   function updateEntityColour (arg0_entity_id, arg1_colour, arg2_opacity) {
