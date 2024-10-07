@@ -1,15 +1,5 @@
 //Initialise functions
 {
-  /*
-    UNTESTED ELEMENTS:
-
-    - wysiwyg/rich_text
-
-    TESTED ELEMENTS:
-
-    biuf
-  */
-
   //Requires: html2canvas
   /*
     createContextMenu() - Creates a context menu within the DOM.
@@ -75,6 +65,7 @@
 
     //Declare local instance variables
     var all_options = Object.keys(options);
+    var context_menu_el = document.createElement("div");
     var default_keys = ["anchor", "class", "id", "maximum_height", "maximum_width"];
     var html_string = [];
     var query_selector_el;
@@ -88,7 +79,9 @@
     var parent_style = `${height_string}${width_string}`;
 
     //Format html_string
-    html_string.push(`<div ${(options.id) ? `id = "${options.id}" ` : ""}class = "${(options.class) ? options.class + " " : ""}context-menu"${(parent_style.length > 0) ? ` style = "${parent_style}"` : ""}>`);
+    if (options.id) context_menu_el.id = options.id;
+    context_menu_el.setAttribute("class", `${(options.class) ? options.class + " " : ""}context-menu`);
+    if (parent_style.length > 0) context_menu_el.setAttribute("style", `${parent_style}`);
 
     //Fetch table_columns; table_rows
     for (var i = 0; i < all_options.length; i++) {
@@ -167,23 +160,22 @@
         html_string.push(`<tr></tr>`);
       }
 
-    html_string.push(`</table>`);
-
     //Close html_string
-    html_string.push(`</div>`);
+    html_string.push(`</table>`);
+    context_menu_el.innerHTML = html_string.join("");
+    handleContextMenu(context_menu_el);
 
-    //Fetch query_selector_el and set .innerHTML to html_string.join("");
     if (!options.return_html) {
       if (options.anchor) {
         query_selector_el = (isElement(options.anchor)) ? options.anchor : document.querySelector(options.anchor);
-        query_selector_el.innerHTML = html_string.join("");
+        query_selector_el.appendChild(context_menu_el);
       }
 
       //Return statement
       return query_selector_el;
     } else {
       //Return statement
-      return html_string.join("");
+      return context_menu_el.innerHTML;
     }
   }
 
@@ -399,9 +391,6 @@
 
       //High-intensity - take a page from Naissance colour wheels
       html_string.push(`<div class = "colour-picker-container">`);
-        //Onload handler
-        html_string.push(`<img src = "" onerror = "handleColourWheel('${options.id}');">`);
-
         //Colour picker HTML
         html_string.push(`<img id = "colour-picker-hue" class = "colour-picker-hue" src = "./UF/gfx/colour_wheel.png">`);
         html_string.push(`<div id = "colour-picker-brightness" class = "colour-picker-brightness"></div>`);
@@ -1253,12 +1242,13 @@
     }
   }
 
-  function handleColourWheel (arg0_parent_el_id) {
+  function handleColourWheel (arg0_parent_selector) {
+    console.log(`handleColourWheel()`)
     //Convert from parameters
-    var parent_el_id = arg0_parent_el_id;
+    var parent_selector = arg0_parent_selector;
 
     //Declare local instance variables
-    var parent_el = document.getElementById(parent_el_id);
+    var parent_el = (typeof parent_selector == "string") ? document.querySelector(parent_selector) : parent_selector;
 
     var brightness_el = parent_el.querySelector(`#colour-picker-brightness-range`);
     var colour_brightness_el = parent_el.querySelector(`#colour-picker-brightness`);
@@ -1276,20 +1266,26 @@
 
     //colour_wheel_el onclick handler
     colour_wheel_el.onclick = function (e) {
+
       var bounding_rect = e.target.getBoundingClientRect();
       var coord_x = e.clientX - bounding_rect.left;
       var coord_y = e.clientY - bounding_rect.top;
+      console.log(e);
 
       colour_cursor_el.style.left = `calc(${coord_x}px - 6px)`;
-      colour_cursor_el.style.top = `calc(${coord_y}px - 6px - 1rem)`;
+      colour_cursor_el.style.top = `calc(${coord_y}px - 6px)`;
 
       //Apply post-rem offset
       coord_y += rem_px*1;
       coord_x += rem_px*1;
 
       //Get r,g,b value of pixel
-      removeErrorHandlers();
-      html2canvas(parent_el, { logging: false }).then((canvas) => {
+      removeErrorHandlers(); //Remove error handlers; restore later
+      var temp_parent_el = parent_el.cloneNode(true);
+      document.body.appendChild(temp_parent_el); //Temporarily append child to body for reading; restore later
+
+      temp_parent_el.querySelector(`#colour-picker-cursor`).remove(); //Remove cursor from interference
+      html2canvas(temp_parent_el, { logging: true }).then((canvas) => {
         var ctx = canvas.getContext("2d");
 
         var canvas_height = ctx.canvas.height;
@@ -1301,8 +1297,9 @@
         r_el.value = pixel[0];
         g_el.value = pixel[1];
         b_el.value = pixel[2];
-        restoreErrorHandlers()
+        restoreErrorHandlers();
       });
+      temp_parent_el.remove();
     };
 
     //Range change listeners
@@ -1311,7 +1308,7 @@
 
       //Set brightness opacity
       colour_brightness_el.style.opacity = `${1 - brightness_value*0.01}`;
-      updateBrightnessOpacityHeaders(parent_el_id);
+      updateBrightnessOpacityHeaders(parent_el);
     });
     onRangeChange(opacity_el, function (e) {
       if (e.onclick) {
@@ -1320,22 +1317,39 @@
       }
 
       //Set brightness opacity
-      updateBrightnessOpacityHeaders(parent_el_id);
+      updateBrightnessOpacityHeaders(parent_el);
     });
 
     //RGB listeners
     r_el.onchange = function () {
       this.value = Math.max(Math.min(this.value, 255), 0);
-      setColourWheelCursor(`#${parent_el_id}`, [r_el.value, g_el.value, b_el.value]);
+      setColourWheelCursor(parent_el, [r_el.value, g_el.value, b_el.value]);
     };
     g_el.onchange = function () {
       this.value = Math.max(Math.min(this.value, 255), 0);
-      setColourWheelCursor(`#${parent_el_id}`, [r_el.value, g_el.value, b_el.value]);
+      setColourWheelCursor(parent_el, [r_el.value, g_el.value, b_el.value]);
     };
     b_el.onchange = function () {
       this.value = Math.max(Math.min(this.value, 255), 0);
-      setColourWheelCursor(`#${parent_el_id}`, [r_el.value, g_el.value, b_el.value]);
+      setColourWheelCursor(parent_el, [r_el.value, g_el.value, b_el.value]);
     };
+  }
+
+  function handleContextMenu (arg0_context_menu_el, arg1_options) {
+    //Convert from parameters
+    var context_menu_el = arg0_context_menu_el;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var all_inputs = context_menu_el.querySelectorAll(".context-menu-cell");
+
+    //1. General input handling
+    for (var i = 0; i < all_inputs.length; i++) {
+      var local_type = all_inputs[i].getAttribute("type");
+
+      if (local_type == "colour")
+        handleColourWheel(all_inputs[i]);
+    }
   }
 
   function initBIUFToolbar (arg0_parent_el_id) {
@@ -1538,7 +1552,7 @@
     var do_not_change = arg2_do_not_change;
 
     //Declare local instance variables
-    var parent_el = document.querySelector(parent_selector);
+    var parent_el = (typeof parent_selector == "string") ? document.querySelector(parent_selector) : parent_selector;
 
     var brightness_el = parent_el.querySelector(`#colour-picker-brightness-range`);
     var colour_brightness_el = parent_el.querySelector(`#colour-picker-brightness`);
@@ -1618,12 +1632,12 @@
     });
   }
 
-  function updateBrightnessOpacityHeaders (arg0_parent_el_id) {
+  function updateBrightnessOpacityHeaders (arg0_parent_selector) {
     //Convert from parameters
-    var parent_el_id = arg0_parent_el_id;
+    var parent_selector = arg0_parent_selector;
 
     //Declare local instance variables
-    var parent_el = document.getElementById(parent_el_id);
+    var parent_el = (typeof parent_selector == "string") ? document.querySelector(parent_selector) : parent_selector;
 
     var brightness_el = parent_el.querySelector(`#colour-picker-brightness-range`);
     var brightness_header_el = parent_el.querySelector(`#brightness-header`);

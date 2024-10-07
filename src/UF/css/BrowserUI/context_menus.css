@@ -157,7 +157,7 @@
 }
 .colour-picker-mask {
   position: relative;
-  bottom: 2rem;
+  bottom: 0.85rem;
 
   border-radius: 50%;
   background: none;
@@ -193,7 +193,7 @@
 .rgb-inputs {
   position: relative;
 
-  bottom: 10rem;
+  bottom: 8.5rem;
   left: 9rem;
   height: 3.25rem;
 
@@ -214,7 +214,7 @@
   position: relative;
   margin: 0px;
 
-  bottom: 4.5rem;
+  bottom: 3rem;
   right: 0.7rem;
 
   .small-header {
