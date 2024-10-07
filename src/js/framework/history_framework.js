@@ -26,7 +26,7 @@
       if (!coords) {
         actual_coords = (old_history_entry) ?
           old_history_entry.coords :
-          entity_obj._latlngs;
+          convertMaptalksCoordsToTurf(entity_obj)[0];
       } else {
         actual_coords = coords;
       }

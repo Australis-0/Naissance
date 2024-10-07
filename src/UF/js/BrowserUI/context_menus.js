@@ -163,7 +163,7 @@
     //Close html_string
     html_string.push(`</table>`);
     context_menu_el.innerHTML = html_string.join("");
-    handleContextMenu(context_menu_el);
+    handleContextMenu(context_menu_el, options);
 
     if (!options.return_html) {
       if (options.anchor) {
@@ -355,7 +355,7 @@
         html_string.push(`</div>`);
       html_string.push(`</div>`);
     } else if (options.type == "button") {
-      html_string.push(`<span${(options.onclick) ? ` onclick = "${options.onclick}"` : ""} ${objectToAttributes(options.attributes)} class = "button">`);
+      html_string.push(`<span class = "button">`);
         if (options.icon)
           html_string.push(`<img src = "${options.icon}">`);
         if (options.name)
@@ -1243,7 +1243,6 @@
   }
 
   function handleColourWheel (arg0_parent_selector) {
-    console.log(`handleColourWheel()`)
     //Convert from parameters
     var parent_selector = arg0_parent_selector;
 
@@ -1266,7 +1265,6 @@
 
     //colour_wheel_el onclick handler
     colour_wheel_el.onclick = function (e) {
-
       var bounding_rect = e.target.getBoundingClientRect();
       var coord_x = e.clientX - bounding_rect.left;
       var coord_y = e.clientY - bounding_rect.top;
@@ -1298,6 +1296,9 @@
         g_el.value = pixel[1];
         b_el.value = pixel[2];
         restoreErrorHandlers();
+
+        //'onchange' handler
+        (typeof parent_el.onchange == "string") ? eval(parent_el.onchange) : parent_el.onchange([pixel[0], pixel[1], pixel[2]]);
       });
       temp_parent_el.remove();
     };
@@ -1335,6 +1336,11 @@
     };
   }
 
+  /*
+    handleContextMenu() - Provides the interaction handler for context menus.
+    arg0_context_menu_el: (HTMLElement) - The context menu HTML element.
+    arg1_options: (Object) - Optional. Same as the originaal context menu options.
+  */
   function handleContextMenu (arg0_context_menu_el, arg1_options) {
     //Convert from parameters
     var context_menu_el = arg0_context_menu_el;
@@ -1345,10 +1351,25 @@
 
     //1. General input handling
     for (var i = 0; i < all_inputs.length; i++) {
+      var local_id = all_inputs[i].getAttribute("id");
+      var local_input_obj = options[local_id];
       var local_type = all_inputs[i].getAttribute("type");
 
       if (local_type == "colour")
         handleColourWheel(all_inputs[i]);
+
+      //Custom interaction handling
+      if (local_input_obj)
+        if (local_input_obj.onclick)
+          if (local_type == "button") {
+            if (typeof local_input_obj.onclick == "string") {
+              all_inputs[i].setAttribute("onclick", local_input_obj.onclick);
+            } else {
+              all_inputs[i].onclick = function (e) { local_input_obj.onclick(e); }
+            }
+          } else if (local_type == "colour") {
+            all_inputs[i].onchange = local_input_obj.onclick;
+          }
     }
   }
 
@@ -1577,8 +1598,11 @@
 
     //Move colour_cursor_el
     removeErrorHandlers();
+    var temp_parent_el = colour_picker_el.cloneNode(true);
+    document.body.appendChild(temp_parent_el); //Temporarily append child to body for reading; restore later
 
-    html2canvas(colour_picker_el, { logging: false }).then((canvas) => {
+    temp_parent_el.querySelector(`#colour-picker-cursor`).remove(); //Remove cursor from interference
+    html2canvas(temp_parent_el, { logging: false }).then((canvas) => {
       var ctx = canvas.getContext("2d");
 
       var canvas_height = ctx.canvas.height;
@@ -1614,7 +1638,7 @@
         pointIsInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius)
       ) {
         colour_cursor_el.style.left = `calc(${closest_pixel[1]}px - 6px*2)`;
-        colour_cursor_el.style.top = `calc(${closest_pixel[2]}px - 6px - 1rem)`;
+        colour_cursor_el.style.top = `calc(${closest_pixel[2]}px - 6px)`;
       } else {
         //If not, use closest point to edge of circle instead
         var bounding_rect = colour_picker_hue_el.getBoundingClientRect();
@@ -1630,6 +1654,10 @@
       colour_cursor_el.style.visibility = "visible";
       restoreErrorHandlers();
     });
+    temp_parent_el.remove();
+
+    //'onchange' handler
+    (typeof parent_el.onchange == "string") ? eval(parent_el.onchange) : parent_el.onchange(colour);
   }
 
   function updateBrightnessOpacityHeaders (arg0_parent_selector) {

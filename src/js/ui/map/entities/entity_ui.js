@@ -428,6 +428,20 @@
         x: 0,
         y: 0,
 
+        onclick: function (arg0_colour) {
+          //Convert from parameters
+          var colour = arg0_colour;
+
+          //Declare local instance variables
+          var entity_obj = getEntity(entity_id);
+          var entity_ui_obj = global.interfaces[entity_id];
+
+          if (entity_ui_obj.page == "fill") {
+            setEntityFillColour(entity_id, colour);
+          } else if (entity_ui_obj.page == "stroke") {
+            setEntityStrokeColour(entity_id, colour);
+          }
+        }
       }
     });
 
@@ -545,61 +559,5 @@
         </div>
       </div>
     </div>`;
-  }
-
-  function updateEntityColour (arg0_entity_id, arg1_colour, arg2_opacity) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-    var colour = arg1_colour;
-    var opacity = arg2_opacity;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var b_el = entity_el.querySelector(common_selectors.entity_b);
-    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
-    var g_el = entity_el.querySelector(common_selectors.entity_g);
-    var r_el = entity_el.querySelector(common_selectors.entity_r);
-
-    //Update values
-    if (colour) {
-      if (colour[0]) r_el.value = colour[0];
-      if (colour[1]) g_el.value = colour[1];
-      if (colour[2]) b_el.value = colour[2];
-      if (opacity)
-        opacity_el.value = opacity*100;
-
-      setEntityColourWheelCursor(entity_id, colour, true);
-    } else {
-      r_el.value = 255;
-      g_el.value = 255;
-      b_el.value = 255;
-
-      setEntityColourWheelCursor(entity_id, [255, 255, 255], true);
-    }
-  }
-
-  function updateBrightnessOpacityHeaders (arg0_entity_id) {
-    //Convert from parameters
-    var entity_id = arg0_entity_id;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var entity_el = getEntityElement(entity_id);
-
-    var brightness_el = entity_el.querySelector(common_selectors.colour_brightness);
-    var brightness_header_el = entity_el.querySelector(common_selectors.brightness_header);
-    var opacity_el = entity_el.querySelector(common_selectors.opacity_range);
-    var opacity_header_el = entity_el.querySelector(common_selectors.opacity_header);
-
-    var brightness_value = parseInt(brightness_el.value);
-    var opacity_value = parseInt(opacity_el.value);
-
-    //Update values
-    if (brightness_header_el)
-      brightness_header_el.innerHTML = `Brightness | ${brightness_value/100}`;
-    if (opacity_header_el)
-      opacity_header_el.innerHTML = `Opacity | ${opacity_value/100}`;
   }
 }
