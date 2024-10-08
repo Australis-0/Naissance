@@ -696,6 +696,7 @@
     for (let i = 0; i < all_pages.length; i++) {
       let local_tab_button_el = tabs_el.querySelector(`span[id="${all_pages[i]}"]`);
       local_tab_button_el.onclick = function (e) {
+        content_el.innerHTML = "";
         localSwitchPage(all_pages[i], e);
       };
     }
@@ -1350,10 +1351,10 @@
     var all_inputs = context_menu_el.querySelectorAll(".context-menu-cell");
 
     //1. General input handling
-    for (var i = 0; i < all_inputs.length; i++) {
-      var local_id = all_inputs[i].getAttribute("id");
-      var local_input_obj = options[local_id];
-      var local_type = all_inputs[i].getAttribute("type");
+    for (let i = 0; i < all_inputs.length; i++) {
+      let local_id = all_inputs[i].getAttribute("id");
+      let local_input_obj = options[local_id];
+      let local_type = all_inputs[i].getAttribute("type");
 
       if (local_type == "colour")
         handleColourWheel(all_inputs[i]);
@@ -1362,13 +1363,24 @@
       if (local_input_obj)
         if (local_input_obj.onclick)
           if (local_type == "button") {
-            if (typeof local_input_obj.onclick == "string") {
-              all_inputs[i].setAttribute("onclick", local_input_obj.onclick);
-            } else {
-              all_inputs[i].onclick = function (e) { local_input_obj.onclick(e); }
-            }
+            if (local_input_obj.onclick)
+              if (typeof local_input_obj.onclick == "string") {
+                all_inputs[i].setAttribute("onclick", local_input_obj.onclick);
+              } else {
+                all_inputs[i].onclick = function (e) { local_input_obj.onclick(e); };
+              }
           } else if (local_type == "colour") {
             all_inputs[i].onchange = local_input_obj.onclick;
+          } else if (local_type == "number") {
+            if (local_input_obj.onclick)
+              if (typeof local_input_obj.onclick == "string") {
+                all_inputs[i].setAttribute("onchange", local_input_obj.onclick);
+              } else {
+                all_inputs[i].onchange = function (e) {
+                  console.log(local_input_obj);
+                  local_input_obj.onclick(e);
+                };
+              }
           }
     }
   }

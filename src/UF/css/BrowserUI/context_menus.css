@@ -222,6 +222,12 @@
   }
 }
 
+/* -- Number -- */
+.context-menu-cell[type="number"] {
+  padding-bottom: 0.1rem;
+  padding-top: 0.1rem;
+}
+
 /* -- WYSIWYG Editor -- */
 .wysiwyg-editor {
   border: 1px solid black;

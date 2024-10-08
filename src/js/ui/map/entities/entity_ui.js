@@ -412,7 +412,11 @@
 
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
+    var current_history = getHistoryFrame(entity_id, main.date);
     var entity_el = getEntityElement(entity_id);
+
+    var entity_maximum_zoom = (current_history.options.maximum_zoom_level) ? current_history.options.maximum_zoom_level : 0;
+    var entity_minimum_zoom = (current_history.options.minimum_zoom_level) ? current_history.options.minimum_zoom_level : 0;
 
     //Define colour picker
     var entity_customisation_fill_tab_el = createContextMenu({
@@ -464,7 +468,34 @@
           name: "Stroke"
         },
         other: {
-          name: "Other"
+          name: "Other",
+
+          maximum_zoom_level: {
+            id: "maximum_zoom_level",
+            name: "Maximum Zoom Level: ",
+            type: "number",
+            attributes: {
+              min: 0,
+              max: 20,
+              value: entity_maximum_zoom
+            },
+            onclick: function (e) {
+              setEntityMaximumZoomLevel(entity_id, e.target.value);
+            }
+          },
+          minimum_zoom_level: {
+            id: "minimum_zoom_level",
+            name: "Minimum Zoom Level: ",
+            type: "number",
+            attributes: {
+              min: 0,
+              max: 20,
+              value: entity_minimum_zoom
+            },
+            onclick: function (e) {
+              setEntityMinimumZoomLevel(entity_id, e.target.value);
+            }
+          }
         }
       }
     });

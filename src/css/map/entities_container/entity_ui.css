@@ -416,11 +416,16 @@
 
   color: white;
   font-family: "Barlow";
-  font-size: 0.75vw;
+  font-size: 1.25rem;
   font-weight: 300;
   text-transform: uppercase;
 
-  padding-bottom: 0.2vw;
+  padding-bottom: 0.2rem;
+}
+#entity-ui-customisation-other {
+  font-family: "Barlow";
+  font-size: 1rem;
+  font-weight: 300;
 }
 
 /* -- Container styling: Actions -- */

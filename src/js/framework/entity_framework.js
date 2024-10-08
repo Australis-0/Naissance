@@ -792,6 +792,36 @@
   }
 
   /*
+    isEntityVisible() - Checks whether an entity should currently be visible; for both .minimum_zoom_level, .maximum_zoom_level and isEntityHidden().
+    arg0_entity_id: (String) - The entity ID to check for.
+    arg1_date: (Object, Date) - Optional. The date at which to check if an entity is hidden. main.date by default.
+
+    Returns: (Boolean)
+  */
+  function isEntityVisible (arg0_entity_id, arg1_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : main.date;
+
+    //Guard clause if entity is hidden
+    if (isEntityHidden(entity_id, date)) return false;
+
+    //Declare local instance variables
+    var current_history = getHistoryFrame(entity_id, date);
+    var entity_obj = getEntity(entity_id);
+    var zoom_level = map.getZoom();
+
+    var entity_maximum_zoom = (current_history.options.maximum_zoom_level) ? current_history.options.maximum_zoom_level : 1000;
+    var entity_minimum_zoom = (current_history.options.minimum_zoom_level) ? current_history.options.minimum_zoom_level : 0;
+
+    //Guard clause; return false if current zoom requirements are not met
+    if (zoom_level < entity_minimum_zoom || zoom_level > entity_maximum_zoom) return false;
+
+    //Return statement
+    return true;
+  }
+
+  /*
     refreshEntityActions() - Refreshes the visible Entity Action navigation menu.
     arg0_entity_id: (String) - The entity ID to refresh Entity Actions for.
   */
@@ -981,6 +1011,34 @@
 
     //Return statement
     return entity_name;
+  }
+
+  /*
+    updateEntityVisibility() - Updates an entity's visibility on the map based on hidden/zoom levels, or other attributes.
+    arg0_entity_id: (String) - The entity ID to update.
+    arg1_date: (Object, Date) - Optional. TRhe date at which to check for if an entity is hidden. main.date by default.
+  */
+  function updateEntityVisibility (arg0_entity_id, arg1_date) { //[WIP] - Finish function body
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var date = (arg1_date) ? arg1_date : main.date;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(entity_id);
+    var is_entity_actually_visible = true;
+    var is_entity_visible = isEntityVisible(entity_id, date); //Whether the entity should be visible
+
+    //Check if entity is actually visible
+    if (entity_obj)
+      if (!entity_obj.isVisible()) is_entity_actually_visible = false;
+
+    //Update entity visibility
+    if (!is_entity_actually_visible)
+      if (is_entity_visible)
+        entity_obj.show();
+    if (is_entity_actually_visible)
+      if (!is_entity_visible)
+        entity_obj.hide();
   }
 }
 
