@@ -395,7 +395,7 @@
 
     //Return statement
     return `<div id = "entity-ui-timeline-bio-container" class = "entity-ui-container bio">
-      <div id = "entity-ui-timeline-bio-subcontainer" class = "entity-ui-subcontainer">
+      <div id = "entity-ui-timeline-bio-subcontainer" class = "relative">
         <table id = "entity-ui-timeline-bio-table" class = "timeline-bio-table">
           <tr>
             <th>YEAR</th>
@@ -576,7 +576,7 @@
 
     //Return statement
     return `<div id = "entity-ui-timeline-graph-container" class = "entity-ui-container timeline">
-      <div id = "entity-ui-timeline-graph-subcontainer" class = "entity-ui-subcontainer">
+      <div id = "entity-ui-timeline-graph-subcontainer" class = "relative">
         <select id = "entity-ui-timeline-graph-type" class = "entity-select">${data_select_ui.join("\n")}</select>
         <canvas id = "entity-ui-timeline-graph" class = "entity-ui-graph"></canvas>
 

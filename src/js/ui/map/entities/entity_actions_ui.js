@@ -334,7 +334,7 @@
 
     //formatted_navigation_obj now contains the correct createContextMenu() options; assign to #entity-actions-context-menu
     formatted_navigation_obj.anchor = `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor}`;
-    formatted_navigation_obj.class = "entity-context-menu actions-menu";
+    formatted_navigation_obj.class = "entity-ui-container entity-context-menu actions-menu";
     var context_menu_el = createContextMenu(formatted_navigation_obj);
 
     //Iterate over all_entity_actions

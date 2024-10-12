@@ -5,12 +5,14 @@
 		<!-- Import Fonts, Font Awesome -->
 		<link rel="preconnect" href="https://fonts.gstatic.com">
 		<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300;400;500;600;700&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Slabo+27px&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
 		<!-- CSS Stylesheets -->
 		<link rel = "stylesheet" href = "./css/icons.css" type = "text/css">
 
 		<link rel = "stylesheet" href = "./css/.global/context_menus.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/.global/global.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/.global/global_classes.css" type = "text/css">
 
 		<link rel = "stylesheet" href = "./css/left_sidebar/date_container/date_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/file/file_ui.css" type = "text/css">
@@ -165,7 +167,7 @@
 				<!-- 4th container -->
 				<div id = "brush-container" class = "brush-container">
 					<div id = "brush-options-container" class = "brush-options-container">
-						<div id = "brush-options-subheader" class = "brush-options subheader">Brush Options</div>
+						<div id = "brush-options-subheader" class = "brush-options medium-header">Brush Options</div>
 						<div id = "brush-information-container" class = "brush-information-container"></div>
 						<div id = "brush-buttons-container" class = "brush-buttons-container">
 							<img src = "gfx/interface/simplify_icon.png" class = "small button" id = "simplify-brush-btn" draggable = "false" context = "true" onclick = "printBrushOptions('simplify');">
@@ -177,7 +179,7 @@
 				<div id = "mapmode-settings-container" class = "mapmode-settings-container hidden">
 				</div>
 				<div id = "mapmode-settings-header-container" class = "mapmode-settings-header-container">
-					<span id = "mapmode-settings-subheader" class = "bottom-right subheader">Mapmode Settings
+					<span id = "mapmode-settings-subheader" class = "bottom-right medium-header">Mapmode Settings
 						<img src = "gfx/interface/empty_icon.png" class = "small button reverse-minimise-icon right-align" id = "toggle-mapmode-settings-btn" onclick = "toggleMapmodeSettings();">
 					</span>
 				</div>
@@ -186,7 +188,7 @@
 				<div id = "select-mapmode-container" class = "select-mapmode-container">
 				</div>
 				<div id = "select-mapmode-header-container" class = "select-mapmode-header-container">
-					<span id = "select-mapmode-subheader" class = "bottom-right subheader">Select Mapmode
+					<span id = "select-mapmode-subheader" class = "bottom-right medium-header">Select Mapmode
 						<img src = "gfx/interface/empty_icon.png" class = "small button minimise-icon right-align" id = "toggle-select-mapmode-btn" onclick = "toggleSelectMapmode();">
 					</span>
 				</div>

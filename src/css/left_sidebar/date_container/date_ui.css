@@ -9,6 +9,9 @@
 
   background-color: rgba(0, 0, 0, 0.85);
 }
+.date-ui.unique > * {
+  margin: 0 auto;
+}
 
 /* -- Date Styling -- */
 .date-container #date-input {

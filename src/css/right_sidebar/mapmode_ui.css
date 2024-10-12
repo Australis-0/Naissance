@@ -49,8 +49,9 @@
   margin: 12px;
 
   color: white;
-  font-family: "Barlow Light";
-  font-size: 1vh;
+  font-family: "Barlow";
+  font-weight: 300;
+  font-size: 1rem;
 }
 
 .brush-options.subheader {

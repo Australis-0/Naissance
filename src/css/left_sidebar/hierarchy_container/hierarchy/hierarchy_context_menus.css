@@ -1,8 +1,8 @@
 #hierarchy-context-menu {
-  left: calc(var(--sidebar-width) + var(--context-menu-x-margin));
+  left: calc(var(--sidebar-width) + var(--context-menu-margin-left));
 }
 #hierarchy-context-menu-two {
-  left: calc(var(--sidebar-width) + var(--context-menu-width) + var(--context-menu-x-margin)*2);
+  left: calc(var(--sidebar-width) + var(--context-menu-width) + var(--context-menu-margin-left)*2);
 
   .context-menu {
     width: calc(var(--context-menu-width)*1.5);

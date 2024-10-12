@@ -8,16 +8,14 @@ input {
   font-size: 1rem;
   font-weight: 300;
 }
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #23232329;
+}
 option {
   color: black;
-}
-
-/* -- Global display classes -- */
-.display-none, .instant-display-none {
-  display: none;
-}
-.hidden {
-  visibility: hidden;
 }
 
 /* -- Global styling classes -- */
@@ -28,15 +26,6 @@ option {
 .icon.medium {
   height: 1.25vh;
   width: 1.25vh;
-}
-.negative {
-  filter: invert(1);
-}
-.no-select {
-  user-select: none;
-}
-.uppercase {
-  text-transform: uppercase;
 }
 
 /* -- Scrollbar styling -- */
@@ -52,22 +41,6 @@ option {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: white;
-}
-
-/* -- Text styling -- */
-.small-header {
-  display: inline-block;
-  font-size: 0.5vw;
-  text-transform: uppercase;
-}
-.subheader {
-  color: white;
-  font-family: "Karla";
-  font-size: 2vh;
-  font-weight: 700;
-  text-transform: uppercase;
-
-  margin-left: 10px;
 }
 
 /* -- Tooltip styling -- */
@@ -86,8 +59,8 @@ option {
 /* -- CSS Variables -- */
 :root {
   /* -- Context Menus -- */
+  --context-menu-margin-left: calc(0.5rem);
   --context-menu-width: calc(10rem);
-  --context-menu-x-margin: calc(0.5rem);
 
   /* -- Entity UI: Timeline/Data Graph -- */
   --canvas-height: 4vw;
