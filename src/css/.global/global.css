@@ -20,12 +20,12 @@ option {
 
 /* -- Global styling classes -- */
 .icon.small {
-  height: 1vh;
-  width: 1vh;
+  height: 1rem;
+  width: 1rem;
 }
 .icon.medium {
-  height: 1.25vh;
-  width: 1.25vh;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 
 /* -- Scrollbar styling -- */
@@ -62,13 +62,23 @@ option {
   --context-menu-margin-left: calc(0.5rem);
   --context-menu-width: calc(10rem);
 
+  /* -- Left Sidebar -- */
+  --left-sidebar-width: calc(min(40rem, 25vw));
+
+  /* -- Map -- */
+    /* -- 0. Entity UI: General -- */
+    --entity-ui-padding: 12px;
+    --entity-ui-width: calc(35rem);
+
+    /* -- 3. Entity UI: Customisation -- */
+    --entity-ui-customisation-tabs: 3;
+
+
   /* -- Entity UI: Timeline/Data Graph -- */
   --canvas-height: 4vw;
   --canvas-x-axis-margin-right: 12px;
   --canvas-y-axis-margin-left: calc(0.2vw);
   --entity-ui-header-buttons: 3;
-  --entity-ui-width: calc(20vw + 24px);
   --graph-label-font-size: calc(0.5vw);
   --selection-colour: rgba(255, 255, 255, 0.3);
-  --sidebar-width: calc(25vw);
 }

@@ -660,11 +660,9 @@
 
       //Declare local instance variables
       var hr_el = tabs_el.querySelector("hr");
-      var left_offset = 0.5; //In rem
-      var left_offset_multiplier = all_pages.indexOf(page);
+      var left_offset = 0.125; //In rem
       var local_tab_button_el = tabs_el.querySelector(`span[id="${page}"]`);
       var local_value = options.pages[page];
-      var tab_width = 7; //In rem
 
       //Initialise local_value options
       if (!local_value.anchor) local_value.anchor = content_el;
@@ -677,7 +675,7 @@
       for (var x = 0; x < all_pages.length; x++)
         removeClass(tabs_el.querySelector(`span[id="${all_pages[x]}"]`), "active");
       addClass(local_tab_button_el, "active");
-      hr_el.style.left = `${left_offset + tab_width*left_offset_multiplier}rem`;
+      hr_el.style.left = `calc(${local_tab_button_el.offsetLeft - local_tab_button_el.parentElement.offsetLeft}px + ${left_offset}rem)`;
 
       //Set "page" attribute for content_el; replace content
       content_el.setAttribute("page", page);
