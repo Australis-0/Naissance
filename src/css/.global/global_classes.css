@@ -3,6 +3,20 @@
   user-select: none;
 }
 
+/* -- Button attributes -- */
+.button.small {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+.button.medium {
+  height: 2rem;
+  width: 2rem;
+}
+.button.large {
+  height: 3rem;
+  width: 3rem;
+}
+
 /* -- Display attributes -- */
 .absolute {
   position: absolute;
@@ -17,6 +31,25 @@
 /*  -- Filter attributes -- */
 .negative {
   filter: invert(1);
+}
+
+/* -- Float attributes -- */
+.left-align {
+  float: left;
+}
+.right-align {
+  float: right;
+}
+
+/* -- Icon attributes -- */
+
+.icon.small {
+  height: 1rem;
+  width: 1rem;
+}
+.icon.medium {
+  height: 1.25rem;
+  width: 1.25rem;
 }
 
 /* -- Text classes -- */
