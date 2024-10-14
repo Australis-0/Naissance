@@ -1,4 +1,30 @@
 /* -- 0. Entity UI General Styling -- */
+.entity-ui-container {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  margin-top: 5px;
+  font-family: "Barlow";
+  font-weight: 300;
+  font-size: 1rem;
+  overflow-y: auto;
+  padding-top: 8px;
+  padding-left: 12px;
+  padding-bottom: 8px;
+  width: var(--entity-ui-width);
+
+  transition: all 0.5s, padding 1s;
+}
+.entity-ui-container.hidden {
+  margin: 0px;
+  max-height: 0px;
+  overflow-y: auto;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+.entity-ui-container.hidden::-webkit-scrollbar {
+  display: none;
+}
+
 /* -- 1. Entity UI Title -- */
 .leaflet-popup #entity-header {
   padding-bottom: 0px;
@@ -7,6 +33,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 65% 65%;
+    border-radius: 35%;
     height: calc(var(--entity-ui-title-button-size));
     margin-left: calc(var(--entity-ui-title-button-margin));
     margin-right: calc(var(--entity-ui-title-button-margin));
@@ -15,6 +42,7 @@
   }
   .button:hover {
     background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
     cursor: pointer;
     transition: all 1s, background-color 0.5s;
   }
@@ -40,158 +68,123 @@
 }
 
 /* -- 2. Entity UI Graph/Bio -- */
-.entity-ui-graph {
-  height: var(--canvas-height);
-  margin-left: calc(1vw + var(--canvas-height)/4);
-  margin-top: 0.5vw;
-  width: calc(100% - var(--canvas-height)/2 - var(--canvas-x-axis-margin-right));
-}
-.graph-label {
-  font-size: 0.75rem;
-}
-/* -- 3. Entity UI Customisation -- */
-/* -- 4. Entity UI Actions -- */
-/* -- A. Entity UI Animations -- */
-
-/* -- Select styling -- */
 .entity-select {
   background: none;
   border: none;
 
   color: white;
   font-family: "Barlow";
-  font-size: calc(1rem*1.5);
+  font-size: calc(1.25rem);
   font-weight: 300;
   text-transform: uppercase;
 }
 .entity-select > option {
   background-color: black;
 }
+#entity-ui-timeline-graph-container {
+  padding-bottom: calc(0.5vw + 8px);
 
-/* -- Container styling -- */
-.entity-ui-container {
-  background-color: rgba(0, 0, 0, 0.85);
-  color: white;
-  margin-top: 5px;
-  max-height: 100vh;
-  font-family: "Barlow";
-  font-weight: 300;
-  font-size: 1rem;
-  overflow-y: auto;
-  padding-top: 8px;
-  padding-left: 12px;
-  padding-bottom: 8px;
-  width: var(--entity-ui-width);
+  .entity-ui-graph {
+    height: var(--entity-ui-graph-height);
+    margin-left: calc(1vw + var(--entity-ui-graph-height)/4);
+    margin-top: 0.5vw;
+    width: calc(100% - var(--entity-ui-graph-height)/2 - var(--entity-ui-graph-margin-right));
+  }
+  .entity-ui-graph-x-axis {
+    clear: both;
+    margin-left: calc(2vw);
+    width: calc(100% - var(--entity-ui-graph-height)/2 - var(--entity-ui-graph-margin-right));
+  }
+  .entity-ui-graph-y-axis {
+    position: absolute;
+    height: calc(var(--entity-ui-graph-height) - 0.5vw*2 - 16px);
+    left: calc(0.2vw);
+    top: calc(3rem + 12px);
+    width: 3px;
 
-  transition: all 0.5s, padding 1s;
+    border-left: 1px solid white;
+  }
+  #entity-ui-timeline-graph-y-top-axis-label {
+    position: absolute;
+    left: calc(0.2rem);
+    top: calc(1.5rem + 16px);
+  }
+  #entity-ui-timeline-graph-y-bottom-axis-label {
+    position: absolute;
+    bottom: 0px;
+    left: calc(0.2rem);
+  }
+  .graph-label {
+    font-size: 0.75rem;
+  }
+}
+#entity-ui-timeline-bio-subcontainer {
+  .timeline-bio-table {
+    width: 97.5%;
+
+    .bio-add-keyframe-icon {
+      border-radius: 50%;
+      left: 0px;
+      position: relative;
+    }
+    .bio-add-keyframe-icon, .bio-context-menu-icon, .bio-jump-to-icon {
+      height: 0.75rem;
+      width: 0.75rem;
+
+      float: right;
+      margin-top: 0.1rem;
+      margin-right: 0.25rem;
+      vertical-align: middle;
+
+      transition: all 0.25s ease;
+    }
+    .bio-box {
+      position: relative;
+      top: 0.05rem;
+
+      font-size: 1.4rem;
+      line-height: 0.85rem;
+    }
+    .bio-jump-to-icon {
+      margin-right: 0.5rem;
+    }
+    .header-padding {
+      height: 0.5rem;
+    }
+    .top-bio-header th:nth-child(2) {
+      font-weight: 300;
+      font-size: 0.9rem;
+    }
+    .top-bio-header th:nth-child(2) input[type="checkbox"] {
+      position: relative;
+      top: 0.1rem;
+    }
+  }
+  .timeline-bio-table td {
+    border: 0px;
+    display: table-cell;
+    font-size: 0.75rem;
+  }
+  .timeline-bio-table td span:not(.bio-box) {
+    display: inline-block;
+    width: calc(100% - 2.7rem - 12px);
+  }
+  .timeline-bio-table tr:not(.no-select):hover {
+    background-color: var(--selection-colour);
+  }
+  .timeline-bio-table tr td, .timeline-bio-table tr th {
+    padding-left: 5px;
+  }
+  .timeline-bio-table tr td input[type="checkbox"] {
+    position: relative;
+    top: 0.1rem;
+    margin-right: 0.3rem;
+  }
 }
 
-/* -- Container styling: Animations -- */
-.entity-ui-container.hidden {
-  margin: 0px;
-  max-height: 0px;
-  overflow-y: auto;
-  padding-bottom: 0px !important;
-  padding-top: 0px !important;
-}
-.entity-ui-container.hidden::-webkit-scrollbar {
-  display: none;
-}
-
-/* -- Container styling: Entity UI header -- */
-#entity-header .button {
-  border-radius: 35%;
-}
-#entity-header .button:hover {
-  border-radius: 50%;
-}
-
-/* -- Container styling: Timeline/Data -- */
-.entity-ui-container.timeline {
-  padding-bottom: calc(0.5vw + 8px)
-}
-.entity-ui-graph-x-axis {
-  clear: both;
-  margin-left: calc(2vw);
-  width: calc(100% - var(--canvas-height)/2 - var(--canvas-x-axis-margin-right));
-}
-.entity-ui-graph-y-axis {
-  position: absolute;
-  height: calc(var(--canvas-height) - 0.5vw*2 - 16px);
-  left: calc(0.2vw);
-  top: calc(3rem + 12px);
-  width: 3px;
-
-  border-left: 1px solid white;
-}
-#entity-ui-timeline-graph-y-top-axis-label {
-  position: absolute;
-  left: calc(0.2vw);
-  top: calc(1rem*1.5 + 16px);
-}
-#entity-ui-timeline-graph-y-bottom-axis-label {
-  position: absolute;
-  bottom: 0px;
-  left: calc(0.2vw);
-}
-.timeline-bio-table {
-  width: 97.5%;
-}
-.timeline-bio-table .header-padding {
-  height: 0.5vh;
-}
-.timeline-bio-table td {
-  border: 0px;
-  display: table-cell;
-  font-size: 0.85vh;
-}
-.timeline-bio-table td span:not(.bio-box) {
-  display: inline-block;
-  width: calc(100% - (0.85vh + 0.25vh*2)*2 - 12px);
-}
-.timeline-bio-table .top-bio-header th:nth-child(2) {
-  font-weight: 300;
-  font-size: 0.9vh;
-}
-.timeline-bio-table .top-bio-header th:nth-child(2) input[type="checkbox"] {
-  position: relative;
-  top: 0.1vh;
-}
-.timeline-bio-table tr td, .timeline-bio-table tr th {
-  padding-left: 5px;
-}
-.timeline-bio-table tr td input[type="checkbox"] {
-  position: relative;
-  top: 0.1vh;
-  margin-right: 0.3vh;
-}
-
-.bio-add-keyframe-icon {
-  border-radius: 50%;
-  left: 0vh;
-  position: relative;
-}
-.bio-add-keyframe-icon, .bio-context-menu-icon, .bio-jump-to-icon {
-  height: 0.85vh;
-  width: 0.85vh;
-
-  float: right;
-  margin-top: 0.1vh;
-  margin-right: 0.25vh;
-  vertical-align: middle;
-
-  transition: all 0.25s ease;
-}
-.bio-box {
-  position: relative;
-  top: 0.05vh;
-
-  font-size: 1.4vh;
-  line-height: 0.85vh;
-}
-.bio-jump-to-icon {
-  margin-right: 0.5vh;
-}
+/* -- 3. Entity UI Customisation -- */
+/* -- 4. Entity UI Actions -- */
+/* -- A. Entity UI Animations -- */
 
 /* -- Container styling: Timeline/Data Animations -- */
 .bio-add-keyframe-icon:hover, .bio-context-menu-icon:hover, .bio-jump-to-icon:hover {
@@ -216,9 +209,7 @@
   margin: 0px;
   max-height: 0px;
 }
-.timeline-bio-table tr:not(.no-select):hover {
-  background-color: var(--selection-colour);
-}
+
 
 /* -- Container styling: Bio Context Menu -- */
 .bio-context-menu-container {
