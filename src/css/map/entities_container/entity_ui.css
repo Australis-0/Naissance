@@ -303,16 +303,19 @@
   background-color: rgba(0, 0, 0, 0.85);
   border-radius: 0px;
 }
+.entity-context-menu.actions-menu table {
+  padding-right: 8px;
+}
 .entity-context-menu.actions-menu td {
   background-color: rgba(0, 0, 0, 0) !important;
   color: white;
 }
+.entity-context-menu.actions-menu td:hover {
+  background-color: var(--selection-colour) !important;
+  border-radius: 0px;
+}
 .entity-context-menu.actions-menu td span {
   width: -webkit-fill-available;
-}
-
-.entity-context-menu.actions-menu td .button:hover {
-  border-radius: 0px;
 }
 
 /* -- A. Entity UI Animations -- */
