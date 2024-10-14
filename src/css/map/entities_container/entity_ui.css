@@ -90,6 +90,9 @@
     margin-top: 0.5vw;
     width: calc(100% - var(--entity-ui-graph-height)/2 - var(--entity-ui-graph-margin-right));
   }
+  .entity-ui-graph:hover {
+    cursor: grab;
+  }
   .entity-ui-graph-x-axis {
     clear: both;
     margin-left: calc(2vw);
@@ -119,6 +122,9 @@
   }
 }
 #entity-ui-timeline-bio-subcontainer {
+  max-height: 10rem;
+  overflow-y: auto;
+
   .timeline-bio-table {
     width: 97.5%;
 
@@ -126,6 +132,14 @@
       border-radius: 50%;
       left: 0px;
       position: relative;
+    }
+    .bio-add-keyframe-icon:hover {
+      background-color: var(--selection-colour);
+      padding: 0.5rem;
+      left: 0.5rem;
+    }
+    .bio-add-keyframe-icon:hover, .bio-context-menu-icon:hover, .bio-jump-to-icon:hover {
+      cursor: pointer;
     }
     .bio-add-keyframe-icon, .bio-context-menu-icon, .bio-jump-to-icon {
       height: 0.75rem;
@@ -181,175 +195,98 @@
     margin-right: 0.3rem;
   }
 }
-
-/* -- 3. Entity UI Customisation -- */
-/* -- 4. Entity UI Actions -- */
-/* -- A. Entity UI Animations -- */
-
-/* -- Container styling: Timeline/Data Animations -- */
-.bio-add-keyframe-icon:hover, .bio-context-menu-icon:hover, .bio-jump-to-icon:hover {
-  cursor: pointer;
-}
-.bio-add-keyframe-icon:hover {
-  background-color: var(--selection-colour);
-  padding: 0.5vh;
-  left: 0.5vh;
-}
-.entity-ui-graph:hover {
-  cursor: grab;
-}
-.entity-ui-header-container > img {
-  margin-right: 16px;
-}
-.entity-ui-container.bio {
-  max-height: 10vh;
-  overflow-y: auto;
-}
-.entity-ui-container.bio.hidden {
+#entity-ui-timeline-bio-subcontainer.hidden {
   margin: 0px;
   max-height: 0px;
 }
 
+  /* -- 2.1. -- Entity UI Graph/Bio - Context Menus -- */
+  .bio-context-menu-container {
+    position: fixed;
+    left: calc(var(--entity-ui-width) + 12px);
+    width: var(--context-menu-width);
 
-/* -- Container styling: Bio Context Menu -- */
-.bio-context-menu-container {
-  position: fixed;
-  left: calc(var(--entity-ui-width) + 12px);
-  width: var(--context-menu-width);
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+    color: black;
+    font-size: 1rem;
+  }
+  .bio-context-menu-container .context-menu-button {
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.5rem;
 
-  background-color: rgb(255, 255, 255);
-  border-radius: 5px;
-  color: black;
-  font-size: 1vh;
-}
-.bio-context-menu-container .context-menu-button {
-  padding-bottom: 0.5vh;
-  padding-left: 0.5vw;
-  padding-right: 0.5vw;
-  padding-top: 0.5vh;
+    transition: all 0.25s ease;
+  }
+  .context-menu-button .icon {
+    margin-bottom: 0.15rem;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+  }
 
-  transition: all 0.25s ease;
-}
-.context-menu-button .icon {
-  margin-bottom: 0.15vh;
-  margin-right: 0.3vh;
-  vertical-align: middle;
-}
+/* -- 3. Entity UI Customisation -- */
+#customisation-top-parent {
+  display: flex;
+  height: 14rem;
+  width: calc(var(--entity-ui-width) + var(--entity-ui-padding));
 
-/* -- Container styling: Bio Context Menu - Date UI -- */
+  #entity-ui-customisation-colour {
+    flex: 1;
 
-.bio-context-menu-date-container {
-  position: fixed;
-  left: calc(var(--entity-ui-width) + var(--context-menu-width) + 16px);
+    background-color: rgba(0, 0, 0, 0.85);
+    max-width: calc(var(--entity-ui-width)*0.40);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 12px;
+    padding-left: 4px;
+    padding-top: 4px;
 
-  background-color: rgb(255, 255, 255);
-  border-radius: 5px;
-  color: black;
-  font-size: 1vh;
-  width: 10vw;
-}
-.bio-context-menu-date-container .day-input {
-  width: 4vh;
-}
-.bio-context-menu-date-container .hour-input, .bio-context-menu-date-container .minute-input {
-  width: 2vh;
-}
-.bio-context-menu-date-container input, .bio-context-menu-date-container select {
-  border-radius: 0px;
-  color: black;
-  font-family: "Barlow";
-  font-size: 1vh;
-
-  text-align: center;
-  text-align-last: center;
-}
-.bio-context-menu-date-container input[type="number"]::-webkit-outer-spin-button, .bio-context-menu-date-container input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.bio-context-menu-date-container select {
-  -webkit-appearance: none;
-
-  padding: 0.125vh; /* 1/8ths of font size */
-}
-.bio-context-menu-date-container .year-input {
-  width: 4vh;
-}
-
-/* -- Container styling: Bio Context Menu Animations -- */
-
-.bio-context-menu-container .context-menu-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  cursor: pointer;
-}
-.bio-context-menu-container .context-menu-button.delete:hover {
-  background-color: rgba(240, 60, 60, 0.7);
-  color: white;
-}
-.bio-context-menu-container:not(.display-none) {
-  animation: fade-in 0.5s forwards;
-}
-.bio-context-menu-container.display-none {
-  display: block;
-  animation: fade-out 0.5s forwards;
-}
-.context-menu-button.delete:hover .icon {
-  filter: invert(0);
-}
-
-/* -- Container styling: Customisation -- */
-.leaflet-popup {
-  #customisation-top-parent {
-    display: flex;
-    height: 14rem;
-
-    #entity-ui-customisation-colour {
-      flex: 1;
-
-      background-color: rgba(0, 0, 0, 0.85);
-      max-width: calc(var(--entity-ui-width)*0.40);
-      overflow-x: hidden;
-      overflow-y: hidden;
-      padding: 12px;
-      padding-left: 4px;
-      padding-top: 4px;
-
-      :is(.brightness-range-container, .opacity-range-container) .small-header {
-        font-size: 0.85rem;
-        line-height: 1rem;
-        margin-bottom: 0.1rem;
-        margin-left: 0.5rem;
-        margin-right: 0rem;
-        vertical-align: middle;
-      }
-      #colour-picker {
-        margin-right: calc(var(--entity-ui-width)*0.10);
-      }
+    :is(.brightness-range-container, .opacity-range-container) .small-header {
+      font-size: 0.85rem;
+      line-height: 1rem;
+      margin-bottom: 0.1rem;
+      margin-left: 0.5rem;
+      margin-right: 0rem;
+      vertical-align: middle;
     }
-    #entity-ui-customisation-other {
-      flex: 1;
+    #colour-picker {
+      margin-right: calc(var(--entity-ui-width)*0.10);
+    }
+  }
+  #entity-ui-customisation-other {
+    flex: 1;
 
-      background-color: rgba(0, 0, 0, 0.85);
-      margin-left: 6px;
-      padding: 12px;
-      width: calc(var(--entity-ui-width) - var(--context-menu-width));
+    background-color: rgba(0, 0, 0, 0.85);
+    font-family: "Barlow";
+    font-size: 0.85rem;
+    font-weight: 300;
+    margin-left: 6px;
+    padding: 12px;
+    width: calc(var(--entity-ui-width) - var(--context-menu-width));
+
+    #customisation-tab-container {
+      display: inline-block;
+      width: 100%;
+
+      color: white;
+      font-family: "Barlow";
+      font-size: 1rem;
+      font-weight: 300;
+      text-transform: uppercase;
+
+      padding-bottom: 0.2rem;
+
+      .tabs-container > span {
+        width: calc((var(--entity-ui-width)/var(--entity-ui-customisation-tabs))*0.45);
+      }
     }
   }
 }
-
-.customisation-top-parent {
-  display: flex;
-  width: calc(var(--entity-ui-width) + var(--entity-ui-padding));
-}
-.entity-ui-container.colour-container {
-  flex: 1;
-  height: 7vw;
-  max-width: 7vw;
-  min-width: 7vw !important;
-  overflow-y: hidden;
-
-  padding: 12px;
+/* -- Hides default context menu background -- */
+.customisation-top-parent.hidden {
+  opacity: 0;
+  margin: 0px;
 }
 .entity-ui-container.customisation-top-parent {
   background: none;
@@ -357,53 +294,8 @@
 
   overflow: visible;
 }
-.entity-ui-container.options-container {
-  flex: 1;
-  height: 7vw;
-  min-width: calc(13vw - 30px - 12px) !important;
 
-  margin-left: 6px;
-  padding: 12px;
-}
-.hidden.customisation-top-parent {
-  opacity: 0;
-  margin: 0px;
-}
-.options-body {
-  margin-top: 0.5vw;
-
-  font-size: 0.9vh;
-}
-.options-body .short-number-input {
-  width: 2.5vh;
-
-  color: black;
-}
-
-/* -- Container styling: Customisation Options -- */
-#customisation-tab-container {
-  display: inline-block;
-  width: 100%;
-
-  color: white;
-  font-family: "Barlow";
-  font-size: 1rem;
-  font-weight: 300;
-  text-transform: uppercase;
-
-  padding-bottom: 0.2rem;
-
-  .tabs-container > span {
-    width: calc((var(--entity-ui-width)/var(--entity-ui-customisation-tabs))*0.45);
-  }
-}
-#entity-ui-customisation-other {
-  font-family: "Barlow";
-  font-size: 1rem;
-  font-weight: 300;
-}
-
-/* -- Container styling: Actions -- */
+/* -- 4. Entity UI Actions -- */
 .entity-context-menu.actions-menu {
   margin-top: 6px;
   width: var(--entity-ui-width);
@@ -422,3 +314,5 @@
 .entity-context-menu.actions-menu td .button:hover {
   border-radius: 0px;
 }
+
+/* -- A. Entity UI Animations -- */
