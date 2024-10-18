@@ -1,4 +1,5 @@
 config.defines.common = {
+  reserved_brush_actions: ["name", "scope_type"], //The types of keys that are reserved for config.brush_actions categories
   reserved_entity_actions: ["name", "scope_type"], //The types of keys that are reserved for config.entity_actions categories
   reserved_entity_keyframes: ["name", "scope_type"], //The types of keys that are reserved for config.entity_keyframes categories
 
@@ -26,6 +27,7 @@ config.defines.common = {
       minute_el: `#date-container #minute-input`,
 
     //Interface - Right Sidebar
+    brush_actions_context_menu_anchor: `#brush-actions-context-menu`,
 
     //Interface - Topbar
     topbar_tab_buttons: `#topbar > ul li`, //The query selector for all topbar tab buttons.

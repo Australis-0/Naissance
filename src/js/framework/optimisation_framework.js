@@ -1,12 +1,20 @@
 //Declare function
 {
   function initOptimisation () {
+    //BRUSH ACTIONS
+    //Set .flattened_brush_actions
+    config.flattened_brush_actions = dumbFlattenObject(config.brush_actions);
+
+    config.alL_brush_actions = getAllBrushActions();
+    config.all_brush_actions_keys = getAllBrushActions({ return_keys: true });
+    config.brush_actions_lowest_order = getBrushActionsLowestOrder();
+
     //ENTITY ACTIONS
     //Set .flattened_entity_actions
     config.flattened_entity_actions = dumbFlattenObject(config.entity_actions);
 
     config.all_entity_actions = getAllEntityActions();
-    config.all_entity_actions_keys = getAllEntityActions({ return_key: true });
+    config.all_entity_actions_keys = getAllEntityActions({ return_keys: true });
     config.entity_actions_lowest_order = getEntityActionsLowestOrder();
 
     //ENTITY KEYFRAMES

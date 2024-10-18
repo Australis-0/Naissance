@@ -13,14 +13,14 @@
     //Declare local instance variables
     var entity_actions_anchor_el = getEntityActionsAnchorElement(entity_id);
 
-    //Fetch local entity keyframe context menu and close it
+    //Fetch local entity action context menu and close it
     var entity_actions_el = entity_actions_anchor_el.querySelector(`[order="${order}"]`);
     entity_actions_el.remove();
     refreshEntityActionsContextMenus(entity_id);
   }
 
   /*
-    closeEntityKeyframeContextMenu() - Closes all entity keyframe context menus.
+    closeEntityKeyframeContextMenu() - Closes all entity actions context menus.
     arg0_entity_id: (String) - The entity ID for which to close all menus.
   */
   function closeEntityActionContextMenus (arg0_entity_id) {
@@ -39,7 +39,7 @@
   }
 
   /*
-    closeEntityActionLastContextMenu() - Closes the last opened keyframe context menu for an entity.
+    closeEntityActionLastContextMenu() - Closes the last opened context menus for an entity.
     arg0_entity_id: (String) - The entity ID for which to close the last opened menu.
   */
   function closeEntityActionLastContextMenu (arg0_entity_id) {
@@ -50,15 +50,17 @@
     var entity_actions_anchor_el = getEntityActionsAnchorElement(entity_id);
     var entity_open_orders = getEntityActionsOpenOrders(entity_id);
 
-    //Close late actions context menu
+    //Close last actions context menu
     closeEntityActionContextMenu(entity_id, entity_open_orders[entity_open_orders.length - 1]);
   }
 
   /*
-    getEntityActionsAnchorElement() - Fetches the Entity actions HTMLElement or selector of a given entity's entity actions anchor element.
+    getEntityActionsAnchorElement() - Fetches the entity actions HTMLElement or selector of a given entity's entity actions anchor element.
     arg0_entity_id: (String) - The entity ID for which to fetch the selector for.
     arg1_options: (Object)
       return_selector: (Boolean) - Optional. Whether or not to return the selector instead of the HTMLElement. False by default.
+
+    Returns: (HTMLElement/String)
   */
   function getEntityActionsAnchorElement (arg0_entity_id, arg1_options) {
     //Convert from parameters
@@ -84,39 +86,28 @@
 
     Returns: (Array<Number>)
   */
-  function getEntityActionsOpenOrders (arg0_entity_id) {
+  function getEntityActionsOpenOrders (arg0_entity_id, arg1_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
 
     //Declare local instance variables
-    var flattened_entity_actions = config.flattened_entity_actions;
-    var order = (options.order != undefined) ? options.order : 1;
-    var return_actions = [];
-    var return_keys = [];
-    var return_obj = {};
+    var entity_actions_anchor_selector = getEntityActionsAnchorElement(entity_id, { return_selector: true });
+    var entity_actions_els = document.querySelectorAll(`${entity_actions_anchor_el} > .context-menu`);
+    var unique_orders = [];
 
-    //Iterate over all_flattened_entity_actions
-    var all_flattened_entity_actions = Object.keys(flattened_entity_actions);
+    //Iterate over all entity_actions_els
+    for (var i = 0; i < entity_actions_els.length; i++) {
+      var local_order = entity_actions_els[i].getAttribute("order");
 
-    for (var i = 0; i < all_flattened_entity_actions.length; i++) {
-      var local_action = flattened_entity_actions[all_flattened_entity_actions[i]];
-
-      if (local_action.order == options.order) {
-        return_actions.push(local_action);
-        return_keys.push(all_entity_actions_keys[i]);
+      if (local_order != undefined) {
+        local_order = parseInt(local_order);
+        if (!unique_orders.includes(local_order))
+          unique_orders.push(local_order);
       }
     }
 
-    //options.return_object handler
-    if (options.return_object) {
-      for (var i = 0; i < return_keyframes.length; i++)
-        return_obj[return_actions[i]] = return_actions[i];
-      //Return statement
-      return return_obj;
-    }
-
     //Return statement
-    return (!options.return_key) ? return_actions : return_keys;
+    return unique_orders;
   }
 
   /*
@@ -192,7 +183,7 @@
           if (entity_el.querySelector(`${common_selectors.entity_actions_context_menu_anchor} [order="${entity_action_order}"]`))
             closeEntityActionContextMenu(entity_id, entity_action_order);
 
-          //Append dummy context menu div first for context_menu_ui to appended to
+          //Append dummy context menu div first for context_menu_ui to append to
           var context_menu_el = document.createElement("div");
 
           context_menu_el.setAttribute("class", "context-menu");
@@ -208,13 +199,11 @@
           if (entity_action_obj.maximum_width) context_menu_ui.maximum_width = entity_action_obj.maximum_width;
 
           //Initialise preliminary context menu first
-          if (entity_action_obj.interface) {
-            var new_interface = JSON.parse(JSON.stringify(entity_action_obj.interface));
-            new_interface.anchor = context_menu_ui.anchor;
+          var new_interface = JSON.parse(JSON.stringify(entity_action_obj.interface));
+          new_interface.anchor = context_menu_ui.anchor;
 
-            var action_context_menu_ui = createContextMenu(new_interface);
-            refreshEntityActionsContextMenus(entity_id);
-          }
+          var action_context_menu_ui = createContextMenu(new_interface);
+          refreshEntityActionsContextMenus(entity_id);
 
           //Iterate over all_interface_keys and parse them correctly
           var all_interface_keys = Object.keys(entity_action_obj.interface);
@@ -223,8 +212,8 @@
             let local_value = entity_action_obj.interface[all_interface_keys[i]];
 
             if (!Array.isArray(local_value) && typeof local_value == "object") {
-              let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
               if (!local_value.id) local_value.id = all_interface_keys[i];
+              let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
 
               //Type handlers: set placeholders and user_value where applicable
               {
@@ -358,7 +347,7 @@
   }
 
   /*
-    refreshEntityActionsContextMenus() - Refreshes entity actions context menuw idths.
+    refreshEntityActionsContextMenus() - Refreshes entity actions context menu widths.
     arg0_entity_id: (String) - The entity ID to refresh entity actions context menus for.
 
     Returns: (Number)
