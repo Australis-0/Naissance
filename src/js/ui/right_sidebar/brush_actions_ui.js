@@ -290,8 +290,8 @@
 
           button_el.onclick = function (e) {
             parseBrushEffect(local_value.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
-            console.log(`Parse brush effect:`, local_válue.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
-          }
+            console.log(`Parse brush effect:`, local_value.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
+          };
         }
     }
 
