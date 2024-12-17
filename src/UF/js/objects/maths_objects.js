@@ -265,13 +265,13 @@ function invertFractionObject (arg0_object) {
 }
 
 /*
-modifyObjectRange() - Modifies ranges in an object recursively, by operating on objects
-arg0_object: (Object) - The object to pass.
-arg1_value: (Number) - The value to modify ranges by.
-arg2_options: (Object)
-  include_numbers: (Number) - Optional. Whether to include single numbers. True by default.
+  modifyObjectRange() - Modifies ranges in an object recursively, by operating on objects
+  arg0_object: (Object) - The object to pass.
+  arg1_value: (Number) - The value to modify ranges by.
+  arg2_options: (Object)
+    include_numbers: (Number) - Optional. Whether to include single numbers. True by default.
 
-Returns: (Object)
+  Returns: (Object)
 */
 function modifyObjectRange (arg0_object, arg1_value, arg2_options) {
   //Convert from parameters
@@ -402,8 +402,8 @@ function operateObject (arg0_object, arg1_equation, arg2_options) {
     only_numbers: (Boolean) - Optional. Whether only numbers can be operated on. True by default
     recursive: (Boolean) - Optional. Whether the operation is recursive. True by default
   Returns: (Object)
-    object: (Object) The modified version of the 1st object
-    ot_object: (Object) The modified version of the 2nd object
+    object: (Object) - The modified version of the 1st object
+    ot_object: (Object) - The modified version of the 2nd object
 */
 function operateObjects (arg0_object, arg1_object, arg2_equation, arg3_options) {
   //Convert from parameters

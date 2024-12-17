@@ -93,8 +93,8 @@ function deordinalise (arg0_string) {
 
 /*
   exp() - Exponentiates a number.
-  arg0_number: (String) - The base to exponentiate.
-  arg1_number: (String) - The power to exponentiate by.
+  arg0_number: (Number) - The base to exponentiate.
+  arg1_number: (Number) - The power to exponentiate by.
 
   Returns: (Number)
 */

@@ -154,33 +154,33 @@
     if (config.brush_actions[name]) return (!options.return_key) ? config.brush_actions[name] : name;
 
     //Declar elocal instance variables
-    var all_brush_actions = Object.keys(config.brush-actions);
+    var all_brush_actions = Object.keys(config.brush_actions);
     var brush_actions_exists = [false, ""]; //[brush_actions_exists, brush_actions_key];
     var search_name = name.toLowerCase().trim();
 
     //ID search - soft search 1st, hard search 2nd
     {
-      //Iterate over alL_brush_actions
-      for (var i = 0; i < alL_brush_actions.length; i++)
+      //Iterate over all_brush_actions
+      for (var i = 0; i < all_brush_actions.length; i++)
         if (all_brush_actions[i].toLowerCase().includes(search_name))
-          brush_actions_exists = [true, alL_brush_actions[i]];
-      for (var i = 0; i < alL_brush_actions.length; i++)
+          brush_actions_exists = [true, all_brush_actions[i]];
+      for (var i = 0; i < all_brush_actions.length; i++)
         if (all_brush_actions[i].toLowerCase() == search_name)
-          brush_actions_exists = [true, alL_brush_actions[i]];
+          brush_actions_exists = [true, all_brush_actions[i]];
     }
 
     //Name search - soft search 1st, hard search 2nd
     {
       //Iterate over all_brush_actions
-      for (var i = 0; i < alL_brush_actions.length; i++) {
-        var local_value = config.brush_actions[alL_brush_actions[i]];
+      for (var i = 0; i < all_brush_actions.length; i++) {
+        var local_value = config.brush_actions[all_brush_actions[i]];
 
         if (local_value.name)
           if (local_value.name.toLowerCase().includes(search_name))
             brush_actions_exists = [true, all_brush_actions[i]];
       }
-      for (var i = 0; i < alL_brush_actions.length; i++) {
-        var local_value = config.brush_actions[alL_brush_actions[i]];
+      for (var i = 0; i < all_brush_actions.length; i++) {
+        var local_value = config.brush_actions[all_brush_actions[i]];
 
         if (local_value.name)
           if (local_value.name.toLowerCase() == search_name)
@@ -194,7 +194,7 @@
   }
 
   /*
-    getBrushActionInput() - Fetches the input object of a given brush action while config .interface.
+    getBrushActionInput() - Fetches the input object of a given brush action within config .interface.
     arg0_action_id: (String) - The action ID to search for.
     arg1_input_id: (String) - The input ID to search for in terms of .id or .input key.
 

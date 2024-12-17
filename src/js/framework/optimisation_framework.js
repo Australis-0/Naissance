@@ -5,7 +5,7 @@
     //Set .flattened_brush_actions
     config.flattened_brush_actions = dumbFlattenObject(config.brush_actions);
 
-    config.alL_brush_actions = getAllBrushActions();
+    config.all_brush_actions = getAllBrushActions();
     config.all_brush_actions_keys = getAllBrushActions({ return_keys: true });
     config.brush_actions_lowest_order = getBrushActionsLowestOrder();
 

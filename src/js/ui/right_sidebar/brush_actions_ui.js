@@ -247,12 +247,12 @@
     var limits_fulfilled = {};
 
     //Iterate over all_brush_actions
-    for (var i = 0; i < alL_brush_actions.length; i++) {
+    for (var i = 0; i < all_brush_actions.length; i++) {
       var limit_fulfilled = true;
-      var local_action = brush_actions_navigation_obj[alL_brush_actions[i]];
+      var local_action = brush_actions_navigation_obj[all_brush_actions[i]];
 
       //Make sure that local_action is actually a valid UI element
-      if (!Array.isArray(local_action) && !reserved_brush_actions.includes(alL_brush_actions[i])) {
+      if (!Array.isArray(local_action) && !reserved_brush_actions.includes(all_brush_actions[i])) {
         //Check if .limit is fulfilled
         if (local_action.limit)
           limit_fulfilled = parseBrushLimit(local_action.limit, {
@@ -262,15 +262,15 @@
 
         if (limit_fulfilled) {
           //Define default parameters for element
-          formatted_navigation_obj[alL_brush_actions[i]] = {
-            id: alL_brush_actions[i],
+          formatted_navigation_obj[all_brush_actions[i]] = {
+            id: all_brush_actions[i],
             type: "button"
           };
-          var local_context_obj = formatted_navigation_obj[alL_brush_actions[i]];
+          var local_context_obj = formatted_navigation_obj[all_brush_actions[i]];
 
           //Add element if limit_fulfilled
           local_context_obj = dumbMergeObjects(local_context_obj, local_action);
-          limits_fulfilled[alL_brush_actions[i]] = limit_fulfilled;
+          limits_fulfilled[all_brush_actions[i]] = limit_fulfilled;
         }
       }
     }
@@ -279,14 +279,14 @@
     formatted_navigation_obj.class = `brush-context-menu actions-menu`;
     var context_menu_el = createContextMenu(formatted_navigation_obj);
 
-    //Iterate over alL_brush_actions
-    for (var i = 0; i < alL_brush_actions.length; i++) {
-      let local_value = brush_actions_navigation_obj[alL_brush_actions[i]];
+    //Iterate over all_brush_actions
+    for (var i = 0; i < all_brush_actions.length; i++) {
+      let local_value = brush_actions_navigation_obj[all_brush_actions[i]];
 
       //Make sure limits are fulfilled first before parsing effect onclick
-      if (limits_fulfilled[alL_brush_actions[i]])
+      if (limits_fulfilled[all_brush_actions[i]])
         if (local_value.effect) {
-          let button_el = context_menu_el.querySelector(`div[type="button"][id="${alL_brush_actions[i]}"]`);
+          let button_el = context_menu_el.querySelector(`div[type="button"][id="${all_brush_actions[i]}"]`);
 
           button_el.onclick = function (e) {
             parseBrushEffect(local_value.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });

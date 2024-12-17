@@ -21,8 +21,6 @@ function convertTimestampToDate (arg0_timestamp) {
     return timestamp;
 
   //Calculate years
-
-
   local_date.year = Math.floor(timestamp/(365.25*24*60));
   timestamp -= convertTimestampToInt(getTimestamp({ year: local_date.year, month: 0, day: 0, hour: 0, minute: 0 }));
 

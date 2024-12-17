@@ -88,11 +88,11 @@ function addMatrices (arg0_matrix, arg1_matrix) {
     //Iterate over columns
     for (var x = 0; x < matrix[i].length; x++)
       //Add corresponding elements and push to the result matrix
-      return_matrix[i].push(matrix[i][j] + ot_matrix[i][j]);
+      return_matrix[i].push(matrix[i][x] + ot_matrix[i][x]);
   }
 
   //Return statement
-  return result;
+  return return_matrix;
 }
 
 /*
@@ -441,7 +441,7 @@ function gaussSeidelMatrix (arg0_matrix, arg1_tolerance, arg2_max_iterations) {
   getCofactor() - Fetches the cofactor in a matrix.
   arg0_matrix: (Array<Array, ...>) - The matrix to pass to the function.
   arg1_row: (Number) - The row to calculate cofactor for.
-  arg2_column: (Number) - The column to calcualte cofactor for.
+  arg2_column: (Number) - The column to calculate cofactor for.
 
   Returns: (Array<Array, ...>)
 */

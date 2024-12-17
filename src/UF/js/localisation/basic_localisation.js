@@ -1,7 +1,7 @@
 //General localisation functions
 {
   /*
-    parseLocalisation() - Parses a localisation into given sounds.
+    parseLocalisation() - Parses a localisation into given strings.
     arg0_string: (String) - The string to parse into a given localisation, with {} representing scope variables.
     arg1_options: (Object)
       is_html: (Boolean) - Optional. Whether the localisation to be parsed is HTML. False by default.
