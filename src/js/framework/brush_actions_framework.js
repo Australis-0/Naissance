@@ -259,7 +259,7 @@
   function getBrushActionsNavigationObject () {
     //Declare local instance variables
     var flattened_brush_actions = config.flattened_brush_actions;
-    var lowest_order = getEntityActionsLowestOrder(flattened_brush_actions);
+    var lowest_order = getBrushActionsLowestOrder();
 
     //Return statement
     return getBrushActionsAtOrder({ order: lowest_order, return_object: true });
