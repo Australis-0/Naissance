@@ -206,7 +206,7 @@
                   type: local_value.type,
                   placeholder: local_actual_value
                 });
-              parseBrushEffect(local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "brush_actions" });
+              parseEffect(undefined, local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "brush_actions" });
 
               //Range post-handler
               if (local_value.type == "range") {
@@ -220,12 +220,12 @@
   }
 
   /*
-    printBrushActionsNavigationmenu() - Prints the brush actions navigation menu - in this case, visible by default.
+    printBrushActionsNavigationMenu() - Prints the brush actions navigation menu - in this case, visible by default.
     arg0_parent_el: (HTMLElement) - The HTMLElement to assign the navigation menu to.
 
     Returns: (HTMLElement)
   */
-  function printBrushActionsNavigationMenu (arg0_parent_el) { //[WIP] - Finish function body
+  function printBrushActionsNavigationMenu (arg0_parent_el) { //[WIP] - The function body needs to be completely overhauled to account accurately for tooltips and the structure of config.brush_actions.<navigation_obj>
     //Convert from parameters
     var parent_el = arg0_parent_el;
 
@@ -240,63 +240,86 @@
 
     //Format Brush Actions navigation UI into valid context menu object
     var all_brush_actions = Object.keys(brush_actions_navigation_obj);
-    var formatted_navigation_obj = {
-      anchor: `${brush_actions_anchor_selector}`,
-      class: "brush-context-menu actions-menu"
-    };
-    var limits_fulfilled = {};
 
-    //Iterate over all_brush_actions
+    //Iterate over all_brush_actions; add them as images or abbreviations (if no icon is available)
     for (var i = 0; i < all_brush_actions.length; i++) {
-      var limit_fulfilled = true;
       var local_action = brush_actions_navigation_obj[all_brush_actions[i]];
 
-      //Make sure that local_action is actually a valid UI element
-      if (!Array.isArray(local_action) && !reserved_brush_actions.includes(all_brush_actions[i])) {
-        //Check if .limit is fulfilled
-        if (local_action.limit)
-          limit_fulfilled = parseBrushLimit(local_action.limit, {
-            timestamp: current_timestamp,
-            ui_type: "brush_actions"
-          });
+      if (!Array.isArray(local_action) && typeof local_action == "object")
+        if (local_action.effect) {
+          var local_action_class;
+            if (local_action.attributes)
+              if (local_action.attributes.class)
+                local_action_class = local_action.attributes.class;
 
-        if (limit_fulfilled) {
-          //Define default parameters for element
-          formatted_navigation_obj[all_brush_actions[i]] = {
-            id: all_brush_actions[i],
-            type: "button"
-          };
-          var local_context_obj = formatted_navigation_obj[all_brush_actions[i]];
+          var local_class = `brush-action-button${(local_action_class) ? " " + local_action_class : ""}`;
+          var local_element;
+          var local_id = all_brush_actions[i];
+          var limit_fulfilled = true;
+          var limits_fulfilled = {};
 
-          //Add element if limit_fulfilled
-          local_context_obj = dumbMergeObjects(local_context_obj, local_action);
-          limits_fulfilled[all_brush_actions[i]] = limit_fulfilled;
+          //Add local_action to brush_actions_anchor_el
+          if (local_action.icon) {
+            var local_img = document.createElement("img");
+
+            local_img.setAttribute("class", local_class);
+            local_img.setAttribute("id", local_id);
+            local_img.setAttribute("src", local_action.icon);
+
+            //Add local_img to brush_actions_anchor_el
+            local_element = local_img;
+          } else {
+            var local_initials = "";
+            var local_span = document.createElement("span");
+            var local_split_string = local_action.name.split(" ");
+
+            for (var x = 0; x < local_split_string.length; x++)
+              local_initials += local_split_string[x][0];
+
+            local_span.setAttribute("class", local_class);
+            local_span.setAttribute("id", local_id);
+            local_span.innerHTML = local_initials;
+
+            //Add local_span to brush_actions_anchor_el
+            local_element = local_span;
+          }
+
+          //Set .limit, .effect functionality
+          //.limit handler
+          {
+            if (local_action.limit)
+              limit_fulfilled = parseBrushLimit(local_action.limit, {
+                timestamp: current_timestamp,
+                ui_type: "brush_actions"
+              });
+
+            if (limit_fulfilled) {
+              //Add element if limit_fulfilled
+              brush_actions_anchor_el.appendChild(local_element);
+              limits_fulfilled[all_brush_actions[i]] = limit_fulfilled;
+            }
+          }
+
+          //.effect handler
+          {
+            if (limits_fulfilled[all_brush_actions[i]])
+              if (local_action.effect) {
+                let button_el = local_element;
+
+                local_element.onclick = function (e) {
+                  parseEffect(undefined, local_action.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
+                };
+              }
+          }
+
+          //Set tooltip
+          if (local_action.name)
+            tippy(`${brush_actions_anchor_selector} #${local_id}`, {
+              content: local_action.name,
+              arrow: false
+            });
         }
-      }
     }
-
-    //formatted_navigation_obj now contains the correct createContextMenu() options; assign to #brush-buttons-container
-    formatted_navigation_obj.class = `brush-context-menu actions-menu`;
-    var context_menu_el = createContextMenu(formatted_navigation_obj);
-
-    //Iterate over all_brush_actions
-    for (var i = 0; i < all_brush_actions.length; i++) {
-      let local_value = brush_actions_navigation_obj[all_brush_actions[i]];
-
-      //Make sure limits are fulfilled first before parsing effect onclick
-      if (limits_fulfilled[all_brush_actions[i]])
-        if (local_value.effect) {
-          let button_el = context_menu_el.querySelector(`div[type="button"][id="${all_brush_actions[i]}"]`);
-
-          button_el.onclick = function (e) {
-            parseBrushEffect(local_value.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
-            console.log(`Parse brush effect:`, local_value.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
-          };
-        }
-    }
-
-    //Return statement
-    return (context_menu_el) ? context_menu_el : undefined;
   }
 
   /*
@@ -318,7 +341,7 @@
     for (var i = 0; i < brush_actions_context_menus.length; i++) {
       //Set current position; track brush_actions_context_width
       if (!brush_actions_context_menus[i].getAttribute("class").includes("actions-menu"))
-        brush_actions_context_menus[i].style.left = `${brush_actions_context_width}px`;
+        brush_actions_context_menus[i].style.right = `calc(20% + 12px + 10px + ${brush_actions_context_width}px)`;
       brush_actions_context_width += brush_actions_context_menus[i].offsetWidth + 8;
     }
 

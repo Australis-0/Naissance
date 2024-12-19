@@ -15,7 +15,7 @@
 
     //Iterate over elapsed months
     for (var i = 0; i < date.month - 1; i++)
-      days += days_in_months[i];
+      days += global.days_in_months[i];
     if (isLeapYear(date.year) && date.month >= 2) days++;
 
     //Return statement

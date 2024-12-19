@@ -7,6 +7,7 @@
     arg0_options: (Object)
       anchor: (String/Element) - The query selector to pin a context menu to.
       class: (String) - The class prefix to prepend.
+      do_not_append: (Boolean) - Whether to append or not.
       id: (String) - The ID of the context menu.
       name: (String) - Optional. Title of the context menu. Undefined; will not display by default.
       maximum_height: (String) - Optional. The height after which a scrollbar should appear in CSS units.
@@ -168,11 +169,16 @@
     if (!options.return_html) {
       if (options.anchor) {
         query_selector_el = (isElement(options.anchor)) ? options.anchor : document.querySelector(options.anchor);
-        query_selector_el.appendChild(context_menu_el);
+
+        if (!options.do_not_append) {
+          query_selector_el.appendChild(context_menu_el);
+        } else {
+          query_selector_el.replaceChildren(context_menu_el);
+        }
       }
 
       //Return statement
-      return query_selector_el;
+      return context_menu_el;
     } else {
       //Return statement
       return context_menu_el.innerHTML;
@@ -1596,6 +1602,7 @@
     colour_cursor_el.style.visibility = "hidden";
 
     //Adjust brightness_el to new maximum brightness
+    console.log("Colour: " + colour);
     max_brightness = Math.max(Math.max(colour[0], colour[1]), colour[2])/255;
 
     brightness_el.value = max_brightness*100;

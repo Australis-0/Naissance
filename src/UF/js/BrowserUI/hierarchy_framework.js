@@ -253,7 +253,7 @@
     //Remove element and send function if necessary
     if (hierarchy_options.delete_function)
       global[hierarchy_options.delete_function](local_el.dataset.id);
-    local_el.parentNode.removeChild(local_el);
+    try { local_el.parentNode.removeChild(local_el) } catch (e) {};
   }
 
   /*

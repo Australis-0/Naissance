@@ -1,0 +1,392 @@
+//Parser handling
+{
+  /*
+    parseEffect() - Applies an entity effect from a given .effect scope.
+    arg0_entity_id: (String) - The entity ID to which this effect applies.
+    arg1_scope: (Object) - The effect scope to apply.
+    arg2_options: (Object)
+      options: (Object) - The actual options of various inputs and the data given, treated as global variables.
+
+      depth: (Number) - The current recursive depth. Starts at 1.
+      scope_type: (Array<String>) - Optional. What the current scope_type currently refers to (e.g. 'polities', 'markers'). All if undefined. Undefined by default.
+      timestamp: (String) - Optional. The current timestamp of the keyframe being referenced, if any.
+      ui_type: (String) - Optional. Whether the ui_type is 'brush_actions'/'entity_actions'/'entity_keyframes'. 'entity_keyframes' by default.
+  */
+  function parseEffect (arg0_entity_id, arg1_scope, arg2_options) { //[WIP] - Finish function body.
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var scope = (arg1_scope) ? arg1_scope : {};
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Initialise options
+    if (options.depth == undefined) options.depth = 0;
+      options.depth++;
+    if (!options.ui_type) options.ui_type = "entity_keyframes";
+    console.log(`parseEffect():`, entity_id, scope, options);
+
+    //Declare local instance variables
+    var all_scope_keys = Object.keys(scope);
+    var brush_obj = main.brush;
+    var entity_obj = getEntity(entity_id);
+    var limit_fulfilled = true;
+    scope = JSON.parse(JSON.stringify(scope)); //Deep-copy scope
+
+    //.interface parser; load inputs into .options
+    if (options.depth == 1) {
+      var common_selectors = config.defines.common.selectors;
+      var entity_el = (["entity_actions", "entity_keyframes"].includes(options.ui_type)) ?
+        getEntityElement(entity_id) : undefined;
+      var actions_container_el;
+      var actions_input_obj;
+      var brush_actions_container_el;
+      var brush_actions_input_obj;
+      var keyframe_container_el;
+      var keyframe_input_obj;
+
+      //'entity_actions', 'entity_keyframes' local instance variables
+      if (entity_el) {
+        actions_container_el = entity_el.querySelector(`${common_selectors.entity_actions_context_menu_anchor}`);
+        actions_input_obj = getInputsAsObject(actions_container_el, { entity_id: entity_id });
+        keyframe_container_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
+        keyframe_input_obj = getInputsAsObject(keyframe_container_el, { entity_id: entity_id });
+
+        options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
+      } else {
+        //'brush_actions' local instanace variables
+        brush_actions_container_el = getBrushActionsAnchorElement();
+        brush_actions_input_obj = getInputsAsObject(brush_actions_container_el);
+
+        options.options = brush_actions_input_obj;
+      }
+
+      //Set options.timestamp to be passed down
+      options.options.timestamp = options.timestamp;
+
+      //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
+      for (var i = 0; i < all_scope_keys.length; i++) {
+        var local_value = getList(scope[all_scope_keys[i]]);
+
+        //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
+        if (local_value.length == 1)
+          if (typeof local_value[0] == "string") {
+            //Direct variable substitution if detected as valid
+            if (options.options[local_value[0]] != undefined)
+              scope[all_scope_keys[i]] = options.options[local_value[0]];
+            //If the string is more complex; attempt to use parseVariableString() on it
+            try {
+              scope[all_scope_keys[i]] = parseVariableString(local_value[0], options.options);
+            } catch (e) {}
+          }
+      }
+    }
+    var suboptions = options.options;
+
+    //.limit parser
+    if (scope.limit) {
+      var new_options = JSON.parse(JSON.stringify(options));
+      limit_fulfilled = parseLimit(entity_id, scope.limit, new_options);
+    }
+
+    //.effect parser
+    //Iterate over all_scope_keys, recursively parsing the scope whenever 'effect_<key>' is encountered.
+    if (limit_fulfilled)
+      for (var i = 0; i < all_scope_keys.length; i++) {
+        var local_value = getList(scope[all_scope_keys[i]]);
+
+        //Recursive parsers/scoping
+        if (all_scope_keys[i].startsWith("effect_")) {
+          var new_options = JSON.parse(JSON.stringify(options));
+          var parsed_effect = parseEffect(entity_id, local_value[0], new_options);
+        }
+
+        //Same-scope effects
+        {
+          //Action effects - [WIP] - Finish adding action effects
+          if (all_scope_keys[i] == "apply_path")
+            applyPathToKeyframes(entity_id, local_value);
+          if (all_scope_keys[i] == "clean_all_keyframes")
+            cleanKeyframes(entity_id, options.ENTITY_ABSOLUTE_AGE);
+          if (all_scope_keys[i] == "clean_keyframes")
+            cleanKeyframes(entity_id, local_value[0]);
+          if (all_scope_keys[i] == "edit_entity")
+            editEntity(entity_id);
+          if (all_scope_keys[i] == "finish_entity")
+            finishEntity();
+          if (all_scope_keys[i] == "hide_entity")
+            if (local_value[0]) {
+              hideEntity(entity_id);
+            } else {
+              showEntity(entity_id);
+            }
+          if (all_scope_keys[i] == "set_brush_simplify_tolerance")
+            setBrushSimplifyTolerance(local_value[0]);
+          if (all_scope_keys[i] == "simplify_all_keyframes")
+            simplifyAllEntityKeyframes(entity_id, returnSafeNumber(local_value[0]));
+
+          //History effects
+          if (all_scope_keys[i] == "delete_keyframe")
+            deleteKeyframe(entity_id, suboptions[local_value]);
+          if (all_scope_keys[i] == "edit_keyframe")
+            editKeyframe(entity_id, suboptions[local_value]);
+          if (all_scope_keys[i] == "move_keyframe")
+            moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
+
+          //UI interface effects
+          if (all_scope_keys[i] == "close_ui")
+            //Parse the entity_effect being referenced
+            for (var x = 0; x < local_value.length; x++) {
+              if (entity_el) {
+                //[WIP] - Refactor this so it is compatible with 'entity_action'
+                if (options.ui_type == "entity_actions") {
+                  var local_entity_action = getEntityAction(local_value[x]);
+                  var local_entity_order = (local_entity_action.order != undefined) ?
+                    local_entity_action.order : 1;
+
+                  closeEntityActionContextMenu(entity_id, local_entity_order);
+                }
+                if (options.ui_type == "entity_keyframes") {
+                  var local_entity_keyframe = getEntityKeyframe(local_value[x]);
+                  var local_entity_order = (local_entity_keyframe.order != undefined) ?
+                    local_entity_keyframe.order : 1;
+
+                  closeEntityKeyframeContextMenu(entity_id, local_entity_order);
+                }
+              } else {
+                var local_brush_action = getBrushAction(local_value[x]);
+                var local_brush_order = (local_brush_action.order != undefined) ?
+                  local_brush_action.order : 1;
+
+                closeBrushActionContextMenu(local_brush_action);
+              }
+            }
+          if (all_scope_keys[i] == "close_menus")
+            if (local_value[0]) closeEntityKeyframeContextMenus(entity_id);
+          if (all_scope_keys[i] == "close_select_multiple_keyframes")
+            selectMultipleKeyframes(entity_id, { close_selection: true });
+          if (all_scope_keys[i] == "interface")
+            printEntityKeyframeContextMenu(entity_id, scope);
+          if (["open_ui", "trigger"].includes(all_scope_keys[i]))
+            if (options.ui_type == "brush_actions") {
+              //Parse the brush_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_brush_action = getBrushAction(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
+
+                //Initialise options
+                if (!new_options.BRUSH_ACTION)
+                  new_options.BRUSH_ACTION = local_value[x];
+
+                //Parse scope
+                if (local_brush_action.effect)
+                  parsed_effect = parseEffect(undefined, local_brush_action.effect, new_options);
+                if (local_brush_action.immediate)
+                  parsed_immediate = parseEffect(undefined, local_brush_action.immediate, new_options);
+                if (local_brush_action)
+                  printBrushActionsContextMenu(local_brush_action, new_options);
+              }
+            } else if (options.ui_type == "entity_actions") {
+              //Parse the entity_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_entity_action = getEntityAction(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
+
+                //Initialise options
+                if (!new_options.ENTITY_ACTION)
+                  new_options.ENTITY_ACTION = local_value[x];
+
+                //Parse scope
+                if (local_entity_action.effect)
+                  parsed_effect = parseEffect(entity_id, local_entity_action.effect, new_options);
+                if (local_entity_action.immediate)
+                  parsed_immediate = parseEffect(entity_id, local_entity_action.immediate, new_options);
+                if (local_entity_action)
+                  printEntityActionsContextMenu(entity_id, local_entity_action, new_options);
+              }
+            } else if (options.ui_type == "entity_keyframes") {
+              //Parse the entity_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_entity_keyframe = getEntityKeyframe(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
+
+                //Initialise options
+                if (!new_options.ENTITY_KEYFRAME)
+                  new_options.ENTITY_KEYFRAME = local_value[x];
+
+                //Parse scope
+                if (local_entity_keyframe.effect)
+                  parsed_effect = parseEffect(entity_id, local_entity_keyframe.effect, new_options);
+                if (local_entity_keyframe.immediate)
+                  parsed_immediate = parseEffect(entity_id, local_entity_keyframe.immediate, new_options);
+                if (local_entity_keyframe)
+                  printEntityKeyframeContextMenu(entity_id, local_entity_keyframe, new_options);
+              }
+            }
+          if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
+            refreshEntityActions(entity_id);
+          if (all_scope_keys[i] == "select_multiple_keyframes")
+            selectMultipleKeyframes(entity_id, { assign_key: local_value[0] });
+        }
+      }
+  }
+
+  /*
+    parseLimit() - Recursively returns a boolean for an entity given its .limit scope.
+    arg0_entity_id: (String) - The entity ID for which this limit checks.
+    arg1_scope: (Object) - The effect limit scope to apply.
+    arg2_options: (Object)
+      operator: (String) - Optional. The current operator. Either 'and', 'not', 'or', or 'xor'. 'and' by default.
+      options: (Object) - The actual options of various inputs and the data given, treated as global variables.
+
+      depth: (Number) - The current recursive depth. Starts at 1.
+      scope_type: (Array<String>) - Optional. What the current scope_type currently refers to. (e.g. 'polities', 'markers'). All if undefined. Undefined by default.
+      timestamp: (String) - Optional. The current timestamp of the keyframe being referenced, if any.
+      ui_type: (String) - Optional. Whether the ui_type is 'brush_actions'/'entity_actions'/'entity_keyframes'. 'entity_keyframes' by default.
+
+    Returns: (Boolean)
+  */
+  function parseLimit (arg0_entity_id, arg1_scope, arg2_options) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var scope = arg1_scope;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Initialise options
+    if (options.depth == undefined) options.depth = 0;
+      options.depth++;
+    if (!options.operator) options.operator = "and";
+    if (!options.ui_type) options.ui_type = "entity_keyframes";
+
+    //Declare local instance variables
+    var all_scope_keys = Object.keys(scope);
+    var entity_obj = getEntity(entity_id);
+    var local_checks = 0;
+
+    //Add in scope variables if options.options demands; but only on the first depth layer
+    if (options.depth == 1)
+      //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
+      for (var i = 0; i < all_scope_keys.length; i++) {
+        var local_value = getList(scope[all_scope_keys[i]]);
+
+        //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
+        if (local_value.length == 1)
+          if (typeof local_value[0] == "string")
+            if (options.options[local_value[0]] != undefined)
+              scope[all_scope_keys[i]] = options.options[local_value[0]];
+      }
+
+    //Current .limit parser
+    //Iterate over all_scope_keys, recursively parsing the scope whenever a subscope is encountered.
+    for (var i = 0; i < all_scope_keys.length; i++) {
+      var local_value = getList(scope[all_scope_keys[i]]);
+
+      //Recursive parsers/scoping
+      {
+        if (all_scope_keys[i].startsWith("limit_") || all_scope_keys[i] == "limit") {
+          var new_options = JSON.parse(JSON.stringify(options));
+          var parsed_limit = parseLimit(entity_id, local_value[0], new_options);
+
+          if (parsed_limit) local_checks++;
+        }
+        //And/Not/Or/Xor parser
+        var local_boolean_type = getBooleanOperatorFromString(all_scope_keys[i]);
+        if (local_boolean_type) {
+          var new_options = JSON.parse(JSON.stringify(options));
+            new_options.scope = local_boolean_type;
+          var parsed_limit = parseLimit(entity_id, local_value[0], new_options);
+
+          if (parsed_limit) local_checks++;
+        }
+      }
+
+      //Same-scope conditions
+      {
+        if (all_scope_keys[i] == "entity_is_being_edited")
+          if (local_value[0] == true) {
+            if (isEntityBeingEdited(entity_id, local_value[0]))
+              local_checks++;
+          } else {
+            if (!isEntityBeingEdited(entity_id, local_value[0]))
+              local_checks++;
+          }
+        if (all_scope_keys[i] == "entity_is_hidden")
+          if (local_value[0] == true) {
+            if (isEntityHidden(entity_id, main.date))
+              local_checks++;
+          } else {
+            if (!isEntityHidden(entity_id, main.date))
+              local_checks++;
+          }
+      }
+    }
+
+    //Return statement; AND/NOT/OR/XOR handler
+    if (options.operator == "and")
+      if (local_checks >= all_scope_keys.length) return true;
+    if (options.operator == "not")
+      if (local_checks == 0) return true;
+    if (options.operator == "or")
+      if (local_checks > 0) return true;
+    if (options.operator == "xor")
+      if (local_checks == 1) return true;
+  }
+
+  /*
+    parseVariableString() - Parses a variable string and returns its resolved value.
+    arg0_string: (String) - The string which to resolve.
+    arg1_options: (Object)
+      <key>: (Variable) - The value to substitute all mentions of this key with.
+
+    Returns: (Variable)
+  */
+  function parseVariableString (arg0_string, arg1_options) {
+    //Convert from parameters
+    var string = JSON.parse(JSON.stringify(arg0_string));
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Initialise options
+    if (!options.BRUSH_OBJ) options.BRUSH_OBJ = "main.brush";
+    if (!options.MAIN_OBJ) options.MAIN_OBJ = "global.main";
+
+    //Declare local instance variables
+    var all_option_keys = Object.keys(options);
+
+    //Iterate over all_option_keys and construct RegExp to replace it
+    for (var i = 0; i < all_option_keys.length; i++) {
+      var local_value = options[all_option_keys[i]];
+
+      var local_regexp = new RegExp(all_option_keys[i], "g");
+      string = string.replace(local_regexp, local_value);
+    }
+
+    //Destructure all keys in options such that they are locally available for eval to use
+    Object.entries(options).forEach(([key, value]) => {
+      eval(`var ${key} = value;`);
+    });
+
+    //Return statement; run string as eval
+    return eval(string);
+  }
+}
+
+//Parser helper functions
+{
+  /*
+    getBooleanOperatorFromString() - Helper function. Fetches a boolean operator (e.g. 'xor') from a given scripting string. Returns either 'and', 'not', 'or', or 'xor'.
+    arg0_string: (String) - The scripting string.
+
+    Returns: (String)
+  */
+  function getBooleanOperatorFromString (arg0_string) {
+    //Convert from parameters
+    var string = arg0_string;
+
+    //Return statement
+    if (string.startsWith("and_") || string == "and") return "and";
+    if (string.startsWith("not_") || string == "not") return "not";
+    if (string.startsWith("or_") || string == "or") return "or";
+    if (string.startsWith("xor_") || string == "xor") return "xor";
+  }
+}

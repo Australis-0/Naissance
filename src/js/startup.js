@@ -148,12 +148,15 @@ if (!global.config) global.config = {};
   });
   main.entity_layer = new maptalks.VectorLayer("entity_layer").addTo(map);
 
+  //Initialise Basic Frameworks
+  {
+    //Initialise Date
+    initDateFramework();
+  }
+
   //Initialise Brush UI
   initBrush();
   initBrushUI();
-
-  //Initialise Date
-  initDateFramework();
 
   //KEEP AT BOTTOM!
   //Initialise Undo/Redo

@@ -1,20 +1,17 @@
 //Button functionality
 {
   function initBrushUI () {
+    window.brush_buttons_container_el = document.getElementById("brush-buttons-container");
     window.brush_container_el = document.getElementById("brush-container");
     window.brush_context_menu_el = document.getElementById("brush-context-menu-container");
 
-    brush_container_el.onclick = function (e) {
+    /*brush_container_el.onclick = function (e) {
       //Hide element only e.target is not a button
       if (!e.target.getAttribute("onclick"))
         hideElement(brush_context_menu_el);
-    };
+    };*/
 
-    //Intiialise tooltips
-    tippy(`#simplify-brush-btn`, {
-      content: "Simplify",
-      arrow: false
-    });
+    printBrushActionsNavigationMenu(window.brush_buttons_container_el);
   }
 }
 
@@ -62,7 +59,7 @@
     printBrushOptions() - Changes the brush options UI to the selected page
     mode: "simplify"
   */
-  function printBrushOptions (arg0_mode) {
+  /*function printBrushOptions (arg0_mode) {
     //Convert from parameters
     var mode = arg0_mode;
 
@@ -104,24 +101,5 @@
         brush_obj.simplify_tolerance = getSimplifyTolerance(e.target.value);
       });
     }
-  }
-}
-
-//Minimise UI functions
-{
-  function toggleMapmodeSettings () {
-    //Declare local instance variables
-    var local_btn = document.getElementById("toggle-mapmode-settings-btn");
-    var local_el = document.getElementById("mapmode-settings-container");
-
-    toggleElementVisibility(local_el, local_btn);
-  }
-
-  function toggleSelectMapmode () {
-    //Declare local instance variables
-    var local_btn = document.getElementById("toggle-select-mapmode-btn");
-    var local_el = document.getElementById("select-mapmode-container");
-
-    toggleElementVisibility(local_el, local_btn);
-  }
+  }*/
 }

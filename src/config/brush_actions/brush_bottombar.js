@@ -7,8 +7,6 @@ config.brush_actions.brush_bottombar = {
     icon: "gfx/interface/simplify_icon.png",
     name: "Simplify Path",
     order: 1,
-    x: 0,
-    y: 0,
 
     effect: {
       trigger: "brush_simplify_path"

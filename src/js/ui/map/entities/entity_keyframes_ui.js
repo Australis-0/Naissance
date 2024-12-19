@@ -227,7 +227,7 @@
           //Parse .effect to .onclick event handler
           if (local_value.effect)
             local_element.onclick = function (e) {
-              parseEntityEffect(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_keyframes" });
+              parseEffect(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_keyframes" });
               console.log(entity_id, local_value.effect, { timestamp: options.timestamp, ui_type: "entity_keyframes" });
             };
         }

@@ -1,11 +1,11 @@
 config.brush_actions.brush_options = {
   name: "Brush Actions",
   scope_type: ["brush"],
+  order: 1,
 
   brush_simplify_path: {
     id: "brush_simplify_path",
     name: "Simplify Path",
-    order: 1,
 
     interface: {
       simplify_check_options: {

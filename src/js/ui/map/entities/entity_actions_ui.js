@@ -247,7 +247,7 @@
                       type: local_value.type,
                       placeholder: local_actual_value
                     });
-                  parseEntityEffect(entity_id, local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "entity_actions" });
+                  parseEffect(entity_id, local_value.effect, { timestamp: convertTimestampToInt(getTimestamp(main.date)), ui_type: "entity_actions" });
 
                   //Range post-handler
                   if (local_value.type == "range") {
@@ -300,7 +300,7 @@
       if (!Array.isArray(local_action) && !reserved_entity_actions.includes(all_entity_actions[i])) {
         //Check if .limit is fulfilled
         if (local_action.limit)
-          limit_fulfilled = parseEntityLimit(entity_id, local_action.limit, {
+          limit_fulfilled = parseLimit(entity_id, local_action.limit, {
             //[WIP] - Make sure to add .options for inputs
             timestamp: current_timestamp,
             ui_type: "entity_actions"
@@ -323,7 +323,10 @@
 
     //formatted_navigation_obj now contains the correct createContextMenu() options; assign to #entity-actions-context-menu
     formatted_navigation_obj.anchor = `${entity_selector} ${common_selectors.entity_actions_context_menu_anchor}`;
+    formatted_navigation_obj.do_not_append = true;
     formatted_navigation_obj.class = "entity-ui-container entity-context-menu actions-menu";
+
+    //Delete current .innerHTML
     var context_menu_el = createContextMenu(formatted_navigation_obj);
 
     //Iterate over all_entity_actions
@@ -336,7 +339,7 @@
           let button_el = context_menu_el.querySelector(`div[type="button"][id="${all_entity_actions[i]}"]`);
 
           button_el.onclick = function (e) {
-            parseEntityEffect(entity_id, local_value.effect, { timestamp: current_timestamp, ui_type: "entity_actions" });
+            parseEffect(entity_id, local_value.effect, { timestamp: current_timestamp, ui_type: "entity_actions" });
             console.log(`Parse entity effect:`, entity_id, local_value.effect, { timestamp: current_timestamp, ui_type: "entity_actions" });
           };
         }

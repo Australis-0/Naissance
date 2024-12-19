@@ -40,7 +40,8 @@
   */
   function createPopup (arg0_coords, arg1_content, arg2_options) {
     //Convert from parameters
-    var coords = arg0_coords;
+    var coords = (Array.isArray(arg0_coords)) ?
+      { x: arg0_coords[1], y: arg0_coords[0], z: undefined } : arg0_coords;
     var content = (arg1_content) ? arg1_content : "";
     var options = (arg2_options) ? arg2_options : {};
 
@@ -115,11 +116,13 @@
     var page = entity_ui_obj.page;
 
     //Initialise setColourWheelCursor()
-    if (page == "fill") {
-      setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.fillColor));
-    } else if (page == "stroke") {
-      setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.color));
-    }
+    if (current_history.options)
+      if (Object.keys(current_history.options).length > 0)
+        if (page == "fill") {
+          setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.fillColor));
+        } else if (page == "stroke") {
+          setColourWheelCursor(`${entity_selector} #colour_input`, hexToRGB(current_history.options.color));
+        }
   }
 
   function populateEntityTooltips (arg0_entity_id) {
@@ -296,7 +299,6 @@
       coords_string = (typeof options.coords == "object" && !Array.isArray(options.coords)) ?
         `[${[options.coords.x, options.coords.y]}]` :
         `[${options.coords.toString()}]`;
-
 
     //Check if reload_popup is true; only close existing UI and open a new popup if the popup is not already pinned
     if (entity_interface) {

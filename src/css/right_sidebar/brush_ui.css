@@ -7,6 +7,24 @@
   pointer-events: all;
 }
 
+/* -- Brush Actions -- */
+.brush-action-button {
+  height: 2rem;
+  width: 2rem;
+}
+.brush-action-button:hover {
+  cursor: pointer;
+}
+
+/* -- Brush Actions Context Menu -- */
+#brush-actions-context-menu .context-menu {
+  position: fixed;
+  bottom: 0.5rem;
+  right: calc(20% + 12px + 10px);
+
+  color: black;
+}
+
 /* -- Brush UI container -- */
 .brush-context-menu-container {
   position: fixed;
