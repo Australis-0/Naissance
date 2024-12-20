@@ -39,7 +39,7 @@ config.brush_actions.brush_options = {
         value_equation: `VALUE/Math.pow(10, 3)`, //1 represents 0,001; 100 represents 0,1
 
         effect: {
-          set_brush_simplify_tolerance: "simplify_range"
+          set_brush_simplify_tolerance: "brush_simplify_range"
         }
       }
     }

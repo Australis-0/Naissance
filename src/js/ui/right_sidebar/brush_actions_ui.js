@@ -6,7 +6,7 @@
   */
   function closeBrushActionContextMenu (arg0_order) {
     //Convert from parameters
-    var order = (ar0_order) ? arg0_order : 1;
+    var order = (arg0_order) ? arg0_order : 1;
 
     //Declare local instance variables
     var brush_actions_anchor_el = getBrushActionsAnchorElement();
@@ -21,7 +21,7 @@
   function closeBrushActionContextMenus () {
     //Declare local instance variables
     var brush_actions_anchor_selector = getBrushActionsAnchorElement({ return_selector: true });
-    var brush_actions_els = document.querySelectorAll(`${brush_actions_anchor_el} > .context-menu`);
+    var brush_actions_els = document.querySelectorAll(`${brush_actions_anchor_selector} > .context-menu`);
 
     //Iterate over all brush_actions_els
     for (var i = 0; i < brush_actions_els.length; i++)
@@ -72,8 +72,8 @@
     var unique_orders = [];
 
     //Iterate over all entity_actions_els
-    for (var i = 0; i < entity_actions_els.length; i++) {
-      var local_order = entity_actions_els[i].getAttribute("order");
+    for (var i = 0; i < brush_actions_els.length; i++) {
+      var local_order = brush_actions_els[i].getAttribute("order");
 
       if (local_order != undefined) {
         local_order = parseInt(local_order);
@@ -104,6 +104,21 @@
 
     //Return statement
     return inputs_obj;
+  }
+
+  function isBrushActionContextMenuOpen (arg0_brush_action) {
+    //Convert from parameters
+    var brush_action = arg0_brush_action;
+
+    //Declare local instance variables
+    var brush_action_obj = getBrushAction(brush_action);
+    var brush_actions_anchor_el = getBrushActionsAnchorElement();
+
+    if (brush_action_obj)
+      if (brush_action_obj.id)
+        if (brush_actions_anchor_el.querySelector(`#${brush_action_obj.id}`))
+          //Return statement
+          return true;
   }
 
   /*
@@ -186,6 +201,7 @@
                 local_value.value_equation
               );
               var range_el = local_element.querySelector(`input[type="range"]`);
+              console.log("Actual number in range: ", actual_number_in_range);
 
               range_el.value = actual_number_in_range;
             }
@@ -241,9 +257,16 @@
     //Format Brush Actions navigation UI into valid context menu object
     var all_brush_actions = Object.keys(brush_actions_navigation_obj);
 
+    brush_actions_anchor_el.onclick = function (e) {
+      var is_button_hovered = document.querySelector(`${brush_actions_anchor_selector} > *:hover`);
+
+      if (!is_button_hovered)
+        closeBrushActionContextMenus();
+    };
+
     //Iterate over all_brush_actions; add them as images or abbreviations (if no icon is available)
     for (var i = 0; i < all_brush_actions.length; i++) {
-      var local_action = brush_actions_navigation_obj[all_brush_actions[i]];
+      let local_action = brush_actions_navigation_obj[all_brush_actions[i]];
 
       if (!Array.isArray(local_action) && typeof local_action == "object")
         if (local_action.effect) {
@@ -307,6 +330,7 @@
                 let button_el = local_element;
 
                 local_element.onclick = function (e) {
+                  //Close current orders first; then parse effect
                   parseEffect(undefined, local_action.effect, { timestamp: current_timestamp, ui_type: "brush_actions" });
                 };
               }

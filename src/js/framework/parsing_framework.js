@@ -22,7 +22,6 @@
     if (options.depth == undefined) options.depth = 0;
       options.depth++;
     if (!options.ui_type) options.ui_type = "entity_keyframes";
-    console.log(`parseEffect():`, entity_id, scope, options);
 
     //Declare local instance variables
     var all_scope_keys = Object.keys(scope);

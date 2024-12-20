@@ -11,5 +11,12 @@ config.brush_actions.brush_bottombar = {
     effect: {
       trigger: "brush_simplify_path"
     }
+  },
+  close_button: {
+    icon: "gfx/interface/close_icon.png",
+    name: "Deprecated",
+    order: 1,
+
+    effect: {}
   }
 };
