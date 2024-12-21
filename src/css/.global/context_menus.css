@@ -23,7 +23,7 @@
   transition: all 0.5s;
 
   .context-menu-cell {
-    max-width: fit-content;
+    max-width: 100%;
   }
   > div {
     padding: 0rem;

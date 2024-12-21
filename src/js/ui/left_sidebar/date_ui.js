@@ -137,13 +137,14 @@
           parseInt(year_field.value) :
           parseInt(year_field.value)*-1;
       } else if (year_field.value == 0) {
-        printDateError("There is no year 0!");
+        new_date.year = (year_type_field.value == "AD") ?
+          1 : -1;
       } else {
         new_date.year = year_field.value;
         year_type_field.value = (year_type_field.value == "AD") ? "BC" : "AD";
       }
     } else {
-      printDateError(`Inputted year must be a number!`);
+      autoFillDate();
     }
 
     //Check if month is valid

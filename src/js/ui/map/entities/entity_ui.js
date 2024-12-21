@@ -104,6 +104,17 @@
     return (!options.return_selector) ? document.querySelector(entity_selector) : entity_selector;
   }
 
+  function onEntityUISetEntityName (arg0_name_element) {
+    //Convert from parameters
+    var name_el = arg0_name_element;
+
+    //Declare local instance variables
+    var entity_obj = getEntity(name_el.getAttribute("class"));
+
+    if (entity_obj)
+      renameEntity(entity_obj, name_el.value);
+  }
+
   function populateEntityColour (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
@@ -383,7 +394,7 @@
         var entity_actions_el = getEntityActionsAnchorElement(entity_id)
         var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
 
-        var entity_colour_ui = printEntityContextMenuCustomisationSection(entity_id);
+        var entity_customisation_ui = printEntityContextMenuCustomisationSection(entity_id);
 
         //Populate entity UI
         populateEntityUI(entity_id);
@@ -417,12 +428,14 @@
     var current_history = getHistoryFrame(entity_id, main.date);
     var entity_el = getEntityElement(entity_id);
 
+    var entity_customisation_content_selector = `div.leaflet-popup[class~="${entity_id}"] ${common_selectors.entity_customisation_options}`;
+    var entity_customisation_selector = `div.leaflet-popup[class~="${entity_id}"] ${common_selectors.entity_colour_picker}`;
     var entity_maximum_zoom = (current_history.options.maximum_zoom_level) ? current_history.options.maximum_zoom_level : 0;
     var entity_minimum_zoom = (current_history.options.minimum_zoom_level) ? current_history.options.minimum_zoom_level : 0;
 
     //Define colour picker
     var entity_customisation_fill_tab_el = createContextMenu({
-      anchor: common_selectors.entity_colour_picker,
+      anchor: entity_customisation_selector,
       class: `colour-picker-container unique`,
       id: "entity-colour-picker",
       name: "Colour Picker:",
@@ -455,7 +468,7 @@
     var entity_customisation_content_el = createPageMenu({
       id: entity_id,
 
-      anchor: common_selectors.entity_customisation_options,
+      anchor: entity_customisation_content_selector,
       tab_anchor: common_selectors.entity_customisation_tab_container,
       default: "fill",
 
@@ -554,7 +567,7 @@
 
     //Return statement
     return `<div id = "entity-header" class = "entity-ui-container">
-      <input id = "polity-name" class = "${entity_id}" value = "${entity_name}"></input>
+      <input id = "polity-name" class = "${entity_id}" value = "${entity_name}" onkeyup = "onEntityUISetEntityName(this);"></input>
 
       <img src = "gfx/interface/empty_icon.png" class = "button cross-icon" id = "close-popup" onclick = "closeEntityContextMenu('${entity_id}');" draggable = "false">
       <img src = "gfx/interface/empty_icon.png" class = "button delete-icon" id = "delete-entity" onclick = "deleteEntity('${entity_id}');" draggable = "false">

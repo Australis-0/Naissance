@@ -24,6 +24,23 @@
     delete brush_obj.entity_options;
   }
 
+  function setBrushAutoSimplify (arg0_auto_simplify) {
+    //Convert from parameters
+    var auto_simplify = arg0_auto_simplify;
+
+    //Declare local instance variables
+    //console.log(auto_simplify);
+    var brush_obj = main.brush;
+
+    //Set actual brush_obj.auto_simplify_when_editing
+    if (auto_simplify) {
+      brush_obj.auto_simplify_when_editing = true;
+    } else {
+      delete brush_obj.auto_simplify_when_editing;
+    }
+    delete global.simplify_auto_simplify_when_editing;
+  }
+
   function setBrushSimplifyTolerance (arg0_tolerance) {
     //Convert from parameters
     var tolerance = arg0_tolerance;

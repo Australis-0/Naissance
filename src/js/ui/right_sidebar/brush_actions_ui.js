@@ -175,7 +175,7 @@
       //Initialise preliminary context menu first
       var new_interface = JSON.parse(JSON.stringify(brush_action_obj.interface));
       new_interface.anchor = context_menu_ui.anchor;
-
+      
       var action_context_menu_ui = createContextMenu(new_interface);
       refreshBrushActionsContextMenus();
 
@@ -201,7 +201,6 @@
                 local_value.value_equation
               );
               var range_el = local_element.querySelector(`input[type="range"]`);
-              console.log("Actual number in range: ", actual_number_in_range);
 
               range_el.value = actual_number_in_range;
             }

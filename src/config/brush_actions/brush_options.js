@@ -41,6 +41,17 @@ config.brush_actions.brush_options = {
         effect: {
           set_brush_simplify_tolerance: "brush_simplify_range"
         }
+      },
+      confirm_button: {
+        id: "confirm_button",
+        name: "Confirm",
+        type: "button",
+        x: 0,
+        y: 2,
+
+        effect: {
+          set_brush_auto_simplify: "simplify_auto_simplify_when_editing",
+        }
       }
     }
   }

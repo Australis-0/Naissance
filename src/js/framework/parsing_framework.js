@@ -53,7 +53,7 @@
       } else {
         //'brush_actions' local instanace variables
         brush_actions_container_el = getBrushActionsAnchorElement();
-        brush_actions_input_obj = getInputsAsObject(brush_actions_container_el);
+        brush_actions_input_obj = getInputsAsObject(brush_actions_container_el); //[WIP] - This function is flawed when it comes to checkboxes for some reason
 
         options.options = brush_actions_input_obj;
       }
@@ -69,8 +69,11 @@
         if (local_value.length == 1)
           if (typeof local_value[0] == "string") {
             //Direct variable substitution if detected as valid
-            if (options.options[local_value[0]] != undefined)
+            if (options.options[local_value[0]] != undefined) {
+
               scope[all_scope_keys[i]] = options.options[local_value[0]];
+            }
+
             //If the string is more complex; attempt to use parseVariableString() on it
             try {
               scope[all_scope_keys[i]] = parseVariableString(local_value[0], options.options);
@@ -117,6 +120,8 @@
             } else {
               showEntity(entity_id);
             }
+          if (all_scope_keys[i] == "set_brush_auto_simplify")
+            setBrushAutoSimplify(local_value[0]);
           if (all_scope_keys[i] == "set_brush_simplify_tolerance")
             setBrushSimplifyTolerance(local_value[0]);
           if (all_scope_keys[i] == "simplify_all_keyframes")
@@ -124,11 +129,14 @@
 
           //History effects
           if (all_scope_keys[i] == "delete_keyframe")
-            deleteKeyframe(entity_id, suboptions[local_value]);
-          if (all_scope_keys[i] == "edit_keyframe")
-            editKeyframe(entity_id, suboptions[local_value]);
+            deleteKeyframe(entity_id, suboptions[local_value[0]]);
+          if (all_scope_keys[i] == "edit_keyframe") {
+
+              editKeyframe(entity_id, suboptions[local_value[0]]);
+              console.log(local_value);
+          }
           if (all_scope_keys[i] == "move_keyframe")
-            moveKeyframe(entity_id, options.timestamp, suboptions[local_value]);
+            moveKeyframe(entity_id, options.timestamp, local_value[0]);
 
           //UI interface effects
           if (all_scope_keys[i] == "close_ui")
@@ -340,7 +348,7 @@
 
     Returns: (Variable)
   */
-  function parseVariableString (arg0_string, arg1_options) {
+  function parseVariableString (arg0_string, arg1_options) { //[WIP] - Something here is wrong as it returns HTMLElement in some cases.
     //Convert from parameters
     var string = JSON.parse(JSON.stringify(arg0_string));
     var options = (arg1_options) ? arg1_options : {};
@@ -365,8 +373,20 @@
       eval(`var ${key} = value;`);
     });
 
+    var evaluated_string = eval(string);
+
+    //Handle HTMLElement types
+    if (isElement(evaluated_string))
+      if (evaluated_string.getAttribute("type") == "checkbox") {
+        //Return statement
+        return evaluated_string.checked;
+      } else {
+        //Return statemenbt
+        return evaluated_string.value;
+      }
+
     //Return statement; run string as eval
-    return eval(string);
+    return evaluated_string;
   }
 }
 

@@ -1596,85 +1596,95 @@
     var colour_cursor_el = parent_el.querySelector(`#colour-picker-cursor`);
     var colour_picker_el = parent_el.querySelector(`.colour-picker-container`);
     var colour_picker_hue_el = parent_el.querySelector(`.colour-picker-hue`);
+    var has_colour = false;
     var max_brightness = 255;
 
-    //Get closest r, g, b value in colour wheel and teleport cursor there
-    colour_cursor_el.style.visibility = "hidden";
+    //Check if colour is defined
+    if (colour)
+      if (Array.isArray(colour))
+        if (colour.length >= 3) {
+          //Get closest r, g, b value in colour wheel and teleport cursor there
+          has_colour = true;
+          colour_cursor_el.style.visibility = "hidden";
 
-    //Adjust brightness_el to new maximum brightness
-    console.log("Colour: " + colour);
-    max_brightness = Math.max(Math.max(colour[0], colour[1]), colour[2])/255;
+          //Adjust brightness_el to new maximum brightness
+          max_brightness = Math.max(Math.max(colour[0], colour[1]), colour[2])/255;
 
-    brightness_el.value = max_brightness*100;
-    colour_brightness_el.style.opacity = `${1 - max_brightness}`;
+          brightness_el.value = max_brightness*100;
+          colour_brightness_el.style.opacity = `${1 - max_brightness}`;
 
-    //Set r, g, b colour fields
-    parent_el.querySelector(`.rgb-inputs #r`).value = colour[0];
-    parent_el.querySelector(`.rgb-inputs #g`).value = colour[1];
-    parent_el.querySelector(`.rgb-inputs #b`).value = colour[2];
+          //Set r, g, b colour fields
+          parent_el.querySelector(`.rgb-inputs #r`).value = colour[0];
+          parent_el.querySelector(`.rgb-inputs #g`).value = colour[1];
+          parent_el.querySelector(`.rgb-inputs #b`).value = colour[2];
 
-    //Move colour_cursor_el
-    removeErrorHandlers();
-    var temp_parent_el = colour_picker_el.cloneNode(true);
-    document.body.appendChild(temp_parent_el); //Temporarily append child to body for reading; restore later
+          //Move colour_cursor_el
+          removeErrorHandlers();
+          var temp_parent_el = colour_picker_el.cloneNode(true);
+          document.body.appendChild(temp_parent_el); //Temporarily append child to body for reading; restore later
 
-    temp_parent_el.querySelector(`#colour-picker-cursor`).remove(); //Remove cursor from interference
-    html2canvas(temp_parent_el, { logging: false }).then((canvas) => {
-      var ctx = canvas.getContext("2d");
+          temp_parent_el.querySelector(`#colour-picker-cursor`).remove(); //Remove cursor from interference
+          html2canvas(temp_parent_el, { logging: false }).then((canvas) => {
+            var ctx = canvas.getContext("2d");
 
-      var canvas_height = ctx.canvas.height;
-      var canvas_width = ctx.canvas.width;
-      var circle_radius = canvas_width/2;
-      var image_data = ctx.getImageData(0, 0, canvas_width, canvas_height).data;
+            var canvas_height = ctx.canvas.height;
+            var canvas_width = ctx.canvas.width;
+            var circle_radius = canvas_width/2;
+            var image_data = ctx.getImageData(0, 0, canvas_width, canvas_height).data;
 
-      //Iterate over all image_data; each pixel has 4 elements
-      var closest_pixel = [10000000, 0, 0]; //[colour_distance, x, y];
+            //Iterate over all image_data; each pixel has 4 elements
+            var closest_pixel = [10000000, 0, 0]; //[colour_distance, x, y];
 
-      //Iterate over image_data array
-      for (var i = 0; i < image_data.length; i += 4) {
-        var local_colour = [image_data[i], image_data[i + 1], image_data[i + 2]];
+            //Iterate over image_data array
+            for (var i = 0; i < image_data.length; i += 4) {
+              var local_colour = [image_data[i], image_data[i + 1], image_data[i + 2]];
 
-        if (local_colour.join(", ") != "255, 255, 255") {
-          var distance_from_colour = deltaE(colour, local_colour);
+              if (local_colour.join(", ") != "255, 255, 255") {
+                var distance_from_colour = deltaE(colour, local_colour);
 
-          if (distance_from_colour < closest_pixel[0]) {
-            //Calculate local_x, local_y
-            var local_x = (i/4) % canvas_width;
-            var local_y = Math.floor((i/4)/canvas_width);
+                if (distance_from_colour < closest_pixel[0]) {
+                  //Calculate local_x, local_y
+                  var local_x = (i/4) % canvas_width;
+                  var local_y = Math.floor((i/4)/canvas_width);
 
-            closest_pixel = [distance_from_colour, local_x, local_y, i];
-          }
+                  closest_pixel = [distance_from_colour, local_x, local_y, i];
+                }
+              }
+            }
+
+            //Set cursor colour
+            colour_cursor_el.style.background = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
+
+            //Check if closest_pixel[1], closest_pixel[2] are inside circle
+            if (
+              pointIsInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius)
+            ) {
+              colour_cursor_el.style.left = `calc(${closest_pixel[1]}px - 6px*2)`;
+              colour_cursor_el.style.top = `calc(${closest_pixel[2]}px - 6px)`;
+            } else {
+              //If not, use closest point to edge of circle instead
+              var bounding_rect = colour_picker_hue_el.getBoundingClientRect();
+              var cursor_coords = closestPointInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius);
+
+              var actual_x = (cursor_coords[0])*(bounding_rect.width/canvas_width);
+              var actual_y = (cursor_coords[1])*(bounding_rect.height/canvas_height);
+
+              colour_cursor_el.style.left = `calc(${actual_x}px - 6px)`;
+              colour_cursor_el.style.top = `calc(${actual_y}px - 6px - 1rem)`;
+            }
+
+            colour_cursor_el.style.visibility = "visible";
+            restoreErrorHandlers();
+          });
+          temp_parent_el.remove();
+
+          //'onchange' handler
+          (typeof parent_el.onchange == "string") ? eval(parent_el.onchange) : parent_el.onchange(colour);
         }
-      }
 
-      //Set cursor colour
-      colour_cursor_el.style.background = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
-
-      //Check if closest_pixel[1], closest_pixel[2] are inside circle
-      if (
-        pointIsInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius)
-      ) {
-        colour_cursor_el.style.left = `calc(${closest_pixel[1]}px - 6px*2)`;
-        colour_cursor_el.style.top = `calc(${closest_pixel[2]}px - 6px)`;
-      } else {
-        //If not, use closest point to edge of circle instead
-        var bounding_rect = colour_picker_hue_el.getBoundingClientRect();
-        var cursor_coords = closestPointInCircle(0, 0, closest_pixel[1], closest_pixel[2], circle_radius);
-
-        var actual_x = (cursor_coords[0])*(bounding_rect.width/canvas_width);
-        var actual_y = (cursor_coords[1])*(bounding_rect.height/canvas_height);
-
-        colour_cursor_el.style.left = `calc(${actual_x}px - 6px)`;
-        colour_cursor_el.style.top = `calc(${actual_y}px - 6px - 1rem)`;
-      }
-
-      colour_cursor_el.style.visibility = "visible";
-      restoreErrorHandlers();
-    });
-    temp_parent_el.remove();
-
-    //'onchange' handler
-    (typeof parent_el.onchange == "string") ? eval(parent_el.onchange) : parent_el.onchange(colour);
+    //If no colour is defined, set cursor to the dead middle of the colour picker
+    if (!has_colour)
+      colour_cursor_el.style.top = `calc(${colour_picker_el.offsetHeight/3}px - 6px)`;
   }
 
   function updateBrightnessOpacityHeaders (arg0_parent_selector) {
