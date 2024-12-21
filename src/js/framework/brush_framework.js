@@ -1,5 +1,43 @@
 //Declare functions
 {
+  function addToBrush (arg0_polygon, arg1_do_not_add_to_undo_redo) {
+    //Convert from parameters
+    var polygon = arg0_polygon;
+    var do_not_add_to_undo_redo = arg1_do_not_add_to_undo_redo;
+
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
+    try {
+      //1. Initialise brush.current_path if not defined
+      if (!brush_obj.current_path)
+        brush_obj.current_path = brush_obj.cursor;
+      //2. Cache intersection_polygon
+      var intersection_polygon;
+      try { intersection_polygon = intersection(brush_obj.current_path, polygon); } catch (e) {}
+
+      brush_obj.brush_change = true;
+      //console.log(brush_obj.current_path);
+      brush_obj.current_path = union(brush_obj.current_path, polygon);
+
+      var delta_polygon;
+      try { delta_polygon = difference(polygon, intersection_polygon); } catch (e) {}
+      refreshBrush();
+
+      //3. Add to actions
+      if (!do_not_add_to_undo_redo)
+        performAction({
+          action_id: "add_to_brush",
+          redo_function: "addToBrush",
+          redo_function_parameters: [polygon, true],
+          undo_function: "removeFromBrush",
+          undo_function_parameters: [delta_polygon, true]
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   function clearBrush () {
     //Declare local instance variables
     var brush_obj = main.brush;
@@ -22,6 +60,37 @@
     delete brush_obj.current_path;
     delete brush_obj.editing_entity;
     delete brush_obj.entity_options;
+  }
+
+  function removeFromBrush (arg0_polygon, arg1_do_not_add_to_undo_redo) {
+    //Convert from parameters
+    var polygon = arg0_polygon;
+    var do_not_add_to_undo_redo = arg1_do_not_add_to_undo_redo;
+
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
+    try {
+      //1. Set delta_polygon if possible
+      var delta_polygon;
+      try { delta_polygon = intersection(brush.current_path, polygon); } catch (e) {}
+
+      brush_obj.brush_change = true;
+      brush_obj.current_path = difference(brush_obj.current_path, polygon);
+      refreshBrush();
+
+      //2. Add to actions
+      if (!do_not_add_to_undo_redo)
+        performAction({
+          action_id: "remove_from_brush",
+          redo_function: "removeFromBrush",
+          redo_function_parameters: [polygon, true],
+          undo_function: "addToBrush",
+          undo_function_parameters: [delta_polygon, true]
+        });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   function setBrushAutoSimplify (arg0_auto_simplify) {

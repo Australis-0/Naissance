@@ -136,8 +136,11 @@
     //Declare local instance variables
     var coord_type;
 
-    if (!format)
+    if (!format) {
       console.error(`getCoordsType() was fed an undefined format!`, format);
+      //var error = new Error();
+      //console.log(error.stack());
+    }
 
     //Check if type is GeoJSON
     if (format._initHooksCalled && !format._latlngs && !format._symbolUpdated)

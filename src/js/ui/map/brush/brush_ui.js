@@ -41,12 +41,13 @@
           }
 
           brush_obj.brush_change = true;
+          addToBrush(brush_obj.cursor);
           brush_obj.current_path = union(brush_obj.current_path, brush_obj.cursor);
         } else if (main.events.right_mouse) {
           //Only delete if brush_obj.current_path exists
           if (brush_obj.current_path)
             try {
-              brush_obj.current_path = difference(brush_obj.current_path, brush_obj.cursor);
+              removeFromBrush(brush_obj.cursor);
 
               brush_obj.brush_change = true;
             } catch (e) {

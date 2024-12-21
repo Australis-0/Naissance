@@ -97,6 +97,18 @@
     });
   }
 
+  function getGroupElement (arg0_group_id) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+
+    //Declare local instance variables
+    var group_obj = getGroup("hierarchy", group_id);
+    var common_selectors = config.defines.common.selectors;
+
+    //Return statement
+    return document.querySelector(`${common_selectors.hierarchy} .group[data-id="${group_obj.id}"]`);
+  }
+
   function refreshHierarchy () {
     renderHierarchy("hierarchy", { naissance_hierarchy: true });
   }
