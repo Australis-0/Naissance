@@ -655,6 +655,13 @@
       var interaction_container_el = document.createElement("span");
       interaction_container_el.setAttribute("class", "interaction-container");
 
+      //Create context_menu_container
+      {
+        var context_menu_container = document.createElement("div");
+        context_menu_container.id = "context-menu-container";
+        interaction_container_el.appendChild(context_menu_container);
+      }
+
       //Create delete_button
       {
         var delete_button = document.createElement("button");

@@ -183,7 +183,7 @@
       if (entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor} [order="${entity_keyframe_order}"]`))
         closeEntityKeyframeContextMenu(entity_id, entity_keyframe_order);
 
-      //Append dummy context menu div first for context_menu_ui to appended to
+      //Append dummy context menu div first for context_menu_ui to append to
       var context_menu_el = document.createElement("div");
 
       context_menu_el.setAttribute("class", "context-menu");
@@ -285,7 +285,6 @@
     var entity_keyframe_anchor_el = entity_el.querySelector(`${common_selectors.entity_keyframe_context_menu_anchor}`);
     var entity_keyframe_context_menus = entity_keyframe_anchor_el.querySelectorAll(`${common_selectors.entity_keyframe_context_menu_anchor} > .context-menu`);
     var entity_keyframe_context_width = entity_header_el.offsetWidth + 8; //Measured in px
-    var timestamp = entity_keyframe_anchor_el.getAttribute("timestamp");
 
     //Iterate over entity_keyframe_context_menus; fetch current entity keyframe context menu width. Set current width
     entity_keyframe_context_menus = sortElements(entity_keyframe_context_menus, { attribute: "order" });
