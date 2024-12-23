@@ -2,7 +2,7 @@
 {
   function initOptimisation () {
     //BRUSH ACTIONS
-    //Set .flattened_brush_actions
+    //Set .all_brush_actions; .all_brush_actions_keys
     config.flattened_brush_actions = dumbFlattenObject(config.brush_actions);
 
     config.all_brush_actions = getAllBrushActions();
@@ -10,7 +10,7 @@
     config.brush_actions_lowest_order = getBrushActionsLowestOrder();
 
     //ENTITY ACTIONS
-    //Set .flattened_entity_actions
+    //Set .all_entity_actions; .all_entity_actions_keys
     config.flattened_entity_actions = dumbFlattenObject(config.entity_actions);
 
     config.all_entity_actions = getAllEntityActions();
@@ -18,12 +18,20 @@
     config.entity_actions_lowest_order = getEntityActionsLowestOrder();
 
     //ENTITY KEYFRAMES
-    //Set .all_entity_keyframes; .all_entity_keyframe_objects
+    //Set .all_entity_keyframes; .all_entity_keyframe_keys
     config.flattened_entity_keyframes = dumbFlattenObject(config.entity_keyframes);
 
     config.all_entity_keyframes = getAllEntityKeyframes();
     config.all_entity_keyframe_keys = getAllEntityKeyframes({ return_keys: true });
     config.entity_keyframes_lowest_order = getEntityKeyframesLowestOrder();
+
+    //GROUP ACTIONS
+    //Set .all_group_actions; .all_group_actions_keys
+    config.flattened_group_actions = dumbFlattenObject(config.group_actions);
+
+    config.all_group_actions = getAllGroupActions();
+    config.all_group_actions_keys = getAllGroupActions({ return_keys: true });
+    config.group_actions_lowest_order = getGroupActionsLowestOrder();
 
     //Process entity_keyframes
     {

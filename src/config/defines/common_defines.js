@@ -2,6 +2,7 @@ config.defines.common = {
   reserved_brush_actions: ["name", "scope_type"], //The types of keys that are reserved for config.brush_actions categories
   reserved_entity_actions: ["name", "scope_type"], //The types of keys that are reserved for config.entity_actions categories
   reserved_entity_keyframes: ["name", "scope_type"], //The types of keys that are reserved for config.entity_keyframes categories
+  reserved_group_actions: ["name", "scope_type"], //The types of keys that are reserved for config.group_actions categories
 
   months_lowercase: ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"],
   months_uppercase: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],

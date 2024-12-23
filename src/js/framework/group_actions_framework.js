@@ -1,285 +1,269 @@
 //Initialise functions
 {
-  function closeGroupActionsContextMenu (arg0_group_id, arg1_order) {
+  /*
+    getAllGroupActions() - Fetches all group actions as either an array of keys or objects.
+    arg0_options: (Object)
+      return_keys: (Boolean) - Optional. Whether or not to return an array of keys instead of objects. False by default.
+
+    Returns: (Array<Object>/Array<String>)
+  */
+  function getAllGroupActions (arg0_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var order = (arg1_order) ? arg1_order : 1;
+    var options = (arg0_options) ? arg0_options : {};
 
     //Declare local instance variables
-    var group_actions_anchor_el = getGroupActionsAnchorElement(group_id);
+    var common_defines = config.defines.common;
+    var flattened_group_actions = config.flattened_group_actions;
+    var return_actions = [];
+    var return_keys = [];
 
-    //Fetch local group action context menu and close it
-    var group_actions_el = group_actions_anchor_el.querySelector(`[order="${order}"]`);
-    group_actions_el.remove();
-    refreshGroupActionContextMenus();
+    //Iterate over all_flattened_group_actions
+    var all_flattened_group_actions = Object.keys(flattened_group_actions);
+
+    for (var i = 0; i < all_flattened_group_actions.length; i++)
+      if (!common_defines.reserved_group_actions.includes(all_flattened_group_actions[i])) {
+        return_actions.push(flattened_group_actions[all_flattened_group_actions[i]]);
+        return_keys.push(all_flattened_group_actions[i]);
+      }
+
+    //Return statement
+    return (!options.return_keys) ? return_actions : return_keys;
   }
 
-  function closeGroupActionsContextMenus (arg0_group_id) {
+  /*
+    getGroupAction() - Fetches a group action.
+    arg0_name: (String) - The name/ID of the group action category.
+    arg1_options: (Object)
+      return_key: (Boolean) - Optional. Whether or not to return the key. False by default.
+
+    Returns: (Object/String)
+  */
+  function getGroupAction (arg0_name, arg1_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-
-    //Declare local instance variables
-    var group_actions_anchor_selector = getGroupActionsAnchorElement(group_id, { return_selector: true });
-
-    //Fetch local group action context menus and close all of them
-    var group_action_els = document.querySelectorAll(`${group_actions_anchor_selector} > .context-menu`);
-
-    //Iterate over all group_action_els
-    for (var i = 0; i < group_action_els.length; i++)
-      group_action_els[i].remove();
-  }
-
-  function closeGroupActionsLastContextMenu (arg0_group_id) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
-
-    //Declare local instance variables
-    var group_actions_anchor_el = getGroupActionsAnchorElement(group_id);
-    var group_open_orders = getGroupActionsOpenOrders(group_id);
-
-    //Close last keyframe context menu
-    closeGroupActionsContextMenu(group_id, group_open_orders[group_open_orders.length - 1]);
-  }
-
-  function getGroupActionsAnchorElement (arg0_group_id, arg1_options) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
+    var name = arg0_name;
     var options = (arg1_options) ? arg1_options : {};
 
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var group_el = getGroupElement(group_id);
-    var entity_group_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
-    var entity_selector = `${common_selectors.group_ui}[data-id="${group_id}"]`;
-
-    //Return statement
-    return (!options.return_selector) ?
-      entity_group_anchor_el :
-      `${entity_selector} ${common_selectors.group_actions_context_menu_anchor}`;
-  }
-
-  function getGroupActionsOpenOrders (arg0_group_id) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
+    //Guard clause for objects; direct keys
+    if (typeof name == "object") return name;
+    if (config.flattened_group_actions[name]) return (!options.return_key) ? config.flattened_group_actions[name] : name;
 
     //Declare local instance variables
-    var group_actions_anchor_selector = getGroupActionsAnchorElement(group_id, { return_selector: true });
-    var group_actions_els = document.querySelectorAll(`${group_actions_anchor_selector} .context-menu`);
-    var unique_orders = [];
+    var group_action_exists = [false, ""]; //[group_action_exists, group_action_key];
+    var search_name = name.toLowerCase().trim();
 
-    //Iterate over all group_actions_els; get unique orders
-    for (var i = 0; i < group_actions_els.length; i++) {
-      var local_order = group_actions_els[i].getAttribute("order");
+    //ID search - soft search 1st, hard search 2nd
+    {
+      //Iterate over config.all_group_actions
+      for (var i = 0; i < config.all_group_actions.length; i++) {
+        var local_value = config.all_group_actions[i];
 
-      if (local_order)
-        if (!unique_orders.includes(local_order))
-          unique_orders.push(local_order);
+        if (local_value.id.toLowerCase().includes(search_name))
+          group_action_exists = [true, local_value.key];
+      }
+      for (var i = 0; i < config.all_group_actions.length; i++) {
+        var local_value = config.all_group_actions[i];
+
+        if (local_value.id.toLowerCase() == search_name)
+          group_action_exists = [true, local_value.key];
+      }
     }
 
-    //Return statement
-    return unique_orders;
-  }
+    //Name search - soft search 1st, hard search 2nd
+    {
+      //Iterate over config.all_group_actions
+      for (var i = 0; i < config.all_group_actions.length; i++) {
+        var local_value = config.all_group_actions[i];
 
-  function getGroupActionsInputObject (arg0_group_id) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
-
-    //Declare local instance variables
-    var group_el = getGroupElement(group_id);
-    var group_actions_anchor_el = getGroupActionsAnchorElement(group_id);
-    var inputs_obj = {};
-
-    //Iterate over all_context_menu_els
-    var all_context_menu_els = group_actions_anchor_el.querySelectorAll(".context-menu");
-
-    for (var i = 0; i < all_context_menu_els.length; i++)
-      inputs_obj = dumbMergeObjects(inputs_obj, getInputsAsObject(all_context_menu_els[i], {
-        group_id: group_id
-      }));
-
-    //Return statement
-    return inputs_obj;
-  }
-
-  function printGroupActionContextMenu (arg0_group_id, arg1_group_action, arg2_options) {
-    //Convert from parameters
-    var group_id = arg0_group_id;
-    var group_action = arg1_group_action;
-    var options = (arg2_options)
-
-    //Declare local instance variables
-    var common_defines = config.defines.common;
-    var common_selectors = common_defines.selectors;
-    var group_action_obj = getGroupAction(group_action);
-    var group_obj = getGroup("hierarchy", group_id);
-
-    //Initialise interfaces[group_id] if it doesn't exist
-    if (!global.interfaces[group_id]) global.interfaces[group_id] = {
-      id: group_id,
-      group_obj: group_obj,
-      options: {}
-    };
-
-    //Refresh group action context menus first; then append the current context menu
-    var context_menu_ui = {};
-
-    //Parse given .interface from group_action_obj if applicable
-    if (group_action_obj.interface) {
-      var group_el = getGroupElement(group_id);
-      var group_action_anchor_el = getGroupActionsAnchorElement(group_id);
-      var group_action_order = (group_action_obj.orer != undefined) ? group_action_obj.order : 1;
-      var group_selector = getGroupElement(group_id, { return_selector: true });
-      var lowest_order = config.group_actions_lowest_order;
-
-      //Initialise options
-      if (!options.timestamp) options.timestamp = group_action_anchor_el.getAttribute("timestamp");
-
-      //Check to see if given group_action_obj is of the lowest order. If so, set "timestamp" attribute
-      if (group_action_order == config.group_actions_lowest_order)
-        group_actions_anchor_el.setAttribute("timestamp", options.timestamp);
-
-      //Append dummy context menu ddiv first for context_menu_ui to append to
-      var context_menu_el = document.createElement("div");
-
-      context_menu_el.setAttribute("class", "context-menu");
-      context_menu_el.id = group_action_obj.id;
-      context_menu_el.setAttribute("order", group_action_order);
-      group_action_anchor_el.appendChild(context_menu_el);
-
-      //Initialise context_menu_ui options
-      context_menu_ui.anchor = `${group_selector} ${common_selectors.group_actions_context_menu_anchor} .context-menu#${group_action_obj.id}`;
-      if (group_action_obj.class) context_menu_ui.class = group_action_obj.class;
-      if (group_action_obj.name) context_menu_ui.name = group_action_obj.name;
-      if (group_action_obj.maximum_height) context_menu_ui.maximum_height = group_action_obj.maximum_height;
-      if (group_action_obj.maximum_width) context_menu_ui.maximum_width = group_action_obj.maximum_width;
-
-      //Initialise preliminary context menu first
-      if (group_action_obj.interface) {
-        var new_interface = JSON.parse(JSON.stringify(group_action_obj.interface));
-        new_interface.anchor = context_menu_ui.anchor;
-
-        var group_action_context_menu_ui = createContextMenu(new_interface);
-        refreshGroupActionContextMenus(group_id);
+        if (local_value.name)
+          if (local_value.name.toLowerCase().includes(search_name))
+            group_action_exists = [true, local_value.key];
       }
+      for (var i = 0; i < config.all_group_actions.length; i++) {
+        var local_value = config.all_group_actions[i];
 
-      //Iterate over all_interface_keys and parse them correctly
-      var all_interface_keys = Object.keys(group_action_obj.interface);
-
-      for (let i = 0; i < all_interface_keys.length; i++) {
-        let local_value = group_action_obj.interface[all_interface_keys[i]];
-
-        if (!Array.isArray(local_value) && typeof local_value == "object") {
-          let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
-          if (!local_value.id) local_value.id = all_interface_keys[i];
-
-          //Type handlers: set placeholders where applicable
-          {
-            //Date
-            if (local_value.type == "date")
-              populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
-          }
-
-          //Parse .effect to .onclick event handler
-          if (local_value.effect)
-            local_element.onclick = function (e) {
-              parseEffect(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
-              console.log(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
-            };
-        }
+        if (local_value.name)
+          if (local_value.name.toLowerCase() == search_name)
+            group_action_exists = [true, local_value.key];
       }
     }
 
     //Return statement
-    return (context_menu_el) ? context_menu_el : undefined;
+    if (group_action_exists[0])
+      return (!options.return_key) ? config.flattened_group_actions[group_action_exists[1]] : group_action_exists[1];
   }
 
-  function printGroupActionNavigationMenu (arg0_group_id, arg1_parent_el) {
+  /*
+    getGroupActionsAtOrder() - Fetches all group actions belonging to a given .order.
+    arg0_options: (Object)
+      order: (Number) - Optional. The current order to fetch all relevant actions at 1 by default.
+      return_keys: (Boolean) - Optional. Whether or not to return an array of keys instea dof objects. False by default.
+      return_object: (Boolean) - Optional. Whether to return the array as an object or not. False by default.
+
+    Returns: (Array<Object>/Array<String>)
+  */
+  function getGroupActionsAtOrder (arg0_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
-    var parent_el = arg1_parent_el;
+    var options = (arg0_options) ? arg0_options : {};
 
     //Declare local instance variables
-    var common_defines = config.defines.common;
-    var common_selectors = common_defines.selectors;
-    var group_el = getGroupElement(group_id);
-    var timestamp = parent_el.parentElement.getAttribute("timestamp");
+    var flattened_group_actions = config.flattened_group_actions;
+    var order = (options.order != undefined) ? options.order : 1;
+    var return_actions = [];
+    var return_keys = [];
+    var return_obj = {};
 
-    //Calculate top_string
-    var container_el = document.querySelector(common_selectors.hierarchy);
-    var parent_offset = getY(parent_el, container_el);
-    var top_string = `calc(${container_el.offsetTop}px + ${parent_offset}px)`;
+    //Iterate over all_flattened_group_actions
+    var all_flattened_group_actions = Object.keys(flattened_group_actions);
 
-    //Create local context menu
-    var group_actions_anchor_el = getGroupActionsAnchorElement(group_id);
-    var group_actions_navigation_obj = getGroupActionsNavigationObject();
+    for (var i = 0; i < all_flattened_group_actions.length; i++) {
+      var local_action = flattened_group_actions[all_flattened_group_actions[i]];
 
-    group_actions_anchor_el.style.top = top_string;
-    group_actions_anchor_el.setAttribute("timestamp", timestamp);
-    printGroupActionContextMenu(group_id, group_actions_navigation_obj);
-  }
-
-  function refreshGroupActionContextMenus (arg0_group_id) { //[WIP] - Measure .style.left from hierarchy
-    //Convert from parameters
-    var group_id = arg0_group_id;
-
-    //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var group_el = getGroupElement(group_id);
-    var hierarchy_el = group_el.querySelector(`${common_selectors.hierarchy}`);
-
-    var group_actions_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
-    var group_actions_context_menus = group_el.querySelectorAll(`${common_selectors.group_actions_context_menu_anchor} > .context-menu`);
-    var group_actions_context_width = hierarchy_el.offsetWidth + 8;
-
-    //Iterate over group_actions_context_menus; fetch current group actions context menu width. Set current width.
-    group_actions_context_menus = sortElements(group_actions_context_menus, { attribute: "order" });
-    for (var i = 0; i < group_actions_context_menus.length; i++) {
-      //Set current position; track group_actions_context_width
-      group_actions_context_menus[i].style.left = `${group_actions_context_width}px`;
-      group_actions_context_width += group_actions_context_menus[i].offsetWidth + 8;
+      if (local_action.order == options.order) {
+        return_actions.push(local_action);
+        return_keys.push(all_flattened_group_actions[i]);
+      }
     }
 
-    //Update context menu inputs
-    refreshGroupActionContextMenuInputs(group_id);
+    //options.return_object handler
+    if (options.return_object) {
+      for (var i = 0; i < return_actions.length; i++)
+        return_obj[return_actions[i]] = return_actions[i];
+      //Return statement
+      return return_obj;
+    }
 
     //Return statement
-    return group_actions_context_width;
+    return (!options.return_key) ? return_actions : return_keys;
   }
 
-  function refreshGroupActionContextMenuInputs (arg0_group_id) {
+  /*
+    getGroupActionsCategory() - Fetches a group actions category object/key.
+    arg0_name: (String) - The name/ID of the group action category.
+    arg1_options: (Object)
+      return_key: (Boolean) - Optional. Whether or not to return the key. False by default.
+
+    Returns: (Object/String)
+  */
+  function getGroupActionsCategory (arg0_name, arg1_options) {
     //Convert from parameters
-    var group_id = arg0_group_id;
+    var name = arg0_name;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Guard clause for objects; direct keys
+    if (typeof name == "object") return name;
+    if (config.group_actions[name]) return (!options.return_actions) ? config.return_actions[name] : name;
 
     //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
-    var group_el = getGroupElement(group_id);
-    var group_actions_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
-    var group_actions_context_menus = group_actions_anchor_el.querySelectorAll(`${common_selectors.group_actions_context_menu_anchor} > .context-menu`);
+    var all_group_actions = Object.keys(config.group_actions);
+    var group_actions_exists = [false, ""]; //[group_actions_exists, group_actions_key];
+    var search_name = name.toLowerCase().trim();
 
-    //Placeholder handlers
-    //Iterate over all group_actions_context_menus; fetch their IDs and update their inputs based on .placeholders
-    for (var i = 0; i < group_actions_context_menus.length; i++) {
-      var group_action_obj = config.flattened_group_actions[group_actions_context_menus[i].id];
-      var input_obj = getInputsAsObject(group_actions_context_menus[i], { group_id: group_id });
-
-      if (group_action_obj)
-        if (group_action_obj.interface) {
-          var all_interface_keys = Object.keys(group_action_obj.interface);
-
-          //Iterate over all_interface_keys to fill out input if placeholder exists
-          for (var x = 0; x < all_interface_keys.length; x++) {
-            var local_value = group_action_obj.interface[all_interface_keys[x]];
-
-            //Make sure local_value.placeholder is a valid field before filling it in
-            var local_input_el = group_actions_context_menus[i].querySelector(`#${local_value.id}`);
-            if (local_value.placeholder)
-              fillInput({
-                element: local_input_el,
-                type: local_input_el.getAttribute("type"),
-                placeholder: input_obj[local_value.placeholder]
-              });
-          }
-        }
+    //ID search - soft search 1st, hard search 2nd
+    {
+      //Iterate over all_group_actions
+      for (var i = 0; i < all_group_actions.length; i++)
+        if (all_group_actions[i].toLowerCase().includes(search_name))
+          group_actions_exists = [true, all_group_actions[i]];
+      for (var i = 0; i < all_group_actions.length; i++)
+        if (all_group_actions[i].toLowerCase() == search_name)
+          group_actions_exists = [true, all_group_actions[i]];
     }
+
+    //Name search - soft search 1st, hard search 2nd
+    {
+      //Iterate over all_group_actions
+      for (var i = 0; i < all_group_actions.length; i++) {
+        var local_value = config.group_actions[all_group_actions[i]];
+
+        if (local_value.name)
+          if (local_value.name.toLowerCase().includes(search_name))
+            group_actions_exists = [true, all_group_actions[i]];
+      }
+      for (var i = 0; i < all_group_actions.length; i++) {
+        var local_value = config.group_actions[all_group_actions[i]];
+
+        if (local_value.name)
+          if (local_value.name.toLowerCase() == search_name)
+            group_actions_exists = [true, all_group_actions[i]];
+      }
+    }
+
+    //Return statement
+    if (!group_actions_exists[0])
+      return (!options.return_key) ? config.group_actions[group_actions_exists[1]] : group_actions_exists[1];
+  }
+
+  /*
+    getGroupActionsInput() - Fetches the input object of a given group action within config .interface.
+    arg0_group_action_id: (Stirng) - The group action ID to search for.
+    arg1_input_id: (String) - The input ID to search for in terms of .id or input key.
+
+    Returns: (Object)
+  */
+  function getGroupActionsInput (arg0_group_action_id, arg1_input_id) {
+    //Convert from parameters
+    var group_action_id = arg0_group_action_id;
+    var input_id = arg1_input_id;
+
+    //Declare local instance variables
+    var group_action = getGroupAction();
+
+    if (group_action)
+      //Iterate over .interface if it exists
+      if (group_action.interface) {
+        //Guard clause if citing direct key
+        if (group_action.interface[input_id]) return group_action.interface[input_id];
+
+        //Iterate overt all_inputs
+        for (var i = 0; i < all_inputs.length; i++) {
+          var local_input = group_action.interface[all_inputs[i]];
+
+          if (!Array.isArray(local_input) && typeof local_input == "object")
+            if (local_input.id == input_id)
+              //Return statement
+              return local_input;
+        }
+      }
+  }
+
+  /*
+    getGroupActionsLowestOrder() - Fetches the lowest .order from all config.group_actions.
+
+    Returns: (Number)
+  */
+  function getGroupActionsLowestOrder (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Declare local instance variables
+    var flattened_group_actions = config.flattened_group_actions;
+    var min_order = Infinity;
+
+    //Iterate over all_flattened_group_actions
+    var all_flattened_group_actions = Object.keys(flattened_group_actions);
+
+    for (var i = 0; i < all_flattened_group_actions.length; i++) {
+      var local_group_action = flattened_group_actions[all_flattened_group_actions[i]];
+
+      if (local_group_action.order != undefined)
+        min_order = Math.min(min_order, local_group_action.order);
+    }
+
+    //Return statement
+    return min_order;
+  }
+
+  /*
+    getGroupActionsNavigationObject() - Fetches the navigation object for group actions; the initial context menu from lowest order.
+
+    Returns: (Object)
+  */
+  function getGroupActionsNavigationObject () {
+    //Declare local instance variables
+    var flattened_group_actions = config.flattened_group_actions;
+    var lowest_order = getGroupActionsLowestOrder(flattened_group_actions);
+
+    //Return statement
+    return getGroupActionsAtOrder({ order: lowest_order })[0];
   }
 }

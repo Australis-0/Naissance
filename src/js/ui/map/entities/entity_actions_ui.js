@@ -39,7 +39,7 @@
   }
 
   /*
-    closeEntityActionLastContextMenu() - Closes the last opened context menus for an entity.
+    closeEntityActionLastContextMenu() - Closes the last opened context menu for an entity.
     arg0_entity_id: (String) - The entity ID for which to close the last opened menu.
   */
   function closeEntityActionLastContextMenu (arg0_entity_id) {
@@ -386,7 +386,7 @@
 
   /*
     refreshEntityActionsContextMenuInputs() - Refreshes all entity actions context menu inputs.
-    arg0_entity_id: (String) - The entity ID which tor efresh entity actions context menus for.
+    arg0_entity_id: (String) - The entity ID which to refresh entity actions context menus for.
   */
   function refreshEntityActionsContextMenuInputs (arg0_entity_id) {
     //Convert from parameters
