@@ -344,7 +344,7 @@
     parseVariableString() - Parses a variable string and returns its resolved value.
     arg0_string: (String) - The string which to resolve.
     arg1_options: (Object)
-      <key>: (Variable) - The value to substitute all mentions of this key with.
+      <key>: (Variable)
 
     Returns: (Variable)
   */
@@ -356,6 +356,23 @@
     //Initialise options
     if (!options.BRUSH_OBJ) options.BRUSH_OBJ = "main.brush";
     if (!options.MAIN_OBJ) options.MAIN_OBJ = "global.main";
+
+    //'hierarchies' handler
+    var group_id = main.cache.selected_group_id;
+
+    if (group_id) {
+      var group_el = getGroupElement(group_id);
+      var group_obj = getGroup("hierarchy", group_id);
+
+      //Set FROM object
+      if (!options.FROM)
+        options.FROM = {
+          current_group: group_obj,
+          group_el: group_el,
+          group_id: group_id,
+          group_obj: group_obj
+        };
+    }
 
     //Declare local instance variables
     var all_option_keys = Object.keys(options);

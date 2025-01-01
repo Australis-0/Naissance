@@ -55,6 +55,7 @@ window.path = require("path");
       subtract: [] //Overrides mask (Array<Object, Polity>)
     }
   };
+  main.cache = {};
   main.date = {
     year: current_date.getFullYear(),
     month: current_date.getMonth() + 1,
