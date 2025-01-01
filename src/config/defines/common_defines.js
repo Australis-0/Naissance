@@ -17,7 +17,7 @@ config.defines.common = {
     //Interface - Left Sidebar
     hierarchy: `#hierarchy`, //The query selector for the actual hierarchy tab or supercontainer.
     hierarchy_container: `#hierarchy-container`, //The query selector for the actual hierarchy container.
-      group_actions_context_menu_container: `#context-menu-container`,
+      group_actions_context_menu_anchor: `#context-menu-container`,
     date_container: `#date-container`, //The query selector for the global date container to be populated automatically.
     date_fields: `#date-container input`, //The query selector on which to apply 'keyup' update interactivity.
       day_el: `#date-container #day-input`,

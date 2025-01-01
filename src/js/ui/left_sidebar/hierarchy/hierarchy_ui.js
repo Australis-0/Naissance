@@ -14,7 +14,7 @@
       //Functions
       delete_function: "deleteEntity",
       entity_context_menu_function: "printHierarchyEntityContextMenu",
-      group_context_menu_function: "printHierarchyGroupContextMenu",
+      group_context_menu_function: "printGroupActionsNavigationMenuHandler",
       rename_function: "renameEntity"
     });
     initHierarchyEvents();
@@ -97,16 +97,19 @@
     });
   }
 
-  function getGroupElement (arg0_group_id) {
+  function getGroupElement (arg0_group_id, arg1_options) {
     //Convert from parameters
     var group_id = arg0_group_id;
+    var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
     var group_obj = getGroup("hierarchy", group_id);
     var common_selectors = config.defines.common.selectors;
 
     //Return statement
-    return document.querySelector(`${common_selectors.hierarchy} .group[data-id="${group_obj.id}"]`);
+    return (!options.return_selector) ?
+      document.querySelector(`${common_selectors.hierarchy} .group[data-id="${group_obj.id}"]`) :
+      `${common_selectors.hierarchy} .group[data-id="${group_obj.id}"]`;
   }
 
   function refreshHierarchy () {

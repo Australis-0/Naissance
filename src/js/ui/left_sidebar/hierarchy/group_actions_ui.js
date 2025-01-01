@@ -145,7 +145,7 @@
     //Convert from parameters
     var group_id = arg0_group_id;
     var group_action = arg1_group_action;
-    var options = (arg2_options)
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
     var common_defines = config.defines.common;
@@ -169,62 +169,66 @@
       var group_action_anchor_el = getGroupActionsAnchorElement(group_id);
       var group_action_order = (group_action_obj.orer != undefined) ? group_action_obj.order : 1;
       var group_selector = getGroupElement(group_id, { return_selector: true });
+      var interaction_container_el = group_el.querySelectorAll(`.interaction-container`)[0];
       var lowest_order = config.group_actions_lowest_order;
 
-      //Initialise options
-      if (!options.timestamp) options.timestamp = group_action_anchor_el.getAttribute("timestamp");
+      //Make sure UI isn't already open
+      if (!interaction_container_el.querySelector(`[id="${group_action_obj.id}"]`)) {
+        //Initialise options
+        if (!options.timestamp) options.timestamp = convertTimestampToInt(getTimestamp(main.date));
 
-      //Check to see if given group_action_obj is of the lowest order. If so, set "timestamp" attribute
-      if (group_action_order == config.group_actions_lowest_order)
-        group_actions_anchor_el.setAttribute("timestamp", options.timestamp);
+        //Check to see if given group_action_obj is of the lowest order. If so, set "timestamp" attribute
+        if (group_action_order == config.group_actions_lowest_order)
+          group_action_anchor_el.setAttribute("timestamp", options.timestamp);
 
-      //Append dummy context menu ddiv first for context_menu_ui to append to
-      var context_menu_el = document.createElement("div");
+        //Append dummy context menu ddiv first for context_menu_ui to append to
+        var context_menu_el = document.createElement("div");
 
-      context_menu_el.setAttribute("class", "context-menu");
-      context_menu_el.id = group_action_obj.id;
-      context_menu_el.setAttribute("order", group_action_order);
-      group_action_anchor_el.appendChild(context_menu_el);
+        context_menu_el.setAttribute("class", "context-menu");
+        context_menu_el.id = group_action_obj.id;
+        context_menu_el.setAttribute("order", group_action_order);
+        group_action_anchor_el.appendChild(context_menu_el);
 
-      //Initialise context_menu_ui options
-      context_menu_ui.anchor = `${group_selector} ${common_selectors.group_actions_context_menu_anchor} .context-menu#${group_action_obj.id}`;
-      if (group_action_obj.class) context_menu_ui.class = group_action_obj.class;
-      if (group_action_obj.name) context_menu_ui.name = group_action_obj.name;
-      if (group_action_obj.maximum_height) context_menu_ui.maximum_height = group_action_obj.maximum_height;
-      if (group_action_obj.maximum_width) context_menu_ui.maximum_width = group_action_obj.maximum_width;
+        //Initialise context_menu_ui options
+        context_menu_ui.anchor = `${group_selector} ${common_selectors.group_actions_context_menu_anchor} .context-menu#${group_action_obj.id}`;
+        if (group_action_obj.class) context_menu_ui.class = group_action_obj.class;
+        if (group_action_obj.name) context_menu_ui.name = group_action_obj.name;
+        if (group_action_obj.maximum_height) context_menu_ui.maximum_height = group_action_obj.maximum_height;
+        if (group_action_obj.maximum_width) context_menu_ui.maximum_width = group_action_obj.maximum_width;
 
-      //Initialise preliminary context menu first
-      if (group_action_obj.interface) {
-        var new_interface = JSON.parse(JSON.stringify(group_action_obj.interface));
-        new_interface.anchor = context_menu_ui.anchor;
+        //Initialise preliminary context menu first
+        if (group_action_obj.interface) {
+          var new_interface = JSON.parse(JSON.stringify(group_action_obj.interface));
+          new_interface.anchor = context_menu_ui.anchor;
 
-        var group_action_context_menu_ui = createContextMenu(new_interface);
-        refreshGroupActionContextMenus(group_id);
-      }
+          var group_action_context_menu_ui = createContextMenu(new_interface);
+          refreshGroupActionsContextMenus(group_id);
+        }
 
-      //Iterate over all_interface_keys and parse them correctly
-      var all_interface_keys = Object.keys(group_action_obj.interface);
+        //Iterate over all_interface_keys and parse them correctly
+        var all_interface_keys = Object.keys(group_action_obj.interface);
 
-      for (let i = 0; i < all_interface_keys.length; i++) {
-        let local_value = group_action_obj.interface[all_interface_keys[i]];
+        for (let i = 0; i < all_interface_keys.length; i++) {
+          let local_value = group_action_obj.interface[all_interface_keys[i]];
 
-        if (!Array.isArray(local_value) && typeof local_value == "object") {
-          let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
-          if (!local_value.id) local_value.id = all_interface_keys[i];
+          if (!Array.isArray(local_value) && typeof local_value == "object") {
+            let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
+            if (!local_value.id) local_value.id = all_interface_keys[i];
 
-          //Type handlers: set placeholders where applicable
-          {
-            //Date
-            if (local_value.type == "date")
-              populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+            //Type handlers: set placeholders where applicable
+            {
+              //Date
+              if (local_value.type == "date")
+                populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+            }
+
+            //Parse .effect to .onclick event handler
+            if (local_value.effect)
+              local_element.onclick = function (e) {
+                parseEffect(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
+                console.log(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
+              };
           }
-
-          //Parse .effect to .onclick event handler
-          if (local_value.effect)
-            local_element.onclick = function (e) {
-              parseEffect(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
-              console.log(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
-            };
         }
       }
     }
@@ -249,7 +253,7 @@
     var common_defines = config.defines.common;
     var common_selectors = common_defines.selectors;
     var group_el = getGroupElement(group_id);
-    var timestamp = parent_el.parentElement.getAttribute("timestamp");
+    var timestamp = convertTimestampToInt(getTimestamp(main.date));
 
     //Calculate top_string
     var container_el = document.querySelector(common_selectors.hierarchy);
@@ -265,6 +269,20 @@
     printGroupActionContextMenu(group_id, group_actions_navigation_obj);
   }
 
+  function printGroupActionsNavigationMenuHandler (arg0_hierarchy_key, arg1_group_id) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var group_id = arg1_group_id;
+
+    //Declare local instance variables
+    var common_selectors = config.defines.common.selectors;
+    var parent_el = document.querySelector(`.group[data-id="${group_id}"]`)
+      .querySelector(common_selectors.group_actions_context_menu_anchor);
+
+    //Invoke printGroupActionsNavigationMenu
+    printGroupActionsNavigationMenu(group_id, parent_el);
+  }
+
   /*
     refreshGroupActionsContextMenus() - Refreshes group actions context menu widths.
     arg0_group_id: (String) - The group ID to refresh group actions context menus for.
@@ -276,24 +294,38 @@
     var group_id = arg0_group_id;
 
     //Declare local instance variables
-    var common_selectors = config.defines.common.selectors;
+      var common_selectors = config.defines.common.selectors;
     var group_el = getGroupElement(group_id);
-    var hierarchy_el = group_el.querySelector(`${common_selectors.hierarchy}`);
+    var hierarchy_el = document.querySelector(`${common_selectors.hierarchy}`);
+    var left_sidebar_el = document.querySelector(`${common_selectors.left_sidebar}`);
+    var interaction_container_el = group_el.querySelectorAll(`.interaction-container`)[0];
 
     var group_actions_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
-    var group_actions_context_menus = group_el.querySelectorAll(`${common_selectors.group_actions_context_menu_anchor} > .context-menu`);
-    var group_actions_context_width = hierarchy_el.offsetWidth + 8;
+    var group_actions_context_menus = interaction_container_el.querySelectorAll("div.context-menu[order]");
+    var group_actions_context_width = left_sidebar_el.offsetWidth + 8;
 
     //Iterate over group_actions_context_menus; fetch current group actions context menu width. Set current width.
     group_actions_context_menus = sortElements(group_actions_context_menus, { attribute: "order" });
     for (var i = 0; i < group_actions_context_menus.length; i++) {
       //Set current position; track group_actions_context_width
       group_actions_context_menus[i].style.left = `${group_actions_context_width}px`;
+      group_actions_context_menus[i].style.top = group_actions_anchor_el.style.top;
       group_actions_context_width += group_actions_context_menus[i].offsetWidth + 8;
     }
 
+    //Close all other group action context menus
+    var all_group_els = hierarchy_el.querySelectorAll(".group");
+    group_id = group_el.getAttribute("data-id");
+
+    for (var i = 0; i < all_group_els.length; i++)
+      if (all_group_els[i].getAttribute("data-id") != group_id) {
+        var local_context_menu_container = all_group_els[i].querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
+
+        local_context_menu_container.innerHTML = "";
+      }
+
     //Update context menu inputs
-    refreshGroupActionContextMenuInputs(group_id);
+    refreshGroupActionsContextMenuInputs(group_id);
 
     //Return statement
     return group_actions_context_width;
