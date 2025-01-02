@@ -170,31 +170,11 @@
   }
 
   /*
-    getDepth() - Returns object depth as a number.
-    arg0_object: (Object) - The object to fetch depth for.
-    arg1_depth: (Number) - Optimisation parameter used as an internal helper.
-
-    Returns: (Number)
+    getAllObjectKeys() - Fetches all keys in an object recursively.
+    arg0_object: (Object) - The object to list all keys for.
+    arg1_options: (Object)
+      include_parent_keys: (Boolean) - Optional. Whether to include parent keys. False by default.
   */
-  function getDepth (arg0_object, arg1_depth) {
-    //Convert from parameters
-    var object = arg0_object;
-    var depth = (arg1_depth) ? arg1_depth : 1;
-
-    //Iterate over object
-    for (var key in object) {
-      if (!object.hasOwnProperty(key)) continue;
-
-      if (typeof object[key] == "object") {
-        var level = getDepth(object[key]) + 1;
-        depth = Math.max(depth, level);
-      }
-    }
-
-    //Return statement
-    return depth;
-  }
-
   function getAllObjectKeys (arg0_object, arg1_options) {
     //Convert from parameters
     var object = arg0_object;
@@ -224,6 +204,32 @@
 
     //Return statement
     return object_keys_array;
+  }
+
+  /*
+    getDepth() - Returns object depth as a number.
+    arg0_object: (Object) - The object to fetch depth for.
+    arg1_depth: (Number) - Optimisation parameter used as an internal helper.
+
+    Returns: (Number)
+  */
+  function getDepth (arg0_object, arg1_depth) {
+    //Convert from parameters
+    var object = arg0_object;
+    var depth = (arg1_depth) ? arg1_depth : 1;
+
+    //Iterate over object
+    for (var key in object) {
+      if (!object.hasOwnProperty(key)) continue;
+
+      if (typeof object[key] == "object") {
+        var level = getDepth(object[key]) + 1;
+        depth = Math.max(depth, level);
+      }
+    }
+
+    //Return statement
+    return depth;
   }
 
   /*
@@ -494,6 +500,35 @@
           delete object[all_object_keys[i]];
       if (typeof local_subobj == "object")
         object[all_object_keys[i]] = removeZeroes(local_subobj);
+    }
+
+    //Return statement
+    return object;
+  }
+
+  function setObjectKey (arg0_object, arg1_key, arg2_value) {
+    //Convert from parameters
+    var object = arg0_object;
+    var key = arg1_key;
+    var value = arg2_value;
+
+    //Declare local instance variables
+    var current = object;
+    var split_key = key.split(".");
+
+    //Iterate over split_key and set each key if not defined
+    for (var i = 0; i < split_key.length; i++) {
+      var local_key = split_key[i];
+
+      //If it's the last key, set the value
+      if (i == split_key.length - 1) {
+        current[local_key] = value;
+      } else {
+        if (!current[local_key] || typeof current[local_key] != "object")
+          current[local_key] = {};
+        //Move top the next level
+        current = current[local_key];
+      }
     }
 
     //Return statement

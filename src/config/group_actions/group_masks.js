@@ -28,6 +28,10 @@ config.group_actions.group_masks = {
 
         effect: {
           set_group_mask: "group_mask_select"
+          /*set_group_mask: {
+            group_id: "FROM.group_id",
+            value: "group_mask_select"
+          }*/
         }
       }
     }

@@ -70,19 +70,21 @@
       options.options.timestamp = options.timestamp;
 
       //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
-      for (var i = 0; i < all_scope_keys.length; i++) {
-        var local_value = getList(scope[all_scope_keys[i]]);
+      var all_recursive_scope_keys = getAllObjectKeys(scope, { include_parent_keys: true });
+
+      for (var i = 0; i < all_recursive_scope_keys.length; i++) {
+        var local_value = getList(getObjectKey(scope, all_recursive_scope_keys[i]));
 
         //Test to make sure that local_value[0] is indeed a string; and that local_value is 1 long
         if (local_value.length == 1)
           if (typeof local_value[0] == "string") {
             //Direct variable substitution if detected as valid
-            if (options.options[local_value[0]] != undefined)
-              scope[all_scope_keys[i]] = options.options[local_value[0]];
+            if (getObjectKey(options.options, local_value[0]) != undefined)
+              setObjectKey(scope, all_recursive_scope_keys[i], getObjectKey(options.options, local_value[0]));
 
             //If the string is more complex; attempt to use parseVariableString() on it
             try {
-              scope[all_scope_keys[i]] = parseVariableString(local_value[0], options.options);
+              setObjectKey(scope, all_recursive_scope_keys[i], parseVariableString(local_value[0], options.options));
             } catch (e) {
               console.log(e);
             }
@@ -142,10 +144,12 @@
             deleteGroup("hierarchy", local_value[0].id);
           if (all_scope_keys[i] == "delete_group_recursively")
             deleteGroupRecursively("hierarchy", local_value[0].id);
-          if (all_scope_keys[i] == "set_group_mask") {
-            console.log("set_group_mask", local_value);
-            setGroupMask(main.cache.selected_group_id, local_value[0]);
-          }
+          if (all_scope_keys[i] == "set_group_mask")
+            if (typeof local_value[0] == "object") {
+              setGroupMask(local_value[0].group_id, local_value[0].value);
+            } else {
+              setGroupMask(main.cache.selected_group_id, local_value[0]);
+            }
 
           //History effects
           if (all_scope_keys[i] == "delete_keyframe")
