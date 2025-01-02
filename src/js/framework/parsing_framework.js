@@ -39,6 +39,8 @@
       var actions_input_obj;
       var brush_actions_container_el;
       var brush_actions_input_obj;
+      var group_actions_container_el;
+      var group_actions_input_obj;
       var keyframe_container_el;
       var keyframe_input_obj;
 
@@ -51,7 +53,10 @@
 
         options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
       } else if (options.ui_type == "group_actions") {
-        //Set FROM.group_id
+        group_actions_el = getGroupActionsAnchorElement(main.cache.selected_group_id);
+        group_actions_input_obj = getInputsAsObject(group_actions_el);
+
+        options.options = group_actions_input_obj;
       } else {
         //'brush_actions' local instanace variables
         brush_actions_container_el = getBrushActionsAnchorElement();
@@ -137,6 +142,10 @@
             deleteGroup("hierarchy", local_value[0].id);
           if (all_scope_keys[i] == "delete_group_recursively")
             deleteGroupRecursively("hierarchy", local_value[0].id);
+          if (all_scope_keys[i] == "set_group_mask") {
+            console.log("set_group_mask", local_value);
+            setGroupMask(main.cache.selected_group_id, local_value[0]);
+          }
 
           //History effects
           if (all_scope_keys[i] == "delete_keyframe")
@@ -237,6 +246,27 @@
                   parsed_immediate = parseEffect(entity_id, local_entity_keyframe.immediate, new_options);
                 if (local_entity_keyframe)
                   printEntityKeyframeContextMenu(entity_id, local_entity_keyframe, new_options);
+              }
+            } else if (options.ui_type == "group_actions") {
+              //Parse the group_effect being referenced
+              for (var x = 0; x < local_value.length; x++) {
+                var local_group_action = getGroupAction(local_value[x]);
+                var new_options = JSON.parse(JSON.stringify(options));
+                var parsed_effect, parsed_immediate;
+
+                //console.log(options.options);
+
+                //Initialise options
+                if (!new_options.GROUP_ACTION)
+                  new_options.GROUP_ACTION = local_value[x];
+
+                //Parse scope
+                if (local_group_action.effect)
+                  parsed_effect = parseEffect(undefined, local_group_action.effect, new_options);
+                if (local_group_action.immediate)
+                  parsed_immediate = parseEffect(undefined, local_group_action.immediate, new_options);
+                if (local_group_action)
+                  printGroupActionsContextMenu(main.cache.selected_group_id, local_group_action, new_options);
               }
             }
           if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
@@ -408,9 +438,12 @@
     }
 
     //console.log("parseVariableString()", all_option_keys);
-    //console.log("String:", string);
-
-    var evaluated_string = eval(string);
+    var evaluated_string;
+    try {
+      evaluated_string = eval(string);
+    } catch (e) {
+      evaluated_string = string;
+    }
 
     //Handle HTMLElement types
     if (isElement(evaluated_string))

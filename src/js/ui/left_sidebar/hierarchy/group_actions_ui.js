@@ -70,7 +70,6 @@
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
     var group_el = getGroupElement(group_id);
-    console.log("Group el:", group_id, group_el);
     var entity_group_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
     var entity_selector = `${common_selectors.group_ui}[data-id="${group_id}"]`;
 
