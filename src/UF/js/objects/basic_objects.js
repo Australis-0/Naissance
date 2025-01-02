@@ -195,10 +195,41 @@
     return depth;
   }
 
+  function getAllObjectKeys (arg0_object, arg1_options) {
+    //Convert from parameters
+    var object = arg0_object;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Initialise options
+    if (!options.current_key) options.current_key = "";
+
+    //Declare local instance variables
+    var all_object_keys = Object.keys(object);
+    var object_keys_array = [];
+
+    //Iterate over all_object_keys
+    for (var i = 0; i < all_object_keys.length; i++) {
+      var local_value = object[all_object_keys[i]];
+
+      if (typeof local_value != "object" || options.include_parent_keys)
+        object_keys_array.push(`${options.current_key}${all_object_keys[i]}`);
+      if (typeof local_value == "object" && !Array.isArray(local_value)) {
+        var new_options = JSON.parse(JSON.stringify(options));
+        new_options.current_key += `${all_object_keys[i]}.`;
+
+        var new_object_keys = getAllObjectKeys(local_value, new_options);
+        object_keys_array = object_keys_array.concat(new_object_keys);
+      }
+    }
+
+    //Return statement
+    return object_keys_array;
+  }
+
   /*
     getObjectKey() - Fetches object value from a string (e.g. 'test.one.two')
     arg0_object: (Object) - The object to fetch the key from.
-    arg1_key: (String) - The string of the key to fetch from the object.
+    arg1_key: (String) - The string of the key to fetch from the object 'test.one.two'.
 
     Returns: (Variable)
   */

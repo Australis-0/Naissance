@@ -50,6 +50,8 @@
         keyframe_input_obj = getInputsAsObject(keyframe_container_el, { entity_id: entity_id });
 
         options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
+      } else if (options.ui_type == "group_actions") {
+        //Set FROM.group_id
       } else {
         //'brush_actions' local instanace variables
         brush_actions_container_el = getBrushActionsAnchorElement();
@@ -59,6 +61,7 @@
       }
 
       //Set options.timestamp to be passed down
+      if (!options.options) options.options = {};
       options.options.timestamp = options.timestamp;
 
       //Iterate over all_scope_keys and replace any strings with values in options.options if they indeed exist
@@ -69,15 +72,15 @@
         if (local_value.length == 1)
           if (typeof local_value[0] == "string") {
             //Direct variable substitution if detected as valid
-            if (options.options[local_value[0]] != undefined) {
-
+            if (options.options[local_value[0]] != undefined)
               scope[all_scope_keys[i]] = options.options[local_value[0]];
-            }
 
             //If the string is more complex; attempt to use parseVariableString() on it
             try {
               scope[all_scope_keys[i]] = parseVariableString(local_value[0], options.options);
-            } catch (e) {}
+            } catch (e) {
+              console.log(e);
+            }
           }
       }
     }
@@ -127,14 +130,19 @@
           if (all_scope_keys[i] == "simplify_all_keyframes")
             simplifyAllEntityKeyframes(entity_id, returnSafeNumber(local_value[0]));
 
+          //Group actions
+          if (all_scope_keys[i] == "create_subgroup")
+            addGroup("hierarchy", { parent_group: local_value[0].id });
+          if (all_scope_keys[i] == "delete_group")
+            deleteGroup("hierarchy", local_value[0].id);
+          if (all_scope_keys[i] == "delete_group_recursively")
+            deleteGroupRecursively("hierarchy", local_value[0].id);
+
           //History effects
           if (all_scope_keys[i] == "delete_keyframe")
             deleteKeyframe(entity_id, suboptions[local_value[0]]);
-          if (all_scope_keys[i] == "edit_keyframe") {
-
-              editKeyframe(entity_id, suboptions[local_value[0]]);
-              console.log(local_value);
-          }
+          if (all_scope_keys[i] == "edit_keyframe")
+            editKeyframe(entity_id, suboptions[local_value[0]]);
           if (all_scope_keys[i] == "move_keyframe")
             moveKeyframe(entity_id, options.timestamp, local_value[0]);
 
@@ -375,20 +383,32 @@
     }
 
     //Declare local instance variables
-    var all_option_keys = Object.keys(options);
+    var all_option_keys = getAllObjectKeys(options, { include_parent_keys: true });
 
     //Iterate over all_option_keys and construct RegExp to replace it
     for (var i = 0; i < all_option_keys.length; i++) {
       var local_value = options[all_option_keys[i]];
 
       var local_regexp = new RegExp(all_option_keys[i], "g");
-      string = string.replace(local_regexp, local_value);
+      //string = string.replace(local_regexp, local_value);
     }
 
     //Destructure all keys in options such that they are locally available for eval to use
-    Object.entries(options).forEach(([key, value]) => {
-      eval(`var ${key} = value;`);
-    });
+    for (var i = 0; i < all_option_keys.length; i++) {
+      var local_split_key = all_option_keys[i].split(".");
+      var local_value = getObjectKey(options, all_option_keys[i]);
+
+      //Destructure local object first
+      if (local_split_key.length > 1) {
+        eval(`if (!${local_split_key[0]}) var ${local_split_key[0]} = {};`);
+        eval(`${all_option_keys[i]} = local_value;`);
+      } else {
+        eval(`var ${all_option_keys[i]} = local_value;`);
+      }
+    }
+
+    //console.log("parseVariableString()", all_option_keys);
+    //console.log("String:", string);
 
     var evaluated_string = eval(string);
 

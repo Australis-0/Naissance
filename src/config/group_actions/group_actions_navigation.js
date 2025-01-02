@@ -38,7 +38,7 @@ config.group_actions.actions_navigation = {
         y: 2,
 
         effect: {
-          delete_group: "FROM.current_group"
+          delete_group_recursively: "FROM.current_group"
         }
       },
       set_mask_button: {

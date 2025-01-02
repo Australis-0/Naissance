@@ -295,6 +295,7 @@
 
           var new_group = {
             name: group_name,
+            id: group_id,
 
             entities: [],
             subgroups: []

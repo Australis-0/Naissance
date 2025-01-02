@@ -70,6 +70,7 @@
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
     var group_el = getGroupElement(group_id);
+    console.log("Group el:", group_id, group_el);
     var entity_group_anchor_el = group_el.querySelector(`${common_selectors.group_actions_context_menu_anchor}`);
     var entity_selector = `${common_selectors.group_ui}[data-id="${group_id}"]`;
 
@@ -135,13 +136,13 @@
   }
 
   /*
-    printGroupActionContextMenu() - Prints a group actions context menu based on a GroupAction object.
+    printGroupActionsContextMenu() - Prints a group actions context menu based on a GroupAction object.
     arg0_group_id: (String) - The group ID for which to print the context menu for.
     arg1_group_action: (Object) - The group action to be referenced from config.group_actions.
     arg2_options: (Object)
       <key>: (Variable) - The placeholder value to assign to the given context menu.
   */
-  function printGroupActionContextMenu (arg0_group_id, arg1_group_action, arg2_options) {
+  function printGroupActionsContextMenu (arg0_group_id, arg1_group_action, arg2_options) {
     //Convert from parameters
     var group_id = arg0_group_id;
     var group_action = arg1_group_action;
@@ -225,7 +226,7 @@
             //Parse .effect to .onclick event handler
             if (local_value.effect)
               local_element.onclick = function (e) {
-                parseEffect(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
+                parseEffect(group_id, local_value.effect, { event: e, timestamp: options.timestamp, ui_type: "group_actions" });
                 console.log(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
               };
           }
@@ -266,7 +267,10 @@
 
     group_actions_anchor_el.style.top = top_string;
     group_actions_anchor_el.setAttribute("timestamp", timestamp);
-    printGroupActionContextMenu(group_id, group_actions_navigation_obj);
+    printGroupActionsContextMenu(group_id, group_actions_navigation_obj);
+
+    //Set main.cache.selected_group_id
+    main.cache.selected_group_id = group_id;
   }
 
   function printGroupActionsNavigationMenuHandler (arg0_hierarchy_key, arg1_group_id) {
