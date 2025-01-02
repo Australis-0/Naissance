@@ -8,6 +8,7 @@
     //Declare local instance variables
     var brush_obj = main.brush;
 
+    processBrush();
     try {
       //1. Initialise brush.current_path if not defined
       if (!brush_obj.current_path)
@@ -69,6 +70,7 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
+    processBrush();
 
     try {
       //1. Set delta_polygon if possible

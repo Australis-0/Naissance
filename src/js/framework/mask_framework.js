@@ -67,6 +67,22 @@
     }
   }
 
+  function getMask (arg0_mask_name) {
+    
+  }
+
+  function parseMaskEffect (arg0_mask_name) {
+
+  }
+
+  //parseMasks() - Parses all masks currently in config.mask_types and applies each of them to main.brush
+  function parseMasks () {
+    //Declare local instance variables
+    var all_mask_types_keys = Object.keys(config.mask_types);
+
+    //Iterate over all_mask_types_keys and parse each effect
+  }
+
   function removeEntityMask (arg0_entity_id) {
     //Convert from parameters
     var entity_id = arg0_entity_id;

@@ -111,10 +111,16 @@
               }
           }
 
+          //[WIP] - This section needs to be refactored with the following algorithm:
+          /*
+            1. Fetch brush_obj.masks.intersect_overlay result
+            2. Subtract brush_obj.masks.intersect_overlay result from all entities in brush_obj.masks.intersect_add
+          */
           //Iterate over all mask_intersect_add entities
+          /*
           if (brush_obj.masks.intersect_add.length > 0) {
             //1. Fetch combined_union
-            var combined_union = getTurfObject(brush_obj.masks.intersect_add[0]._latlngs);
+            var combined_union = convertMaptalksCoordsToTurf(brush_obj.masks.intersect_add[0]);
 
             for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
               var local_value = brush_obj.masks.intersect_add[i];
@@ -122,8 +128,8 @@
               var local_id = local_value.options.className;
 
               if (local_id != selected_id)
-                if (local_value._latlngs)
-                  combined_union = union(local_value._latlngs, combined_union);
+                if (local_value._coordinates)
+                  combined_union = union(convertMaptalksCoordsToTurf(local_value), combined_union);
             }
 
             //2. Set brush_obj.current_path to intersection of brush and combined_union
@@ -143,12 +149,14 @@
               var local_id = local_value.options.className;
 
               if (local_id != selected_id)
-                if (local_value._latlngs && brush_obj.current_path) {
-                  var local_coords = difference(local_value._latlngs, brush_obj.current_path);
+                if (local_value._coordinates && brush_obj.current_path) {
+                  var local_coords = difference(convertMaptalksCoordsToTurf(local_value), brush_obj.current_path);
 
                   //If local_coords is defined, set it - otherwise hide it
                   if (local_coords) {
-                    local_value.setLatLngs(local_coords);
+                    try {
+                      local_value.setCoordinates(local_coords);
+                    } catch {}
 
                     //Set new ._latlngs to coords of current history frame
                     createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
@@ -169,14 +177,19 @@
             for (var i = 0; i < brush_obj.masks.intersect_add.length; i++) {
               var local_value = brush_obj.masks.intersect_add[i];
 
-              if (local_value.selection)
-                brush_obj.current_path = union(local_value._latlngs, brush_obj.current_path);
+              if (local_value.selection) {
+                console.log("Local value:", local_value);
+                console.log(getCoordsType(local_value));
+                if (local_value._latlngs)
+                  brush_obj.current_path = union(getTurfObject(local_value), brush_obj.current_path);
+              }
             }
           }
+          */
 
           //Iterate over all mask_intersect_overlay entities
           if (brush_obj.masks.intersect_overlay.length > 0) {
-            var combined_union = getTurfObject(brush_obj.masks.intersect_overlay[0]._latlngs);
+            var combined_union = convertMaptalksCoordsToTurf(brush_obj.masks.intersect_overlay[0]);
 
             for (var i = 0; i < brush_obj.masks.intersect_overlay.length; i++) {
               var local_value = brush_obj.masks.intersect_overlay[i];
@@ -184,8 +197,8 @@
               var local_id = local_value.options.className;
 
               if (local_id != selected_id)
-                if (local_value._latlngs)
-                  combined_union = union(local_value._latlngs, combined_union);
+                if (local_value._coordinates)
+                  combined_union = union(convertMaptalksCoordsToTurf(local_value), combined_union);
             }
 
             brush_obj.current_path = intersection(brush_obj.current_path, combined_union);
@@ -198,8 +211,8 @@
             var local_id = local_value.options.className;
 
             if (local_id != selected_id)
-              if (local_value._latlngs)
-                brush_obj.current_path = difference(brush_obj.current_path, local_value._latlngs);
+              if (local_value._coordinates)
+                brush_obj.current_path = difference(brush_obj.current_path, convertMaptalksCoordsToTurf(local_value));
           }
         }
 
