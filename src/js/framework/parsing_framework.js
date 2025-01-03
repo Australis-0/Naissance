@@ -135,9 +135,8 @@
             }
           if (all_scope_keys[i] == "set_brush_auto_simplify")
             setBrushAutoSimplify(local_value[0]);
-          if (all_scope_keys[i] == "set_brush_simplify_tolerance") {
+          if (all_scope_keys[i] == "set_brush_simplify_tolerance")
             setBrushSimplifyTolerance(parseFloat(local_value[0]));
-          }
           if (all_scope_keys[i] == "simplify_all_keyframes")
             simplifyAllEntityKeyframes(entity_id, returnSafeNumber(local_value[0]));
 
