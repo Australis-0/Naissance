@@ -96,18 +96,19 @@
             var local_id = local_value.options.className;
 
             if (local_id != selected_id)
-              if (local_value._latlngs && brush_obj.current_path) {
-                var local_coords = difference(local_value._latlngs, brush_obj.current_path);
+              if (local_value._coordinates && brush_obj.current_path) {
+                var local_coords = difference(local_value, brush_obj.current_path);
 
                 //If local_coords is defined, set it - otherwise hide it
+                /*
                 if (local_coords) {
-                  local_value.setLatLngs(local_coords);
+                  local_value.setCoordinates(convertLeafletCoordsToMaptalks(local_coords));
 
                   //Set new ._latlngs to coords of current history frame
                   createHistoryFrame(local_value.options.className, main.date, {}, local_coords);
                 } else {
                   hideEntity(local_value.options.className, main.date);
-                }
+                }*/
               }
           }
 
@@ -189,7 +190,7 @@
 
           //Iterate over all mask_intersect_overlay entities
           if (brush_obj.masks.intersect_overlay.length > 0) {
-            var combined_union = convertMaptalksCoordsToTurf(brush_obj.masks.intersect_overlay[0]);
+            var combined_union = brush_obj.masks.intersect_overlay[0];
 
             for (var i = 0; i < brush_obj.masks.intersect_overlay.length; i++) {
               var local_value = brush_obj.masks.intersect_overlay[i];
@@ -198,9 +199,9 @@
 
               if (local_id != selected_id)
                 if (local_value._coordinates)
-                  combined_union = union(convertMaptalksCoordsToTurf(local_value), combined_union);
+                  combined_union = union(local_value, combined_union);
             }
-
+            
             brush_obj.current_path = intersection(brush_obj.current_path, combined_union);
           }
 
@@ -212,7 +213,7 @@
 
             if (local_id != selected_id)
               if (local_value._coordinates)
-                brush_obj.current_path = difference(brush_obj.current_path, convertMaptalksCoordsToTurf(local_value));
+                brush_obj.current_path = difference(brush_obj.current_path, local_value);
           }
         }
 

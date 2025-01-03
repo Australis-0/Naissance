@@ -68,7 +68,10 @@
   }
 
   function getMask (arg0_mask_name) {
-    
+    //Convert from parameters
+    var mask_name = arg0_mask_name;
+
+    //Declare local instance variables
   }
 
   function parseMaskEffect (arg0_mask_name) {

@@ -1,5 +1,49 @@
 //Coordinate conversion functions
 {
+  /*
+    convertToGeoJSON() - Converts any format to GeoJSON.
+    arg0_format: (Variable) - The coords format to input.
+
+    Returns: (Object, GeoJSON)
+  */
+  function convertToGeoJSON (arg0_format) {
+    //Convert from parameters
+    var format = arg0_format;
+
+    //Declare local instance variables
+    var format_type = getCoordsType(format);
+    var geojson_coords;
+
+    //Guard clauses if format_type is already GeoJSON
+    if (format_type == "geojson") return format;
+
+    if (format_type == "leaflet") {
+      var leaflet_geojson = new L.Polygon(format).toGeoJSON();
+      geojson_coords = leaflet_geojson.geometry;
+    } else if (format_type == "leaflet_non_poly") {
+      var leaflet_geojson = new L.Polygon(format._latlngs).toGeoJSON();
+      geojson_coords = leaflet_geojson.geometry;
+    } else if (format_type == "maptalks") {
+      geojson_coords = format.toGeoJSON();
+    } else if (format_type == "turf") {
+      geojson_coords = {
+        type: (format[1] == "polygon") ? "Polygon" : "MultiPolygon",
+        coordinates: format[0]
+      };
+    } else if (format_type == "turf_object") {
+      geojson_coords = format.geometry;
+    }
+
+    //Return statement
+    return geojson_coords;
+  }
+
+  /*
+    convertToLeaflet() - Converts any format to Leaflet.
+    arg0_format: (Variable) - The coords format to input.
+
+    Returns: (Array<Array<{ lat: (Number), lng: (Number) }>>)
+  */
   function convertToLeaflet (arg0_format) {
     //Convert from parameters
     var format = arg0_format;
@@ -47,7 +91,34 @@
     return leaflet_coords;
   }
 
-  //convertToNaissance() - Recursive function stripping lat, lng from coordinates
+  /*
+    convertToMaptalks() - Converts any format to Maptalks.
+    arg0_format: (Variable) - The coords format to input.
+
+    Returns: (Array<Array<{ x: (Number), y: (Number), z: (Number) }>>)
+  */
+  function convertToMaptalks (arg0_format) {
+    //Convert from parameters
+    var format = arg0_format;
+
+    //Declare local instance variables
+    var format_type = getCoordsType(format);
+
+    //Guard clause if format_type is already Maptalks
+    if (format_type == "maptalks") return format;
+
+    var maptalks_coords = maptalks.GeoJSON.toGeometry(convertToGeoJSON(format)).getCoordinates();
+
+    //Return statement
+    return maptalks_coords;
+  }
+
+  /*
+    convertToNaissance() - Converts any format to Naissance.
+    arg0_format: (Variable) - The coords format to input.
+
+    Returns: (Array<Array<{ lat: (Number), lng: (Number) }>>)
+  */
   function convertToNaissance (arg0_format) {
     //Convert from parameters
     var format = arg0_format;
@@ -67,12 +138,11 @@
     return leaflet_coords;
   }
 
-  //convertToTurf() - Returns [coordinates, type];
   /*
     convertToTurf() - Converts any format to Turf.
     arg0_format: (Variable) - The coords format to input.
 
-    Returns: (Array<Array<Number, Number>>) - Turf coordinates.
+    Returns: (Array<Array<Number, Number>>)
   */
   function convertToTurf (arg0_format) {
     //Convert from parameters
@@ -272,9 +342,9 @@
     });
   }
 
-  function getGeoJSONCoords (arg0_geoJSON) {
+  function getGeoJSONCoords (arg0_geojson) {
     //Convert from parameters
-    var geojson = arg0_geoJSON;
+    var geojson = arg0_geojson;
 
     //Declare local instance variables
     var coords = [];
@@ -291,22 +361,30 @@
     return coords;
   }
 
-  function isValidCoordinate(coords) {
-    // Check if it's a valid array of [longitude, latitude]
+  function isValidCoordinate (arg0_coords) {
+    //Convert from parameters
+    var coords = arg0_coords;
+
+    //Check if it's a valid array of [longitude, latitude]
+    //Return statement
     return Array.isArray(coords) && coords.length === 2 &&
-           typeof coords[0] === 'number' && typeof coords[1] === 'number' &&
-           coords[0] >= -180 && coords[0] <= 180 && // Valid longitude
-           coords[1] >= -90 && coords[1] <= 90;    // Valid latitude
+           typeof coords[0] === "number" && typeof coords[1] === "number" &&
+           coords[0] >= -180 && coords[0] <= 180 && //Valid longitude
+           coords[1] >= -90 && coords[1] <= 90;    //Valid latitude
   }
 
-  function validateCoordinates(coordsArray) {
-    // Recursively validate coordinates
-    return coordsArray.every(coords => {
+  function validateCoordinates (arg0_coords) {
+    //Convert from parameters
+    var coords_array = arg0_coords;
+
+    //Recursively validate coordinates
+    //Return statement
+    return coords_array.every((coords) => {
       if (Array.isArray(coords[0])) {
-        // If it's a nested array, recurse
+        //If it's a nested array, recurse
         return validateCoordinates(coords);
       } else {
-        // Otherwise, validate the coordinate pair
+        //Otherwise, validate the coordinate pair
         return isValidCoordinate(coords);
       }
     });
