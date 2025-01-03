@@ -248,17 +248,17 @@
     var split_key = (Array.isArray(key)) ? key : key.split(".");
     var return_value;
 
-    if (split_key.length <= 1 && object[split_key[0]]) {
+    if (split_key.length <= 1 && object[split_key[0]] != undefined) {
       return_value = object[split_key[0]];
     } else {
-      if (object[split_key[0]]) {
+      if (object[split_key[0]] != undefined) {
         //Preserve old index; pop from front before calling recursion
         var old_index = JSON.parse(JSON.stringify(split_key[0]));
         split_key.shift();
         var found_return_value = getObjectKey(object[old_index], split_key);
 
         //If value was found, return that
-        if (found_return_value)
+        if (found_return_value != undefined)
           return_value = found_return_value;
       }
     }

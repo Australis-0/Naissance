@@ -175,7 +175,7 @@
       //Initialise preliminary context menu first
       var new_interface = JSON.parse(JSON.stringify(brush_action_obj.interface));
       new_interface.anchor = context_menu_ui.anchor;
-      
+
       var action_context_menu_ui = createContextMenu(new_interface);
       refreshBrushActionsContextMenus();
 

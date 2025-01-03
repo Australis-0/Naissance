@@ -937,7 +937,7 @@
 
       //Fetch local_output
       local_output = getInput(all_inputs[i]);
-      if (local_output) has_output = true;
+      if (local_output != null && local_output != undefined) has_output = true;
 
       //Set return_obj[local_id]
       if (has_output)

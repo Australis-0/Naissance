@@ -84,8 +84,11 @@
 
             //If the string is more complex; attempt to use parseVariableString() on it
             try {
+              options.options.ignore_errors = true;
               setObjectKey(scope, all_recursive_scope_keys[i], parseVariableString(local_value[0], options.options));
+              delete options.options.ignore_errors;
             } catch (e) {
+              console.log(scope, all_recursive_scope_keys[i], local_value[0], options.options);
               console.log(e);
             }
           }
@@ -132,8 +135,9 @@
             }
           if (all_scope_keys[i] == "set_brush_auto_simplify")
             setBrushAutoSimplify(local_value[0]);
-          if (all_scope_keys[i] == "set_brush_simplify_tolerance")
-            setBrushSimplifyTolerance(local_value[0]);
+          if (all_scope_keys[i] == "set_brush_simplify_tolerance") {
+            setBrushSimplifyTolerance(parseFloat(local_value[0]));
+          }
           if (all_scope_keys[i] == "simplify_all_keyframes")
             simplifyAllEntityKeyframes(entity_id, returnSafeNumber(local_value[0]));
 
@@ -196,23 +200,24 @@
           if (["open_ui", "trigger"].includes(all_scope_keys[i]))
             if (options.ui_type == "brush_actions") {
               //Parse the brush_effect being referenced
-              for (var x = 0; x < local_value.length; x++) {
-                var local_brush_action = getBrushAction(local_value[x]);
-                var new_options = JSON.parse(JSON.stringify(options));
-                var parsed_effect, parsed_immediate;
+              for (var x = 0; x < local_value.length; x++)
+                if (local_value[x]) {
+                  var local_brush_action = getBrushAction(local_value[x]);
+                  var new_options = JSON.parse(JSON.stringify(options));
+                  var parsed_effect, parsed_immediate;
 
-                //Initialise options
-                if (!new_options.BRUSH_ACTION)
-                  new_options.BRUSH_ACTION = local_value[x];
+                  //Initialise options
+                  if (!new_options.BRUSH_ACTION)
+                    new_options.BRUSH_ACTION = local_value[x];
 
-                //Parse scope
-                if (local_brush_action.effect)
-                  parsed_effect = parseEffect(undefined, local_brush_action.effect, new_options);
-                if (local_brush_action.immediate)
-                  parsed_immediate = parseEffect(undefined, local_brush_action.immediate, new_options);
-                if (local_brush_action)
-                  printBrushActionsContextMenu(local_brush_action, new_options);
-              }
+                  //Parse scope
+                  if (local_brush_action.effect)
+                    parsed_effect = parseEffect(undefined, local_brush_action.effect, new_options);
+                  if (local_brush_action.immediate)
+                    parsed_immediate = parseEffect(undefined, local_brush_action.immediate, new_options);
+                  if (local_brush_action)
+                    printBrushActionsContextMenu(local_brush_action, new_options);
+                }
             } else if (options.ui_type == "entity_actions") {
               //Parse the entity_effect being referenced
               for (var x = 0; x < local_value.length; x++) {
@@ -419,14 +424,6 @@
     //Declare local instance variables
     var all_option_keys = getAllObjectKeys(options, { include_parent_keys: true });
 
-    //Iterate over all_option_keys and construct RegExp to replace it
-    for (var i = 0; i < all_option_keys.length; i++) {
-      var local_value = options[all_option_keys[i]];
-
-      var local_regexp = new RegExp(all_option_keys[i], "g");
-      //string = string.replace(local_regexp, local_value);
-    }
-
     //Destructure all keys in options such that they are locally available for eval to use
     for (var i = 0; i < all_option_keys.length; i++) {
       var local_split_key = all_option_keys[i].split(".");
@@ -446,6 +443,11 @@
     try {
       evaluated_string = eval(string);
     } catch (e) {
+      if (!options.ignore_errors) {
+        console.log("Options:", options);
+        console.log("String:", string);
+        console.log(e);
+      }
       evaluated_string = string;
     }
 

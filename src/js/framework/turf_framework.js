@@ -285,7 +285,7 @@
   function simplify (arg0_format, arg1_tolerance, arg2_options) {
     //Convert from parameters
     var format = arg0_format;
-    var tolerance = arg1_tolerance;
+    var tolerance = parseFloat(arg1_tolerance);
     var options = (arg2_options) ? arg2_options : {};
 
     //Initialise options
