@@ -67,23 +67,108 @@
     }
   }
 
-  function getMask (arg0_mask_name) {
+  /*
+    processGeometryMask() - Processes a given geometry mask.
+    arg0_geometry: (Variable) - The geometry to input.
+    arg2_options: (Object)
+      mask_type: (String) - The mask type to input.
+  */
+  function processGeometryMask (arg0_geometry, arg1_scope, arg2_options) {
     //Convert from parameters
-    var mask_name = arg0_mask_name;
+    var geometry = arg0_geometry;
+    var scope = (arg1_scope) ? arg1_scope : {};
+    var options = (arg2_options) ? arg2_options : {};
 
     //Declare local instance variables
+    var all_scope_keys = Object.keys(scope);
+
+    //Iterate over all_scope_keys
+    for (var i = 0; i < all_scope_keys.length; i++) {
+      var local_value = getList(scope[all_scope_keys[i]]);
+
+      if (all_scope_keys[i] == "remove_brush_coords_from_selected_polities") {
+        var mask_geometries = main.brush.masks[options.mask_type];
+
+        for (var x = 0; x < mask_geometries.length; x++) {
+          try {
+            var local_coords = getEntityCoords(mask_geometries[x], main.date);
+            var local_difference = difference(local_coords, main.brush.current_path);
+
+            if (local_difference) {
+              createHistoryFrame(mask_geometries[x].options.className, main.date, {}, local_difference);
+            } else {
+              hideEntity(mask_geometries[x].options.className, main.date);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      } else if (all_scope_keys[i] == "remove_brush_coords_outside_selected_polities") {
+        var mask_geometries = main.brush.masks[options.mask_type];
+        var mask_union;
+
+        for (var x = 0; x < mask_geometries.length; x++)
+          try {
+            var local_coords = getEntityCoords(mask_geometries[x], main.date);
+
+            mask_union = (x == 0) ?
+              local_coords : union(mask_union, local_coords);
+          } catch (e) {
+            console.log(e);
+          }
+
+        if (mask_union && main.brush.current_path)
+          geometry = intersection(main.brush.current_path, mask_union);
+      } else if (all_scope_keys[i] == "remove_selected_polities_from_brush_coords") {
+        var mask_geometries = main.brush.masks[options.mask_type];
+        var mask_union;
+
+        for (var x = 0; x < mask_geometries.length; x++)
+          try {
+            var local_coords = getEntityCoords(mask_geometries[x], main.date);
+
+            mask_union = (x == 0) ?
+              local_coords : union(mask_union, local_coords);
+          } catch (e) {
+            console.log(e);
+          }
+
+        if (mask_union && main.brush.current_path)
+          geometry = difference(main.brush.current_path, mask_union);
+      }
+    }
+
+    //Return statement
+    return geometry;
   }
 
-  function parseMaskEffect (arg0_mask_name) {
+  /*
+    processGeometryMasks() - Parses all masks currently in config.mask_types and applies each of them to the input geometry.
+    arg0_geometry: (Variable) - The geometry to input.
 
-  }
+    Returns: (Object, Maptalks)
+  */
+  function processGeometryMasks (arg0_geometry) {
+    //Convert from parameters
+    var geometry = arg0_geometry;
 
-  //parseMasks() - Parses all masks currently in config.mask_types and applies each of them to main.brush
-  function parseMasks () {
     //Declare local instance variables
     var all_mask_types_keys = Object.keys(config.mask_types);
 
     //Iterate over all_mask_types_keys and parse each effect
+    for (var i = 0; i < all_mask_types_keys.length; i++) {
+      var local_value = config.mask_types[all_mask_types_keys[i]];
+
+      if (local_value.effect)
+        if (main.brush.masks[all_mask_types_keys[i]])
+          if (main.brush.masks[all_mask_types_keys[i]].length > 0)
+            geometry = processGeometryMask(geometry, local_value.effect, {
+              mask_type: all_mask_types_keys[i]
+            });
+    }
+
+    //Return statement
+    return geometry;
   }
 
   function removeEntityMask (arg0_entity_id) {

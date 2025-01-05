@@ -34,7 +34,7 @@
       main.events.right_mouse = true;
     main.events.left_mouse = (!main.events.right_mouse);
   };
-  
+
   document.body.onmouseup = function (e) {
     main.events.mouse_pressed = false;
     main.events.right_mouse = false;

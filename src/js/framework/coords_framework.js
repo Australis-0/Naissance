@@ -206,11 +206,11 @@
     //Declare local instance variables
     var coord_type;
 
-    if (!format)
-      console.error(`getCoordsType() was fed an undefined format!`, format);
+    /*if (!format)
+      console.error(`getCoordsType() was fed an undefined format!`, format);*/
 
     //Check if type is GeoJSON
-    if (format._initHooksCalled && !format._latlngs && !format._symbolUpdated)
+    if (format._initHooksCalled && !format._latlngs && !format._symbolUpdated && !format._geometries)
       return "geojson";
 
     //Check if type is Leaflet
@@ -225,7 +225,7 @@
     }
 
     //Check if type is maptalks
-    if (format._symbolUpdated)
+    if (format._symbolUpdated || format._geometries)
       return "maptalks";
 
     //Check if type is naissance_history

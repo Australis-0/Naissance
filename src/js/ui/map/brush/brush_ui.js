@@ -90,7 +90,10 @@
         //Simplify processing
         if (brush_obj.auto_simplify_when_editing)
           if (brush_obj.current_path)
-            brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
+            try {
+              brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
+              brush_obj.current_path = processGeometryMasks(brush_obj.current_path);
+            } catch (e) {}
 
         //Set new poly now
         refreshBrush();

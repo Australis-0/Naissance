@@ -19,7 +19,7 @@ config.brush_actions.brush_options = {
         placeholder: {
           simplify_auto_simplify_when_editing: `BRUSH_OBJ.auto_simplify_when_editing`,
         },
-        x: 0,
+        x: 0, 
         y: 0
       },
       simplify_path: {
@@ -33,7 +33,7 @@ config.brush_actions.brush_options = {
           global_key: "BRUSH_OBJ.simplify_tolerance",
           min: 0,
           max: 100,
-          step: 0.001
+          step: 0.001 //This controls the resolution of control
         },
         placeholder: 0.05,
         value_equation: `VALUE/Math.pow(10, 3)`, //1 represents 0,001; 100 represents 0,1

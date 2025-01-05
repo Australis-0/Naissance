@@ -3,57 +3,29 @@ config.mask_types = {
     name: "Add (Brush > Mask)",
 
     effect: {
-      all_selected_polities: {
-        remove_coords: "brush"
-      }
+      remove_brush_coords_from_selected_polities: true
     }
   },
   intersect_add: {
     name: "Intersect Add (Brush > Intersection)",
 
     effect: {
-      brush: {
-        remove_coords: {
-          value: {
-            not: { //Remove any coords outside all_selected_polities from brush
-              coords: "all_selected_polities"
-            }
-          }
-        }
-      },
-      all_selected_polities: {
-        remove_coords: "brush"
-      }
+      remove_brush_coords_outside_selected_polities: true,
+      remove_brush_coords_from_selected_polities: true
     }
   },
   intersect_overlay: {
     name: "Intersect Overlay (Brush in Intersection)",
 
     effect: {
-      brush: {
-        remove_coords: {
-          value: {
-            not: { //Remove any coords outside all_selected_polities from brush
-              coords: "all_selected_polities"
-            }
-          }
-        }
-      }
+      remove_brush_coords_outside_selected_polities: true
     }
   },
   subtract: {
     name: "Subtract (Mask > Brush)",
 
     effect: {
-      brush: {
-        remove_coords: {
-          value: {
-            is: { //Remove any coords inside all_selected_polities from brush
-              coords: "all_selected_polities"
-            }
-          }
-        }
-      }
+      remove_selected_polities_from_brush_coords: true
     }
   }
 };

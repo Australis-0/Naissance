@@ -8,24 +8,27 @@
     //Declare local instance variables
     var brush_obj = main.brush;
 
-    processBrush();
     try {
-      //1. Initialise brush.current_path if not defined
+      //1. Initialise brush.current_path if not defined; process geometry masks
       if (!brush_obj.current_path)
         brush_obj.current_path = brush_obj.cursor;
-      //2. Cache intersection_polygon
+
+      //2. Make sure intersection_polygon is defined for delta_polygon use
       var intersection_polygon;
       try { intersection_polygon = intersection(brush_obj.current_path, polygon); } catch (e) {}
 
+      //3. Mark brush change and union with polygon
       brush_obj.brush_change = true;
-      //console.log(brush_obj.current_path);
       brush_obj.current_path = union(brush_obj.current_path, polygon);
 
-      var delta_polygon;
-      try { delta_polygon = difference(polygon, intersection_polygon); } catch (e) {}
+      //4. Refresh brush
       refreshBrush();
 
-      //3. Add to actions
+      //5. Add to actions
+      var delta_polygon;
+      if (polygon)
+        try { delta_polygon = difference(polygon, intersection_polygon); } catch (e) {}
+
       if (!do_not_add_to_undo_redo)
         performAction({
           action_id: "add_to_brush",
@@ -70,7 +73,6 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    processBrush();
 
     try {
       //1. Set delta_polygon if possible
