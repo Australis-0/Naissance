@@ -227,6 +227,9 @@
               local_element.onclick = function (e) {
                 parseEffect(group_id, local_value.effect, { event: e, timestamp: options.timestamp, ui_type: "group_actions" });
                 console.log(group_id, local_value.effect, { timestamp: options.timestamp, ui_type: "group_actions" });
+
+                //console.log(document.body);
+                //console.log(getEntityHierarchyElement("54814714446"));
               };
           }
         }

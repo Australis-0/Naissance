@@ -46,9 +46,6 @@
     //Declare local instance variables
     var brush_obj = main.brush;
 
-    //Clear brush; reload brush in masks
-    clearBrushInMasks();
-
     if (brush_obj.current_selection) {
       if (brush_obj.current_selection.options.className)
         for (var i = 0; i < config.mask_types.length; i++) {

@@ -17,7 +17,7 @@
     var entity_id = arg0_entity_id;
     var scope = (arg1_scope) ? arg1_scope : {};
     var options = (arg2_options) ? arg2_options : {};
-
+    
     //Initialise options
     if (options.depth == undefined) options.depth = 0;
       options.depth++;

@@ -32,6 +32,9 @@
             local_group.entities.splice(x, 1);
     }
 
+    //Remove entity from all masks
+    removeEntityMask(entity_id);
+
     //Remove entity
     for (var i = 0; i < main.entities.length; i++)
       if (main.entities[i].options.className == entity_id) {

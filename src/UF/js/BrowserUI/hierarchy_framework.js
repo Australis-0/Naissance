@@ -117,6 +117,8 @@
       id: (String)
       name: (String)
       parent_group: (String)
+
+      naissance_hierarchy: (Boolean)
   */
   function addEntity (arg0_hierarchy_id, arg1_options) {
     //Convert from parameters
@@ -128,12 +130,13 @@
     var new_entity = createEntity((options.name) ? options.name : "New Entity", options);
     var parent_el = (options.parent_group) ? hierarchy_el.querySelector(`.group[data-id="${options.parent_group}"]`) : hierarchy_el;
 
-    renderList(hierarchy_id, hierarchy_el, [new_entity]);
+    renderList(hierarchy_id, hierarchy_el, [new_entity], options);
 
-    if (options.parent_group) {
-      var entity_el = hierarchy_el.querySelector(`.entity[data-id="${options.id}"]`);
+    var entity_el = hierarchy_el.querySelector(`.entity[data-id="${options.id}"]`);
+
+    if (options.parent_group)
       insertEntityAtBottom(parent_el, entity_el);
-    }
+
     setupDragAndDrop();
   }
 
@@ -154,7 +157,7 @@
     var new_group = createGroup((options.name) ? options.name : "New Group", undefined, options);
     var parent_el = (options.parent_group) ? hierarchy_el.querySelector(`.group[data-id="${options.parent_group}"]`) : hierarchy_el;
 
-    renderList(hierarchy_id, parent_el, [new_group]);
+    renderList(hierarchy_id, parent_el, [new_group], options);
     try {
       insertGroupAtTop(parent_el, parent_el.lastChild);
     } catch (e) {
@@ -590,7 +593,9 @@
 
         addEntity(hierarchy_key, {
           id: all_ungrouped_entities[i],
-          name: local_entity.name
+          name: local_entity.name,
+
+          naissance_hierarchy: options.naissance_hierarchy
         });
         excluded_entities.push(all_ungrouped_entities[i]);
       }
@@ -615,18 +620,21 @@
         addEntity(hierarchy_key, {
           id: local_entity_id,
           name: local_entity_name,
-          parent_group: getEntityGroup(hierarchy_key, local_entity_id, { return_key: true })
+          parent_group: getEntityGroup(hierarchy_key, local_entity_id, { return_key: true }),
+
+          naissance_hierarchy: options.naissance_hierarchy
         });
         excluded_entities.push(local_entity_id);
       }
     }
   }
 
-  function renderList (arg0_hierarchy_id, arg1_parent_el, arg2_items) {
+  function renderList (arg0_hierarchy_id, arg1_parent_el, arg2_items, arg3_options) {
     //Convert from parameters
     var hierarchy_id = arg0_hierarchy_id;
     var parent_el = arg1_parent_el;
     var items = getList(arg2_items);
+    var options = (arg3_options) ? arg3_options : {};
 
     //Declare local instance variables
     var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
@@ -712,18 +720,19 @@
 
       //Naissance handling
       {
-        if (local_item.type == "group") {
-          var group_obj = hierarchy_obj.groups[local_item.id];
+        if (local_item.type == "entity")
+          if (options.naissance_hierarchy) {
+            var local_entity_obj = getEntity(local_item.id);
 
-          if (group_obj)
-            if (group_obj.mask)
-              local_div.className = `${local_div.className} ${group_obj.mask}`;
-        }
+            if (local_entity_obj)
+              if (local_entity_obj.options.mask)
+                local_div.setAttribute("class", `${local_div.getAttribute("class")} ${local_entity_obj.options.mask}`);
+          }
       }
 
       //Recursively render list
       if (local_item.type == "group")
-        renderList(hierarchy_id, local_div, local_item.children);
+        renderList(hierarchy_id, local_div, local_item.children, options);
     }
   }
 
