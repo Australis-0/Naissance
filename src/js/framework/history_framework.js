@@ -21,15 +21,12 @@
       if (!entity_obj.options.history) entity_obj.options.history = {};
 
       //Fetch actual coords
-      var actual_coords;
+      var actual_coords = coords;
 
-      if (!coords) {
+      if (!actual_coords)
         actual_coords = (old_history_entry) ?
           old_history_entry.coords :
           convertMaptalksCoordsToTurf(entity_obj)[0];
-      } else {
-        actual_coords = coords;
-      }
 
       //Create new history object
       if (!entity_obj.options.history[date_string])
@@ -153,11 +150,12 @@
 
     Returns: (Variable)
   */
-  function getEntityProperty (arg0_entity_id, arg1_date, arg2_property) {
+  function getEntityProperty (arg0_entity_id, arg1_date, arg2_property, arg3_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var date = (arg1_date) ? arg1_date : main.date;
     var property = arg2_property;
+    var options = (arg3_options) ? arg3_options : {};
 
     //Declare local instance variables
     var ending_timestamp = convertTimestampToInt(getTimestamp(date));
@@ -172,10 +170,17 @@
           for (var i = 0; i < all_history_entries.length; i++) {
             var local_history = entity_obj.options.history[all_history_entries[i]];
 
-            if (parseInt(local_history.id) <= ending_timestamp)
-              if (local_history.options)
-                if (local_history.options[property])
-                  entity_value = local_history.options[property];
+            if (!options.is_non_inclusive) {
+              if (parseInt(local_history.id) <= ending_timestamp)
+                if (local_history.options)
+                  if (local_history.options[property])
+                    entity_value = local_history.options[property];
+            } else {
+              if (parseInt(local_history.id) < ending_timestamp)
+                if (local_history.options)
+                  if (local_history.options[property])
+                    entity_value = local_history.options[property];
+            }
           }
 
           if (!entity_value)
@@ -338,13 +343,19 @@
     getEntityCoords() - Fetches an entity's current coordinates.
     arg0_entity_id: (String) - The entity ID for which to fetch the coordinates for.
     arg1_date: (Object, Date) - Optional. The date relative to which to fetch current .coords.
+    arg2_options: (Object)
+      is_non_inclusive: (Boolean) - Optional. Whether to include the end timestamp when searching for entity coords or not. False by default.
 
     Returns: (Array<Array<Number, Number>>)
   */
-  function getEntityCoords (arg0_entity_id, arg1_date) {
+  function getEntityCoords (arg0_entity_id, arg1_date, arg2_options) {
     //Convert from parameters
     var entity_id = arg0_entity_id;
     var date = (arg1_date) ? arg1_date : main.date;
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Guard clause if entity is hidden
+    if (isEntityHidden(entity_id)) return undefined;
 
     //Declare local instance variables
     var entity_obj = (typeof entity_id != "object") ? getEntity(entity_id) : entity_id;
@@ -353,6 +364,6 @@
     return entityHistoryHasProperty(entity_obj, date, function (local_history) {
       if (local_history.coords)
         return local_history.coords;
-    });
+    }, options);
   }
 }

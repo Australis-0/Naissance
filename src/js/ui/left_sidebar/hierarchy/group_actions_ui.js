@@ -220,6 +220,40 @@
               //Date
               if (local_value.type == "date")
                 populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+
+              //Special Group handling
+              //Group Mask
+              if (local_value.attributes)
+                if (local_value.attributes.global_key == "GROUP_OBJ.mask_select") {
+                  var all_mask_types_keys = Object.keys(config.mask_types);
+                  var all_option_els = [];
+                  var local_select_el = local_element.querySelector("select");
+
+                  for (var x = 0; x < all_mask_types_keys.length; x++) {
+                    var local_mask = config.mask_types[all_mask_types_keys[x]];
+                    var local_option_el = document.createElement("option");
+
+                    local_option_el.setAttribute("value", all_mask_types_keys[x]);
+                    local_option_el.innerHTML = (local_mask.name) ? local_mask.name : all_mask_types_keys[x];
+
+                    //Push local_option_el into current all_option_els
+                    all_option_els.push(local_option_el);
+                  }
+
+                  //Set local_element
+                  local_select_el.innerHTML = "";
+                  for (var x = 0; x < all_option_els.length; x++)
+                    local_select_el.appendChild(all_option_els[x]);
+
+                  //Set actual placeholder
+                  var current_group_mask = getGroupMask(group_obj.id);
+
+                  if (current_group_mask) {
+                    local_select_el.value = current_group_mask;
+                  } else {
+                    local_select_el.value = "clear";
+                  }
+                }
             }
 
             //Parse .effect to .onclick event handler

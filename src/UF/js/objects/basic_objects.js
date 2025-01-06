@@ -105,18 +105,24 @@
     arg2_object: (Object)
     arg3_key: (String)
     arg4_interval: (Number) - Optional. 100 by default.
+    arg5_options: (Object)
+      cleanup_function: (Function)
   */
-  function equateObject (arg0_object, arg1_key, arg2_object, arg3_key, arg4_interval) {
+  function equateObject (arg0_object, arg1_key, arg2_object, arg3_key, arg4_interval, arg5_options) {
     //Convert from parameters
     var object = arg0_object;
     var key = arg1_key;
     var ot_object = arg2_object;
     var ot_key = arg3_key;
     var interval = (arg4_interval) ? arg4_interval : 100;
+    var options = (arg5_options) ? arg5_options : {};
 
     //Return statement; set interval
     return setInterval(function(object, key, ot_object, ot_key){
       object[key] = ot_object[ot_key];
+      
+      if (options.cleanup_function)
+        options.cleanup_function();
     }, interval, object, key, ot_object, ot_key, interval);
   }
 

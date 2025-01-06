@@ -35,7 +35,7 @@ window.path = require("path");
     current_path: undefined, //The raw path currently being edited.
     editing_entity: undefined, //The entity ID currently being edited
     entity_options: {}, //Used to store the options of the entity selected.
-    
+
     simplify_tolerance: 0.005, //The current simplify tolerance for brushes.
 
     //Brush settings

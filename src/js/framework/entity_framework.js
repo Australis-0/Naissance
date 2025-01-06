@@ -211,6 +211,15 @@
       var new_entity_obj = createPolygon(brush_obj.current_path, new_entity.options);
       main.entities.push(new_entity_obj);
       renameEntity(entity_id, entity_name, main.date);
+
+      //Assign to current main.brush.selected_group_id if valid
+      if (main.brush.selected_group_id) {
+        var group_obj = getGroup("hierarchy", main.brush.selected_group_id);
+
+        if (!group_obj.entities) group_obj.entities = [];
+        if (brush_obj.entity_options)
+          group_obj.entities.push(brush_obj.entity_options.className);
+      }
     } else {
       if (brush_obj.entity_options) //If is old entity, edit the extant polygon and reload date
         if (brush_obj.entity_options.className) {
@@ -644,6 +653,28 @@
           if (local_checkbox_el) local_checkbox_el.remove();
         }
       }
+    }
+  }
+
+  /*
+    setEntityCoords() - Sets current entity coords.
+    arg0_entity_id: (String) - The entity ID to set coords for.
+    arg1_coords: (Array<Array<Number, Number>>) - The coords to set.
+    arg2_date: (Object, Date) - Optional. The date to set coords at.
+  */
+  function setEntityCoords (arg0_entity_id, arg1_coords, arg2_date) {
+    //Convert from parameters
+    var entity_id = arg0_entity_id;
+    var coords = arg1_coords;
+    var date = (arg2_date) ? arg2_date : main.date;
+
+    //Set coords
+    if (coords) {
+      var entity_obj = getEntity(entity_id);
+
+      createHistoryFrame(entity_id, date, {}, coords);
+    } else {
+      hideEntity(entity_id, date);
     }
   }
 

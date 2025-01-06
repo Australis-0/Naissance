@@ -27,5 +27,8 @@ config.mask_types = {
     effect: {
       remove_selected_polities_from_brush_coords: true
     }
+  },
+  clear: {
+    name: "No Mask"
   }
 };

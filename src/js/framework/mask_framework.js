@@ -103,14 +103,11 @@
 
         for (var x = 0; x < mask_geometries.length; x++) {
           try {
-            var local_coords = getEntityCoords(mask_geometries[x], main.date);
+            var local_coords = getEntityCoords(mask_geometries[x].options.className, main.date, { is_non_inclusive: true });
+
             var local_difference = difference(local_coords, main.brush.current_path);
 
-            if (local_difference) {
-              createHistoryFrame(mask_geometries[x].options.className, main.date, {}, local_difference);
-            } else {
-              hideEntity(mask_geometries[x].options.className, main.date);
-            }
+            setEntityCoords(mask_geometries[x].options.className, local_difference);
           } catch (e) {
             console.log(e);
           }
@@ -204,14 +201,17 @@
       var local_mask = brush_obj.masks[all_mask_types_keys[i]];
 
       //Remove entity_id from mask
-      for (var x = local_mask.length - 1; x >= 0; x--) {
-        var local_entity = local_mask[x];
+      if (local_mask)
+        if (Array.isArray(local_mask))
+          if (local_mask.length > 0)
+            for (var x = local_mask.length - 1; x >= 0; x--) {
+              var local_entity = local_mask[x];
 
-        if (local_entity.options.className == entity_id) {
-          delete local_entity.options.mask;
-          local_mask.splice(x, 1);
-        }
-      }
+              if (local_entity.options.className == entity_id) {
+                delete local_entity.options.mask;
+                local_mask.splice(x, 1);
+              }
+            }
     }
   }
 

@@ -43,11 +43,11 @@
         maptalks_polygon.options = dumbMergeObjects(maptalks_polygon.options, old_options);
       } else {
         maptalks_polygon = new maptalks.GeoJSON.toGeometry(new L.Polygon(flipCoordinates(coords)).toGeoJSON(), (geometry) => {
-          geometry.config("symbol", options);
           if (!options.do_not_display)
             geometry.addTo(main.entity_layer);
           geometry.options = dumbMergeObjects(maptalks_polygon.options, old_options);
         });
+        maptalks_polygon.setSymbol(options);
       }
     } catch (e) {
       maptalks_polygon = createPolygonFallback(coords, options);

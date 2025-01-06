@@ -14,7 +14,7 @@ config.group_actions.group_masks = {
         type: "select",
 
         attributes: {
-          global_key: "GROUP_OBJ.mask"
+          global_key: "GROUP_OBJ.mask_select"
         },
         options: {
           add: "Add (Brush > Mask)",

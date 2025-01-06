@@ -97,6 +97,7 @@
 
         //Set new poly now
         refreshBrush();
+        loadDate(); //Reload all polygons after applying masks
       }
 
       //Set brush_obj.brush_change to false to avoid repeat processing

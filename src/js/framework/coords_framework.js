@@ -107,7 +107,34 @@
     //Guard clause if format_type is already Maptalks
     if (format_type == "maptalks") return format;
 
-    var maptalks_coords = maptalks.GeoJSON.toGeometry(convertToGeoJSON(format)).getCoordinates();
+    if (format_type === "geojson") {
+      var geojson_geometry = (format.geometry || format); //Support both Feature and Geometry
+      maptalks_coords = maptalks.GeoJSON.toGeometry(geojson_geometry).getCoordinates();
+    } else if (format_type === "leaflet") {
+      maptalks_coords = convertLeafletCoordsToMaptalks(format);
+    } else if (format_type === "leaflet_non_poly") {
+      maptalks_coords = convertLeafletCoordsToMaptalks(format._latlngs);
+    } else if (format_type === "naissance") {
+      var geojson_coords = convertCoordsToGeoJSON(format);
+      maptalks_coords = maptalks.GeoJSON.toGeometry({
+        type: "Polygon",
+        coordinates: geojson_coords,
+      }).getCoordinates();
+    } else if (format_type === "turf") {
+      var geojson_obj = getTurfObject(format);
+      maptalks_coords = maptalks.GeoJSON.toGeometry(geojson_obj.geometry).getCoordinates();
+    } else if (format_type === "turf_object") {
+      maptalks_coords = maptalks.GeoJSON.toGeometry(format.geometry).getCoordinates();
+    } else if (format_type === "naissance_history") {
+      var geojson_coords = convertCoordsToGeoJSON(format.coords);
+      maptalks_coords = maptalks.GeoJSON.toGeometry({
+        type: "Polygon",
+        coordinates: geojson_coords,
+      }).getCoordinates();
+    } else {
+      console.error("Unknown coordinate format type:", format);
+      throw new Error("Unsupported format for conversion to Maptalks.");
+    }
 
     //Return statement
     return maptalks_coords;

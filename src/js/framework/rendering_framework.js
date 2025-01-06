@@ -77,7 +77,9 @@
           }
 
         if (!options.exclude_selection)
-          rendering_order.push(selected_id);
+          //Make sure brush_obj.editing_entity is defined before pushing
+          if (brush_obj.editing_entity)
+            rendering_order.push(selected_id);
       }
     }
 
