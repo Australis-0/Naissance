@@ -271,8 +271,8 @@
     group_actions_anchor_el.setAttribute("timestamp", timestamp);
     printGroupActionsContextMenu(group_id, group_actions_navigation_obj);
 
-    //Set main.cache.selected_group_id
-    main.cache.selected_group_id = group_id;
+    //Set main.brush.selected_group_id
+    main.brush.selected_group_id = group_id;
   }
 
   function printGroupActionsNavigationMenuHandler (arg0_hierarchy_key, arg1_group_id) {

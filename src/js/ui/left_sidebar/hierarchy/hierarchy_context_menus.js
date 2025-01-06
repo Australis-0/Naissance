@@ -23,8 +23,8 @@
     var group_id = arg1_group_id;
     var options = (arg2_options) ? arg2_options : {};
 
-    //Initialise main.cache.selected_group_id
-    main.cache.selected_group_id = group_id;
+    //Initialise main.brush.selected_group_id
+    main.brush.selected_group_id = group_id;
 
     //Declare local instance variables
     var context_menu_el = document.querySelector(`#${hierarchy_key}-context-menu`);

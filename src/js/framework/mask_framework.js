@@ -50,6 +50,36 @@
   }
 
   /*
+    getGroupMask() - Returns the given mask of a group. Undefined for none.
+    arg0_group_id: (String) - The group ID to return the mask for.
+
+    Returns: (String)
+  */
+  function getGroupMask (arg0_group_id) {
+    //Convert from parameters
+    var group_id = arg0_group_id;
+
+    //Declare local instance variables
+    var has_entity_without_first_mask = false;
+    var first_mask;
+    var group_obj = getGroup("hierarchy", group_id);
+
+    if (group_obj) {
+      var all_selected_entities = getGroupEntities("hierarchy", group_obj.id, { surface_layer: true });
+
+      for (var i = 0; i < all_selected_entities.length; i++) {
+        if (!first_mask)
+          first_mask = all_selected_entities[i].options.mask;
+        if (all_selected_entities[i].options.mask != first_mask)
+          has_entity_without_first_mask;
+      }
+    }
+
+    //Return statement
+    return (!has_entity_without_first_mask) ? first_mask : undefined;
+  }
+
+  /*
     processGeometryMask() - Processes a given geometry mask.
     arg0_geometry: (Variable) - The geometry to input.
     arg2_options: (Object)

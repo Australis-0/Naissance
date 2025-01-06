@@ -13,6 +13,9 @@ config.group_actions.group_masks = {
         name: "Group Mask:",
         type: "select",
 
+        attributes: {
+          global_key: "GROUP_OBJ.mask"
+        },
         options: {
           add: "Add (Brush > Mask)",
           intersect_add: "Intersect Add (Brush > Intersection)",

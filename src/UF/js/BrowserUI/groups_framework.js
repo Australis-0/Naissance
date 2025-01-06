@@ -42,7 +42,7 @@
         all_first_layer_groups[all_first_layer_groups.length - 1].after(group_el) :
         (all_first_layer_entities.length > 0) ?
           all_first_layer_entities[0].before(group_el) :
-          selected_layer_el.append(group_el);
+          all_first_layer_entities[0].append(group_el);
     } else {
       //Assign to subgroups element
       var subgroups_el = sidebar_el.querySelector(`[id='${parent_group_id}-subgroups']`);
@@ -306,7 +306,8 @@
     if (group_obj.subgroups)
       for (var i = 0; i < group_obj.subgroups.length; i++)
         //Call function recursively
-        entity_array = appendArrays(entity_array, getGroupEntities(hierarchy_key, group_obj.subgroups[i], options));
+        if (!options.surface_layer)
+          entity_array = appendArrays(entity_array, getGroupEntities(hierarchy_key, group_obj.subgroups[i], options));
 
     //Return statement
     return entity_array;

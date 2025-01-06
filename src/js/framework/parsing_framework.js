@@ -17,7 +17,7 @@
     var entity_id = arg0_entity_id;
     var scope = (arg1_scope) ? arg1_scope : {};
     var options = (arg2_options) ? arg2_options : {};
-    
+
     //Initialise options
     if (options.depth == undefined) options.depth = 0;
       options.depth++;
@@ -53,7 +53,7 @@
 
         options.options = dumbMergeObjects(actions_input_obj, keyframe_input_obj);
       } else if (options.ui_type == "group_actions") {
-        group_actions_el = getGroupActionsAnchorElement(main.cache.selected_group_id);
+        group_actions_el = getGroupActionsAnchorElement(main.brush.selected_group_id);
         group_actions_input_obj = getInputsAsObject(group_actions_el);
 
         options.options = group_actions_input_obj;
@@ -151,7 +151,7 @@
             if (typeof local_value[0] == "object") {
               setGroupMask(local_value[0].group_id, local_value[0].value);
             } else {
-              setGroupMask(main.cache.selected_group_id, local_value[0]);
+              setGroupMask(main.brush.selected_group_id, local_value[0]);
             }
 
           //History effects
@@ -274,7 +274,7 @@
                 if (local_group_action.immediate)
                   parsed_immediate = parseEffect(undefined, local_group_action.immediate, new_options);
                 if (local_group_action)
-                  printGroupActionsContextMenu(main.cache.selected_group_id, local_group_action, new_options);
+                  printGroupActionsContextMenu(main.brush.selected_group_id, local_group_action, new_options);
               }
             }
           if (["refresh_entity_actions", "reload_entity_actions"].includes(all_scope_keys[i]))
@@ -404,7 +404,7 @@
     if (!options.MAIN_OBJ) options.MAIN_OBJ = "global.main";
 
     //'hierarchies' handler
-    var group_id = main.cache.selected_group_id;
+    var group_id = main.brush.selected_group_id;
 
     if (group_id) {
       var group_el = getGroupElement(group_id);
