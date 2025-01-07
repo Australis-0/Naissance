@@ -309,6 +309,11 @@
     main.brush.selected_group_id = group_id;
   }
 
+  /*
+    printGroupActionsNavigationMenuHandler() - Helper function. Provides the main interface through which printGroupActionsNavigationMenu() is invoked.
+    arg0_hierarchy_key: (String) - The hierarchy key to populate group actions UIs for.
+    arg1_group_id: (String) - The group ID for which to print the handdler.
+  */
   function printGroupActionsNavigationMenuHandler (arg0_hierarchy_key, arg1_group_id) {
     //Convert from parameters
     var hierarchy_key = arg0_hierarchy_key;
@@ -319,7 +324,7 @@
     var parent_el = document.querySelector(`.group[data-id="${group_id}"]`)
       .querySelector(common_selectors.group_actions_context_menu_anchor);
 
-    //Invoke printGroupActionsNavigationMenu
+    //Invoke printGroupActionsNavigationMenu()
     printGroupActionsNavigationMenu(group_id, parent_el);
   }
 

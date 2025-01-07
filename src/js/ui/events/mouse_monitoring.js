@@ -40,8 +40,5 @@
     main.events.right_mouse = false;
 
     map.config("draggable", true);
-
-    //Process brush
-    processBrush();
   };
 }

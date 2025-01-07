@@ -178,7 +178,10 @@
   }
 
   //finishEntity() - Finishes an entity's editing process.
-  function finishEntity () {
+  function finishEntity (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
     //Declare local instance variables
     var brush_obj = main.brush;
     var coords = convertToNaissance(brush_obj.current_path);
@@ -229,8 +232,10 @@
     }
 
     //Clear brush and reload date
-    clearBrush();
-    loadDate();
+    if (!options.do_not_reload) {
+      clearBrush();
+      loadDate();
+    }
 
     //Return statement
     return entity_id;
@@ -516,6 +521,11 @@
       var entity_actions_el = getEntityActionsAnchorElement(entity_id);
       var entity_actions_ui = printEntityActionsNavigationMenu(entity_id, entity_actions_el);
     }, 1);
+  }
+
+  function reloadEntitiesArray () {
+    //Run a simple call to loadDate().
+    loadDate(undefined, { reload_map: true });
   }
 
   /*

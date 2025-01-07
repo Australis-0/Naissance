@@ -41,8 +41,7 @@
           }
 
           brush_obj.brush_change = true;
-          addToBrush(brush_obj.cursor);
-          brush_obj.current_path = union(brush_obj.current_path, brush_obj.cursor);
+          brush_obj.current_path = union(brush_obj.current_path, addToBrush(brush_obj.cursor));
         } else if (main.events.right_mouse) {
           //Only delete if brush_obj.current_path exists
           if (brush_obj.current_path)
@@ -77,7 +76,10 @@
     });
   }
 
-  function processBrush () {
+  function processBrush (arg0_polygon) {
+    //Convert from parameters
+    var polygon = arg0_polygon;
+
     //Declare local instance variables
     var brush_obj = main.brush;
     var selected_id = "";
@@ -91,18 +93,21 @@
         if (brush_obj.auto_simplify_when_editing)
           if (brush_obj.current_path)
             try {
-              brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
-              brush_obj.current_path = processGeometryMasks(brush_obj.current_path);
+              polygon = simplify(polygon, brush_obj.simplify_tolerance);
+              polygon = processGeometryMasks(polygon);
             } catch (e) {}
 
         //Set new poly now
         refreshBrush();
-        loadDate(); //Reload all polygons after applying masks
+        reloadEntitiesArray();
       }
 
       //Set brush_obj.brush_change to false to avoid repeat processing
       brush_obj.brush_change = false;
     }
+
+    //Return statement
+    return polygon;
   }
 
   function refreshBrush () {

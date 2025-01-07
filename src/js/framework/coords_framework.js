@@ -406,14 +406,15 @@
 
     //Recursively validate coordinates
     //Return statement
-    return coords_array.every((coords) => {
-      if (Array.isArray(coords[0])) {
-        //If it's a nested array, recurse
-        return validateCoordinates(coords);
-      } else {
-        //Otherwise, validate the coordinate pair
-        return isValidCoordinate(coords);
-      }
-    });
+    if (Array.isArray(coords_array))
+      return coords_array.every((coords) => {
+        if (Array.isArray(coords[0])) {
+          //If it's a nested array, recurse
+          return validateCoordinates(coords);
+        } else {
+          //Otherwise, validate the coordinate pair
+          return isValidCoordinate(coords);
+        }
+      });
   }
 }

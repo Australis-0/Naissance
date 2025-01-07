@@ -12,9 +12,10 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
 //Date load functions
 {
-  function loadDate (arg0_old_date) {
+  function loadDate (arg0_old_date, arg1_options) {
     //Convert from parameters
     var old_date = arg0_old_date;
+    var options = (arg1_options) ? arg1_options : {};
 
     //Declare local instance variables
     var brush_obj = main.brush;
@@ -30,7 +31,8 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
       let local_history = getAbsoluteHistoryFrame(local_entity_id, main.date);
 
       //Reload object; add to map
-      if (local_history) {
+      if (brush_obj.editing_entity != local_entity_id || !options.reload_map)
+        if (local_history) {
         //Update UIs for each open popup
         let local_popup = document.querySelector(`.leaflet-popup[class~="${local_entity_id}"]`);
 
@@ -68,8 +70,9 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
             }
 
             //If this is the current selected polity, re-add cursor
-            if (brush_obj.editing_entity == local_entity_id)
-              clearBrush();
+            if (!options.reload_map)
+              if (brush_obj.editing_entity == local_entity_id)
+                clearBrush();
           }
         }
       }
