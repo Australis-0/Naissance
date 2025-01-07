@@ -10,8 +10,6 @@
 
     try {
       //1. Initialise brush.current_path if not defined; process geometry masks
-      if (!brush_obj.current_path)
-        brush_obj.current_path = brush_obj.cursor;
       polygon = processBrush(polygon);
 
       //2. Make sure intersection_polygon is defined for delta_polygon use

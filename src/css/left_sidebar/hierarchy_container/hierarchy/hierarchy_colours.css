@@ -50,6 +50,9 @@
 .group {
   background-color: var(--group-colour);
 }
+.entity.selected, .group.selected {
+  font-weight: 700;
+}
   .entity.add {
     background-color: color-mix(in srgb, rgb(160, 200, 150), var(--entity-colour));
   }

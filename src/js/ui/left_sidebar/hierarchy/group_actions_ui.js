@@ -306,7 +306,7 @@
     printGroupActionsContextMenu(group_id, group_actions_navigation_obj);
 
     //Set main.brush.selected_group_id
-    main.brush.selected_group_id = group_id;
+    selectGroup(group_id);
   }
 
   /*

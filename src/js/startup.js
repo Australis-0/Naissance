@@ -183,6 +183,9 @@ setTimeout(function(){
   main.previous_hierarchy_html = hierarchy_el.innerHTML;
 
   //Sync groups
+  setInterval(function(){
+    refreshHierarchy({ do_not_reload: true });
+  }, 100);
   setInterval(function() {
     if (main.previous_hierarchy_html != hierarchy_el.innerHTML) {
       var exported_hierarchies = exportHierarchies({ naissance_hierarchy: "hierarchy" });

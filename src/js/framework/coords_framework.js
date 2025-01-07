@@ -67,6 +67,8 @@
           if (all_layers.length > 0)
             leaflet_coords = format._layers[all_layers[0]]._latlngs;
         }
+      } else if (format_type == "maptalks") {
+        leaflet_coords = convertToLeaflet(convertToGeoJSON(format));
       } else if (format_type == "naissance") {
         var temp_polygon = L.polygon(format);
 

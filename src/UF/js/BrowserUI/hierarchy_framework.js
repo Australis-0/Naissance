@@ -636,15 +636,19 @@
     var items = getList(arg2_items);
     var options = (arg3_options) ? arg3_options : {};
 
+    //Initialise options
+    options.depth = returnSafeNumber(options.depth);
+
     //Declare local instance variables
+    var hierarchy_el = document.querySelector(`#${hierarchy_id}`);
     var hierarchy_key = getHierarchyFromID(hierarchy_id, { return_key: true });
     var hierarchy_obj = main.hierarchies[hierarchy_key];
     var hierarchy_options = main.hierarchy_options[hierarchy_key];
 
     //Iterate over all items
     for (var i = 0; i < items.length; i++) {
-      var local_div = document.createElement("div");
-      var local_item = items[i];
+      let local_div = document.createElement("div");
+      let local_item = items[i];
 
       local_div.className = local_item.type;
       local_div.draggable = true;
@@ -718,21 +722,12 @@
         console.log(e)
       }
 
-      //Naissance handling
-      {
-        if (local_item.type == "entity")
-          if (options.naissance_hierarchy) {
-            var local_entity_obj = getEntity(local_item.id);
-
-            if (local_entity_obj)
-              if (local_entity_obj.options.mask)
-                local_div.setAttribute("class", `${local_div.getAttribute("class")} ${local_entity_obj.options.mask}`);
-          }
-      }
-
       //Recursively render list
-      if (local_item.type == "group")
-        renderList(hierarchy_id, local_div, local_item.children, options);
+      if (local_item.type == "group") {
+        var new_options = JSON.parse(JSON.stringify(options));
+          new_options.depth++;
+        renderList(hierarchy_id, local_div, local_item.children, new_options);
+      }
     }
   }
 
