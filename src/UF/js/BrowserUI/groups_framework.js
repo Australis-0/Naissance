@@ -282,6 +282,8 @@
     arg0_hierarchy_key: (String) - Optional. 'hierarchy' by default.
     arg1_group_id: (String)
     arg2_options: (Object)
+      depth: (Number) - Optional. The current depth level. Optimisation parameter.
+      first_order_layer: (Boolean) - Whether to only fetch entities located at depth 0 or depth 1 groups
       return_keys: (Boolean) - Optional. Whether to return keys. False by default
       surface_layer: (Boolean) - Optional. Whether to only get surface layer entities. False by default
 
@@ -293,21 +295,34 @@
     var group_id = arg1_group_id;
     var options = (arg2_options) ? arg2_options : {};
 
+    //Intialise options
+    options.depth = returnSafeNumber(options.depth);
+
     //Declare local instance variables
     var entity_array = [];
     var group_obj = getGroup(hierarchy_key, group_id);
+    var is_finishing_group = false;
 
-    if (group_obj.entities)
+    if (group_obj.entities) {
+      if (group_obj.entities.length > 0)
+        is_finishing_group = true;
+
       for (var i = 0; i < group_obj.entities.length; i++) {
         var local_entity = getEntity(group_obj.entities[i]);
 
         entity_array.push((!options.return_keys) ? local_entity : local_entity.options.className);
       }
+    }
     if (group_obj.subgroups)
-      for (var i = 0; i < group_obj.subgroups.length; i++)
-        //Call function recursively
-        if (!options.surface_layer)
-          entity_array = appendArrays(entity_array, getGroupEntities(hierarchy_key, group_obj.subgroups[i], options));
+      if (!options.first_order_layer || (options.first_order_layer && !is_finishing_group))
+        for (var i = 0; i < group_obj.subgroups.length; i++)
+          //Call function recursively
+          if (!options.surface_layer) {
+            var new_options = JSON.parse(JSON.stringify(options));
+              new_options.depth++;
+
+            entity_array = appendArrays(entity_array, getGroupEntities(hierarchy_key, group_obj.subgroups[i], new_options));
+          }
 
     //Return statement
     return entity_array;

@@ -59,6 +59,9 @@ option {
 
   /* -- Left Sidebar -- */
   --left-sidebar-width: calc(min(40rem, 25vw));
+    /* -- Group/Entity colour scheme -- */
+    --entity-colour: #fff9c4;
+    --group-colour: #e1f5fe;
 
   /* -- Map -- */
     /* -- 0. Entity UI: General -- */

@@ -2,6 +2,10 @@
 {
   /*
     getGroupRenderingOrder() - Fetches the group rendering order.
+    arg0_group_obj: (Object) - The group to fetch the rendering order for.
+    arg1_rendering_order: (Array<String>) - Optional. The cached rendering order to store between recursive iterations.
+
+    Returns: (Array<String>)
   */
   function getGroupRenderingOrder (arg0_group_obj, arg1_rendering_order) {
     //Convert from parameters
@@ -34,6 +38,8 @@
     arg0_options: (Object)
       exclude_selection: (Boolean), - Whether to exclude the selected ID. False by default.
       return_objects: (Boolean) - Whether to return entity objects instead. False by default.
+
+    Returns: (String)
   */
   function getHierarchyRenderingOrder (arg0_options) {
     //Convert from parameters

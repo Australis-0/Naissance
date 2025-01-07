@@ -13,7 +13,7 @@
   pointer-events: all;
 }
 
-/* -- Hierarchy Styling-- */
+/* -- Hierarchy Styling -- */
 .hierarchy-body-container {
   margin-left: 15px;
   margin-top: 15px;
@@ -91,68 +91,4 @@
   .controls + * {
     margin-top: 2rem; /* Add margin under .controls */
   }
-}
-.group, .entity {
-  margin-bottom: 0.1rem;
-  margin-top: 0.1rem;
-  padding-left: 10px;
-
-  border: 1px solid rgb(150, 150, 150);
-  background-color: white;
-  font-family: "Barlow";
-  font-weight: 300;
-  font-size: 1rem;
-
-  cursor: pointer;
-  overflow: hidden;
-  white-space: nowrap;
-
-  /* -- Group styling -- */
-  .add, .add *:is(.group, .entity) {
-    background-color: rgba(60, 240, 60, 0.3);
-  }
-  .intersect_add, .intersect_add *:is(.group, .entity) {
-    background-color: rgba(235, 220, 50, 0.3);
-  }
-  .intersect_overlay, .intersect_overlay *:is(.group, .entity) {
-    background-color: rgba(60, 60, 240, 0.3);
-  }
-  .subtract, .subtract *:is(.group, .entity) {
-    background-color: rgba(240, 60, 60, 0.3);
-  }
-
-  .interaction-container {
-    float: right;
-    margin-right: 0.5rem;
-    vertical-align: middle;
-    width: 4rem;
-
-    .context-menu-button {
-      height: 1rem;
-      width: 1rem;
-    }
-    .context-menu-button, .delete-button {
-      vertical-align: middle;
-    }
-  }
-
-  .item-name {
-    display: inline-block;
-    max-width: calc(100% - 4.5rem);
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-.group input, .entity input {
-  background-color: rgba(0, 0, 0, 0);
-  color: black;
-  max-width: 95%;
-  width: 95%;
-}
-
-.entity {
-  background-color: #fff9c4;
-}
-.group {
-  background-color: #e1f5fe;
 }

@@ -65,13 +65,15 @@
     var group_obj = getGroup("hierarchy", group_id);
 
     if (group_obj) {
-      var all_selected_entities = getGroupEntities("hierarchy", group_obj.id, { surface_layer: true });
+      var all_selected_entities = getGroupEntities("hierarchy", group_obj.id, { first_order_layer: true });
 
       for (var i = 0; i < all_selected_entities.length; i++) {
         if (!first_mask)
           first_mask = all_selected_entities[i].options.mask;
-        if (all_selected_entities[i].options.mask != first_mask)
-          has_entity_without_first_mask;
+        if (!all_selected_entities[i].options.mask || all_selected_entities[i].options.mask != first_mask) {
+          has_entity_without_first_mask = true;
+          break;
+        }
       }
     }
 
@@ -105,7 +107,7 @@
           try {
             var local_coords = getEntityCoords(mask_geometries[x].options.className, main.date, { is_non_inclusive: true });
 
-            var local_difference = difference(local_coords, main.brush.current_path);
+            var local_difference = difference(local_coords, geometry);
 
             setEntityCoords(mask_geometries[x].options.className, local_difference);
           } catch (e) {
@@ -127,7 +129,7 @@
           }
 
         if (mask_union && main.brush.current_path)
-          geometry = intersection(main.brush.current_path, mask_union);
+          geometry = intersection(geometry, mask_union);
       } else if (all_scope_keys[i] == "remove_selected_polities_from_brush_coords") {
         var mask_geometries = main.brush.masks[options.mask_type];
         var mask_union;
@@ -143,7 +145,7 @@
           }
 
         if (mask_union && main.brush.current_path)
-          geometry = difference(main.brush.current_path, mask_union);
+          geometry = difference(geometry, mask_union);
       }
     }
 
@@ -165,15 +167,20 @@
     var all_mask_types_keys = Object.keys(config.mask_types);
 
     //Iterate over all_mask_types_keys and parse each effect
-    for (var i = 0; i < all_mask_types_keys.length; i++) {
-      var local_value = config.mask_types[all_mask_types_keys[i]];
+    for (let i = 0; i < all_mask_types_keys.length; i++) {
+      let local_value = config.mask_types[all_mask_types_keys[i]];
 
       if (local_value.effect)
         if (main.brush.masks[all_mask_types_keys[i]])
           if (main.brush.masks[all_mask_types_keys[i]].length > 0)
-            geometry = processGeometryMask(geometry, local_value.effect, {
-              mask_type: all_mask_types_keys[i]
-            });
+            if (local_value.effect)
+              try {
+                geometry = processGeometryMask(geometry, local_value.effect, {
+                  mask_type: all_mask_types_keys[i]
+                });
+              } catch (e) {
+                console.log(e);
+              }
     }
 
     //Return statement
@@ -209,6 +216,7 @@
 
               if (local_entity.options.className == entity_id) {
                 delete local_entity.options.mask;
+                delete entity_obj.options.mask;
                 local_mask.splice(x, 1);
               }
             }
@@ -231,6 +239,7 @@
     //Edit class display
     if (group_obj) {
       var all_selected_entities = getGroupEntities("hierarchy", group_obj.id);
+      console.log("Called removeGroupMask() on:", group_id);
 
       for (var i = 0; i < all_selected_entities.length; i++)
         removeEntityMask(all_selected_entities[i]);

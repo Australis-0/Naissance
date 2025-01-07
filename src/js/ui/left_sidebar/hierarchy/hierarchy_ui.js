@@ -130,6 +130,23 @@
   }
 
   function refreshHierarchy () {
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies.hierarchy;
+
     renderHierarchy("hierarchy", { naissance_hierarchy: true });
+
+    //Iterate over all groups in main.hierarchies.hierarchy.groups
+    var all_group_keys = Object.keys(hierarchy_obj.groups);
+
+    for (var i = 0; i < all_group_keys.length; i++) {
+      var local_group = hierarchy_obj.groups[all_group_keys[i]];
+      var local_group_mask = getGroupMask(all_group_keys[i]);
+      
+      if (local_group_mask) {
+        var local_group_el = getGroupElement(all_group_keys[i]);
+
+        local_group_el.setAttribute("class", `${local_group_el.getAttribute("class")} ${local_group_mask}`);
+      }
+    }
   }
 }
