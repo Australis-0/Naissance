@@ -41,6 +41,8 @@
           }
 
           brush_obj.brush_change = true;
+          if (!brush_obj.only_simplify_brush)
+            brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
           brush_obj.current_path = union(brush_obj.current_path, addToBrush(brush_obj.cursor));
         } else if (main.events.right_mouse) {
           //Only delete if brush_obj.current_path exists
@@ -93,9 +95,12 @@
         if (brush_obj.auto_simplify_when_editing)
           if (brush_obj.current_path)
             try {
-              polygon = simplify(polygon, brush_obj.simplify_tolerance);
-              polygon = processGeometryMasks(polygon);
+              if (brush_obj.only_simplify_brush)
+                polygon = simplify(polygon, brush_obj.simplify_tolerance);
             } catch (e) {}
+        try {
+          polygon = processGeometryMasks(polygon);
+        } catch (e) {}
 
         //Set new poly now
         refreshBrush();

@@ -107,6 +107,21 @@
     delete global.simplify_auto_simplify_when_editing;
   }
 
+  function setBrushOnlySimplifyBrush (arg0_only_simplify_brush) {
+    //Convert from parameters
+    var only_simplify_brush = arg0_only_simplify_brush;
+
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
+    //Set actual brush_obj.only_simplify_brush
+    if (only_simplify_brush) {
+      brush_obj.only_simplify_brush = true;
+    } else {
+      delete brush_obj.only_simplify_brush;
+    }
+  }
+
   function setBrushSimplifyTolerance (arg0_tolerance) {
     //Convert from parameters
     var tolerance = arg0_tolerance;

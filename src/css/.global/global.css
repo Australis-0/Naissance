@@ -1,6 +1,7 @@
 html, head, body {
   margin: 0px;
   height: 100%;
+  overflow: hidden;
 }
 input {
   color: white;
@@ -51,7 +52,7 @@ option {
 /* -- CSS Variables -- */
 :root {
   /* -- Global styling variables -- */
-  --selection-colour: rgba(255, 255, 255, 0.3);
+  --selection-colour: rgba(255, 255, 255, 0.4);
 
   /* -- Context Menus -- */
   --context-menu-margin-left: calc(0.5rem);
@@ -60,8 +61,8 @@ option {
   /* -- Left Sidebar -- */
   --left-sidebar-width: calc(min(40rem, 25vw));
     /* -- Group/Entity colour scheme -- */
-    --entity-colour: #fff9c4;
-    --group-colour: #e1f5fe;
+    --entity-colour: rgba(255, 249, 196);
+    --group-colour: rgba(225, 245, 254);
 
   /* -- Map -- */
     /* -- 0. Entity UI: General -- */

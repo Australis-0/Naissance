@@ -14,12 +14,14 @@ config.brush_actions.brush_options = {
         type: "checkbox",
         options: {
           simplify_apply_to_all_keyframes: "Apply to All Keyframes",
-          simplify_auto_simplify_when_editing: "Auto-Simplify When Editing"
+          simplify_auto_simplify_when_editing: "Auto-Simplify When Editing",
+          simplify_only_simplify_brush: "Only Simplify Brush"
         },
         placeholder: {
           simplify_auto_simplify_when_editing: `BRUSH_OBJ.auto_simplify_when_editing`,
+          simplify_only_simplify_brush: `BRUSH_OBJ.only_simplify_brush`
         },
-        x: 0, 
+        x: 0,
         y: 0
       },
       simplify_path: {
@@ -51,6 +53,7 @@ config.brush_actions.brush_options = {
 
         effect: {
           set_brush_auto_simplify: "simplify_auto_simplify_when_editing",
+          set_only_simplify_brush: "simplify_only_simplify_brush"
         }
       }
     }

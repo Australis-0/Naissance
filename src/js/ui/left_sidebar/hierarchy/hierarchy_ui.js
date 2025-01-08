@@ -144,14 +144,17 @@
     var all_group_keys = Object.keys(hierarchy_obj.groups);
 
     for (var i = 0; i < all_group_keys.length; i++) {
+      var class_suffix = "";
       var local_group = hierarchy_obj.groups[all_group_keys[i]];
       var local_group_el = getGroupElement(all_group_keys[i]);
       var local_group_mask = getGroupMask(all_group_keys[i]);
       var selected_group_string = (all_group_keys[i] == main.brush.selected_group_id) ? "selected" : "";
 
       if (local_group_mask)
-        local_group_el.setAttribute("class", `${local_group_el.getAttribute("class")} ${local_group_mask}`);
-      local_group_el.setAttribute("class", `${local_group_el.getAttribute("class")} ${selected_group_string}`);
+        class_suffix += ` ${local_group_mask}`;
+      class_suffix += ` ${selected_group_string}`;
+
+      local_group_el.setAttribute("class", `group${class_suffix}`);
     }
   }
 }

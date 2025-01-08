@@ -80,6 +80,7 @@ window.date_fields = [day_field, month_field, year_field, hour_field, minute_fie
 
     //Update Left Sidebar
     autoFillDate();
-    refreshHierarchy();
+    if (!options.reload_map)
+      refreshHierarchy();
   }
 }
