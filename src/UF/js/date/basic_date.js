@@ -106,7 +106,7 @@
   function initDateFramework () {
     //Initialise global date strings
     global.bc_leap_years = [
-      -45, -42, -39, -36, -33, -30, -27, -24, -21, -18, -15, -12, -9
+      -45, -42, -39, -36, -33, -30, -27, -24, -21, -18, -15, -12, -9 //(Ideler 1825); Triennial leap years
     ];
     global.days_in_months = [
       31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31

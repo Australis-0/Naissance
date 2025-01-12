@@ -402,8 +402,9 @@
     var options = (arg1_options) ? arg1_options : {};
 
     //Initialise options
-    if (!options.BRUSH_OBJ) options.BRUSH_OBJ = "main.brush";
-    if (!options.MAIN_OBJ) options.MAIN_OBJ = "global.main";
+    if (!options.regex_replace) options.regex_replace = {};
+      if (!options.regex_replace.BRUSH_OBJ) options.regex_replace.BRUSH_OBJ = "main.brush";
+      if (!options.regex_replace.MAIN_OBJ) options.regex_replace.MAIN_OBJ = "global.main";
 
     //'hierarchies' handler
     var group_id = main.brush.selected_group_id;
@@ -442,6 +443,18 @@
     //console.log("parseVariableString()", all_option_keys);
     var evaluated_string;
     try {
+      //Iterate over options.regex_replace
+      var all_regex_replace_keys = Object.keys(options.regex_replace);
+
+      for (var i = 0; i < all_regex_replace_keys.length; i++) {
+        var local_value = options.regex_replace[all_regex_replace_keys[i]];
+        var local_regexp = new RegExp(all_regex_replace_keys[i], "gm");
+
+        try {
+          string = string.replace(local_regexp, local_value);
+        } catch {}
+      }
+
       evaluated_string = eval(string);
     } catch (e) {
       if (!options.ignore_errors) {

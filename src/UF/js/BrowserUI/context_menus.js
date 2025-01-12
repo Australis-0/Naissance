@@ -989,6 +989,62 @@
 //Initialise write functions
 {
   /*
+    autoFillInputs() - Auto-fills inputs for a given element based on parseVariableString() and their context menu .placeholder object.
+    arg0_options: (Object)
+      element: (HTMLElement) - The direct element object for which to fill in an input for.
+      type: (String) - The type of input the element represents.
+      value: (Object) - The local value for the given context menu object element.
+      placeholder: (Object/String/Variable) - The variable to use as the placeholder.
+  */
+  function autoFillInputs (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
+    //Initalise options
+    if (!options.value) options.value = {};
+
+    //Guard clause if options.placeholder doesn't exist
+    if (options.placeholder == undefined) return undefined;
+
+    //Declare local instance variables
+    var placeholder_obj = JSON.parse(JSON.stringify(options.placeholder));
+
+    //Parse placeholder_obj
+    if (typeof placeholder_obj == "object") {
+      var all_placeholder_keys = Object.keys(options.placeholder);
+
+      for (var i = 0; i < all_placeholder_keys.length; i++) {
+        var local_placeholder = placeholder_obj[all_placeholder_keys[i]];
+        var local_placeholder_string = JSON.parse(JSON.stringify(local_placeholder));
+
+        if (local_placeholder)
+          placeholder_obj[all_placeholder_keys[i]] = (options.value.value_equation) ?
+            parseVariableString(options.value.value_equation, { VALUE: parseVariableString(local_placeholder) }) :
+            parseVariableString(local_placeholder);
+      }
+    }
+
+    if (options.type == "date") {
+      populateDateFields(options.element, convertTimestampToDate(placeholder_obj));
+    } else if (options.type == "range") {
+      var actual_number_in_range = calculateNumberInRange(
+        [returnSafeNumber(options.value.attributes.min, 0), returnSafeNumber(options.value.attributes.max, 100)],
+        placeholder_obj,
+        options.value.value_equation
+      );
+      var range_el = options.element.querySelector(`input[type="range"]`);
+
+      range_el.value = actual_number_in_range;
+    } else {
+      fillInput({
+        element: options.element,
+        type: options.type,
+        placeholder: placeholder_obj
+      });
+    }
+  }
+
+  /*
     fillInput() - Fills in a context menu input with its corresponding type.
     arg0_options: (Object)
       element: (HTMLElement) - The direct element object for which to fill in an input for.
@@ -1009,6 +1065,16 @@
       } else if (["rich_text", "wysiwyg"].includes(options.type)) {
         options.element.querySelector(`.html-view`).value = options.placeholder;
         options.element.querySelector(`.visual-view`).innerHTML = options.placeholder;
+      } else if (options.type == "checkbox") {
+        var all_checkbox_els = options.element.querySelectorAll(`[type="checkbox"]`);
+
+        //Iterate over all_checkbox_els
+        for (var i = 0; i < all_checkbox_els.length; i++)
+          if (options.placeholder[all_checkbox_els[i].id]) {
+            all_checkbox_els[i].checked = options.placeholder[all_checkbox_els[i].id];
+          } else {
+            all_checkbox_els[i].checked = false;
+          }
       } else if (["color", "colour"].includes(options.type)) {
         var b_el = options.element.querySelector(`input#b`);
         var g_el = options.element.querySelector(`input#g`);
@@ -1019,13 +1085,6 @@
         g_el.value = options.placeholder[1];
         b_el.value = options.placeholder[2];
         setColourWheelCursor(options.element, options.placeholder);
-      } else if (options.type == "checkbox") {
-        var all_checkbox_els = options.element.querySelectorAll(`[type="checkbox"]`);
-
-        //Iterate over all_checkbox_els
-        for (var i = 0; i < all_checkbox_els.length; i++)
-          if (options.placeholder[all_checkbox_els[i].id])
-            all_checkbox_els[i].checked = options.placeholder;
       } else if (options.type == "datalist") {
         options.element.querySelector("datalist").value = options.placeholder;
       } else if (options.type == "date") {
