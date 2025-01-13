@@ -216,21 +216,12 @@
               let local_element = document.querySelector(`${context_menu_ui.anchor} #${local_value.id}`);
 
               //Type handlers: set placeholders and user_value where applicable
-              {
-                //Date
-                if (local_value.type == "date")
-                  populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
-                if (local_value.type == "range") {
-                  var actual_number_in_range = calculateNumberInRange(
-                    [returnSafeNumber(local_value.attributes.min, 0), returnSafeNumber(local_value.attributes.max, 100)],
-                    local_value.placeholder,
-                    local_value.value_equation
-                  );
-                  var range_el = local_element.querySelector(`input[type="range"]`);
-
-                  range_el.value = actual_number_in_range;
-                }
-              }
+              autoFillInputs({
+                element: local_element,
+                type: local_value.type,
+                placeholder: local_value.placeholder,
+                value: local_value
+              });
 
               //Parse .effect to .onclick event handlers
               if (local_value.effect)

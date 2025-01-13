@@ -1,6 +1,6 @@
 //Direct Brush UI functions
 {
-  function initBrush () {
+  function initBrush () { //[WIP] - Fix addToBrush(), removeToBrush() to log only the simplified brush to timelines.
     //Declare local instance variables
     var brush_obj = main.brush;
 
@@ -48,9 +48,10 @@
           //Only delete if brush_obj.current_path exists
           if (brush_obj.current_path)
             try {
-              removeFromBrush(brush_obj.cursor);
-
               brush_obj.brush_change = true;
+              removeFromBrush(brush_obj.cursor);
+              if (!brush_obj.only_simplify_brush)
+                brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
             } catch (e) {
               //The selection has been completely deleted
               delete brush_obj.current_path;

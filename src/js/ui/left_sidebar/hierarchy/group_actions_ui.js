@@ -217,9 +217,12 @@
 
             //Type handlers: set placeholders where applicable
             {
-              //Date
-              if (local_value.type == "date")
-                populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
+              autoFillInputs({
+                element: local_element,
+                type: local_value.type,
+                placeholder: local_value.placeholder,
+                value: local_value
+              });
 
               //Special Group handling
               //Group Mask

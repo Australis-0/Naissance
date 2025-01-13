@@ -218,11 +218,12 @@
           if (!local_value.id) local_value.id = all_interface_keys[i];
 
           //Type handlers: set placeholders where applicable
-          {
-            //Date
-            if (local_value.type == "date")
-              populateDateFields(local_element, convertTimestampToDate(options[local_value.placeholder]));
-          }
+          autoFillInputs({
+            element: local_element,
+            type: local_value.type,
+            placeholder: local_value.placeholder,
+            value: local_value
+          });
 
           //Parse .effect to .onclick event handler
           if (local_value.effect)
