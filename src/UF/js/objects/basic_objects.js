@@ -120,7 +120,7 @@
     //Return statement; set interval
     return setInterval(function(object, key, ot_object, ot_key){
       object[key] = ot_object[ot_key];
-      
+
       if (options.cleanup_function)
         options.cleanup_function();
     }, interval, object, key, ot_object, ot_key, interval);
@@ -180,6 +180,8 @@
     arg0_object: (Object) - The object to list all keys for.
     arg1_options: (Object)
       include_parent_keys: (Boolean) - Optional. Whether to include parent keys. False by default.
+
+    Returns: (Array<String>)
   */
   function getAllObjectKeys (arg0_object, arg1_options) {
     //Convert from parameters

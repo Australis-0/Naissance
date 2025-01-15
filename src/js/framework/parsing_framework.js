@@ -433,8 +433,21 @@
 
       //Destructure local object first
       if (local_split_key.length > 1) {
-        eval(`if (!${local_split_key[0]}) var ${local_split_key[0]} = {};`);
-        eval(`${all_option_keys[i]} = local_value;`);
+        var define_string = [];
+        for (var x = 0; x < local_split_key.length - 1; x++)
+          if (x == 0) {
+            define_string.push(`if (${local_split_key[0]} == undefined) var ${local_split_key[0]} = {};`);
+          } else {
+            var local_join_key = [];
+
+            for (var y = 0; y < x + 1; y++)
+              local_join_key.push(local_split_key[y]);
+            local_join_key = local_join_key.join(".");
+
+            define_string.push(`if (${local_join_key} == undefined) ${local_join_key} = {};`);
+          }
+
+          eval(define_string.join(""));
       } else {
         eval(`var ${all_option_keys[i]} = local_value;`);
       }
