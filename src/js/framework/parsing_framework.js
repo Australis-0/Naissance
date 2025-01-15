@@ -434,6 +434,7 @@
       //Destructure local object first
       if (local_split_key.length > 1) {
         var define_string = [];
+
         for (var x = 0; x < local_split_key.length - 1; x++)
           if (x == 0) {
             define_string.push(`if (${local_split_key[0]} == undefined) var ${local_split_key[0]} = {};`);
@@ -488,7 +489,7 @@
         return evaluated_string.value;
       }
 
-    //Return statement; run string as eval
+    //Return statement
     return evaluated_string;
   }
 }
