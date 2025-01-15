@@ -393,6 +393,8 @@
     arg0_string: (String) - The string which to resolve.
     arg1_options: (Object)
       <key>: (Variable)
+      regex_replace: (Object)
+        <key>: (Variable)
 
     Returns: (Variable)
   */
