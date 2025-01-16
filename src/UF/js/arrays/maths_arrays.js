@@ -780,7 +780,7 @@ function operateArrays (arg0_array, arg1_array, arg2_equation, arg3_options) {
     Q: (Array<Array, ...>)
     R: (Array<Array, ...>)
 */
-function QRDecompositionMatrix (arg0_matrix) {
+function QRDecompositionMatrix (arg0_matrix) { //[WIP] - This function is flawed in terms of R results.
   //Convert from parameters
   var matrix = arg0_matrix;
 
@@ -808,18 +808,18 @@ function QRDecompositionMatrix (arg0_matrix) {
     }
 
     //Subtract the projections of previous basis vectors from the ith column of Q
-      for (var x = 0; x < m; x++)
-        for (var y = 0; y <= i; y++)
-          Q[x][i] -= R[y][i]*Q[x][y];
+    for (var x = 0; x < m; x++)
+      for (var y = 0; y <= i; y++)
+        Q[x][i] -= R[y][i]*Q[x][y];
 
-      // Normalize the ith column of Q
-      var norm = 0;
-      for (var x = 0; x < m; x++)
-        norm += Q[x][i]*Q[x][i];
-      norm = Math.sqrt(norm);
+    //Normalise the ith column of Q
+    var norm = 0;
+    for (var x = 0; x < m; x++)
+      norm += Q[x][i]*Q[x][i];
+    norm = Math.sqrt(norm);
 
-      for (var x = 0; x < m; x++)
-        Q[x][i] /= norm;
+    for (var x = 0; x < m; x++)
+      Q[x][i] /= norm;
   }
 
   //Return statement
