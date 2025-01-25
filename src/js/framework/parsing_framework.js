@@ -349,7 +349,7 @@
         var local_boolean_type = getBooleanOperatorFromString(all_scope_keys[i]);
         if (local_boolean_type) {
           var new_options = JSON.parse(JSON.stringify(options));
-            new_options.scope = local_boolean_type;
+            new_options.operator = local_boolean_type;
           var parsed_limit = parseLimit(entity_id, local_value[0], new_options);
 
           if (parsed_limit) local_checks++;
