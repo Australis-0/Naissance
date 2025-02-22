@@ -12,7 +12,7 @@
   */
   function createGroup (arg0_hierarchy_key, arg1_parent_group_id, arg2_options) {
     //Convert from parameters
-    var hierarchy_key = arg0_hierarchy_key;
+    var hierarchy_key = (arg0_hierarchy_key) ? arg0_hierarchy_key : "hierarchy";
     var parent_group_id = arg1_parent_group_id;
     var options = (arg2_options) ? arg2_options : {};
 
@@ -24,7 +24,6 @@
 
       parent_group: (parent_group_id) ? parent_group_id : undefined
     };
-    var hierarchy_key = (options.hierarchy_key) ? options.hierarchy_key : "hierarchy";
     var hierarchy_obj = main.hierarchies[hierarchy_key];
     var sidebar_el = (options.hierarchy_el) ? options.hierarchy_el : document.getElementById(hierarchy_key);
 
@@ -49,7 +48,7 @@
 
       //Make sure it exists in new parent .subgroups
       if (parent_group_id) {
-        var parent_group = getGroup("hierarchy", parent_group_id);
+        var parent_group = getGroup(hierarchy_key, parent_group_id);
 
         if (parent_group) {
           if (!parent_group.subgroups) parent_group.subgroups = [];

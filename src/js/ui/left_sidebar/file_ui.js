@@ -1,83 +1,62 @@
-//Listener events
-document.getElementById("load-file").onclick = function (e) {
-  var load_file_name_el = document.getElementById("load-file-path");
-
-  var load_file_name = load_file_name_el.value;
-
-  //Process load_file_name
-  load_file_name = load_file_name.split("\\");
-  load_file_name = load_file_name[load_file_name.length - 1].replace(".js", "");
-
-  loadSave(load_file_name);
-};
-document.getElementById("save-file").onclick = function (e) {
-  var save_file_name_el = document.getElementById("save-file-name");
-
-  var save_file_name = save_file_name_el.value;
-
-  //Write save
-  writeSave((save_file_name.length > 0) ? save_file_name : "save");
-};
-
-//[WIP] - Temporary hierarchy functions - move out in future
+//Initialise functions
 {
-  /*
-    createHierarchy() - Creates a hierarchy and its corresponding elements.
-
-    arg0_options: (Object)
-      context_menu_selector: (String)
-      context_menu_selectors: (Array<String>)
-      hierarchy_selector: (String)
-
-      hierarchy_key: (String)
-
-      container_el: (HTMLElement) - Assigns a container element to createHierarchy() if necessary.
-      context_menu_html: (String) - Optional.
-  */
-  function createHierarchy (arg0_options) {
+  function createFileExplorer (arg0_container_selector, arg1_file_path, arg2_options) {
     //Convert from parameters
-    var options = (arg0_options) ? arg0_options : {};
+    var container_selector = arg0_container_selector;
+    var file_path = arg1_file_path.trim().toString();
+    var options = (arg2_options) ? arg2_options : {};
+
+    //Initialise options
+    var container_el = document.querySelector(container_selector);
+
+    if (!options.id) options.id = container_el.getAttribute("id");
 
     //Declare local instance variables
-    var container_el = (options.container_el) ? options.container_el : document.body;
-    var context_menu_selector = options.context_menu_selector;
-    var context_menu_selectors = options.context_menu_selectors;
-    var hierarchy_selector = options.hierarchy_selector;
-    var hierarchy_key = options.hierarchy_key;
+    var explorer_el = initHierarchy({
+      id: options.id,
+      hierarchy_selector: container_selector,
+      hide_add_group: true,
+      hide_add_entity: true,
+      hide_context_menus: true
+    });
 
-    if (context_menu_selector && hierarchy_selector) {
-      var context_menu_el = document.querySelector(context_menu_selector);
-      var hierarchy_el = document.querySelector(hierarchy_selector);
+    //Populate initial base saves folder upon load
+  }
 
-      //Call initHierarchy()
-      initHierarchy(hierarchy_el, hierarchy_key, {
-        context_menu_selectors: context_menu_selectors
+  function populateFolderExplorer (arg0_hierarchy_id, arg1_file_path, arg2_parent_group_id, arg3_options) {
+    //Convert from parameters
+    var hierarchy_id = arg0_hierarchy_id;
+    var file_path = arg1_file_path;
+    var parent_group_id = arg2_parent_group_id;
+    var options = (arg3_options) ? arg3_options : {};
+
+    //Declare local instance Variables
+    try {
+      var files = fs.readdirSync(file_path);
+      var hierarchy_options = main.hierarchies[hierarchy_id];
+      var render_items = [];
+
+      files.forEach((file) => {
+        var local_full_path = path.join(file_path, file);
+        var local_stats = fs.statSync(local_full_path);
+
+        var local_item_id = generateRandomID();
+
+        if (local_stats.isDirectory()) {
+          var group_data = addGroup(hierarchy_id, {
+            id: local_item_idd,
+            name: file
+          });
+          group_data.path = local_full_path;
+        } else {
+          var entity_data = addEntity(hierarchy_id, {
+            id: local_item_id,
+            name: file
+          });
+        }
       });
-    } else {
-      //Create context_menu_el; hierarchy_el
-      var local_hierarchy_html = `
-        <!-- Hierarchy buttons -->
-        <button id = "hierarchy-create-new-group">Create New Group</button>
-
-        <br><br>
-
-        <!-- Hierarchy container -->
-        <div id = "hierarchy-${hierarchy_key}" class = "hierarchy-elements-container"></div>
-        <br>
-
-        <!-- Hierarchy selection info -->
-        <div id = "hierarchy-${hierarchy_key}-selection-info" class = "hierarchy-selection-info-container">
-
-        <!-- Hierarchy context menu -->
-        <div id = "hierarchy-context-menu" class = "context-menu-container instant-display-none">
-          ${(options.context_menu_html) ? options.context_menu_html : ""}
-        </div>
-      `;
-
-      //Append local_hierarchy_html to container_el
-      container_el.innerHTML += local_hierarchy_html;
-
-      //Call initHierarchy()
+    } catch (e) {
+      console.error(e);
     }
   }
 }

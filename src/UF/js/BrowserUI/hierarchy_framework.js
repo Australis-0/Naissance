@@ -138,6 +138,9 @@
       insertEntityAtBottom(parent_el, entity_el);
 
     setupDragAndDrop();
+
+    //Return statement
+    return new_entity;
   }
 
   /*
@@ -166,6 +169,9 @@
       console.log(e);
     }
     setupDragAndDrop();
+
+    //Return statement
+    return new_group;
   }
 
   /*

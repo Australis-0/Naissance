@@ -32,9 +32,13 @@ config.defines.common = {
     brush_actions_context_menu_anchor: `#brush-actions-context-menu`,
 
     //Interface - Topbar
+    left_sidebar_pages: `#left-sidebar [page="true"]`,
     topbar_tab_buttons: `#topbar > ul li`, //The query selector for all topbar tab buttons.
       file_button: `#topbar .file`, //The FILE button query selector.
       map_button: `#topbar .map`, //The MAP button query selector.
+
+      file_page: `#left-sidebar #file-tab`,
+      map_page: `#left-sidebar #hierarchy-tab`,
 
     //Map
     entity_ui: `.leaflet-popup`,
