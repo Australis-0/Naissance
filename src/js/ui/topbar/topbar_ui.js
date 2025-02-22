@@ -36,7 +36,7 @@
     //Declare listener events
     getUISelector("file_button").onclick = function (e) {
       switchTopbarTab("file");
-      createFileExplorer(`#file-hierarchy`, __dirname);
+      createFileExplorer(`#file-hierarchy`, main.selected_path);
     };
     getUISelector("map_button").onclick = function (e) {
       switchTopbarTab("map");

@@ -75,7 +75,7 @@ window.path = require("path");
   main.groups = {
     polities: {}
   };
-  main.selected_path = __dirname;
+  main.selected_path = `${path.dirname(__dirname, "\\..")}\\saves`;
 }
 
 /*
