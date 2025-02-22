@@ -67,6 +67,7 @@
 
     hierarchy_options_obj.context_menu_function = options.context_menu_function;
     hierarchy_options_obj.delete_function = options.delete_function;
+    hierarchy_options_obj.disable_renaming = options.disable_renaming;
     hierarchy_options_obj.entity_context_menu_function = options.entity_context_menu_function;
     hierarchy_options_obj.group_context_menu_function = options.group_context_menu_function;
 
@@ -196,6 +197,21 @@
         all_context_menu_els[i].style.top = `${item_el.getBoundingClientRect().top}px`;
       }
     }
+  }
+
+  function clearHierarchy (arg0_hierarchy_key, arg1_options) {
+    //Convert from parameters
+    var hierarchy_key = arg0_hierarchy_key;
+    var options = (arg1_options) ? arg1_options : {};
+
+    //Declare local instance variables
+    var hierarchy_obj = main.hierarchies[hierarchy_key];
+    var hierarchy_options = main.hierarchy_options[hierarchy_key];
+    var hierarchy_selector = (options.hierarchy_selector) ?
+      options.hierarchy_selector : `#${hierarchy_options.id}`;
+
+    hierarchy_obj.groups = {};
+    document.querySelector(hierarchy_selector).innerHTML = "";
   }
 
   function closeHierarchyContextMenus (arg0_hierarchy_key) {
@@ -666,9 +682,10 @@
       name_div.setAttribute("class", "item-name");
 
       name_div.textContent = local_item.name;
-      name_div.addEventListener("click", function (e) {
-        renameItem(hierarchy_id, e.target);
-      });
+      if (!hierarchy_options.disable_renaming)
+        name_div.addEventListener("click", function (e) {
+          renameItem(hierarchy_id, e.target);
+        });
 
       //Create container interaction_el
       var interaction_container_el = document.createElement("span");

@@ -75,6 +75,7 @@ window.path = require("path");
   main.groups = {
     polities: {}
   };
+  main.selected_path = __dirname;
 }
 
 /*

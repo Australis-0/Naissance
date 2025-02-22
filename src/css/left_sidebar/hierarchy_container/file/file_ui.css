@@ -13,6 +13,12 @@
   font-family: "Barlow";
   font-weight: 300;
 }
+.file-container .hierarchy {
+  color: black;
+  height: calc(65vh);
+  overflow-y: auto;
+  width: calc(100% - 0.5rem);
+}
 
 /* -- Input styling -- */
 .file-container input[type="text"] {
