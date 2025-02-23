@@ -39,9 +39,12 @@
       createFileExplorer(`#file-hierarchy`, main.selected_path, { saves_explorer: true });
 
       //[WIP] - Technical debt - move to common.defines.selectors
-      var interaction_container_el = document.querySelector(`.file-container #file-interaction-container`);
+      var common_selectors = config.defines.common.selectors;
+      var interaction_container_el = document.querySelector(common_selectors.files_interaction_container);
       var interaction_container_bounding_rect = interaction_container_el.getBoundingClientRect();
-      document.querySelector(`.file-container .hierarchy`).style.height = `calc(75.5vh - 32.5px - ${interaction_container_bounding_rect.top + interaction_container_bounding_rect.height}px + 3vh)`;
+
+      //Set height based on parent height (75.5vh - 32.5px) minus header (3vh)
+      document.querySelector(common_selectors.files_hierarchy).style.height = `calc(75.5vh - 32.5px - ${interaction_container_bounding_rect.top + interaction_container_bounding_rect.height}px + 3vh)`;
     };
     getUISelector("map_button").onclick = function (e) {
       switchTopbarTab("map");
