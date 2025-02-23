@@ -5,7 +5,7 @@
     var file_name = arg0_file_name;
 
     //Declare local instance variables
-    var save_data = JSON.parse(fs.readFileSync(`./saves/${file_name}.js`, "utf8"));
+    var save_data = JSON.parse(fs.readFileSync(file_name, "utf8"));
 
     //Clear map
     clearMap();
@@ -56,8 +56,9 @@
       main.entities[i] = cleanKeyframes(local_entity, undefined, {
         do_not_display: true
       });
+      //console.log(local_entity);
       save_data.entities.push({
-        coords: convertToNaissance(local_entity._latlngs),
+        coords: convertToNaissance(local_entity),
         options: local_entity.options
       });
     }
@@ -67,7 +68,7 @@
     save_data.groups = main.groups;
 
     //Write save_data to file
-    fs.writeFileSync(`./saves/${file_name}.js`, JSON.stringify(save_data), function (err, data) {
+    fs.writeFileSync(`${main.saves_folder}\\${file_name}`, JSON.stringify(save_data), function (err, data) {
       if (err) return log.error(err);
     });
   }

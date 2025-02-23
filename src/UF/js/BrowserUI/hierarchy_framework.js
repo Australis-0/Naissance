@@ -67,6 +67,7 @@
 
     hierarchy_options_obj.context_menu_function = options.context_menu_function;
     hierarchy_options_obj.delete_function = options.delete_function;
+    hierarchy_options_obj.disable_delete = options.disable_delete;
     hierarchy_options_obj.disable_renaming = options.disable_renaming;
     hierarchy_options_obj.entity_context_menu_function = options.entity_context_menu_function;
     hierarchy_options_obj.group_context_menu_function = options.group_context_menu_function;
@@ -704,9 +705,10 @@
         delete_button.textContent = "Delete";
         delete_button.setAttribute("class", "delete-button");
         delete_button.addEventListener("click", function (e) {
-          (local_item.type == "group") ?
-            deleteGroup(hierarchy_key, local_item.id) :
-            deleteItem(hierarchy_id, local_div);
+          if (!hierarchy_options.disable_delete)
+            (local_item.type == "group") ?
+              deleteGroup(hierarchy_key, local_item.id) :
+              deleteItem(hierarchy_id, local_div);
         });
         interaction_container_el.appendChild(delete_button);
       }

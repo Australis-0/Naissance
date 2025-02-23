@@ -18,6 +18,8 @@ config.defines.common = {
     //Files - Save/Load
       files_hierarchy: `.file-container .hierarchy`,
       files_interaction_container: `.file-container #file-interaction-container`,
+        files_interaction_save_file_button: `.file-container #file-interaction-container #save-file-button`,
+        files_interaction_save_file_input: `.file-container #file-interaction-container #save-file-input`,
     //Hierarchy
       hierarchy: `#hierarchy`, //The query selector for the actual hierarchy tab or supercontainer.
       hierarchy_container: `#hierarchy-container`, //The query selector for the actual hierarchy container.

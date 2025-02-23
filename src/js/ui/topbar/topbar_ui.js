@@ -35,16 +35,29 @@
   function initTopbar () {
     //Declare listener events
     getUISelector("file_button").onclick = function (e) {
-      switchTopbarTab("file");
-      createFileExplorer(`#file-hierarchy`, main.selected_path, { saves_explorer: true });
+      var file_hierarchy_options =  {
+        disable_delete: true,
+        saves_explorer: true
+      };
 
-      //[WIP] - Technical debt - move to common.defines.selectors
+      switchTopbarTab("file");
+      createFileExplorer(`#file-hierarchy`, main.selected_path, file_hierarchy_options);
+
+      //Set files_hierarchy layout
       var common_selectors = config.defines.common.selectors;
       var interaction_container_el = document.querySelector(common_selectors.files_interaction_container);
       var interaction_container_bounding_rect = interaction_container_el.getBoundingClientRect();
 
       //Set height based on parent height (75.5vh - 32.5px) minus header (3vh)
       document.querySelector(common_selectors.files_hierarchy).style.height = `calc(75.5vh - 32.5px - ${interaction_container_bounding_rect.top + interaction_container_bounding_rect.height}px + 3vh)`;
+
+      //Add event listeners
+      document.querySelector(common_selectors.files_interaction_save_file_button).onclick = function (e) {
+        writeSave(document.querySelector(common_selectors.files_interaction_save_file_input).value);
+
+        clearHierarchy("file-hierarchy", { hierarchy_selector: common_selectors.files_hierarchy });
+        populateFolderExplorer("file-hierarchy", main.selected_path, undefined, file_hierarchy_options);
+      };
     };
     getUISelector("map_button").onclick = function (e) {
       switchTopbarTab("map");

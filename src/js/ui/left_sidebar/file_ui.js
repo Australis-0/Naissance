@@ -30,6 +30,7 @@
         hide_add_entity: true,
         hide_context_menus: true,
 
+        disable_delete: options.disable_delete,
         disable_renaming: true
       });
 
@@ -136,11 +137,32 @@
             });
 
             //Remove button.delete_button if options.saves_explorer is true and directory is not a subpath of main.saves_folder
-            if (options.saves_explorer)
+            if (options.saves_explorer) {
+              var file_selector = `${container_selector} .entity[data-id="${local_item_id}"]`;
+
+              var file_el = document.querySelector(file_selector);
+
               if (!local_full_path.includes(main.saves_folder)) {
-                var file_el = document.querySelector(`${container_selector} .entity[data-id="${local_item_id}"]`);
                 file_el.querySelector(`button.delete-button`).remove();
+              } else {
+                //Add 'Load' button if possible
+                var delete_button_el = file_el.querySelector(`button.delete-button`);
+                  delete_button_el.onclick = function (e) {
+                    if (window.confirm(`Are you sure you wish to delete ${local_full_path}?`)) {
+                      file_el.remove();
+                      fs.unlink(local_full_path, (err) => { if (err) console.error(err); });
+                    }
+                  };
+                var load_button_el = document.createElement("button");
+                  load_button_el.innerText = "Load";
+                  load_button_el.onclick = function (e) {
+                    loadSave(local_full_path);
+                  };
+
+                //Append 'Load' before 'Delete'
+                appendBeforeSiblings(file_el.querySelector(`.interaction-container`), `.delete-button`, load_button_el);
               }
+            }
           }
         } catch (e) {}
       });

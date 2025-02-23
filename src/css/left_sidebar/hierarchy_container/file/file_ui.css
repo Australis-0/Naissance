@@ -18,6 +18,10 @@
   height: calc(75.5vh - 32.5px);
   overflow-y: auto;
   width: calc(100% - 0.5rem);
+
+  .interaction-container {
+    max-width: none;
+  }
 }
 
 /* -- Input styling -- */

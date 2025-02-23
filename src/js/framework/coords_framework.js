@@ -232,11 +232,9 @@
     //Convert from parameters
     var format = arg0_format;
 
-    //Declare local instance variables
-    var coord_type;
-
-    /*if (!format)
-      console.error(`getCoordsType() was fed an undefined format!`, format);*/
+    //Guard clause if format does not exist
+    if (!format)
+      return undefined;
 
     //Check if type is GeoJSON
     if (format._initHooksCalled && !format._latlngs && !format._symbolUpdated && !format._geometries)
