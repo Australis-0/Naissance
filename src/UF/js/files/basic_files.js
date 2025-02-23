@@ -32,6 +32,38 @@ function getAllFiles (arg0_folder) {
     return file_array;
 }
 
+function getAllDrives () {
+  //Declare local instance variables
+  var current_os = process.platform;
+
+  if (current_os == "win32") {
+    var stdout = child_process.execSync("wmic logicaldisk get name", { encoding: "utf8" });
+
+    //Parse the output to extract drive letters
+    stdout = stdout.split("\n");
+    stdout.unshift();
+    stdout = stdout.map((line) => line.trim());
+
+    //Iterate over all stdout
+    for (var i = stdout.length - 1; i >= 0; i--)
+      if (stdout[i] == "" || stdout[i] == "Name")
+        stdout.splice(i, 1);
+
+    //Return statement
+    return stdout;
+  } else {
+    var stdout = child_process.execSync("df -h", { encoding: "utf8" });
+
+    //Parse the output to extract drives
+    stdout = stdout.split("\n")
+      .map((line) => line.split(/\s+/).pop())
+      .filter((path) => path.startsWith("/") && !path.startsWith("/dev"));
+
+    //Return statement
+    return [...new Set(stdout)];
+  }
+}
+
 /*
   importFile() - Imports a Node.js file.
   arg0_require_obj: (String) - The file path to import.

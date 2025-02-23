@@ -36,6 +36,7 @@
     var options = (arg3_options) ? arg3_options : {};
 
     //Declare local instance variables
+    var all_drives = getAllDrives();
     var container_selector = (options.hierarchy_selector) ?
       options.hierarchy_selector : `#${hierarchy_id}`;
     var container_el = document.querySelector(container_selector);
@@ -48,11 +49,31 @@
       var render_items = [];
 
       //1. Display folders at top
-      var back_group_data = addGroup(hierarchy_id, {
-        id: generateRandomID(),
-        name: ".."
-      });
-      back_group_data.path = "..";
+      if (main.selected_path.split("\\").length > 1) {
+        var back_group_data = addGroup(hierarchy_id, {
+          id: generateRandomID(),
+          name: ".."
+        });
+        back_group_data.path = "..";
+      }
+
+      //1.1. Display drives if main.selected_path is a length of 2 and main.selected_path[1] == ""
+      if (main.selected_path.split("\\").length == 1) {
+        for (var i = 0; i < all_drives.length; i++) {
+          let local_drive = all_drives[i];
+          let local_full_path = `${local_drive}\\`;
+          let local_item_id = generateRandomID();
+
+          let drive_data = addGroup(hierarchy_id, {
+            id: local_item_id,
+            name: local_drive
+          });
+          let drive_el = document.querySelector(`${container_selector} .group[data-id="${local_item_id}"]`);
+
+          drive_el.setAttribute("data-drive", "true");
+          drive_data.path = local_full_path;
+        }
+      }
 
       files.forEach((file) => {
         try {
@@ -99,27 +120,33 @@
           var local_file_path = `${main.selected_path}\\${local_file_name_el.innerText}`;
           var local_type = local_folder_el.getAttribute("class");
 
-          if (local_type.includes("group")) {
-            if (!["\\..", ".."].includes(local_file_name_el.innerText)) {
-              main.selected_path = local_file_path;
+          if (!local_folder_el.getAttribute("data-drive")) {
+            //Regular folder/file handler
+            if (local_type.includes("group")) {
+              if (!["\\..", ".."].includes(local_file_name_el.innerText)) {
+                main.selected_path = local_file_path;
 
-              clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-              populateFolderExplorer(hierarchy_id, local_file_path);
-              console.log("Going up!");
-            } else {
-              //Go up a folder
-              var split_local_file_path = main.selected_path.split("\\");
-              split_local_file_path.pop();
-              main.selected_path = split_local_file_path.join("\\");
+                clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
+                populateFolderExplorer(hierarchy_id, local_file_path);
+              } else {
+                //Go up a folder
+                var split_local_file_path = main.selected_path.split("\\");
+                split_local_file_path.pop();
+                main.selected_path = split_local_file_path.join("\\");
 
-              clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-              populateFolderExplorer(hierarchy_id, local_file_path);
-              console.log("Going down!");
+                clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
+                populateFolderExplorer(hierarchy_id, local_file_path);
+              }
+            } else if (local_type.includes("entity")) {
+              console.log("Clicked:", local_file_name_el.innerText);
             }
-          } else if (local_type.includes("entity")) {
+          } else {
+            //Drive handler
+            main.selected_path = `${local_file_name_el.innerText}`;
 
+            clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
+            populateFolderExplorer(hierarchy_id, main.selected_path + "\\");
           }
-          console.log("Clicked:", local_file_name_el.innerText);
         };
       }
     } catch (e) {
