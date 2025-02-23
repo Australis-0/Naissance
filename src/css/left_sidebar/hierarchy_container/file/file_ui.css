@@ -15,7 +15,7 @@
 }
 .file-container .hierarchy {
   color: black;
-  height: calc(65vh);
+  height: calc(75.5vh - 32.5px);
   overflow-y: auto;
   width: calc(100% - 0.5rem);
 }

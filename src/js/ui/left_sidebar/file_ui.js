@@ -1,5 +1,13 @@
 //Initialise functions
 {
+  /*
+    createFileExplorer() - Creates a new file explorer in a given container element.
+    arg0_container_selector: (String)
+    arg1_file_path: (String)
+    arg2_options: (Object)
+      saves_explorer: (Boolean) - Whether this is a saves explorer.
+      variable_key: (String) - The variable key to use when setting new paths. main.selected_path by default.
+  */
   function createFileExplorer (arg0_container_selector, arg1_file_path, arg2_options) {
     //Convert from parameters
     var container_selector = arg0_container_selector;
@@ -7,9 +15,11 @@
     var options = (arg2_options) ? arg2_options : {};
 
     //Initialise options
-    var container_el = document.querySelector(container_selector);
+    var container_el = (typeof container_selector != "object" ) ?
+      document.querySelector(container_selector) : container_selector;
 
     if (!options.id) options.id = container_el.getAttribute("id");
+    if (!options.variable_key) options.variable_key = main.selected_path;
 
     //Initialise hierarchy
     if (!main.hierarchies[options.id]) {
@@ -53,11 +63,10 @@
     try {
       var files = fs.readdirSync(file_path);
       var hierarchy_options = main.hierarchies[hierarchy_id];
-      console.log("Options", options);
       var render_items = [];
 
       //1. Display folders at top
-      if (main.selected_path.split("\\").length > 1) {
+      if (options.variable_key.split("\\").length > 1) {
         var back_group_id = generateRandomID();
 
         var back_group_data = addGroup(hierarchy_id, {
@@ -70,8 +79,8 @@
         back_group_data.path = "..";
       }
 
-      //1.1. Display drives if main.selected_path is a length of 2 and main.selected_path[1] == ""
-      if (main.selected_path.split("\\").length == 1) {
+      //1.1. Display drives if options.variable_key is a length of 2 and options.variable_key[1] == ""
+      if (options.variable_key.split("\\").length == 1) {
         for (var i = 0; i < all_drives.length; i++) {
           let local_drive = all_drives[i];
           let local_full_path = `${local_drive}\\`;
@@ -145,22 +154,22 @@
 
         local_folder_el.onclick = function (e) {
           var local_file_name_el = local_folder_el.querySelector(".item-name");
-          var local_file_path = `${main.selected_path}\\${local_file_name_el.innerText}`;
+          var local_file_path = `${options.variable_key}\\${local_file_name_el.innerText}`;
           var local_type = local_folder_el.getAttribute("class");
 
           if (!local_folder_el.getAttribute("data-drive")) {
             //Regular folder/file handler
             if (local_type.includes("group")) {
               if (!["\\..", ".."].includes(local_file_name_el.innerText)) {
-                main.selected_path = local_file_path;
+                options.variable_key = local_file_path;
 
                 clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
                 populateFolderExplorer(hierarchy_id, local_file_path, undefined, options);
               } else {
                 //Go up a folder
-                var split_local_file_path = main.selected_path.split("\\");
+                var split_local_file_path = options.variable_key.split("\\");
                 split_local_file_path.pop();
-                main.selected_path = split_local_file_path.join("\\");
+                options.variable_key = split_local_file_path.join("\\");
 
                 clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
                 populateFolderExplorer(hierarchy_id, local_file_path, undefined, options);
@@ -170,10 +179,10 @@
             }
           } else {
             //Drive handler
-            main.selected_path = `${local_file_name_el.innerText}`;
+            options.variable_key = `${local_file_name_el.innerText}`;
 
             clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-            populateFolderExplorer(hierarchy_id, main.selected_path + "\\", undefined, options);
+            populateFolderExplorer(hierarchy_id, options.variable_key + "\\", undefined, options);
           }
         };
       }

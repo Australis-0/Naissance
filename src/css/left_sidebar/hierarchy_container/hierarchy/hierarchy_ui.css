@@ -29,7 +29,7 @@
   background-color: rgba(0, 0, 0, 0.85);
 }
 .hierarchy-elements-container {
-  height: calc(65vh - 7.5vh);
+  height: calc(65vh);
   overflow-y: auto;
 
   color: white;
@@ -75,7 +75,7 @@
 
 /* -- Hierarchy container styling -- */
 #hierarchy {
-  max-height: 58vh;
+  max-height: 64vh;
   overflow-y: auto;
   width: calc(100% - 0.5rem);
 }
