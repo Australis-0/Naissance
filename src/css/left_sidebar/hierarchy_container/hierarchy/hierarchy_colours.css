@@ -17,8 +17,8 @@
   .interaction-container {
     float: right;
     margin-right: 0.5rem;
+    max-width: 4rem;
     vertical-align: middle;
-    width: 4rem;
 
     .context-menu-button {
       height: 1rem;

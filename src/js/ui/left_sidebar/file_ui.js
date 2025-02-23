@@ -24,10 +24,18 @@
       });
 
       //Populate initial base saves folder upon load
-      populateFolderExplorer(options.id, file_path);
+      populateFolderExplorer(options.id, file_path, undefined, options);
     }
   }
 
+  /*
+    populateFolderExplorer() - Populates the current folder explorer's DOM with the file path stated.
+    arg0_hierarchy_id: (String)
+    arg1_file_path: (String)
+    arg2_parent_group_id: (String) - Optional. Used for nesting displays.
+    arg3_options: (Object)
+      saves_explorer: (Boolean) - Whether this is the saves explorer and file renames/deletes should be limited to the saves folder only.
+  */
   function populateFolderExplorer (arg0_hierarchy_id, arg1_file_path, arg2_parent_group_id, arg3_options) {
     //Convert from parameters
     var hierarchy_id = arg0_hierarchy_id;
@@ -41,19 +49,24 @@
       options.hierarchy_selector : `#${hierarchy_id}`;
     var container_el = document.querySelector(container_selector);
 
-
     //Populate initial folder
     try {
       var files = fs.readdirSync(file_path);
       var hierarchy_options = main.hierarchies[hierarchy_id];
+      console.log("Options", options);
       var render_items = [];
 
       //1. Display folders at top
       if (main.selected_path.split("\\").length > 1) {
+        var back_group_id = generateRandomID();
+
         var back_group_data = addGroup(hierarchy_id, {
-          id: generateRandomID(),
+          id: back_group_id,
           name: ".."
         });
+        var back_group_el = document.querySelector(`${container_selector} .group[data-id="${back_group_id}"]`);
+        back_group_el.querySelector(`button.delete-button`).remove();
+
         back_group_data.path = "..";
       }
 
@@ -71,11 +84,12 @@
           let drive_el = document.querySelector(`${container_selector} .group[data-id="${local_item_id}"]`);
 
           drive_el.setAttribute("data-drive", "true");
+          drive_el.querySelector(`button.delete-button`).remove();
           drive_data.path = local_full_path;
         }
       }
 
-      files.forEach((file) => {
+      files.forEach(function (file) {
         try {
           var local_full_path = path.join(file_path, file);
           var local_stats = fs.statSync(local_full_path);
@@ -88,9 +102,16 @@
               name: file
             });
             group_data.path = local_full_path;
+
+            //Remove button.delete_button if options.saves_explorer is true and directory is not a subpath of main.saves_folder
+            if (options.saves_explorer)
+              if (!group_data.path.includes(main.saves_folder) || main.saves_folder == group_data.path) {
+                var folder_el = document.querySelector(`${container_selector} .group[data-id="${local_item_id}"]`);
+                folder_el.querySelector(`button.delete-button`).remove();
+              }
           }
         } catch (e) {}
-      });
+      }.bind(options));
       //2. Display files at bottom
       files.forEach((file) => {
         try {
@@ -104,6 +125,13 @@
               id: local_item_id,
               name: file
             });
+
+            //Remove button.delete_button if options.saves_explorer is true and directory is not a subpath of main.saves_folder
+            if (options.saves_explorer)
+              if (!local_full_path.includes(main.saves_folder)) {
+                var file_el = document.querySelector(`${container_selector} .entity[data-id="${local_item_id}"]`);
+                file_el.querySelector(`button.delete-button`).remove();
+              }
           }
         } catch (e) {}
       });
@@ -127,7 +155,7 @@
                 main.selected_path = local_file_path;
 
                 clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-                populateFolderExplorer(hierarchy_id, local_file_path);
+                populateFolderExplorer(hierarchy_id, local_file_path, undefined, options);
               } else {
                 //Go up a folder
                 var split_local_file_path = main.selected_path.split("\\");
@@ -135,7 +163,7 @@
                 main.selected_path = split_local_file_path.join("\\");
 
                 clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-                populateFolderExplorer(hierarchy_id, local_file_path);
+                populateFolderExplorer(hierarchy_id, local_file_path, undefined, options);
               }
             } else if (local_type.includes("entity")) {
               console.log("Clicked:", local_file_name_el.innerText);
@@ -145,7 +173,7 @@
             main.selected_path = `${local_file_name_el.innerText}`;
 
             clearHierarchy(hierarchy_id, { hierarchy_selector: container_selector });
-            populateFolderExplorer(hierarchy_id, main.selected_path + "\\");
+            populateFolderExplorer(hierarchy_id, main.selected_path + "\\", undefined, options);
           }
         };
       }
