@@ -1,6 +1,7 @@
 # Naissance
 <br>
-<div align = "center"><img src = "https://i.postimg.cc/mkYVCHMk/naissance.png"></div>
+
+![](https://i.postimg.cc/mkYVCHMk/naissance.png)
 
 #### <div align = "center">Interactive Mapmaking and Historical Data Visualization for the 21st Century, Made Simple.</div>
 
