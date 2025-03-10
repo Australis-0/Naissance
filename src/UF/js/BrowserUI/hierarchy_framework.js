@@ -301,6 +301,9 @@
       var hierarchy_id = hierarchy_div.id;
       var local_hierarchy_obj = main.hierarchies[hierarchy_id];
 
+      //Guard clause if local_hierarchy_obj is not defined
+      if (!local_hierarchy_obj) continue;
+
       hierarchies_obj[hierarchy_id] = {};
 
       //Process local groups

@@ -295,11 +295,16 @@
       var new_options = mergeObjects({ tolerance: tolerance }, options);
 
       if (typeof new_options.tolerance == "number") {
-        var turf_obj = getTurfObject(format);
-        var turf_simplified = turf.simplify(turf_obj, new_options);
+        try {
+          var turf_obj = getTurfObject(format);
+          var turf_simplified = turf.simplify(turf_obj, new_options);
 
-        //Return statement
-        return (options.return_leaflet) ? convertToLeaflet(turf_simplified) : turf_simplified;
+          //Return statement
+          return (options.return_leaflet) ? convertToLeaflet(turf_simplified) : turf_simplified;
+        } catch (e) {
+          //Return statement; guard clause
+          return format;
+        }
       } else {
         console.error(`Invalid tolerance option!`, new_options);
       }
