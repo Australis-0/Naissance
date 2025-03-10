@@ -13,7 +13,7 @@
 
 Naissance is an open-source historical 3D GIS built for proxy modelling, raster input and wrangling, simulation, and statistical analysis with undo/redo trees and version control with user-first UI design. We aim to eventually enable modernised data visualisation and mapmaking to create interactive atlases, different mapmodes, and 3D/video export options. Naissance is currently in **beta**, with features such as gridmap editing planned for future integration over from UF.
 
-We're still a long way from that goal, but join us on that journey!
+All generated files by Naissance are currently stored in JSON, with GeoJSON being supported for import. Saved Naissance files may be found in `./saves/`. A default initialisation file, `./saves/autosave.js`, is loaded for compatibility testing in non-release versions.
 
 ## Roadmap.
 <br>
