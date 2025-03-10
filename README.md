@@ -1,11 +1,11 @@
 # Naissance
-<br>
-<div align = "center"><img src = "https://cdn.discordapp.com/attachments/1070119424067121293/1098151690991063060/image.png" height = "458" width = "700"></div>
 
+![](https://github.com/Australis-0/Naissance/blob/master/naissance_preview.png)
 #### <div align = "center">Interactive Mapmaking and Historical Data Visualization for the 21st Century, Made Simple.</div>
 
 <div align = "center">-</div>
 <br>
+<img src = "https://i.postimg.cc/m2xCLYYh/crd-logo.png" height = "64">
 
 [![Join our community!](https://img.shields.io/discord/548994743925997570?label=Discord&style=for-the-badge)](https://discord.gg/89kQY2KFQz) ![](https://img.shields.io/github/languages/code-size/Australis-0/Naissance?style=for-the-badge) ![](https://img.shields.io/github/downloads/Australis-0/Naissance/total?style=for-the-badge)
 
