@@ -228,22 +228,21 @@
     if (!options.thickness) options.thickness = 1;
 
     //Declare local instance variables
-    var offset = getOffset(element);
-    var ot_offset = getOffset(ot_element);
+    var html_line = new LeaderLine(
+      element,
+      ot_element
+    );
+    html_line.setOptions({
+      startSocket: "bottom",
+      endSocket: "top"
+    });
 
-    var x_1 = offset.left + offset.width;
-    var y_1 = offset.top + offset.height;
-
-    var x_2 = ot_offset.left + ot_offset.width;
-    var y_2 = ot_offset.top;
-
-    var length = Math.sqrt(((x_2 - x_1)*(x_2 - x_1)) + ((y_2 - y_1)*(y_2 - y_1)));
-
-    var cx = ((x_1 + x_2)/2) - (length/2);
-    var cy = ((y_1 + y_2)/2) - (options.thickness/2);
-
-    var angle = Math.atan2((y_1 - y_2), (x_1 - x_2))*(180/Math.PI);
-    var html_line = `<div style = "padding: 0px; margin: 0px; height: ${options.thickness}px; background-color: ${options.colour}; line-height: 1px; position: absolute; left: ${cx}px; top: ${cy}px; width: ${length}px; transform: rotate(${angle}deg);"></div>`;
+    //Apply optional formatting
+    if (options.colour)
+      html_line.color = options.colour;
+    if (options.thickness)
+      html_line.size = options.thickness;
+    html_line.show();
 
     //Return statement
     return html_line;

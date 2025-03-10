@@ -52,13 +52,18 @@
     if (!options.return_leaflet != false) options.return_leaflet = true;
 
     //Declare local instance variables
-    var ot_turf_obj = getTurfObject(ot_format);
-    var turf_obj = getTurfObject(format);
-    var turf_operation = turf[options.operation_type](turf_obj, ot_turf_obj);
+    try {
+      var ot_turf_obj = getTurfObject(ot_format);
+      var turf_obj = getTurfObject(format);
+      var turf_operation = turf[options.operation_type](turf_obj, ot_turf_obj);
 
-    //Return statement
-    if (turf_operation)
+      //Return statement
+      if (turf_operation)
+        return (options.return_leaflet) ? convertToLeaflet(turf_operation) : turf_operation;
+    } catch (e) {
+      //Return statement
       return (options.return_leaflet) ? convertToLeaflet(turf_operation) : turf_operation;
+    }
   }
 }
 

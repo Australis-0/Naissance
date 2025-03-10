@@ -62,8 +62,6 @@
               var generated_line = generateLine(local_graph_element, local_to_element, {
                 colour: "white"
               });
-
-              element.innerHTML += generated_line;
             }
           }
       }

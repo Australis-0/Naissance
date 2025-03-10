@@ -103,17 +103,18 @@
       if (all_scope_keys[i] == "remove_brush_coords_from_selected_polities") {
         var mask_geometries = main.brush.masks[options.mask_type];
 
-        for (var x = 0; x < mask_geometries.length; x++) {
-          try {
-            var local_coords = getEntityCoords(mask_geometries[x].options.className, main.date, { is_non_inclusive: true });
+        for (var x = 0; x < mask_geometries.length; x++)
+          if (mask_geometries[x]) {
+            try {
+              var local_coords = getEntityCoords(mask_geometries[x].options.className, main.date, { is_non_inclusive: true });
 
-            var local_difference = difference(local_coords, geometry);
+              var local_difference = difference(local_coords, geometry);
 
-            setEntityCoords(mask_geometries[x].options.className, local_difference);
-          } catch (e) {
-            console.log(e);
+              setEntityCoords(mask_geometries[x].options.className, local_difference);
+            } catch (e) {
+              console.log(e);
+            }
           }
-        }
       } else if (all_scope_keys[i] == "remove_brush_coords_outside_selected_polities") {
         var mask_geometries = main.brush.masks[options.mask_type];
         var mask_union;
