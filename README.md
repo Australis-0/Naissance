@@ -9,6 +9,8 @@
 
 [![Join our community!](https://img.shields.io/discord/548994743925997570?label=Discord&style=for-the-badge)](https://discord.gg/89kQY2KFQz) ![](https://img.shields.io/github/languages/code-size/Australis-0/Naissance?style=for-the-badge) ![](https://img.shields.io/github/downloads/Australis-0/Naissance/total?style=for-the-badge)
 
+- E-mail: [vf.confoederatio@gmail.com](mailto:vf.confoederatio@gmail.com)
+
 **Abstract.**
 
 Naissance is an open-source historical 3D GIS built for proxy modelling, raster input and wrangling, simulation, and statistical analysis with undo/redo trees and version control with user-first UI design. We aim to eventually enable modernised data visualisation and mapmaking to create interactive atlases, different mapmodes, and 3D/video export options. Naissance is currently in **beta**, with features such as gridmap editing planned for future integration over from UF.
