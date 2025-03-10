@@ -51,7 +51,8 @@
         );
 
         //Append local_graph_entry.connections to element, drawing lines in between table elements
-        /*if (local_graph_entry.connection_ids)
+        //[WIP] - This needs to be debugged later
+        if (local_graph_entry.connection_ids)
           //Iterate over local_graph_entry.connection_ids
           for (var x = 0; x < local_graph_entry.connection_ids.length; x++) {
             var local_connection_id = local_graph_entry.connection_ids[x];
@@ -62,9 +63,9 @@
                 colour: "white"
               });
 
-              //element.innerHTML += generated_line;
+              element.innerHTML += generated_line;
             }
-          }*/
+          }
       }
     }
 
