@@ -8,7 +8,6 @@ config.defines.common = {
   months_uppercase: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
   selectors: {
     //Interface
-
     map: "map", //The query selector for the main map element.
     left_sidebar: `#left-sidebar`, //The query selector for the left sidebar container.
     right_sidebar: `#right-sidebar`, //The query selector for the right sidebar container.
@@ -24,6 +23,8 @@ config.defines.common = {
       hierarchy: `#hierarchy`, //The query selector for the actual hierarchy tab or supercontainer.
       hierarchy_container: `#hierarchy-container`, //The query selector for the actual hierarchy container.
         group_actions_context_menu_anchor: `#context-menu-container`,
+    //Undo/Redo
+      undo_redo_container: `#undo-redo-ui-container`, //The query selector for the actual Undo/Redo container.
     date_container: `#date-container`, //The query selector for the global date container to be populated automatically.
     date_fields: `#date-container input`, //The query selector on which to apply 'keyup' update interactivity.
       day_el: `#date-container #day-input`,
@@ -41,10 +42,12 @@ config.defines.common = {
     left_sidebar_pages: `#left-sidebar [page="true"]`,
     topbar_tab_buttons: `#topbar > ul li`, //The query selector for all topbar tab buttons.
       file_button: `#topbar .file`, //The FILE button query selector.
+      undo_redo_button: `#topbar .undo_redo`, //The UNDO-REDO button query selector
       map_button: `#topbar .map`, //The MAP button query selector.
 
       file_page: `#left-sidebar #file-tab`,
       map_page: `#left-sidebar #hierarchy-tab`,
+      undo_redo_page: `#left-sidebar #undo-redo-tab`,
 
     //Map
     entity_ui: `.leaflet-popup`,

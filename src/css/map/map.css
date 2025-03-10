@@ -8,8 +8,8 @@
   z-index: 0;
 }
 
-div.leaflet-control-zoom {
-  display: none;
+div.leaflet-control-zoom, .maptalks-attribution {
+  display: none !important;
 }
 .leaflet-popup {
   text-align: inherit !important;

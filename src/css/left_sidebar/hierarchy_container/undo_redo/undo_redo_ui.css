@@ -1,5 +1,5 @@
-/* -- Sidebar File UI Styling -- */
-.file-container {
+/* - Undo/Redo UI Styling -- */
+.undo-redo-container {
   position: absolute;
   top: calc(4.5vh + 3rem + 5px);
   left: 5px;
@@ -13,7 +13,7 @@
   font-family: "Barlow";
   font-weight: 300;
 }
-.file-container .hierarchy {
+.undo-redo-container .hierarchy {
   color: black;
   height: calc(75.5vh - 32.5px);
   overflow-y: auto;
@@ -22,10 +22,4 @@
   .interaction-container {
     max-width: none;
   }
-}
-
-/* -- Input styling -- */
-.file-container input[type="text"] {
-  background: none;
-  border: 1px solid white;
 }

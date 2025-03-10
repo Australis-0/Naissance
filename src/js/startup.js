@@ -166,6 +166,7 @@ if (!global.config) global.config = {};
   initialiseUndoRedo();
   initialiseUndoRedoActions();
 
+  initialiseUndoRedoUI();
   initialiseUI();
 
   //UI loop

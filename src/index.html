@@ -21,6 +21,7 @@
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_colours.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_context_menus.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/hierarchy/hierarchy_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/left_sidebar/hierarchy_container/undo_redo/undo_redo_ui.css" type = "text/css">
 
 		<link rel = "stylesheet" href = "./css/map/map.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/map/brush/brush.css" type = "text/css">
@@ -31,7 +32,7 @@
 		<link rel = "stylesheet" href = "./css/right_sidebar/brush_ui.css" type = "text/css">
 		<link rel = "stylesheet" href = "./css/right_sidebar/mapmode_ui.css" type = "text/css">
 
-		<link rel = "stylesheet" href = "./css/topbar/tabs_ui.css" type = "text/css">
+		<link rel = "stylesheet" href = "./css/topbar/topbar_ui.css" type = "text/css">
 
 		<!-- HTML2Canvas, Leaflet.js, Leaflet Geodesy, Maptalks, Sortable, Tippy.js, Turf.js -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.css">
@@ -118,8 +119,19 @@
 		<div id = "topbar" class = "topbar-container">
 			<ul>
 				<li class = "file"><a href = "#">File</a></li>
+				<li class = "undo_redo"><a href = "#">Undo/Redo</a></li>
 				<li class = "map active"><a href = "#">Map</a></li>
 			</ul>
+
+			<!-- Undo/redo buttons -->
+			<div id = "topbar-action-buttons-container">
+				<span class = "small-topbar-button undo-button" onclick = "undoAction();">
+	        <img src = "gfx/interface/undo_button.png" draggable = "false">
+	      </span>
+	      <span class = "small-topbar-button redo-button" onclick = "redoAction();">
+	        <img src = "gfx/interface/redo_button.png" draggable = "false">
+	      </span>
+			</div>
 		</div>
 
 		<!-- Left Sidebar -->
@@ -137,6 +149,18 @@
 					</div>
 					<div id = "file-hierarchy" class = "hierarchy">
 					</div>
+				</div>
+			</div>
+			<div id = "undo-redo-tab" class = "undo-redo-container hidden" page = "true">
+				<div id = "undo-redo-container" class = "hierarchy-body-container">
+					<div id = "undo-redo-header" class = "hierarchy-header">UNDO/REDO</div>
+					<hr class = "hierarchy-header-line">
+					<br>
+
+					<!-- Undo/Redo Management Buttons -->
+
+					<!-- Undo/Redo Container -->
+					<div id = "undo-redo-ui-container"></div>
 				</div>
 			</div>
 			<div id = "hierarchy-tab" class = "hierarchy-container" page = "true">

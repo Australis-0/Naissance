@@ -59,6 +59,9 @@
         populateFolderExplorer("file-hierarchy", main.selected_path, undefined, file_hierarchy_options);
       };
     };
+    getUISelector("undo_redo_button").onclick = function (e) {
+      switchTopbarTab("undo_redo");
+    };
     getUISelector("map_button").onclick = function (e) {
       switchTopbarTab("map");
     };

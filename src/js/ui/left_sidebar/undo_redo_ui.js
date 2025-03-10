@@ -75,12 +75,13 @@
   //initialiseUndoRedoUI() - Initialises undo/redo elements in UI. [WIP] - Finish function body
   function initialiseUndoRedoUI () {
     //Declare local instance variables
-    var undo_redo_ui_el = document.getElementById(`undo-redo-ui-container`);
+    var common_selectors = config.defines.common.selectors;
+    var undo_redo_ui_el = document.querySelector(common_selectors.undo_redo_container);
 
     //Create global.undo_redo_loop
     global.undo_redo_loop = setInterval(function(){
       //Generate timeline table element
-      //generateTimelineTableElement(undo_redo_ui_el);
+      generateTimelineTableElement(undo_redo_ui_el);
     }, 1000);
   }
 }

@@ -4,7 +4,7 @@
   left: 5px;
   bottom: 5px;
 
-  height: 20vh;
+  height: calc(20vh - 3rem);
   width: 100%;
 
   background-color: rgba(0, 0, 0, 0.85);
