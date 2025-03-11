@@ -1,171 +1,141 @@
 //Declare functions
 {
   function generateTimelineCanvasElement (arg0_canvas, arg1_options) {
-    // Convert from parameters
+    //Convert from parameters
     var canvas = arg0_canvas;
     var options = (arg1_options) ? arg1_options : {};
 
-    // Initialize options
-    if (options.flipped !== false) options.flipped = true;
-
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous render
-
-    // Declare local instance variables
-    var timeline_graph = generateTimelineGraph();
-    if (options.flipped) timeline_graph = getFlippedTimeline(timeline_graph);
-
-    var all_graph_keys = Object.keys(timeline_graph);
-    var nodeRadius = 15; // Node circle size
-    var spacingX = 80;
-    var spacingY = 60;
-
-    // Store node positions for event handling
-    var nodePositions = {};
-
-    // Determine canvas size based on graph
-    var timeline_height = 1 + getTimelineMaxY(timeline_graph);
-    var timeline_width = getTimelineMaxX(timeline_graph);
-    canvas.width = timeline_width * spacingX + 100;
-    canvas.height = timeline_height * spacingY + 100;
-
-    // Iterate over all graph keys and render nodes
-    all_graph_keys.forEach((key) => {
-        var local_graph_entry = timeline_graph[key];
-        var x = local_graph_entry.x * spacingX + 50;
-        var y = local_graph_entry.y * spacingY + 50;
-
-        // Store position for click detection
-        nodePositions[key] = { x, y, radius: nodeRadius };
-
-        // Draw node (circle)
-        ctx.beginPath();
-        ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
-        ctx.fillStyle = "white";
-        ctx.fill();
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-        ctx.closePath();
-
-        // Draw text inside node
-        ctx.fillStyle = "black";
-        ctx.font = "12px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(local_graph_entry.data?.name || "Unlisted", x, y);
-    });
-
-    // Draw connections
-    all_graph_keys.forEach((key) => {
-        var local_graph_entry = timeline_graph[key];
-        var startX = nodePositions[key].x;
-        var startY = nodePositions[key].y;
-
-        if (local_graph_entry.connection_ids) {
-            local_graph_entry.connection_ids.forEach((connKey) => {
-                if (nodePositions[connKey]) {
-                    var endX = nodePositions[connKey].x;
-                    var endY = nodePositions[connKey].y;
-
-                    // Draw line between nodes
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY);
-                    ctx.lineTo(endX, endY);
-                    ctx.strokeStyle = "white";
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    ctx.closePath();
-                }
-            });
-        }
-    });
-
-    // Add click event listener to detect node clicks
-    canvas.onclick = function (event) {
-        var rect = canvas.getBoundingClientRect();
-        var clickX = event.clientX - rect.left;
-        var clickY = event.clientY - rect.top;
-
-        for (let key in nodePositions) {
-            let { x, y, radius } = nodePositions[key];
-            let distance = Math.sqrt((clickX - x) ** 2 + (clickY - y) ** 2);
-            if (distance <= radius) {
-                console.log(`Clicked on key: ${key}`);
-                break;
-            }
-        }
-    };
-  }
-
-  /*
-    generateTimelineTableElement() - Generates a timeline table element of the current undo/redo tree.
-    arg0_element: (HTMLElement)
-    arg1_options: (Object)
-      flipped: (Boolean) - Optional. True by default.
-  */
-  function generateTimelineTableElement (arg0_element, arg1_options) { //[WIP] - Fix lines and finish function body
-    //Convert from parameters
-    var element = arg0_element;
-    var options = (arg1_options) ? arg1_options : {};
-
     //Initialise options
-    if (options.flipped != false) options.flipped = true;
+    if (options.flipped != false)
+      options.flipped = true;
 
     //Declare local instance variables
-    var table_html = [];
+    var ctx = canvas.getContext("2d");
     var timeline_graph = generateTimelineGraph();
-      //Flip timeline graph if applicable
-      if (options.flipped) timeline_graph = getFlippedTimeline(timeline_graph);
+      if (options.flipped)
+        timeline_graph = getFlippedTimeline(timeline_graph);
 
     var all_graph_keys = Object.keys(timeline_graph);
+    var spacing_x = 80;
+    var spacing_y = 60;
+
+    //Store node positions for event handling
+    var node_positions = {};
+    var row_tracker = {};
+
+    //Determine canvas size based on graph
     var timeline_height = 1 + getTimelineMaxY(timeline_graph);
     var timeline_width = getTimelineMaxX(timeline_graph);
 
-    //Populate table_html with timeline_x; timeline_y
-    var table_graph_el = generateTable(timeline_width, timeline_height);
+    canvas.width = timeline_width*spacing_x + 100;
+    canvas.height = timeline_height*spacing_y + 100;
 
-    //Assign table_html to element
-    element.innerHTML = table_graph_el;
+    //Clear previous render
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous render
 
-    //Iterate over all_graph_keys
+    //Iterate over all graph keys and render nodes
     for (var i = 0; i < all_graph_keys.length; i++) {
       var local_graph_entry = timeline_graph[all_graph_keys[i]];
-      var local_graph_entry_name = `Unlisted Action`;
+      var local_x = local_graph_entry.x*spacing_x - 50;
+      var local_y = local_graph_entry.y*spacing_y + 10;
 
-      var local_graph_element = element.querySelector(`[id='${local_graph_entry.x}-${local_graph_entry.y}']`);
+      if (!row_tracker[local_graph_entry.y]) row_tracker[local_graph_entry.y] = [];
+        row_tracker[local_graph_entry.y].push(all_graph_keys[i]);
 
-      //Make sure local_graph_element exists
-      if (local_graph_element) {
-        //Append local_graph_entry.data.name to element
-        if (local_graph_entry.data)
-          if (local_graph_entry.data.name)
-            local_graph_entry_name = local_graph_entry.data.name;
-        local_graph_element.innerHTML = local_graph_entry_name;
+      //Measure text width and define node height
+      var node_height = 14;
+      var node_text = (local_graph_entry.data.name) ?
+        local_graph_entry.data.name : "Unlisted";
+      var text_width = ctx.measureText(node_text).width;
 
-        //Set ID in 'class' attribute
-        local_graph_element.setAttribute("class",
-          local_graph_element.getAttribute("class") + ` ${all_graph_keys[i]}`
-        );
+      //Store position for click detection
+      node_positions[all_graph_keys[i]] = {
+        id: `${local_graph_entry.x}-${local_graph_entry.y}`,
+        x: local_x,
+        y: local_y,
 
-        //Append local_graph_entry.connections to element, drawing lines in between table elements
-        //[WIP] - This needs to be debugged later
-        if (local_graph_entry.connection_ids)
-          //Iterate over local_graph_entry.connection_ids
-          for (var x = 0; x < local_graph_entry.connection_ids.length; x++) {
-            var local_connection_id = local_graph_entry.connection_ids[x];
-            var local_to_element = element.querySelector(`[class*='${local_connection_id}']`);
+        height: node_height,
+        width: text_width
+      };
 
-            if (local_to_element) {
-              var generated_line = generateLine(local_graph_element, local_to_element, {
-                colour: "white"
-              });
-            }
+      //Draw text for node
+      ctx.fillStyle = "white";
+      ctx.font = `${node_height}px Barlow Light`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(node_text, local_x, local_y);
+    }
+
+    //Draw horizontal lines
+    var all_row_tracker_keys = Object.keys(row_tracker);
+
+    for (var i = 0; i < all_row_tracker_keys.length; i++) {
+      var local_row = row_tracker[all_row_tracker_keys[i]];
+        local_row.sort((a, b) => node_positions[a].x - node_positions[b].x); //Sort nodes by X position
+
+      for (var x = 0; x < local_row.length - 1; x++) {
+        var local_end_key = local_row[x + 1];
+        var local_start_key = local_row[x];
+
+        var local_end_node = node_positions[local_end_key];
+        var local_end_x = local_end_node.x - local_end_node.width/2 - local_end_node.height/2;
+        var local_end_y = local_end_node.y;
+        var local_start_node = node_positions[local_start_key];
+        var local_start_x = local_start_node.x + local_start_node.width/2 + local_start_node.height/2;
+        var local_start_y = local_start_node.y;
+
+        //Draw line between nodes
+        ctx.beginPath();
+        ctx.moveTo(local_start_x, local_start_y);
+        ctx.lineTo(local_end_x, local_end_y);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.closePath();
+      }
+    }
+
+    //Draw vertical lines
+    for (var i = 0; i < all_graph_keys.length; i++) {
+      var local_graph_entry = timeline_graph[all_graph_keys[i]];
+      var local_node = node_positions[all_graph_keys[i]];
+      var local_start_x = local_node.x;
+      var local_start_y = local_node.y - local_node.height;
+
+      if (local_graph_entry.connection_ids) {
+        for (var x = 0; x < local_graph_entry.connection_ids.length; x++)
+          if (node_positions[local_graph_entry.connection_ids[x]]) {
+            var local_connecting_node = node_positions[local_graph_entry.connection_ids[x]];
+            var local_end_x = local_connecting_node.x;
+            var local_end_y = local_connecting_node.y + local_node.height;
+
+            //Draw line between nodes
+            ctx.beginPath();
+            ctx.moveTo(local_start_x, local_start_y);
+            ctx.lineTo(local_end_x, local_end_y);
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
           }
       }
     }
 
-    //Return statement
-    return element.innerHTML;
+    //Add click event listener to detect node clicks
+    canvas.onclick = function (e) {
+      var all_node_positions = Object.keys(node_positions);
+      var canvas_el_rect = canvas.getBoundingClientRect();
+      var click_x = e.clientX - canvas_el_rect.left;
+      var click_y = e.clientY - canvas_el_rect.top;
+
+      //Iterate over all_node_positions
+      for (var i = 0; i < all_node_positions.length; i++) {
+        var local_node = node_positions[all_node_positions[i]];
+
+        if (click_x >= local_node.x - local_node.width/2 && click_x <= local_node.x + local_node.width && click_y >= local_node.y - local_node.height/2 && click_y <= local_node.y + local_node.height/2)
+          console.log(`Clicked on key: ${local_node.id}`, local_node);
+      }
+    };
   }
 
   //initialiseUndoRedoUI() - Initialises undo/redo elements in UI. [WIP] - Finish function body

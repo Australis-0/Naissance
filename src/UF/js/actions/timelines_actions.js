@@ -14,7 +14,7 @@
     //Convert from parameters
     var parent_timeline_id = (arg0_parent_timeline) ? arg0_parent_timeline : global.actions.initial_timeline;
     var options = (arg1_options) ? arg1_options : {};
-  
+
     //Declare local instance variables
     var new_timeline_id = generateRandomID(global.timelines);
     var parent_timeline_array = global.timelines[parent_timeline_id];
@@ -199,13 +199,14 @@
           var child_timeline_width = getTimelineWidth(local_child_timeline_id);
 
           //Calculate x_offset; y_offset
-          var local_x_offset = x_offset + returnSafeNumber(local_child_timeline[0].parent_timeline_index);
-          var local_y_offset = y_offset + current_y_offset + child_timeline_width;
+          var local_x_offset = returnSafeNumber(local_child_timeline[0].parent_timeline_index);
+          var local_y_offset = child_timeline_width;
 
           current_y_offset += child_timeline_width;
 
           //Iterate recursively - This causes a max. stack call size error for some reason
           var new_timeline_graph = generateTimelineGraph(local_child_timeline_id, {
+            width: child_timeline_width,
             x_offset: local_x_offset,
             y_offset: local_y_offset,
 
@@ -257,12 +258,12 @@
       var local_element = timeline_graph[all_elements[i]];
 
       local_element.x += x_offset;
-      local_element.y += y_offset;
+      local_element.y++;
 
       if (local_element.connections)
         for (var x = 0; x < local_element.connections.length; x++) {
           local_element.connections[x][0] += x_offset;
-          local_element.connections[x][1] += y_offset;
+          local_element.connections[x][1]++;
         }
     }
 
