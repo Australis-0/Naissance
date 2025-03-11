@@ -25,15 +25,21 @@
       if (polygon)
         try { delta_polygon = difference(polygon, intersection_polygon); } catch (e) {}
 
-      if (!do_not_add_to_undo_redo)
+      if (!do_not_add_to_undo_redo) {
+        var new_brush_obj = (brush_obj.current_path) ?
+          JSON.parse(JSON.stringify(brush_obj.current_path)) : undefined;
+
         performAction({
           action_id: "add_to_brush",
           redo_function: "setBrushToPolygon",
-          redo_function_parameters: [JSON.parse(JSON.stringify(brush_obj.current_path)), true],
+          redo_function_parameters: [new_brush_obj, true],
           undo_function: "setBrushToPolygon",
           undo_function_parameters: [old_brush_obj, true]
         });
-    } catch (e) {}
+      }
+    } catch (e) {
+      console.log(e);
+    }
 
     //Refresh brush if action was called from Undo/Redo
     if (do_not_add_to_undo_redo)
@@ -83,14 +89,18 @@
       refreshBrush();
 
       //2. Add to actions
-      if (!do_not_add_to_undo_redo)
+      if (!do_not_add_to_undo_redo) {
+        var new_brush_obj = (brush_obj.current_path) ?
+          JSON.parse(JSON.stringify(brush_obj.current_path)) : undefined;
+
         performAction({
           action_id: "remove_from_brush",
           redo_function: "setBrushToPolygon",
-          redo_function_parameters: [JSON.parse(JSON.stringify(brush_obj.current_path)), true],
+          redo_function_parameters: [new_brush_obj, true],
           undo_function: "setBrushToPolygon",
           undo_function_parameters: [old_brush_obj, true]
         });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -160,7 +170,7 @@
     //Convert from parameters
     var polygon = arg0_polygon;
 
-    console.log(`setBrushToPolygon()`, polygon);
+    console.log(`setBrushToPolygon()`, polygon, global.actions.current_index);
 
     //Declare local instance variables
     var brush_obj = main.brush;

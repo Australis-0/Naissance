@@ -1,5 +1,102 @@
 //Declare functions
 {
+  function generateTimelineCanvasElement (arg0_canvas, arg1_options) {
+    // Convert from parameters
+    var canvas = arg0_canvas;
+    var options = (arg1_options) ? arg1_options : {};
+
+    // Initialize options
+    if (options.flipped !== false) options.flipped = true;
+
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous render
+
+    // Declare local instance variables
+    var timeline_graph = generateTimelineGraph();
+    if (options.flipped) timeline_graph = getFlippedTimeline(timeline_graph);
+
+    var all_graph_keys = Object.keys(timeline_graph);
+    var nodeRadius = 15; // Node circle size
+    var spacingX = 80;
+    var spacingY = 60;
+
+    // Store node positions for event handling
+    var nodePositions = {};
+
+    // Determine canvas size based on graph
+    var timeline_height = 1 + getTimelineMaxY(timeline_graph);
+    var timeline_width = getTimelineMaxX(timeline_graph);
+    canvas.width = timeline_width * spacingX + 100;
+    canvas.height = timeline_height * spacingY + 100;
+
+    // Iterate over all graph keys and render nodes
+    all_graph_keys.forEach((key) => {
+        var local_graph_entry = timeline_graph[key];
+        var x = local_graph_entry.x * spacingX + 50;
+        var y = local_graph_entry.y * spacingY + 50;
+
+        // Store position for click detection
+        nodePositions[key] = { x, y, radius: nodeRadius };
+
+        // Draw node (circle)
+        ctx.beginPath();
+        ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+        ctx.closePath();
+
+        // Draw text inside node
+        ctx.fillStyle = "black";
+        ctx.font = "12px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(local_graph_entry.data?.name || "Unlisted", x, y);
+    });
+
+    // Draw connections
+    all_graph_keys.forEach((key) => {
+        var local_graph_entry = timeline_graph[key];
+        var startX = nodePositions[key].x;
+        var startY = nodePositions[key].y;
+
+        if (local_graph_entry.connection_ids) {
+            local_graph_entry.connection_ids.forEach((connKey) => {
+                if (nodePositions[connKey]) {
+                    var endX = nodePositions[connKey].x;
+                    var endY = nodePositions[connKey].y;
+
+                    // Draw line between nodes
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            });
+        }
+    });
+
+    // Add click event listener to detect node clicks
+    canvas.onclick = function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var clickX = event.clientX - rect.left;
+        var clickY = event.clientY - rect.top;
+
+        for (let key in nodePositions) {
+            let { x, y, radius } = nodePositions[key];
+            let distance = Math.sqrt((clickX - x) ** 2 + (clickY - y) ** 2);
+            if (distance <= radius) {
+                console.log(`Clicked on key: ${key}`);
+                break;
+            }
+        }
+    };
+  }
+
   /*
     generateTimelineTableElement() - Generates a timeline table element of the current undo/redo tree.
     arg0_element: (HTMLElement)
@@ -80,7 +177,7 @@
     //Create global.undo_redo_loop
     global.undo_redo_loop = setInterval(function(){
       //Generate timeline table element
-      generateTimelineTableElement(undo_redo_ui_el);
+      generateTimelineCanvasElement(undo_redo_ui_el);
     }, 1000);
   }
 }
