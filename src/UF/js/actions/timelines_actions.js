@@ -557,6 +557,8 @@
 
     //Ensure there's an action to undo
     if (global.actions.current_index > 0) {
+      console.log(`Current timeline:`, current_timeline, `Current index:`, global.actions.current_index);
+
       //Update global index
       global.actions.current_index--;
       var local_element = current_timeline[global.actions.current_index];
@@ -569,7 +571,15 @@
 
       //Return statement
       return true;
+    } else {
+      var local_element = current_timeline[global.actions.current_index];
+
+      if (local_element.parent_timeline_id) {
+        global.actions.current_timeline = local_element.parent_timeline_id;
+        global.actions.current_index = global.timelines[global.actions.current_timeline].length - 1;
+      }
     }
+
     return false;
   }
 }
