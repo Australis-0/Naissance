@@ -467,13 +467,13 @@ function redoAction () {
   var current_timeline = global.timelines[global.actions.current_timeline];
 
   //See if there's an action to redo
-  if (current_timeline[current_index + 1]) {
+  if (current_timeline[current_index + 1] && current_index != current_timeline.length - 1) {
     var local_element = current_timeline[current_index + 1];
 
     //Move forwards in the current timeline by default
     global[local_element.redo_function](...local_element.redo_function_parameters);
     local_element.delta_toggle = "undo";
-    global.actions.current_index = current_index + 1;
+    global.actions.current_index++;
 
     //Return statement; action successfully redone
     return true;
@@ -513,7 +513,8 @@ function performAction (arg0_options) {
   };
 
   //Check if action was grouped
-  var action_grouped = groupActions(new_action);
+  var action_grouped = (!options.do_not_group) ?
+    groupActions(new_action) : undefined;
 
   if (!action_grouped)
     //If the current_index is not the same as the length of the current timeline - 1, split off a new timeline; and set current_timeline to that.
@@ -538,7 +539,6 @@ function performAction (arg0_options) {
 
       //Set current_index
       global.actions.current_index++;
-
       global.actions.current_index = Math.min(global.actions.current_index, current_timeline.length - 1);
     }
 }
@@ -554,13 +554,13 @@ function undoAction () {
   var current_timeline = global.timelines[global.actions.current_timeline];
 
   //See if there's an action to undo
-  if (current_timeline[current_index - 1]) {
-    var local_element = current_timeline[current_index - 1];
+  if (current_timeline[current_index] && current_index != 0) {
+    var local_element = current_timeline[current_index];
 
     //Move backwards in the current timeline by default
     global[local_element.undo_function](...local_element.undo_function_parameters);
     local_element.delta_toggle = "redo";
-    global.actions.current_index = current_index - 1;
+    global.actions.current_index--;
 
     //Return statement; action successfully undone
     return true;

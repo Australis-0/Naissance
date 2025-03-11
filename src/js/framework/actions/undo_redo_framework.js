@@ -21,19 +21,8 @@
         //Action ID handler
         if (["add_to_brush", "remove_from_brush"].includes(current_action.id)) {
           try {
-            if (current_redo_parameters[0])
-              if (last_redo_parameters[0]) {
-                last_redo_parameters[0] = union(last_redo_parameters[0], current_redo_parameters[0]);
-              } else {
-                last_redo_parameters[0] = current_redo_parameters[0];
-              }
-
             if (current_undo_parameters[0])
-              if (last_undo_parameters[0]) {
-                last_undo_parameters[0] = union(last_undo_parameters[0], current_undo_parameters[0]);
-              } else {
-                last_undo_parameters[0] = current_undo_parameters[0];
-              }
+              last_undo_parameters[0] = current_undo_parameters[0];
 
             action_grouped = true;
           } catch (e) {}

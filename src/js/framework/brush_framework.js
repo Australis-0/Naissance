@@ -7,6 +7,7 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
+    var old_brush_obj = JSON.parse(JSON.stringify(brush_obj.current_path));
 
     try {
       //1. Initialise brush.current_path if not defined; process geometry masks
@@ -27,12 +28,16 @@
       if (!do_not_add_to_undo_redo)
         performAction({
           action_id: "add_to_brush",
-          redo_function: "addToBrush",
-          redo_function_parameters: [polygon, true],
-          undo_function: "removeFromBrush",
-          undo_function_parameters: [delta_polygon, true]
+          redo_function: "setBrushToPolygon",
+          redo_function_parameters: [JSON.parse(JSON.stringify(brush_obj.current_path)), true],
+          undo_function: "setBrushToPolygon",
+          undo_function_parameters: [old_brush_obj, true]
         });
     } catch (e) {}
+
+    //Refresh brush if action was called from Undo/Redo
+    if (do_not_add_to_undo_redo)
+      refreshBrush();
 
     //Return statement
     return polygon;
@@ -66,6 +71,7 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
+    var old_brush_obj = JSON.parse(JSON.stringify(brush_obj.current_path));
 
     try {
       //1. Set delta_polygon if possible
@@ -80,14 +86,18 @@
       if (!do_not_add_to_undo_redo)
         performAction({
           action_id: "remove_from_brush",
-          redo_function: "removeFromBrush",
-          redo_function_parameters: [polygon, true],
-          undo_function: "addToBrush",
-          undo_function_parameters: [delta_polygon, true]
+          redo_function: "setBrushToPolygon",
+          redo_function_parameters: [JSON.parse(JSON.stringify(brush_obj.current_path)), true],
+          undo_function: "setBrushToPolygon",
+          undo_function_parameters: [old_brush_obj, true]
         });
     } catch (e) {
       console.log(e);
     }
+
+    //Refresh brush if action was called from Undo/Redo
+    if (do_not_add_to_undo_redo)
+      refreshBrush();
   }
 
   function setBrushAutoSimplify (arg0_auto_simplify) {
@@ -144,5 +154,20 @@
 
     //Set actual brush_obj.simplify_tolerance
     brush_obj.simplify_tolerance = tolerance;
+  }
+
+  function setBrushToPolygon (arg0_polygon) {
+    //Convert from parameters
+    var polygon = arg0_polygon;
+
+    console.log(`setBrushToPolygon()`, polygon);
+
+    //Declare local instance variables
+    var brush_obj = main.brush;
+
+    //Set new brush pat
+    brush_obj.brush_change = true;
+    brush_obj.current_path = polygon;
+    refreshBrush();
   }
 }
