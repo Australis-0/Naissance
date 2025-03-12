@@ -517,7 +517,7 @@
         global.actions.current_index = Math.min(global.actions.current_index, current_timeline.length - 1);
       }
 
-    console.log(`Current index:`, global.actions.current_index);
+    //console.log(`Current index:`, global.actions.current_index);
   }
 
   /*
