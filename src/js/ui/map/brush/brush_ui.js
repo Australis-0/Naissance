@@ -43,13 +43,13 @@
           brush_obj.brush_change = true;
           if (!brush_obj.only_simplify_brush)
             brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
-          brush_obj.current_path = union(brush_obj.current_path, addToBrush(brush_obj.cursor));
+          brush_obj.current_path = union(brush_obj.current_path, brush_obj.cursor);
         } else if (main.events.right_mouse) {
           //Only delete if brush_obj.current_path exists
           if (brush_obj.current_path)
             try {
               brush_obj.brush_change = true;
-              removeFromBrush(brush_obj.cursor);
+              brush_obj.current_path = difference(brush_obj.current_path, brush_obj.cursor);
               if (!brush_obj.only_simplify_brush)
                 brush_obj.current_path = simplify(brush_obj.current_path, brush_obj.simplify_tolerance);
             } catch (e) {
@@ -63,6 +63,16 @@
         //Refresh selection display
         refreshBrush();
       }
+    });
+
+    //Process brush onmouseup
+    map.on("mouseup", function (e) {
+      if (main.events.mouse_pressed)
+        if (main.events.left_mouse) {
+          addToBrush(brush_obj.current_path);
+        } else if (main.events.right_mouse) {
+          removeFromBrush(brush_obj.current_path);
+        }
     });
 
     //Brush cursor outline

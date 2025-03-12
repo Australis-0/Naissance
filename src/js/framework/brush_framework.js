@@ -7,7 +7,8 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var old_brush_obj = JSON.parse(JSON.stringify(brush_obj.current_path));
+    var old_brush_obj = (brush_obj.current_path) ?
+      JSON.parse(JSON.stringify(brush_obj.current_path)) : undefined;
 
     try {
       //1. Initialise brush.current_path if not defined; process geometry masks
@@ -77,7 +78,8 @@
 
     //Declare local instance variables
     var brush_obj = main.brush;
-    var old_brush_obj = JSON.parse(JSON.stringify(brush_obj.current_path));
+    var old_brush_obj = (brush_obj.current_path) ?
+      JSON.parse(JSON.stringify(brush_obj.current_path)) : undefined;
 
     try {
       //1. Set delta_polygon if possible
@@ -85,8 +87,6 @@
       try { delta_polygon = intersection(brush.current_path, polygon); } catch (e) {}
 
       brush_obj.brush_change = true;
-      brush_obj.current_path = difference(brush_obj.current_path, polygon);
-      refreshBrush();
 
       //2. Add to actions
       if (!do_not_add_to_undo_redo) {
