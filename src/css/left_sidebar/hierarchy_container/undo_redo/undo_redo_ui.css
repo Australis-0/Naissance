@@ -13,7 +13,11 @@
   font-family: "Barlow";
   font-weight: 300;
 
-  overflow: auto;
+  #undo-redo-container {
+    height: 100%;
+    overflow: auto;
+    width: calc(100% - 1.5rem);
+  }
 }
 .undo-redo-container .hierarchy {
   color: black;

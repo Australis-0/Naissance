@@ -19,7 +19,7 @@
     var canvas_height = 0;
     var canvas_width = 0;
     var node_height = 14;
-    var spacing_x = 80;
+    var spacing_x = 140;
     var spacing_y = 60;
 
     //Store node positions for event handling
@@ -37,7 +37,7 @@
     //Iterate over all graph keys and render nodes
     for (var i = 0; i < all_graph_keys.length; i++) {
       var local_graph_entry = timeline_graph[all_graph_keys[i]];
-      var local_x = local_graph_entry.x*spacing_x - 50;
+      var local_x = local_graph_entry.x*spacing_x - 100;
       var local_y = local_graph_entry.y*spacing_y + 10;
 
       if (!row_tracker[local_graph_entry.y]) row_tracker[local_graph_entry.y] = [];
@@ -46,14 +46,19 @@
       //Measure text width and define node height
       var node_text = (local_graph_entry.data.name) ?
         local_graph_entry.data.name : "Unlisted";
+      var text_height = node_text.split("\n").length*node_height;
       var text_width = ctx.measureText(node_text).width;
+
+      //Custom text parsing
+      if (local_graph_entry.data.parent_timeline_id)
+        node_text = `Split From Timeline`;
 
       //Store position for click detection
       node_positions[all_graph_keys[i]] = {
         id: `${local_graph_entry.x}-${local_graph_entry.y}`,
         name: node_text,
 
-        height: node_height,
+        height: text_height,
         width: text_width,
         x: local_x,
         y: local_y,
@@ -96,7 +101,7 @@
         var local_start_key = local_row[x];
 
         var local_end_node = node_positions[local_end_key];
-        var local_end_x = local_end_node.x - local_end_node.width/2 - local_end_node.height/2;
+        var local_end_x = local_end_node.x - local_end_node.width - local_end_node.height;
         var local_end_y = local_end_node.y;
         var local_start_node = node_positions[local_start_key];
         var local_start_x = local_start_node.x + local_start_node.width/2 + local_start_node.height/2;
