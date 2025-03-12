@@ -12,6 +12,8 @@
   font-size: 1vh;
   font-family: "Barlow";
   font-weight: 300;
+
+  overflow: auto;
 }
 .undo-redo-container .hierarchy {
   color: black;

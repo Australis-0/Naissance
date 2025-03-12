@@ -16,19 +16,20 @@
         timeline_graph = getFlippedTimeline(timeline_graph);
 
     var all_graph_keys = Object.keys(timeline_graph);
+    var canvas_height = 0;
+    var canvas_width = 0;
+    var node_height = 14;
     var spacing_x = 80;
     var spacing_y = 60;
 
     //Store node positions for event handling
     var node_positions = {};
     var row_tracker = {};
+    var saved_image;
 
     //Determine canvas size based on graph
     var timeline_height = 1 + getTimelineMaxY(timeline_graph);
     var timeline_width = getTimelineMaxX(timeline_graph);
-
-    canvas.width = timeline_width*spacing_x + 100;
-    canvas.height = timeline_height*spacing_y + 100;
 
     //Clear previous render
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous render
@@ -43,7 +44,6 @@
         row_tracker[local_graph_entry.y].push(all_graph_keys[i]);
 
       //Measure text width and define node height
-      var node_height = 14;
       var node_text = (local_graph_entry.data.name) ?
         local_graph_entry.data.name : "Unlisted";
       var text_width = ctx.measureText(node_text).width;
@@ -51,19 +51,37 @@
       //Store position for click detection
       node_positions[all_graph_keys[i]] = {
         id: `${local_graph_entry.x}-${local_graph_entry.y}`,
-        x: local_x,
-        y: local_y,
+        name: node_text,
 
         height: node_height,
-        width: text_width
+        width: text_width,
+        x: local_x,
+        y: local_y,
       };
+    }
 
-      //Draw text for node
+    //Calculate canvas.height, canvas.width
+    var all_node_positions_keys = Object.keys(node_positions);
+
+    for (var i = 0; i < all_node_positions_keys.length; i++) {
+      var local_node = node_positions[all_node_positions_keys[i]];
+
+      canvas_height = Math.max(canvas_height, returnSafeNumber(local_node.y + local_node.height));
+      canvas_width = Math.max(canvas_width, returnSafeNumber(local_node.x + local_node.width));
+    }
+
+    canvas.setAttribute("height", canvas_height);
+    canvas.setAttribute("width", canvas_width);
+
+    //Draw action nodes
+    for (var i = 0; i < all_node_positions_keys.length; i++) {
+      var local_node = node_positions[all_node_positions_keys[i]];
+
       ctx.fillStyle = "white";
       ctx.font = `${node_height}px Barlow Light`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(node_text, local_x, local_y);
+      ctx.fillText(local_node.name, local_node.x, local_node.y);
     }
 
     //Draw horizontal lines
@@ -120,6 +138,11 @@
           }
       }
     }
+
+    //Iterate over all node_positions and fetch maximum x and y to set canvas.height; canvas.width
+    var all_node_positions_keys = Object.keys(node_positions);
+    var canvas_height = 0;
+    var canvas_width = 0;
 
     //Add click event listener to detect node clicks
     canvas.onclick = function (e) {
