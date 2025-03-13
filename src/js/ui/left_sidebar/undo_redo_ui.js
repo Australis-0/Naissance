@@ -193,6 +193,6 @@
     global.undo_redo_loop = setInterval(function(){
       //Generate timeline table element
       generateTimelineCanvasElement(undo_redo_ui_el);
-    }, 1000);
+    }, 100);
   }
 }

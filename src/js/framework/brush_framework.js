@@ -170,8 +170,6 @@
     //Convert from parameters
     var polygon = arg0_polygon;
 
-    console.log(`setBrushToPolygon()`, polygon, global.actions.current_index);
-
     //Declare local instance variables
     var brush_obj = main.brush;
 
