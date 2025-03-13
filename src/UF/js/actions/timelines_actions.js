@@ -155,7 +155,7 @@
 
     //Declare local instance variables
     var all_timelines = Object.keys(global.timelines);
-    var current_y_offset = 0;
+    var current_y_offset = returnSafeNumber(options.y_offset);
     var timeline_array = global.timelines[timeline_id];
     var timeline_coordinates = {};
     var timeline_graph = {}; //Object list of UI elements: { x: (Number), y: (Number), name: (String), connections: (Array<Array<x, y>>) };
@@ -202,13 +202,11 @@
           var local_x_offset = returnSafeNumber(local_child_timeline[0].parent_timeline_index);
           var local_y_offset = child_timeline_width;
 
-          current_y_offset += child_timeline_width;
-
           //Iterate recursively - This causes a max. stack call size error for some reason
           var new_timeline_graph = generateTimelineGraph(local_child_timeline_id, {
             width: child_timeline_width,
             x_offset: local_x_offset,
-            y_offset: local_y_offset,
+            y_offset: i,
 
             x_original: x_offset,
             y_original: y_offset,
@@ -246,7 +244,7 @@
       timeline_graph[local_id].timeline_id = timeline_id;
       timeline_graph[local_id].timeline_index = i;
       timeline_graph[local_id].x = i;
-      timeline_graph[local_id].y = 0;
+      timeline_graph[local_id].y = current_y_offset;
 
       //Set last_id
       last_id = local_id;

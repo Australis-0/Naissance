@@ -124,6 +124,9 @@
         var local_start_x = local_start_node.x + local_start_node.width/2 + local_start_node.height/2;
         var local_start_y = local_start_node.y;
 
+        if (x >= 1)
+          local_start_x += local_start_node.height*2 + 4;
+
         //Check if line should be drawn
         if (local_end_node.data.parent_timeline_id) {
           //Draw line between nodes
