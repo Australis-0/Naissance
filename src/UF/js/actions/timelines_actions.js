@@ -588,7 +588,7 @@
 
     Returns: (Boolean) - Whether the action was successfully undone.
   */
-  function undoAction (arg0_options) {
+  function undoAction (arg0_options) { //[WIP] - Why is this so janky?
     //Convert from parameters
     var options = (arg0_options) ? arg0_options : {};
 

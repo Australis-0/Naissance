@@ -216,14 +216,11 @@
     //Convert from parameters
     var args = arg0_arguments;
 
-    console.log(`setEntitiesCoords() fired!`);
-
     //Iterate over all arguments
     for (var i = 0; i < args.length; i++)
       if (args[i].type == "brush") {
         setBrushToPolygon(args[i].polygon);
       } else {
-        console.log(args[i]);
         if (args[i].type == "entity")
           setEntityCoords(args[i].entity_id, args[i].polygon, (args[i].date) ? args[i].date : main.date);
       }
