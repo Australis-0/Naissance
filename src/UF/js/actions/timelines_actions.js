@@ -503,6 +503,7 @@
           new_timeline.push(new_action);
 
           //Set current_timeline; current_index to new_timeline
+          new_timeline[0].parent_timeline_index = JSON.parse(JSON.stringify(global.actions.current_index));
           global.actions.current_timeline = new_timeline[0].id;
           global.actions.current_index = 1;
         } else {
@@ -528,14 +529,14 @@
 
     Returns: (Boolean) - Whether the action was successfully redone.
   */
-  function redoAction() {
+  function redoAction () {
     //Declare local instance variables
     var current_timeline = global.timelines[global.actions.current_timeline];
+    var local_element = current_timeline[global.actions.current_index];
 
-    // Ensure there's an action to redo
+    //Ensure there's an action to redo
     if (global.actions.current_index < current_timeline.length - 1) {
       global.actions.current_index++;
-      var local_element = current_timeline[global.actions.current_index];
 
       //Execute redo function
       if (global[local_element.redo_function]) {
@@ -545,7 +546,13 @@
 
       //Return statement
       return true;
+    } else {
+      //Check if there exists a .child_timeline to jump to
+      if (local_element.child_timelines) {
+        console.log(local_element.child_timelines);
+      }
     }
+
     return false;
   }
 
@@ -554,7 +561,7 @@
 
     Returns: (Boolean) - Whether the action was successfully undone.
   */
-  function undoAction() {
+  function undoAction () {
     //Declare local instance variables
     var current_timeline = global.timelines[global.actions.current_timeline];
 
@@ -579,7 +586,8 @@
 
       if (local_element.parent_timeline_id) {
         global.actions.current_timeline = local_element.parent_timeline_id;
-        global.actions.current_index = global.timelines[global.actions.current_timeline].length - 1;
+        global.actions.current_index = (local_element.parent_timeline_index) ?
+          local_element.parent_timeline_index : global.timelines[global.actions.current_timeline].length - 1;
       }
     }
 

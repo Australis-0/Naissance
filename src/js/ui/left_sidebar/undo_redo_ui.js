@@ -124,14 +124,17 @@
         var local_start_x = local_start_node.x + local_start_node.width/2 + local_start_node.height/2;
         var local_start_y = local_start_node.y;
 
-        //Draw line between nodes
-        ctx.beginPath();
-        ctx.moveTo(local_start_x, local_start_y);
-        ctx.lineTo(local_end_x, local_end_y);
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.closePath();
+        //Check if line should be drawn
+        if (local_end_node.data.parent_timeline_id) {
+          //Draw line between nodes
+          ctx.beginPath();
+          ctx.moveTo(local_start_x, local_start_y);
+          ctx.lineTo(local_end_x, local_end_y);
+          ctx.strokeStyle = "white";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+        }
       }
     }
 

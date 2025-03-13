@@ -12,6 +12,14 @@
     //Check to make sure last_action exists
     if (last_action)
       if (last_action.id == current_action.id) {
+        //Guard clause if action cannot be grouped
+        {
+          var current_index = global.actions.current_index;
+          var current_timeline = global.timelines[global.actions.current_timeline];
+
+          if (current_index != current_timeline.length - 1) return;
+        }
+
         var current_redo_parameters = current_action.redo_function_parameters;
         var current_undo_parameters = current_action.undo_function_parameters;
         var current_timeline = global.timelines[global.actions.current_timeline];
