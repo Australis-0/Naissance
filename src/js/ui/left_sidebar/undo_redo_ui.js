@@ -37,7 +37,7 @@
     //Iterate over all graph keys and render nodes
     for (var i = 0; i < all_graph_keys.length; i++) {
       var local_graph_entry = timeline_graph[all_graph_keys[i]];
-      var local_x = local_graph_entry.x*spacing_x - 100;
+      var local_x = local_graph_entry.x*spacing_x - 50;
       var local_y = local_graph_entry.y*spacing_y + 10;
 
       if (!row_tracker[local_graph_entry.y]) row_tracker[local_graph_entry.y] = [];

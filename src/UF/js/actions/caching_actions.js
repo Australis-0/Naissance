@@ -38,7 +38,7 @@ function createAction (arg0_action_key, arg1_options) {
 /*
   deleteAction() - Deletes an action from the action config.
   arg0_action_key: (String) - The key of the action to delete.
-  
+
   Returns: (Object, Action)
 */
 function deleteAction (arg0_action_key) {
@@ -61,7 +61,7 @@ function initialiseUndoRedo () {
   if (!global.actions.current_timeline) {
     var current_timeline_id = generateRandomID(global.timelines);
 
-    global.actions.current_index = 0;
+    global.actions.current_index = 0; //Setting this to -1 removes the 'Unlisted' node from the start of the Undo/Redo tree
     global.actions.current_timeline = current_timeline_id;
     global.actions.initial_timeline = current_timeline_id;
     global.timelines[current_timeline_id] = [];
