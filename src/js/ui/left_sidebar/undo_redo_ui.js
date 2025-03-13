@@ -180,8 +180,12 @@
       for (var i = 0; i < all_node_positions.length; i++) {
         var local_node = node_positions[all_node_positions[i]];
 
-        if (click_x >= local_node.x - local_node.width/2 && click_x <= local_node.x + local_node.width && click_y >= local_node.y - local_node.height/2 && click_y <= local_node.y + local_node.height/2)
+        if (click_x >= local_node.x - local_node.width/2 && click_x <= local_node.x + local_node.width && click_y >= local_node.y - local_node.height/2 && click_y <= local_node.y + local_node.height/2) {
           console.log(`Clicked on key: ${local_node.id}`, local_node);
+
+          //Jump To Timeline
+          jumpToTimeline(local_node.timeline_id, { timeline_index: local_node.timeline_index });
+        }
       }
     };
   }

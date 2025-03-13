@@ -433,13 +433,21 @@
 
       var local_element = global.timelines[split_key[0]][parseInt(split_key[1])];
 
-      //Perform current delta action, then set toggle
-      if (local_element.delta_toggle == "undo") {
-        global[local_element.undo_function](...local_element.undo_function_parameters);
-        local_element.delta_toggle = "redo";
+      if (local_element.delta_toggle) {
+        //Perform current delta action, then set toggle
+        if (local_element.delta_toggle == "undo") {
+          global[local_element.undo_function].apply(null, local_element.undo_function_parameters);
+          local_element.delta_toggle = "redo";
+        } else {
+          global[local_element.redo_function].apply(null, local_element.redo_function_parameters);
+          local_element.delta_toggle = "undo";
+        }
       } else {
-        global[local_element.redo_function](...local_element.redo_function_parameters);
-        local_element.delta_toggle = "undo";
+        if (local_element.parent_timeline_id) {
+          global.actions.current_timeline = local_element.parent_timeline_id;
+          global.actions.current_index = (local_element.parent_timeline_index) ?
+            local_element.parent_timeline_index : global.timelines[global.actions.current_timeline].length - 1;
+        }
       }
     }
 
@@ -452,12 +460,13 @@
     jumpToTimeline() - Jumps to a specific timeline.
     arg0_timeline_id: (String) - The timeline ID to jump to
   */
-  function jumpToTimeline (arg0_timeline_id) {
+  function jumpToTimeline (arg0_timeline_id, arg1_options) {
     //Convert from parameters
     var timeline_id = arg0_timeline_id;
+    var options = (arg1_options) ? arg1_options : {};
 
     //Invoke loadTimeline()
-    loadTimeline(timeline_id, { timeline_index: 0 });
+    loadTimeline(timeline_id, { timeline_index: returnSafeNumber(options.timeline_index, 1) });
   }
 
   /*
@@ -532,7 +541,7 @@
   function redoAction () {
     //Declare local instance variables
     var current_timeline = global.timelines[global.actions.current_timeline];
-    var local_element = current_timeline[global.actions.current_index];
+    var local_element = current_timeline[global.actions.current_index + 1];
 
     //Ensure there's an action to redo
     if (global.actions.current_index < current_timeline.length - 1) {
@@ -547,9 +556,11 @@
       //Return statement
       return true;
     } else {
-      //Check if there exists a .child_timeline to jump to
+      local_element = current_timeline[global.actions.current_index];
+
       if (local_element.child_timelines) {
-        console.log(local_element.child_timelines);
+        global.actions.current_timeline = local_element.child_timelines[0];
+        global.actions.current_index = 0;
       }
     }
 
@@ -567,7 +578,9 @@
 
     //Ensure there's an action to undo
     if (global.actions.current_index > 0) {
-      console.log(`Current timeline:`, current_timeline, `Current index:`, global.actions.current_index);
+      //Make sure delta_toggles are up to date
+      if (global.actions.current_index == current_timeline.length - 1)
+        current_timeline[current_timeline.length - 1].delta_toggle = "redo";
 
       //Update global index
       global.actions.current_index--;
