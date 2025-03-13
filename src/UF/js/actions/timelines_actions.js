@@ -243,6 +243,8 @@
 
       //Add .data field
       timeline_graph[local_id].data = timeline_array[i];
+      timeline_graph[local_id].timeline_id = timeline_id;
+      timeline_graph[local_id].timeline_index = i;
       timeline_graph[local_id].x = i;
       timeline_graph[local_id].y = 0;
 
@@ -497,6 +499,7 @@
         if (current_index != current_timeline.length - 1) {
           var new_timeline = createTimeline(global.actions.current_timeline);
 
+          //Push new action
           new_timeline.push(new_action);
 
           //Set current_timeline; current_index to new_timeline

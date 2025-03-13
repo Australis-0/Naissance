@@ -44,19 +44,31 @@
         row_tracker[local_graph_entry.y].push(all_graph_keys[i]);
 
       //Measure text width and define node height
+      var is_selected = false;
       var node_text = (local_graph_entry.data.name) ?
         local_graph_entry.data.name : "Unlisted";
       var text_height = node_text.split("\n").length*node_height;
       var text_width = ctx.measureText(node_text).width;
 
       //Custom text parsing
+      if (local_graph_entry.data.child_timelines && local_graph_entry.x == 1)
+        node_text = `S. Init.`;
       if (local_graph_entry.data.parent_timeline_id)
         node_text = `Split From Timeline`;
+
+      //is_selected parser
+      if (local_graph_entry.timeline_id == global.actions.current_timeline && local_graph_entry.timeline_index == global.actions.current_index)
+        is_selected = true;
 
       //Store position for click detection
       node_positions[all_graph_keys[i]] = {
         id: `${local_graph_entry.x}-${local_graph_entry.y}`,
         name: node_text,
+
+        data: local_graph_entry.data,
+        is_selected: is_selected,
+        timeline_id: local_graph_entry.timeline_id,
+        timeline_index: local_graph_entry.timeline_index,
 
         height: text_height,
         width: text_width,
@@ -82,7 +94,12 @@
     for (var i = 0; i < all_node_positions_keys.length; i++) {
       var local_node = node_positions[all_node_positions_keys[i]];
 
-      ctx.fillStyle = "white";
+      if (local_node.is_selected) {
+        ctx.fillStyle = `rgb(235, 235, 235)`;
+        ctx.fillRect(local_node.x - local_node.width/2 - local_node.height/2, local_node.y - local_node.height/2 - local_node.height/2, local_node.width + local_node.height, local_node.height + local_node.height);
+      }
+
+      ctx.fillStyle = (!local_node.is_selected) ? "white" : "black";
       ctx.font = `${node_height}px Barlow Light`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";

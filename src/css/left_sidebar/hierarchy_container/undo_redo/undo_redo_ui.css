@@ -14,7 +14,10 @@
   font-weight: 300;
 
   #undo-redo-container {
-    height: 100%;
+    height: calc(100%);
+  }
+  .undo-redo-canvas-container {
+    height: calc(100% - 10vh - 32.5px);
     overflow: auto;
     width: calc(100% - 1.5rem);
   }
