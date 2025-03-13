@@ -193,23 +193,6 @@
   }
 
   /*
-    hideElement() - Hides an HTML element. Appends a 'hidden' class.
-    arg0_element: (HTMLElement) - The HTML element to pass.
-  */
-  function hideElement (arg0_element) {
-    //Convert from parameters
-    var element = arg0_element;
-
-    //Declare local instance variables
-    var class_name = element.getAttribute("class");
-
-    if (!class_name.includes(" hidden"))
-      (class_name) ?
-        element.setAttribute("class", `${class_name} hidden`) :
-        element.setAttribute("class", " hidden");
-  }
-
-  /*
     generateLine() - Generates an HTML line element between two elements.
     arg0_element: (HTMLElement) - The 1st element to pass to the function.
     arg1_element: (HTMLElement) - The 2nd element to pass to the function.
@@ -283,6 +266,30 @@
     return table_html.join("");
   }
 
+  function getCanvasScale (arg0_canvas_el) {
+    //Convert from parameters
+    var canvas_el = arg0_canvas_el;
+
+    //Declare local instance variables
+    var transform_matrix = window.getComputedStyle(canvas_el).transform;
+
+    //Internal guard clause if no transform
+    if (transform_matrix == "none") return 1;
+
+    //Deal with matrix_values
+    var matrix_values = transform_matrix.match(/matrix\(([^)]+)\)/);
+
+    if (matrix_values) {
+      var matrix_array = matrix_values[1].split(", ").map(parseFloat);
+
+      //Return statement
+      return Math.sqrt(matrix_array[0]**2 + matrix_array[1]**2); //Extract scale from matrix
+    }
+
+    //Return statement
+    return 1; //Fallback in case parsing fails
+  }
+
   /*
     getOffset() - Returns the left/top/width/height offset of a given HTML element.
     arg0_element: (HTMLElement) - HTML element to pass.
@@ -328,6 +335,23 @@
 
     //Return statement
     return (element_rect.top - container_rect.top);
+  }
+
+  /*
+    hideElement() - Hides an HTML element. Appends a 'hidden' class.
+    arg0_element: (HTMLElement) - The HTML element to pass.
+  */
+  function hideElement (arg0_element) {
+    //Convert from parameters
+    var element = arg0_element;
+
+    //Declare local instance variables
+    var class_name = element.getAttribute("class");
+
+    if (!class_name.includes(" hidden"))
+      (class_name) ?
+        element.setAttribute("class", `${class_name} hidden`) :
+        element.setAttribute("class", " hidden");
   }
 
   /*

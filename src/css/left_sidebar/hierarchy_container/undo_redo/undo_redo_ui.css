@@ -21,6 +21,9 @@
     overflow: auto;
     width: calc(100% - 1.5rem);
   }
+  .undo-redo-ui-container {
+    transform-origin: center center;
+  }
 }
 .undo-redo-container .hierarchy {
   color: black;

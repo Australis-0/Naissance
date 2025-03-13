@@ -176,8 +176,10 @@
     canvas.onclick = function (e) {
       var all_node_positions = Object.keys(node_positions);
       var canvas_el_rect = canvas.getBoundingClientRect();
-      var click_x = e.clientX - canvas_el_rect.left;
-      var click_y = e.clientY - canvas_el_rect.top;
+      var scale = getCanvasScale(canvas);
+
+      var click_x = (e.clientX - canvas_el_rect.left)/scale;
+      var click_y = (e.clientY - canvas_el_rect.top)/scale;
 
       //Iterate over all_node_positions
       for (var i = 0; i < all_node_positions.length; i++) {
@@ -189,6 +191,7 @@
           //Jump To Timeline
           jumpToTimeline(local_node.timeline_id, { timeline_index: local_node.timeline_index });
         }
+        console.log(`click_x: `, click_x, `click_y: `, click_y);
       }
     };
   }
@@ -197,12 +200,72 @@
   function initialiseUndoRedoUI () {
     //Declare local instance variables
     var common_selectors = config.defines.common.selectors;
+    var undo_redo_container_el = document.querySelector(common_selectors.undo_redo_canvas_container);
+    var undo_redo_tab_el = document.querySelector(common_selectors.undo_redo_tab);
     var undo_redo_ui_el = document.querySelector(common_selectors.undo_redo_container);
+
+    var is_panning = false;
+    var scale = 1;
+    var start_x = 0;
+    var start_y = 0;
+    var translate_x = 0;
+    var translate_y = 0;
+
+    //Add drag/pan options
+    undo_redo_tab_el.addEventListener("mousedown", (e) => {
+      if (e.button == 1) { //Middle Mouse Button
+        is_panning = true;
+        start_x = e.clientX - translate_x;
+        start_y = e.clientY - translate_y;
+        e.preventDefault(); //Prevent scrolling
+        console.log("test")
+      }
+    });
+
+    //Mouse move (only when panning)
+    undo_redo_tab_el.addEventListener("mousemove", (e) => {
+      if (is_panning) {
+        translate_x = e.clientX - start_x;
+        translate_y = e.clientY - start_y;
+        internalHelperUndoRedoUITransform();
+      }
+    });
+
+    //Mouse up (stop panning)
+    undo_redo_tab_el.addEventListener("mouseup", () => {
+      is_panning = false;
+    });
+
+    //Zoom handling (scroll to zoom)
+    undo_redo_tab_el.addEventListener("wheel", (e) => {
+      e.preventDefault(); //Prevent page zoom
+      var zoom_factor = 1.1;
+
+      var new_scale = (e.deltaY < 0) ? scale*zoom_factor: scale/zoom_factor;
+
+      //Limit new_scale to a resonable range
+      new_scale = Math.max(0.5, Math.min(new_scale, 5));
+
+      var undo_redo_ui_rect = undo_redo_ui_el.getBoundingClientRect();
+      var offset_x = (e.clientX - undo_redo_ui_rect.left)/undo_redo_ui_rect.width;
+      var offset_y = (e.clientX - undo_redo_ui_rect.top)/undo_redo_ui_rect.height;
+
+      //Adjust translation based on zoom centre
+      translate_x -= (offset_x - 0.5)*undo_redo_ui_el.width*(new_scale - scale);
+      translate_y -= (offset_y - 0.5)*undo_redo_ui_el.height*(new_scale - scale);
+
+      scale = new_scale;
+      internalHelperUndoRedoUITransform();
+    });
 
     //Create global.undo_redo_loop
     global.undo_redo_loop = setInterval(function(){
       //Generate timeline table element
       generateTimelineCanvasElement(undo_redo_ui_el);
     }, 100);
+
+    function internalHelperUndoRedoUITransform () {
+      undo_redo_ui_el.style.transform = `translate(${translate_x}px, ${translate_y}px) scale(${scale})`;
+    }
   }
 }

@@ -24,7 +24,9 @@ config.defines.common = {
       hierarchy_container: `#hierarchy-container`, //The query selector for the actual hierarchy container.
         group_actions_context_menu_anchor: `#context-menu-container`,
     //Undo/Redo
+      undo_redo_canvas_container: `#undo-redo-tab .undo-redo-canvas-container`,
       undo_redo_container: `#undo-redo-ui-container`, //The query selector for the actual Undo/Redo container.
+      undo_redo_tab: `#undo-redo-container`,
     date_container: `#date-container`, //The query selector for the global date container to be populated automatically.
     date_fields: `#date-container input`, //The query selector on which to apply 'keyup' update interactivity.
       day_el: `#date-container #day-input`,
