@@ -191,7 +191,6 @@
           //Jump To Timeline
           jumpToTimeline(local_node.timeline_id, { timeline_index: local_node.timeline_index });
         }
-        console.log(`click_x: `, click_x, `click_y: `, click_y);
       }
     };
   }

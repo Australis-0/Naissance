@@ -304,11 +304,11 @@
   }
 
   /*
-    getLastAction() - Fetches the last action loaded in the current timeline.
+    getCurrentAction() - Fetches the last action loaded in the current timeline.
 
     Returns: (Object)
   */
-  function getLastAction () {
+  function getCurrentAction () {
     //Declare local instance variables
     var current_timeline = global.timelines[global.actions.current_timeline];
 
@@ -317,6 +317,24 @@
     //Return statement
     if (current_action)
       return current_action;
+  }
+
+  function getPreviousAction () {
+    //Declare local instance variables
+    var current_action = global.timelines[global.actions.current_timeline][global.actions.current_index];
+
+    try {
+      if (current_action.parent_timeline_id && global.actions.current_index == 0) {
+        //Return statement
+        return global.timelines[current_action.parent_timeline_id][current_action.parent_timeline_index];
+      } else {
+        //Return statement
+        return global.timelines[global.actions.current_timeline][global.actions.current_index - 1];
+      }
+    } catch {}
+
+    //Return statement
+    return current_action;
   }
 
   /*
@@ -521,14 +539,12 @@
         }
       } else {
         //Splice element into current_timeline
-        current_timeline.splice(global.actions.current_index + 1, 0, new_action);
+        current_timeline.push(new_action);
 
         //Set current_index
         global.actions.current_index++;
         global.actions.current_index = Math.min(global.actions.current_index, current_timeline.length - 1);
       }
-
-    //console.log(`Current index:`, global.actions.current_index);
   }
 
   /*
@@ -544,6 +560,8 @@
     //Ensure there's an action to redo
     if (global.actions.current_index < current_timeline.length - 1) {
       global.actions.current_index++;
+      if (global.actions.current_index >= current_timeline.length - 1)
+        global.actions.current_index = current_timeline.length - 1;
 
       //Execute redo function
       if (global[local_element.redo_function]) {
@@ -570,7 +588,10 @@
 
     Returns: (Boolean) - Whether the action was successfully undone.
   */
-  function undoAction () {
+  function undoAction (arg0_options) {
+    //Convert from parameters
+    var options = (arg0_options) ? arg0_options : {};
+
     //Declare local instance variables
     var current_timeline = global.timelines[global.actions.current_timeline];
 
@@ -581,8 +602,9 @@
         current_timeline[current_timeline.length - 1].delta_toggle = "redo";
 
       //Update global index
-      global.actions.current_index--;
+      global.actions.current_index--; //This doesn't work all the time but is still needed to be able to undo the latest action
       var local_element = current_timeline[global.actions.current_index];
+      //global.actions.current_index--; //This is incorrect, but suddenly correct when masks are involved? Yet all masks are placed in the same data structure as all other delta actions
 
       //Execute undo function
       if (global[local_element.undo_function]) {

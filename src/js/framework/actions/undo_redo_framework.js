@@ -7,7 +7,7 @@
 
     //Declare local instance variables
     var action_grouped = false;
-    var last_action = getLastAction();
+    var last_action = getCurrentAction();
 
     //Check to make sure last_action exists
     if (last_action)
@@ -27,15 +27,30 @@
         var last_undo_parameters = last_action.undo_function_parameters;
 
         //Action ID handler
-        if (["add_to_brush", "remove_from_brush"].includes(current_action.id)) {
+        if (["add_to_brush"].includes(current_action.id)) {
           try {
-            if (current_redo_parameters[0])
-              last_redo_parameters[0] = current_redo_parameters[0];
-            if (current_undo_parameters[0])
-              last_undo_parameters[0] = current_undo_parameters[0];
+            //1. Set brush coords
+            last_action.redo_function_parameters[0] = current_redo_parameters[0];
+            last_action.undo_function_parameters[0] = current_undo_parameters[0];
+
+            //2. Mask handling (remember to only update .redo_function_parameters here
+            if (current_redo_parameters.length > 1)
+              for (var i = 1; i < current_redo_parameters.length; i++)
+                last_action.redo_function_parameters[i] = current_redo_parameters[i];
 
             action_grouped = true;
-          } catch (e) {}
+          } catch (e) {
+            console.log(e);
+          }
+        } else if (["remove_from_brush"].includes(current_action.id)) {
+          try {
+            last_action.redo_function_parameters = current_redo_parameters;
+            last_action.undo_function_parameters = current_undo_parameters;
+
+            action_grouped = true;
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
 

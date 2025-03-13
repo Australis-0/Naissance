@@ -29,13 +29,36 @@
       if (!do_not_add_to_undo_redo) {
         var new_brush_obj = (brush_obj.current_path) ?
           JSON.parse(JSON.stringify(brush_obj.current_path)) : undefined;
+        var previous_action = getPreviousAction();
+        var redo_function_parameters = [];
+        var undo_function_parameters = [];
+
+        undo_function_parameters.push({
+          type: "brush",
+          polygon: old_brush_obj
+        });
+        //Iterate over all main.cache.old_mask_changes
+        if (main.cache.old_mask_changes)
+          for (var i = 0; i < main.cache.old_mask_changes.length; i++)
+            redo_function_parameters.push(JSON.parse(JSON.stringify(main.cache.old_mask_changes[i])));
+        main.cache.old_mask_changes = [];
+
+        redo_function_parameters.push({
+          type: "brush",
+          polygon: new_brush_obj
+        });
+        //Iterate over all main.cache.new_mask_changes
+        if (main.cache.new_mask_changes)
+          for (var i = 0; i < main.cache.new_mask_changes.length; i++)
+            undo_function_parameters.push(JSON.parse(JSON.stringify(main.cache.new_mask_changes[i])));
+        main.cache.new_mask_changes = [];
 
         performAction({
           action_id: "add_to_brush",
-          redo_function: "setBrushToPolygon",
-          redo_function_parameters: [new_brush_obj, true],
-          undo_function: "setBrushToPolygon",
-          undo_function_parameters: [old_brush_obj, true]
+          redo_function: "setEntitiesCoords",
+          redo_function_parameters: [undo_function_parameters],
+          undo_function: "setEntitiesCoords",
+          undo_function_parameters: [redo_function_parameters]
         });
       }
     } catch (e) {
@@ -96,9 +119,9 @@
         performAction({
           action_id: "remove_from_brush",
           redo_function: "setBrushToPolygon",
-          redo_function_parameters: [new_brush_obj, true],
+          redo_function_parameters: [new_brush_obj],
           undo_function: "setBrushToPolygon",
-          undo_function_parameters: [old_brush_obj, true]
+          undo_function_parameters: [old_brush_obj]
         });
       }
     } catch (e) {
@@ -177,5 +200,32 @@
     brush_obj.brush_change = true;
     brush_obj.current_path = polygon;
     refreshBrush();
+  }
+
+  /*
+    setEntitiesCoords() - Set entities coords.
+    arguments: (Array<Object>)
+      [i]:
+        type: (String) - Either 'brush'/'entity'
+
+        date: (Object, Date)
+        entity_id: (String)
+        polygon: (Array<Array<Number, Number>>)
+  */
+  function setEntitiesCoords (arg0_arguments) {
+    //Convert from parameters
+    var args = arg0_arguments;
+
+    console.log(`setEntitiesCoords() fired!`);
+
+    //Iterate over all arguments
+    for (var i = 0; i < args.length; i++)
+      if (args[i].type == "brush") {
+        setBrushToPolygon(args[i].polygon);
+      } else {
+        console.log(args[i]);
+        if (args[i].type == "entity")
+          setEntityCoords(args[i].entity_id, args[i].polygon, (args[i].date) ? args[i].date : main.date);
+      }
   }
 }

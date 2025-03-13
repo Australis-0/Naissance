@@ -682,6 +682,8 @@
     if (coords) {
       var entity_obj = getEntity(entity_id);
 
+      if (isEntityHidden(entity_id, date) && coords != undefined)
+        showEntity(entity_id);
       createHistoryFrame(entity_id, date, {}, coords);
     } else {
       hideEntity(entity_id, date);

@@ -110,7 +110,28 @@
 
               var local_difference = difference(local_coords, geometry);
 
+              //Log before delta actions before setting entity coords
+              if (!main.cache.old_mask_changes)
+                main.cache.old_mask_changes = [];
+              main.cache.old_mask_changes.push({
+                type: "entity",
+
+                date: JSON.parse(JSON.stringify(main.date)),
+                entity_id: mask_geometries[x].options.className,
+                polygon: local_coords
+              });
               setEntityCoords(mask_geometries[x].options.className, local_difference);
+
+              //Log after delta actions after setting entity coords
+              if (!main.cache.new_mask_changes)
+                main.cache.new_mask_changes = [];
+              main.cache.new_mask_changes.push({
+                type: "entity",
+
+                date: JSON.parse(JSON.stringify(main.date)),
+                entity_id: mask_geometries[x].options.className,
+                polygon: local_difference
+              });
             } catch (e) {
               console.log(e);
             }
