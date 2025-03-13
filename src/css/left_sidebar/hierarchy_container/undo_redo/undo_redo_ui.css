@@ -18,7 +18,7 @@
   }
   .undo-redo-canvas-container {
     height: calc(100% - 10vh - 32.5px);
-    overflow: auto;
+    overflow: hidden;
     width: calc(100% - 1.5rem);
   }
   .undo-redo-ui-container {
@@ -28,7 +28,6 @@
 .undo-redo-container .hierarchy {
   color: black;
   height: calc(75.5vh - 32.5px);
-  overflow-y: auto;
   width: calc(100% - 0.5rem);
 
   .interaction-container {

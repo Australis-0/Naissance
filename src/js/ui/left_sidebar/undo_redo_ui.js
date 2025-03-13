@@ -218,8 +218,11 @@
         start_x = e.clientX - translate_x;
         start_y = e.clientY - translate_y;
         e.preventDefault(); //Prevent scrolling
-        console.log("test")
       }
+    });
+
+    undo_redo_tab_el.addEventListener("mouseleave", () => {
+      is_panning = false;
     });
 
     //Mouse move (only when panning)
