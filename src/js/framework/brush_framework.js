@@ -37,21 +37,21 @@
           type: "brush",
           polygon: old_brush_obj
         });
-        //Iterate over all main.cache.old_mask_changes
-        if (main.cache.old_mask_changes)
-          for (var i = 0; i < main.cache.old_mask_changes.length; i++)
-            redo_function_parameters.push(JSON.parse(JSON.stringify(main.cache.old_mask_changes[i])));
-        main.cache.old_mask_changes = [];
-
-        redo_function_parameters.push({
-          type: "brush",
-          polygon: new_brush_obj
-        });
         //Iterate over all main.cache.new_mask_changes
         if (main.cache.new_mask_changes)
           for (var i = 0; i < main.cache.new_mask_changes.length; i++)
             undo_function_parameters.push(JSON.parse(JSON.stringify(main.cache.new_mask_changes[i])));
         main.cache.new_mask_changes = [];
+
+        redo_function_parameters.push({
+          type: "brush",
+          polygon: new_brush_obj
+        });
+        //Iterate over all main.cache.old_mask_changes
+        if (main.cache.old_mask_changes)
+          for (var i = 0; i < main.cache.old_mask_changes.length; i++)
+            redo_function_parameters.push(JSON.parse(JSON.stringify(main.cache.old_mask_changes[i])));
+        main.cache.old_mask_changes = [];
 
         performAction({
           action_id: "add_to_brush",
